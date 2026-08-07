@@ -2,6 +2,30 @@ import { Router } from "express";
 
 const router = Router();
 
+/**
+ * @openapi
+ * /health:
+ *   get:
+ *     summary: Check API health
+ *     tags:
+ *       - System
+ *     responses:
+ *       200:
+ *         description: API is running
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: LMS API is running
+ *                 data:
+ *                   type: object
+ */
 router.get("/health", (_request, response) => {
   response.status(200).json({
     success: true,

@@ -1,5 +1,7 @@
 import cors from "cors";
 import express from "express";
+import swaggerUi from "swagger-ui-express";
+import { swaggerSpec } from "./config/swagger.js";
 import apiRouter from "./routes/index.js";
 
 const app = express();
@@ -13,6 +15,12 @@ app.use(
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+app.use(
+  "/api-docs",
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerSpec)
+);
 
 app.use("/api/v1", apiRouter);
 
