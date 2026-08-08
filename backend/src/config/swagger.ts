@@ -80,6 +80,45 @@ const swaggerDefinition = {
           updatedAt: { type: "string", format: "date-time", example: "2026-08-07T08:00:00.000Z" }
         }
       },
+      ProfileResponse: {
+        type: "object",
+        required: ["success", "message", "data"],
+        properties: {
+          success: { type: "boolean", enum: [true], example: true },
+          message: { type: "string", example: "Profile retrieved successfully" },
+          data: {
+            type: "object",
+            required: [
+              "id",
+              "fullName",
+              "email",
+              "avatarUrl",
+              "role",
+              "status",
+              "createdAt",
+              "updatedAt"
+            ],
+            properties: {
+              id: { type: "string", format: "uuid", example: "550e8400-e29b-41d4-a716-446655440000" },
+              fullName: { type: "string", example: "Trần Minh Duy" },
+              email: { type: "string", format: "email", example: "duy@example.com" },
+              avatarUrl: { type: "string", format: "uri", nullable: true, example: null },
+              role: {
+                type: "string",
+                enum: ["STUDENT", "INSTRUCTOR", "ADMIN"],
+                example: "STUDENT"
+              },
+              status: {
+                type: "string",
+                enum: ["ACTIVE", "BLOCKED"],
+                example: "ACTIVE"
+              },
+              createdAt: { type: "string", format: "date-time", example: "2026-08-07T08:00:00.000Z" },
+              updatedAt: { type: "string", format: "date-time", example: "2026-08-07T08:00:00.000Z" }
+            }
+          }
+        }
+      },
       ErrorResponse: {
         type: "object",
         required: ["success", "message"],
