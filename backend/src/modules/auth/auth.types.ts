@@ -4,13 +4,3 @@ export interface RegisterInput {
   password: string;
   confirmPassword: string;
 }
-
-export interface LoginInput {
-  email: string;
-  password: string;
-}
-
-export interface AuthTokenPayload {
-  userId: string;
-  role: "STUDENT" | "INSTRUCTOR" | "ADMIN";
-}
