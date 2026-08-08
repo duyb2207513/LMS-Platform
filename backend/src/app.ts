@@ -1,9 +1,6 @@
 import cors from "cors";
 import express from "express";
 import swaggerUi from "swagger-ui-express";
-import { errorHandler } from "./common/middlewares/errorHandler.js";
-import { notFound } from "./common/middlewares/notFound.js";
-import { env } from "./config/env.js";
 import { swaggerSpec } from "./config/swagger.js";
 import apiRouter from "./routes/index.js";
 
@@ -11,7 +8,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: env.frontendUrl,
+    origin: process.env.FRONTEND_URL ?? "http://localhost:5173",
     credentials: true
   })
 );
@@ -27,7 +24,11 @@ app.use(
 
 app.use("/api/v1", apiRouter);
 
-app.use(notFound);
-app.use(errorHandler);
+app.use((_request, response) => {
+  response.status(404).json({
+    success: false,
+    message: "API endpoint not found"
+  });
+});
 
 export default app;
