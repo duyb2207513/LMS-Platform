@@ -23,7 +23,7 @@ function getDashboardRoute() {
 </script>
 
 <template>
-  <header class="sticky top-0 z-40 w-full border-b border-slate-200/80 dark:border-slate-800/80 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl transition-colors duration-300">
+  <header class="sticky top-0 z-40 w-full border-b border-slate-200/80 dark:border-slate-800/80 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl transition-colors duration-300">
     <div class="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
       <!-- Logo -->
       <router-link to="/" class="flex items-center gap-2.5 group">
@@ -147,7 +147,7 @@ function getDashboardRoute() {
 
     <!-- Mobile Menu -->
     <Transition name="slide-down">
-      <div v-if="mobileMenuOpen" class="md:hidden border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 pb-4 pt-2">
+      <div v-if="mobileMenuOpen" class="md:hidden border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-950 px-4 pb-4 pt-2">
         <router-link to="/" @click="mobileMenuOpen = false" class="block py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400">Trang chủ</router-link>
         <router-link to="/courses" @click="mobileMenuOpen = false" class="block py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400">Khóa học</router-link>
         <template v-if="!auth.isLoggedIn">
