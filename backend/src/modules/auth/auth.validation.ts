@@ -1,5 +1,5 @@
 import type { RequestValidationResult } from "../../common/middlewares/validateRequest.js";
-import type { LoginInput, RegisterInput } from "./auth.types.js";
+import type { RegisterInput } from "./auth.types.js";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -44,31 +44,4 @@ export function validateRegisterInput(body: unknown): RequestValidationResult<Re
   }
 
   return { data: { fullName, email, password, confirmPassword } };
-}
-
-export function validateLoginInput(body: unknown): RequestValidationResult<LoginInput> {
-  if (!body || typeof body !== "object" || Array.isArray(body)) {
-    return { errors: { body: "Request body must be a JSON object" } };
-  }
-
-  const input = body as Record<string, unknown>;
-  const errors: Record<string, string> = {};
-  const email = typeof input.email === "string" ? input.email.trim().toLowerCase() : "";
-  const password = typeof input.password === "string" ? input.password : "";
-
-  if (!email) {
-    errors.email = "Email is required";
-  } else if (!EMAIL_PATTERN.test(email) || email.length > 255) {
-    errors.email = "Email must be a valid email address";
-  }
-
-  if (!password) {
-    errors.password = "Password is required";
-  }
-
-  if (Object.keys(errors).length > 0) {
-    return { errors };
-  }
-
-  return { data: { email, password } };
 }
