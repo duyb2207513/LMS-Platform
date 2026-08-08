@@ -1,5 +1,8 @@
 import assert from "node:assert/strict";
-import { validateRegisterInput } from "../../dist/modules/auth/auth.validation.js";
+import {
+  validateLoginInput,
+  validateRegisterInput
+} from "../../dist/modules/auth/auth.validation.js";
 
 const validInput = {
   fullName: "Trần Minh Duy",
@@ -34,4 +37,17 @@ const withRole = validateRegisterInput({ ...validInput, role: "ADMIN" });
 
 assert.equal(withRole.errors?.role, "Role cannot be set during registration");
 
-console.log("Registration validation tests passed");
+const normalizedLogin = validateLoginInput({
+  email: "  DUY@EXAMPLE.COM ",
+  password: "Password123"
+});
+
+assert.equal(normalizedLogin.errors, undefined);
+assert.equal(normalizedLogin.data?.email, "duy@example.com");
+
+const missingLoginFields = validateLoginInput({ email: "", password: "" });
+
+assert.equal(missingLoginFields.errors?.email, "Email is required");
+assert.equal(missingLoginFields.errors?.password, "Password is required");
+
+console.log("Authentication validation tests passed");
