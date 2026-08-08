@@ -1,7 +1,42 @@
 import { Router } from "express";
+import authRouter from "../modules/auth/auth.routes.js";
+import categoriesRouter from "../modules/categories/categories.routes.js";
+import coursesRouter from "../modules/courses/courses.routes.js";
+import instructorCoursesRouter from "../modules/courses/instructor-courses.routes.js";
+import usersRouter from "../modules/users/users.routes.js";
 
 const router = Router();
 
+router.use("/auth", authRouter);
+router.use("/categories", categoriesRouter);
+router.use("/courses", coursesRouter);
+router.use("/instructor", instructorCoursesRouter);
+router.use("/users", usersRouter);
+
+/**
+ * @openapi
+ * /health:
+ *   get:
+ *     summary: Check API health
+ *     tags:
+ *       - System
+ *     responses:
+ *       200:
+ *         description: API is running
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: LMS API is running
+ *                 data:
+ *                   type: object
+ */
 router.get("/health", (_request, response) => {
   response.status(200).json({
     success: true,

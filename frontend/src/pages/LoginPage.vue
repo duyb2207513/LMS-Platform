@@ -21,24 +21,24 @@ const roleOptions = [
   {
     key: 'student' as LoginRole,
     label: 'Học viên',
-    icon: '🎓',
+    icon: '👨‍🎓',
     description: 'Truy cập khóa học',
     redirect: '/courses',
   },
   {
     key: 'instructor' as LoginRole,
     label: 'Giảng viên',
-    icon: '📚',
+    icon: '👨‍🏫',
     description: 'Quản lý khóa học',
     redirect: '/instructor/courses',
   },
   {
     key: 'admin' as LoginRole,
-    label: 'Quản trị viên',
-    icon: '⚙️',
+    label: 'Quản trị',
+    icon: '👑',
     description: 'Quản lý hệ thống',
     redirect: '/admin',
-  },
+  }
 ]
 
 async function handleLogin() {
@@ -65,17 +65,7 @@ async function handleLogin() {
 <template>
   <AuthLayout>
     <div class="space-y-6">
-      <!-- Back to Home -->
-      <router-link
-        to="/"
-        class="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
-      >
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-        </svg>
-        Về trang chủ
-      </router-link>
-
+      
       <div class="text-center">
         <h1 class="text-2xl font-bold text-slate-900 dark:text-white">Chào mừng trở lại!</h1>
         <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Đăng nhập để tiếp tục học tập</p>
@@ -91,17 +81,17 @@ async function handleLogin() {
             type="button"
             @click="selectedRole = r.key"
             :class="[
-              'flex flex-col items-center p-3 rounded-xl border-2 transition-all cursor-pointer',
+              'flex flex-col items-center p-3 rounded-xl border-2 transition-all cursor-pointer text-center',
               selectedRole === r.key
-                ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-950/30 shadow-sm shadow-indigo-500/10'
+                ? 'border-purple-500 bg-purple-50 shadow-sm shadow-purple-500/10 dark:bg-slate-800 dark:border-slate-500 dark:shadow-none'
                 : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600',
             ]"
           >
             <span class="text-xl mb-1">{{ r.icon }}</span>
-            <span :class="['text-xs font-semibold', selectedRole === r.key ? 'text-indigo-700 dark:text-indigo-400' : 'text-slate-700 dark:text-slate-300']">
+            <span :class="['text-xs font-semibold', selectedRole === r.key ? 'text-purple-700 dark:text-white' : 'text-slate-700 dark:text-slate-300']">
               {{ r.label }}
             </span>
-            <span :class="['text-[10px] mt-0.5 leading-tight', selectedRole === r.key ? 'text-indigo-500 dark:text-indigo-400/70' : 'text-slate-400 dark:text-slate-500']">
+            <span :class="['text-[10px] mt-0.5 leading-tight', selectedRole === r.key ? 'text-purple-500 dark:text-slate-400' : 'text-slate-400 dark:text-slate-500']">
               {{ r.description }}
             </span>
           </button>

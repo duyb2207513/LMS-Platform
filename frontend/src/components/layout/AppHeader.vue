@@ -64,13 +64,13 @@ function getDashboardRoute() {
         <template v-if="!auth.isLoggedIn">
           <router-link
             to="/login"
-            class="hidden sm:inline-flex px-4 py-2 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-slate-800 transition-all"
+            class="hidden sm:inline-flex px-4 py-2 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-purple-600 dark:hover:text-purple-400 hover:bg-purple-50 dark:hover:bg-slate-800 transition-all"
           >
             Đăng nhập
           </router-link>
           <router-link
             to="/register"
-            class="inline-flex px-5 py-2 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 shadow-lg shadow-indigo-500/25 transition-all hover:shadow-xl"
+            class="inline-flex px-5 py-2 rounded-xl text-sm font-semibold text-white bg-purple-600 hover:bg-purple-700 shadow-lg shadow-purple-500/30 transition-all hover:shadow-xl"
           >
             Đăng ký
           </router-link>

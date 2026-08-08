@@ -1,5 +1,19 @@
 <template>
   <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-white to-purple-50 dark:from-slate-950 dark:via-slate-900 dark:to-indigo-950/20 relative overflow-hidden transition-colors duration-300">
+    
+    <!-- Nút Về trang chủ (Nền màu tím, chữ trắng) -->
+    <div class="absolute top-6 left-6 sm:top-8 sm:left-8 z-50">
+      <router-link
+        to="/"
+        class="inline-flex items-center gap-2 px-5 py-3 rounded-xl text-base font-bold text-white bg-purple-600 hover:bg-purple-700 shadow-lg shadow-purple-500/30 hover:shadow-xl hover:shadow-purple-500/40 transition-all duration-200 hover:-translate-y-0.5"
+      >
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" />
+        </svg>
+        Trở về
+      </router-link>
+    </div>
+
     <!-- Decorative Background -->
     <div class="absolute inset-0 overflow-hidden pointer-events-none">
       <div class="absolute -top-40 -right-40 w-96 h-96 bg-gradient-to-br from-indigo-200/40 to-purple-200/40 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-full blur-3xl" />
