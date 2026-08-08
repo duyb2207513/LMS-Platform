@@ -1,11 +1,9 @@
 import bcrypt from "bcryptjs";
 import { AppError } from "../../common/errors/AppError.js";
 import { prisma } from "../../config/database.js";
-import { createAccessToken, createRefreshToken } from "./auth.tokens.js";
-import type { LoginInput, RegisterInput } from "./auth.types.js";
+import type { RegisterInput } from "./auth.types.js";
 
 const PASSWORD_SALT_ROUNDS = 12;
-const DUMMY_PASSWORD_HASH = bcrypt.hashSync("invalid-password", PASSWORD_SALT_ROUNDS);
 
 function isUniqueConstraintError(error: unknown): boolean {
   return (
@@ -53,41 +51,4 @@ export async function register(input: RegisterInput) {
 
     throw error;
   }
-}
-
-export async function login(input: LoginInput) {
-  const user = await prisma.user.findUnique({
-    where: { email: input.email },
-    select: {
-      id: true,
-      fullName: true,
-      email: true,
-      passwordHash: true,
-      avatarUrl: true,
-      role: true,
-      status: true
-    }
-  });
-
-  const passwordMatches = await bcrypt.compare(
-    input.password,
-    user?.passwordHash ?? DUMMY_PASSWORD_HASH
-  );
-
-  if (!user || !passwordMatches) {
-    throw new AppError(401, "Invalid email or password");
-  }
-
-  if (user.status === "BLOCKED") {
-    throw new AppError(403, "Account is blocked");
-  }
-
-  const tokenPayload = { userId: user.id, role: user.role };
-  const { passwordHash: _passwordHash, ...publicUser } = user;
-
-  return {
-    accessToken: createAccessToken(tokenPayload),
-    refreshToken: createRefreshToken(tokenPayload),
-    user: publicUser
-  };
 }

@@ -39,8 +39,6 @@ services:
       NODE_ENV: development
       PORT: 3000
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/lms_db
-      JWT_ACCESS_SECRET: local-development-access-secret-change-me
-      JWT_REFRESH_SECRET: local-development-refresh-secret-change-me
 
     depends_on:
       postgres:

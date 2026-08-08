@@ -1,8 +1,8 @@
 import { Router } from "express";
 import { validateRequest } from "../../common/middlewares/validateRequest.js";
 import { asyncHandler } from "../../common/utils/asyncHandler.js";
-import { loginController, registerController } from "./auth.controller.js";
-import { validateLoginInput, validateRegisterInput } from "./auth.validation.js";
+import { registerController } from "./auth.controller.js";
+import { validateRegisterInput } from "./auth.validation.js";
 
 const authRouter = Router();
 
@@ -77,74 +77,6 @@ authRouter.post(
   "/register",
   validateRequest(validateRegisterInput),
   asyncHandler(registerController)
-);
-
-/**
- * @openapi
- * /auth/login:
- *   post:
- *     operationId: login
- *     summary: Log in to an account
- *     description: Authenticates an active account and sets a seven-day refresh token in an HttpOnly cookie.
- *     tags: [Auth]
- *     security: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/LoginRequest'
- *           example:
- *             email: duy@example.com
- *             password: Password123
- *     responses:
- *       200:
- *         description: Login successful. The refresh token is returned in a secure HttpOnly cookie.
- *         headers:
- *           Set-Cookie:
- *             description: Seven-day refresh token cookie
- *             schema:
- *               type: string
- *               example: refreshToken=token; Path=/api/v1/auth; HttpOnly; Secure; SameSite=Lax
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/LoginResponse'
- *       400:
- *         description: Email or password is missing or invalid
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
- *       401:
- *         description: Email or password is incorrect
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
- *             example:
- *               success: false
- *               message: Invalid email or password
- *       403:
- *         description: The account is blocked
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
- *             example:
- *               success: false
- *               message: Account is blocked
- *       500:
- *         description: Unexpected server error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
- */
-authRouter.post(
-  "/login",
-  validateRequest(validateLoginInput),
-  asyncHandler(loginController)
 );
 
 export default authRouter;
