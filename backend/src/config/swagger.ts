@@ -119,6 +119,58 @@ const swaggerDefinition = {
           }
         }
       },
+      UpdateProfileRequest: {
+        type: "object",
+        additionalProperties: false,
+        minProperties: 1,
+        properties: {
+          fullName: {
+            type: "string",
+            minLength: 2,
+            maxLength: 100,
+            example: "Trần Minh Duy Updated"
+          },
+          avatarUrl: {
+            type: "string",
+            format: "uri",
+            nullable: true,
+            example: "https://example.com/avatar.jpg"
+          }
+        }
+      },
+      UpdateProfileResponse: {
+        type: "object",
+        required: ["success", "message", "data"],
+        properties: {
+          success: { type: "boolean", enum: [true], example: true },
+          message: { type: "string", example: "Profile updated successfully" },
+          data: {
+            type: "object",
+            required: ["id", "fullName", "email", "avatarUrl", "role", "status"],
+            properties: {
+              id: { type: "string", format: "uuid", example: "550e8400-e29b-41d4-a716-446655440000" },
+              fullName: { type: "string", example: "Trần Minh Duy Updated" },
+              email: { type: "string", format: "email", example: "duy@example.com" },
+              avatarUrl: {
+                type: "string",
+                format: "uri",
+                nullable: true,
+                example: "https://example.com/avatar.jpg"
+              },
+              role: {
+                type: "string",
+                enum: ["STUDENT", "INSTRUCTOR", "ADMIN"],
+                example: "STUDENT"
+              },
+              status: {
+                type: "string",
+                enum: ["ACTIVE", "BLOCKED"],
+                example: "ACTIVE"
+              }
+            }
+          }
+        }
+      },
       ErrorResponse: {
         type: "object",
         required: ["success", "message"],
