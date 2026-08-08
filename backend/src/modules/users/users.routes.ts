@@ -3,10 +3,14 @@ import { authenticate } from "../../common/middlewares/authenticate.js";
 import { validateRequest } from "../../common/middlewares/validateRequest.js";
 import { asyncHandler } from "../../common/utils/asyncHandler.js";
 import {
+  changeMyPasswordController,
   getMyProfileController,
   updateMyProfileController
 } from "./users.controller.js";
-import { validateUpdateProfileInput } from "./users.validation.js";
+import {
+  validateChangePasswordInput,
+  validateUpdateProfileInput
+} from "./users.validation.js";
 
 const usersRouter = Router();
 
@@ -112,6 +116,65 @@ usersRouter.patch(
   authenticate,
   validateRequest(validateUpdateProfileInput),
   asyncHandler(updateMyProfileController)
+);
+
+/**
+ * @openapi
+ * /users/me/password:
+ *   patch:
+ *     operationId: changeMyPassword
+ *     summary: Change the authenticated user's password
+ *     description: Verifies the current password, hashes the new password with bcrypt, and updates only the user identified by the access token.
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/ChangePasswordRequest'
+ *           example:
+ *             currentPassword: Password123
+ *             newPassword: NewPassword456
+ *             confirmNewPassword: NewPassword456
+ *     responses:
+ *       200:
+ *         description: Password changed successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ChangePasswordResponse'
+ *       400:
+ *         description: Password input is invalid or the current password is incorrect
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       401:
+ *         description: Access token is missing, invalid, or expired
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       404:
+ *         description: The user referenced by the token no longer exists
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       500:
+ *         description: Unexpected server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ */
+usersRouter.patch(
+  "/me/password",
+  authenticate,
+  validateRequest(validateChangePasswordInput),
+  asyncHandler(changeMyPasswordController)
 );
 
 export default usersRouter;

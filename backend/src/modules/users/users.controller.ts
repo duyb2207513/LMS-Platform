@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
 import { sendSuccess } from "../../common/utils/response.js";
-import { getProfile, updateProfile } from "./users.service.js";
-import type { UpdateProfileInput } from "./users.types.js";
+import { changePassword, getProfile, updateProfile } from "./users.service.js";
+import type { ChangePasswordInput, UpdateProfileInput } from "./users.types.js";
 
 export async function getMyProfileController(
   request: Request,
@@ -19,4 +19,13 @@ export async function updateMyProfileController(
   const profile = await updateProfile(request.auth.userId, request.body as UpdateProfileInput);
 
   sendSuccess(response, 200, "Profile updated successfully", profile);
+}
+
+export async function changeMyPasswordController(
+  request: Request,
+  response: Response
+): Promise<void> {
+  await changePassword(request.auth.userId, request.body as ChangePasswordInput);
+
+  sendSuccess(response, 200, "Password changed successfully", null);
 }

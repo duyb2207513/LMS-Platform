@@ -1,5 +1,5 @@
 import type { RequestValidationResult } from "../../common/middlewares/validateRequest.js";
-import type { UpdateProfileInput } from "./users.types.js";
+import type { ChangePasswordInput, UpdateProfileInput } from "./users.types.js";
 
 const ALLOWED_FIELDS = new Set(["fullName", "avatarUrl"]);
 
@@ -62,4 +62,54 @@ export function validateUpdateProfileInput(
   }
 
   return { data };
+}
+
+export function validateChangePasswordInput(
+  body: unknown
+): RequestValidationResult<ChangePasswordInput> {
+  if (!body || typeof body !== "object" || Array.isArray(body)) {
+    return { errors: { body: "Request body must be a JSON object" } };
+  }
+
+  const input = body as Record<string, unknown>;
+  const allowedFields = new Set(["currentPassword", "newPassword", "confirmNewPassword"]);
+  const errors: Record<string, string> = {};
+  const currentPassword =
+    typeof input.currentPassword === "string" ? input.currentPassword : "";
+  const newPassword = typeof input.newPassword === "string" ? input.newPassword : "";
+  const confirmNewPassword =
+    typeof input.confirmNewPassword === "string" ? input.confirmNewPassword : "";
+
+  for (const field of Object.keys(input)) {
+    if (!allowedFields.has(field)) {
+      errors[field] = `${field} is not allowed`;
+    }
+  }
+
+  if (!currentPassword) {
+    errors.currentPassword = "Current password is required";
+  }
+
+  if (newPassword.length < 8) {
+    errors.newPassword = "New password must be at least 8 characters";
+  } else if (
+    !/[A-Z]/.test(newPassword) ||
+    !/[a-z]/.test(newPassword) ||
+    !/\d/.test(newPassword)
+  ) {
+    errors.newPassword =
+      "New password must contain an uppercase letter, a lowercase letter, and a number";
+  } else if (newPassword === currentPassword) {
+    errors.newPassword = "New password must be different from current password";
+  }
+
+  if (confirmNewPassword !== newPassword) {
+    errors.confirmNewPassword = "Confirm new password must match new password";
+  }
+
+  if (Object.keys(errors).length > 0) {
+    return { errors };
+  }
+
+  return { data: { currentPassword, newPassword, confirmNewPassword } };
 }

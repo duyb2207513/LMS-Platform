@@ -1,5 +1,8 @@
 import assert from "node:assert/strict";
-import { validateUpdateProfileInput } from "../../dist/modules/users/users.validation.js";
+import {
+  validateChangePasswordInput,
+  validateUpdateProfileInput
+} from "../../dist/modules/users/users.validation.js";
 
 const valid = validateUpdateProfileInput({
   fullName: "  Trần Minh Duy Updated  ",
@@ -26,4 +29,34 @@ assert.ok(forbidden.errors?.role);
 assert.ok(forbidden.errors?.status);
 assert.ok(forbidden.errors?.password);
 
-console.log("Update profile validation tests passed");
+const validPasswordChange = validateChangePasswordInput({
+  currentPassword: "Password123",
+  newPassword: "NewPassword456",
+  confirmNewPassword: "NewPassword456"
+});
+
+assert.equal(validPasswordChange.errors, undefined);
+
+assert.ok(
+  validateChangePasswordInput({
+    currentPassword: "Password123",
+    newPassword: "weak",
+    confirmNewPassword: "different"
+  }).errors?.newPassword
+);
+
+const samePassword = validateChangePasswordInput({
+  currentPassword: "Password123",
+  newPassword: "Password123",
+  confirmNewPassword: "Password123"
+});
+assert.ok(samePassword.errors?.newPassword);
+
+const mismatchedConfirmation = validateChangePasswordInput({
+  currentPassword: "Password123",
+  newPassword: "NewPassword456",
+  confirmNewPassword: "Different789"
+});
+assert.ok(mismatchedConfirmation.errors?.confirmNewPassword);
+
+console.log("Users validation tests passed");
