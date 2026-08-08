@@ -5,11 +5,6 @@ export interface RegisterInput {
   confirmPassword: string;
 }
 
-export interface AuthTokenPayload {
-  userId: string;
-  role: "STUDENT" | "INSTRUCTOR" | "ADMIN";
-}
-
 export interface LoginInput {
   email: string;
   password: string;
@@ -19,5 +14,3 @@ export interface AuthTokenPayload {
   userId: string;
   role: "STUDENT" | "INSTRUCTOR" | "ADMIN";
 }
-// #addition
-// need to merge
