@@ -293,6 +293,63 @@ const swaggerDefinition = {
           data: { nullable: true, example: null }
         }
       },
+      Category: {
+        type: "object",
+        required: ["id", "name", "slug", "description"],
+        properties: {
+          id: { type: "string", format: "uuid", example: "550e8400-e29b-41d4-a716-446655440000" },
+          name: { type: "string", example: "Lập trình Web" },
+          slug: { type: "string", example: "lap-trinh-web" },
+          description: {
+            type: "string",
+            nullable: true,
+            example: "Các khóa học phát triển website"
+          }
+        }
+      },
+      CreateCategoryRequest: {
+        type: "object",
+        additionalProperties: false,
+        required: ["name"],
+        properties: {
+          name: { type: "string", minLength: 1, maxLength: 100, example: "Lập trình Web" },
+          description: {
+            type: "string",
+            nullable: true,
+            example: "Các khóa học phát triển website"
+          }
+        }
+      },
+      UpdateCategoryRequest: {
+        type: "object",
+        additionalProperties: false,
+        minProperties: 1,
+        properties: {
+          name: { type: "string", minLength: 1, maxLength: 100, example: "Phát triển Web" },
+          description: { type: "string", nullable: true, example: "Frontend và Backend" }
+        }
+      },
+      CategoryResponse: {
+        type: "object",
+        required: ["success", "message", "data"],
+        properties: {
+          success: { type: "boolean", enum: [true], example: true },
+          message: { type: "string", example: "Category created successfully" },
+          data: { $ref: "#/components/schemas/Category" }
+        }
+      },
+      CategoryListResponse: {
+        type: "object",
+        required: ["success", "message", "data"],
+        properties: {
+          success: { type: "boolean", enum: [true], example: true },
+          message: { type: "string", example: "Categories retrieved successfully" },
+          data: {
+            type: "array",
+            items: { $ref: "#/components/schemas/Category" }
+          }
+        }
+      },
       ErrorResponse: {
         type: "object",
         required: ["success", "message"],

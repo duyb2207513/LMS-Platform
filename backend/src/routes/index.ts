@@ -1,10 +1,12 @@
 import { Router } from "express";
 import authRouter from "../modules/auth/auth.routes.js";
+import categoriesRouter from "../modules/categories/categories.routes.js";
 import usersRouter from "../modules/users/users.routes.js";
 
 const router = Router();
 
 router.use("/auth", authRouter);
+router.use("/categories", categoriesRouter);
 router.use("/users", usersRouter);
 
 /**
