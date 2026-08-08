@@ -171,6 +171,40 @@ const swaggerDefinition = {
           }
         }
       },
+      ChangePasswordRequest: {
+        type: "object",
+        additionalProperties: false,
+        required: ["currentPassword", "newPassword", "confirmNewPassword"],
+        properties: {
+          currentPassword: {
+            type: "string",
+            format: "password",
+            example: "Password123"
+          },
+          newPassword: {
+            type: "string",
+            format: "password",
+            minLength: 8,
+            pattern: "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$",
+            example: "NewPassword456"
+          },
+          confirmNewPassword: {
+            type: "string",
+            format: "password",
+            minLength: 8,
+            example: "NewPassword456"
+          }
+        }
+      },
+      ChangePasswordResponse: {
+        type: "object",
+        required: ["success", "message", "data"],
+        properties: {
+          success: { type: "boolean", enum: [true], example: true },
+          message: { type: "string", example: "Password changed successfully" },
+          data: { nullable: true, example: null }
+        }
+      },
       ErrorResponse: {
         type: "object",
         required: ["success", "message"],
