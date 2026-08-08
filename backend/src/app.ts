@@ -1,6 +1,7 @@
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import express from "express";
+import path from "node:path";
 import swaggerUi from "swagger-ui-express";
 import { errorHandler } from "./common/middlewares/errorHandler.js";
 import { notFound } from "./common/middlewares/notFound.js";
@@ -20,6 +21,7 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use("/uploads", express.static(path.resolve("uploads")));
 
 app.use(
   "/api-docs",
