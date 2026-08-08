@@ -350,6 +350,129 @@ const swaggerDefinition = {
           }
         }
       },
+      CourseLevel: {
+        type: "string",
+        enum: ["BEGINNER", "INTERMEDIATE", "ADVANCED"]
+      },
+      CourseStatus: {
+        type: "string",
+        enum: ["DRAFT", "PUBLISHED", "ARCHIVED"]
+      },
+      Course: {
+        type: "object",
+        required: ["id", "title", "slug", "description", "level", "price", "isFree", "status"],
+        properties: {
+          id: { type: "string", format: "uuid" },
+          title: { type: "string", example: "ExpressJS cơ bản" },
+          slug: { type: "string", example: "expressjs-co-ban" },
+          description: { type: "string" },
+          thumbnailUrl: { type: "string", format: "uri", nullable: true },
+          level: { $ref: "#/components/schemas/CourseLevel" },
+          price: { type: "number", minimum: 0, example: 299000 },
+          isFree: { type: "boolean", example: false },
+          language: { type: "string", example: "Vietnamese" },
+          requirements: { type: "string", nullable: true },
+          learningOutcomes: { type: "string", nullable: true },
+          status: { $ref: "#/components/schemas/CourseStatus" },
+          publishedAt: { type: "string", format: "date-time", nullable: true },
+          instructor: {
+            type: "object",
+            properties: {
+              id: { type: "string", format: "uuid" },
+              fullName: { type: "string" },
+              avatarUrl: { type: "string", nullable: true }
+            }
+          },
+          category: { $ref: "#/components/schemas/Category" }
+        }
+      },
+      CreateCourseRequest: {
+        type: "object",
+        additionalProperties: false,
+        required: ["title", "description", "categoryId", "level"],
+        properties: {
+          title: { type: "string", maxLength: 255 },
+          description: { type: "string" },
+          categoryId: { type: "string", format: "uuid" },
+          level: { $ref: "#/components/schemas/CourseLevel" },
+          price: { type: "number", minimum: 0, default: 0 },
+          isFree: { type: "boolean", default: false },
+          language: { type: "string", maxLength: 50, default: "Vietnamese" },
+          requirements: { type: "string", nullable: true },
+          learningOutcomes: { type: "string", nullable: true }
+        }
+      },
+      UpdateCourseRequest: {
+        type: "object",
+        additionalProperties: false,
+        minProperties: 1,
+        description: "All fields are optional. instructorId, status, slug, and thumbnailUrl are not accepted.",
+        properties: {
+          title: { type: "string", maxLength: 255 },
+          description: { type: "string" },
+          categoryId: { type: "string", format: "uuid" },
+          level: { $ref: "#/components/schemas/CourseLevel" },
+          price: { type: "number", minimum: 0 },
+          isFree: { type: "boolean" },
+          language: { type: "string", maxLength: 50 },
+          requirements: { type: "string", nullable: true },
+          learningOutcomes: { type: "string", nullable: true }
+        }
+      },
+      CourseResponse: {
+        type: "object",
+        required: ["success", "message", "data"],
+        properties: {
+          success: { type: "boolean", enum: [true], example: true },
+          message: { type: "string" },
+          data: { $ref: "#/components/schemas/Course" }
+        }
+      },
+      CourseListResponse: {
+        type: "object",
+        required: ["success", "message", "data", "meta"],
+        properties: {
+          success: { type: "boolean", enum: [true], example: true },
+          message: { type: "string", example: "Courses retrieved successfully" },
+          data: { type: "array", items: { $ref: "#/components/schemas/Course" } },
+          meta: {
+            type: "object",
+            required: ["page", "limit", "totalItems", "totalPages"],
+            properties: {
+              page: { type: "integer", example: 1 },
+              limit: { type: "integer", example: 12 },
+              totalItems: { type: "integer", example: 25 },
+              totalPages: { type: "integer", example: 3 }
+            }
+          }
+        }
+      },
+      ThumbnailResponse: {
+        type: "object",
+        properties: {
+          success: { type: "boolean", enum: [true] },
+          message: { type: "string", example: "Thumbnail uploaded successfully" },
+          data: {
+            type: "object",
+            properties: { thumbnailUrl: { type: "string", format: "uri" } }
+          }
+        }
+      },
+      CourseStatusResponse: {
+        type: "object",
+        properties: {
+          success: { type: "boolean", enum: [true] },
+          message: { type: "string" },
+          data: {
+            type: "object",
+            properties: {
+              id: { type: "string", format: "uuid" },
+              status: { $ref: "#/components/schemas/CourseStatus" },
+              publishedAt: { type: "string", format: "date-time", nullable: true }
+            }
+          }
+        }
+      },
       ErrorResponse: {
         type: "object",
         required: ["success", "message"],
