@@ -22,6 +22,12 @@ const swaggerDefinition = {
         type: "http",
         scheme: "bearer",
         bearerFormat: "JWT"
+      },
+      refreshTokenCookie: {
+        type: "apiKey",
+        in: "cookie",
+        name: "refreshToken",
+        description: "Secure HttpOnly refresh token cookie set by the login endpoint"
       }
     },
     schemas: {
@@ -132,6 +138,34 @@ const swaggerDefinition = {
               user: { $ref: "#/components/schemas/LoginUserResponse" }
             }
           }
+        }
+      },
+      RefreshTokenResponse: {
+        type: "object",
+        required: ["success", "message", "data"],
+        properties: {
+          success: { type: "boolean", enum: [true], example: true },
+          message: { type: "string", example: "Token refreshed successfully" },
+          data: {
+            type: "object",
+            required: ["accessToken"],
+            properties: {
+              accessToken: {
+                type: "string",
+                description: "New JWT access token valid for 15 minutes",
+                example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+              }
+            }
+          }
+        }
+      },
+      LogoutResponse: {
+        type: "object",
+        required: ["success", "message", "data"],
+        properties: {
+          success: { type: "boolean", enum: [true], example: true },
+          message: { type: "string", example: "Logout successful" },
+          data: { nullable: true, example: null }
         }
       },
       ErrorResponse: {

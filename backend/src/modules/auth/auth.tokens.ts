@@ -22,3 +22,21 @@ export function createRefreshToken(payload: AuthTokenPayload): string {
 
   return jwt.sign({ ...payload, tokenType: "refresh" }, env.jwtRefreshSecret, options);
 }
+
+export function verifyRefreshToken(token: string): AuthTokenPayload {
+  const payload = jwt.verify(token, env.jwtRefreshSecret);
+
+  if (
+    typeof payload === "string" ||
+    typeof payload.userId !== "string" ||
+    !["STUDENT", "INSTRUCTOR", "ADMIN"].includes(payload.role) ||
+    payload.tokenType !== "refresh"
+  ) {
+    throw new Error("Invalid refresh token payload");
+  }
+
+  return {
+    userId: payload.userId,
+    role: payload.role as AuthTokenPayload["role"]
+  };
+}

@@ -1,7 +1,11 @@
 import bcrypt from "bcryptjs";
 import { AppError } from "../../common/errors/AppError.js";
 import { prisma } from "../../config/database.js";
-import { createAccessToken, createRefreshToken } from "./auth.tokens.js";
+import {
+  createAccessToken,
+  createRefreshToken,
+  verifyRefreshToken
+} from "./auth.tokens.js";
 import type { LoginInput, RegisterInput } from "./auth.types.js";
 
 const PASSWORD_SALT_ROUNDS = 12;
@@ -90,4 +94,25 @@ export async function login(input: LoginInput) {
     refreshToken: createRefreshToken(tokenPayload),
     user: publicUser
   };
+}
+
+export async function refreshAccessToken(refreshToken: string) {
+  let tokenPayload;
+
+  try {
+    tokenPayload = verifyRefreshToken(refreshToken);
+  } catch {
+    throw new AppError(401, "Invalid or expired refresh token");
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { id: tokenPayload.userId },
+    select: { id: true, role: true, status: true }
+  });
+
+  if (!user || user.status !== "ACTIVE") {
+    throw new AppError(401, "Invalid or expired refresh token");
+  }
+
+  return createAccessToken({ userId: user.id, role: user.role });
 }

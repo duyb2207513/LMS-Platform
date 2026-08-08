@@ -1,7 +1,12 @@
 import { Router } from "express";
 import { validateRequest } from "../../common/middlewares/validateRequest.js";
 import { asyncHandler } from "../../common/utils/asyncHandler.js";
-import { loginController, registerController } from "./auth.controller.js";
+import {
+  loginController,
+  logoutController,
+  refreshTokenController,
+  registerController
+} from "./auth.controller.js";
 import { validateLoginInput, validateRegisterInput } from "./auth.validation.js";
 
 const authRouter = Router();
@@ -146,5 +151,79 @@ authRouter.post(
   validateRequest(validateLoginInput),
   asyncHandler(loginController)
 );
+
+/**
+ * @openapi
+ * /auth/refresh-token:
+ *   post:
+ *     operationId: refreshAccessToken
+ *     summary: Refresh the access token
+ *     description: Issues a new 15-minute access token using the seven-day refresh token stored in an HttpOnly cookie. No request body is required.
+ *     tags: [Auth]
+ *     security:
+ *       - refreshTokenCookie: []
+ *     responses:
+ *       200:
+ *         description: Access token refreshed successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/RefreshTokenResponse'
+ *       401:
+ *         description: The refresh token cookie is missing, invalid, expired, or belongs to an unavailable account
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *             examples:
+ *               missingCookie:
+ *                 summary: Cookie is missing
+ *                 value:
+ *                   success: false
+ *                   message: Refresh token is required
+ *               invalidToken:
+ *                 summary: Token is invalid or expired
+ *                 value:
+ *                   success: false
+ *                   message: Invalid or expired refresh token
+ *       500:
+ *         description: Unexpected server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ */
+authRouter.post("/refresh-token", asyncHandler(refreshTokenController));
+
+/**
+ * @openapi
+ * /auth/logout:
+ *   post:
+ *     operationId: logout
+ *     summary: Log out of the current account
+ *     description: Clears the secure HttpOnly refresh-token cookie. The endpoint is idempotent and does not require a request body.
+ *     tags: [Auth]
+ *     security: []
+ *     responses:
+ *       200:
+ *         description: Logout successful and the refresh-token cookie has been cleared
+ *         headers:
+ *           Set-Cookie:
+ *             description: Expired refresh-token cookie
+ *             schema:
+ *               type: string
+ *               example: refreshToken=; Path=/api/v1/auth; Expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly; Secure; SameSite=Lax
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/LogoutResponse'
+ *       500:
+ *         description: Unexpected server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ */
+authRouter.post("/logout", asyncHandler(logoutController));
 
 export default authRouter;

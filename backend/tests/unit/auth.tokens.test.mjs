@@ -9,7 +9,8 @@ const {
   ACCESS_TOKEN_EXPIRES_IN_SECONDS,
   REFRESH_TOKEN_EXPIRES_IN_SECONDS,
   createAccessToken,
-  createRefreshToken
+  createRefreshToken,
+  verifyRefreshToken
 } = await import("../../dist/modules/auth/auth.tokens.js");
 
 const payload = {
@@ -34,5 +35,16 @@ assert.equal(refreshPayload.userId, payload.userId);
 assert.equal(refreshPayload.role, payload.role);
 assert.equal(refreshPayload.tokenType, "refresh");
 assert.equal(refreshPayload.exp - refreshPayload.iat, REFRESH_TOKEN_EXPIRES_IN_SECONDS);
+
+assert.deepEqual(verifyRefreshToken(createRefreshToken(payload)), payload);
+assert.throws(() => verifyRefreshToken("not-a-valid-token"));
+
+const expiredRefreshToken = jwt.sign(
+  { ...payload, tokenType: "refresh" },
+  process.env.JWT_REFRESH_SECRET,
+  { expiresIn: -1 }
+);
+
+assert.throws(() => verifyRefreshToken(expiredRefreshToken));
 
 console.log("Authentication token tests passed");
