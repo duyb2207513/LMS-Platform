@@ -3,6 +3,7 @@ export interface RegisterInput {
   email: string;
   password: string;
   confirmPassword: string;
+  role?: "STUDENT" | "INSTRUCTOR";
 }
 
 export interface LoginInput {

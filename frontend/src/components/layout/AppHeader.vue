@@ -38,41 +38,41 @@ function getDashboardRoute() {
       </router-link>
 
       <!-- Desktop Nav -->
-      <nav class="hidden md:flex items-center gap-1">
+      <nav class="hidden md:flex items-center gap-2">
         <router-link
           to="/"
-          class="px-4 py-2 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-slate-800 transition-all"
-          active-class="!text-indigo-600 !bg-indigo-50 dark:!text-indigo-400 dark:!bg-slate-800"
+          class="px-4 py-2 rounded-xl text-sm font-medium text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-purple-600 hover:text-white transition-all duration-200"
+          active-class="!bg-purple-600 !text-white"
         >
           Trang chủ
         </router-link>
         <router-link
           to="/courses"
-          class="px-4 py-2 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-slate-800 transition-all"
-          active-class="!text-indigo-600 !bg-indigo-50 dark:!text-indigo-400 dark:!bg-slate-800"
+          class="px-4 py-2 rounded-xl text-sm font-medium text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-purple-600 hover:text-white transition-all duration-200"
+          active-class="!bg-purple-600 !text-white"
         >
           Khóa học
         </router-link>
       </nav>
 
       <!-- Right Section -->
-      <div class="flex items-center gap-3">
+      <div class="flex items-center gap-2.5">
         <!-- Theme Toggle -->
         <ThemeToggle />
 
         <!-- Auth Buttons (Guest) -->
         <template v-if="!auth.isLoggedIn">
           <router-link
-            to="/login"
-            class="hidden sm:inline-flex px-4 py-2 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-purple-600 dark:hover:text-purple-400 hover:bg-purple-50 dark:hover:bg-slate-800 transition-all"
-          >
-            Đăng nhập
-          </router-link>
-          <router-link
             to="/register"
-            class="inline-flex px-5 py-2 rounded-xl text-sm font-semibold text-white bg-purple-600 hover:bg-purple-700 shadow-lg shadow-purple-500/30 transition-all hover:shadow-xl"
+            class="inline-flex px-5 py-2 rounded-xl text-sm font-semibold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-purple-600 hover:text-white active:bg-purple-700 transition-all duration-200"
           >
             Đăng ký
+          </router-link>
+          <router-link
+            to="/login"
+            class="hidden sm:inline-flex px-4 py-2 rounded-xl text-sm font-medium text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-purple-600 hover:text-white active:bg-purple-700 transition-all duration-200"
+          >
+            Đăng nhập
           </router-link>
         </template>
 
@@ -80,7 +80,7 @@ function getDashboardRoute() {
         <template v-else>
           <router-link
             :to="getDashboardRoute()"
-            class="hidden sm:inline-flex px-4 py-2 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-slate-800 transition-all"
+            class="hidden sm:inline-flex px-4 py-2 rounded-xl text-sm font-medium text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-purple-600 hover:text-white active:bg-purple-700 transition-all duration-200"
           >
             Dashboard
           </router-link>
@@ -89,7 +89,7 @@ function getDashboardRoute() {
           <div class="relative">
             <button
               @click="profileMenuOpen = !profileMenuOpen"
-              class="flex items-center gap-2 p-1 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+              class="flex items-center gap-2 p-1 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-purple-600 hover:text-white transition-colors cursor-pointer"
             >
               <div class="h-8 w-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-sm font-bold shadow-md">
                 {{ auth.userInitials }}
@@ -108,14 +108,14 @@ function getDashboardRoute() {
                 <div class="px-4 py-3 border-b border-slate-100 dark:border-slate-800">
                   <p class="text-sm font-semibold text-slate-900 dark:text-white">{{ auth.user?.fullName }}</p>
                   <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{{ auth.user?.email }}</p>
-                  <span class="inline-block mt-1.5 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-indigo-100 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-400">
+                  <span class="inline-block mt-1.5 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-purple-100 dark:bg-purple-950/50 text-purple-700 dark:text-purple-400">
                     {{ auth.user?.role }}
                   </span>
                 </div>
                 <router-link
                   :to="getDashboardRoute()"
                   @click="profileMenuOpen = false"
-                  class="block px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-indigo-50 dark:hover:bg-slate-800 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+                  class="block px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-purple-600 hover:text-white transition-colors"
                 >
                   Dashboard
                 </router-link>
@@ -133,7 +133,7 @@ function getDashboardRoute() {
         <!-- Mobile Menu Toggle -->
         <button
           @click="mobileMenuOpen = !mobileMenuOpen"
-          class="md:hidden p-2 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+          class="md:hidden p-2 rounded-xl text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 hover:bg-purple-600 hover:text-white transition-colors cursor-pointer"
         >
           <svg v-if="!mobileMenuOpen" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
@@ -147,12 +147,12 @@ function getDashboardRoute() {
 
     <!-- Mobile Menu -->
     <Transition name="slide-down">
-      <div v-if="mobileMenuOpen" class="md:hidden border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-950 px-4 pb-4 pt-2">
-        <router-link to="/" @click="mobileMenuOpen = false" class="block py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400">Trang chủ</router-link>
-        <router-link to="/courses" @click="mobileMenuOpen = false" class="block py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400">Khóa học</router-link>
+      <div v-if="mobileMenuOpen" class="md:hidden border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-950 px-4 pb-4 pt-2 space-y-1">
+        <router-link to="/" @click="mobileMenuOpen = false" class="block py-2.5 px-3 rounded-xl text-sm font-medium text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-purple-600 hover:text-white transition-all">Trang chủ</router-link>
+        <router-link to="/courses" @click="mobileMenuOpen = false" class="block py-2.5 px-3 rounded-xl text-sm font-medium text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-purple-600 hover:text-white transition-all">Khóa học</router-link>
         <template v-if="!auth.isLoggedIn">
-          <router-link to="/login" @click="mobileMenuOpen = false" class="block py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400">Đăng nhập</router-link>
-          <router-link to="/register" @click="mobileMenuOpen = false" class="block py-2.5 text-sm font-semibold text-indigo-600 dark:text-indigo-400">Đăng ký</router-link>
+          <router-link to="/register" @click="mobileMenuOpen = false" class="block py-2.5 px-3 rounded-xl text-sm font-semibold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-purple-600 hover:text-white transition-all">Đăng ký</router-link>
+          <router-link to="/login" @click="mobileMenuOpen = false" class="block py-2.5 px-3 rounded-xl text-sm font-medium text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-purple-600 hover:text-white transition-all">Đăng nhập</router-link>
         </template>
       </div>
     </Transition>
@@ -160,22 +160,8 @@ function getDashboardRoute() {
 </template>
 
 <style scoped>
-.dropdown-enter-active,
-.dropdown-leave-active {
-  transition: all 0.15s ease;
-}
-.dropdown-enter-from,
-.dropdown-leave-to {
-  opacity: 0;
-  transform: translateY(-4px) scale(0.97);
-}
-.slide-down-enter-active,
-.slide-down-leave-active {
-  transition: all 0.2s ease;
-}
-.slide-down-enter-from,
-.slide-down-leave-to {
-  opacity: 0;
-  transform: translateY(-8px);
-}
+.dropdown-enter-active, .dropdown-leave-active { transition: all 0.15s ease; }
+.dropdown-enter-from, .dropdown-leave-to { opacity: 0; transform: translateY(-4px) scale(0.97); }
+.slide-down-enter-active, .slide-down-leave-active { transition: all 0.2s ease; }
+.slide-down-enter-from, .slide-down-leave-to { opacity: 0; transform: translateY(-8px); }
 </style>

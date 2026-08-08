@@ -37,7 +37,8 @@ export async function register(input: RegisterInput) {
       data: {
         fullName: input.fullName,
         email: input.email,
-        passwordHash
+        passwordHash,
+        role: input.role
       },
       select: {
         id: true,

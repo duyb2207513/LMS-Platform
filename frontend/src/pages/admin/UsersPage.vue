@@ -12,7 +12,7 @@ const loading = ref(true)
 function getRoleBadge(role: string) {
   switch (role) {
     case 'ADMIN': return { text: 'Admin', class: 'bg-rose-100 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400' }
-    case 'INSTRUCTOR': return { text: 'Giảng viên', class: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-400' }
+    case 'INSTRUCTOR': return { text: 'Giảng viên', class: 'bg-purple-100 text-purple-700 dark:bg-purple-950/40 dark:text-purple-400' }
     default: return { text: 'Học viên', class: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400' }
   }
 }
