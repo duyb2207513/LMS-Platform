@@ -76,7 +76,7 @@ onMounted(async () => {
     </section>
 
     <!-- Categories Section -->
-    <section class="py-16 sm:py-20 bg-white dark:bg-slate-900 border-y border-slate-100 dark:border-slate-800 transition-colors duration-300">
+    <section class="py-16 sm:py-20 bg-white dark:bg-slate-950 border-y border-slate-100 dark:border-slate-800/60 transition-colors duration-300">
       <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-12">
           <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white">
@@ -94,7 +94,7 @@ onMounted(async () => {
             v-for="category in (categoryStore.categories || []).slice(0, 8)"
             :key="category.id"
             :to="`/courses?categoryId=${category.id}`"
-            class="group relative overflow-hidden rounded-2xl p-6 bg-slate-50 dark:bg-slate-800/50 border border-slate-200/50 dark:border-slate-800 hover:border-purple-500 hover:bg-purple-50 dark:hover:bg-purple-950/20 transition-all duration-300"
+            class="group relative overflow-hidden rounded-2xl p-6 bg-slate-50 dark:bg-slate-900 border border-slate-200/50 dark:border-slate-800 hover:border-purple-500 hover:bg-purple-50 dark:hover:bg-purple-950/20 transition-all duration-300"
           >
             <div class="relative">
               <h3 class="font-bold text-slate-900 dark:text-slate-100 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
