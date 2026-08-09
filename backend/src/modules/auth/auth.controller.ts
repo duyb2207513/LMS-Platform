@@ -16,7 +16,7 @@ export async function loginController(request: Request, response: Response): Pro
 
   response.cookie("refreshToken", refreshToken, {
     httpOnly: true,
-    secure: true,
+    secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     maxAge: REFRESH_TOKEN_EXPIRES_IN_SECONDS * 1000,
     path: "/api/v1/auth"
@@ -42,7 +42,7 @@ export async function refreshTokenController(
 export async function logoutController(_request: Request, response: Response): Promise<void> {
   response.clearCookie("refreshToken", {
     httpOnly: true,
-    secure: true,
+    secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/api/v1/auth"
   });
