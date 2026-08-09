@@ -8,7 +8,6 @@ import { useAuthStore } from '@/stores/auth'
 
 const auth = useAuthStore()
 const router = useRouter()
-
 const email = ref('')
 const password = ref('')
 const loading = ref(false)
@@ -21,14 +20,14 @@ const roleOptions = [
   {
     key: 'student' as LoginRole,
     label: 'Học viên',
-    icon: '👨‍🎓',
+    icon: '🎓',
     description: 'Truy cập khóa học',
     redirect: '/courses',
   },
   {
     key: 'instructor' as LoginRole,
     label: 'Giảng viên',
-    icon: '👨‍🏫',
+    icon: '👩‍🏫',
     description: 'Quản lý khóa học',
     redirect: '/instructor/courses',
   },
@@ -38,15 +37,31 @@ const roleOptions = [
     icon: '👑',
     description: 'Quản lý hệ thống',
     redirect: '/admin',
-  }
+  },
 ]
 
 async function handleLogin() {
   error.value = ''
+
+  const trimmedEmail = email.value.trim()
+  if (!trimmedEmail) {
+    error.value = 'Email là bắt buộc'
+    return
+  }
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  if (!emailPattern.test(trimmedEmail)) {
+    error.value = 'Email không hợp lệ'
+    return
+  }
+
+  if (!password.value) {
+    error.value = 'Mật khẩu là bắt buộc'
+    return
+  }
+
   loading.value = true
   try {
-    await auth.login({ email: email.value, password: password.value })
-    // Redirect based on role requirements
+    await auth.login({ email: trimmedEmail, password: password.value })
     if (auth.isAdmin) {
       router.push('/admin')
     } else if (auth.isInstructor) {
@@ -65,7 +80,6 @@ async function handleLogin() {
 <template>
   <AuthLayout>
     <div class="space-y-6">
-      
       <div class="text-center">
         <h1 class="text-2xl font-bold text-slate-900 dark:text-white">Chào mừng trở lại!</h1>
         <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Đăng nhập để tiếp tục học tập</p>
@@ -114,7 +128,7 @@ async function handleLogin() {
           v-model="email"
           label="Email"
           type="email"
-          placeholder="your@email.com"
+          placeholder="your@gmail.com"
           :required="true"
         />
         <BaseInput
@@ -125,7 +139,6 @@ async function handleLogin() {
           placeholder="••••••••"
           :required="true"
         />
-
         <BaseButton
           type="submit"
           :loading="loading"
@@ -136,19 +149,9 @@ async function handleLogin() {
         </BaseButton>
       </form>
 
-      <!-- Role-based redirect info -->
-      <div class="rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 p-4">
-        <p class="text-xs text-slate-500 dark:text-slate-400 text-center">
-          Sau khi đăng nhập, bạn sẽ được chuyển đến:
-          <span class="font-semibold text-indigo-600 dark:text-indigo-400">
-            {{ roleOptions.find(r => r.key === selectedRole)?.redirect }}
-          </span>
-        </p>
-      </div>
-
       <p class="text-center text-sm text-slate-500 dark:text-slate-400">
         Chưa có tài khoản?
-        <router-link to="/register" class="font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors">
+        <router-link to="/register" class="font-semibold text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-colors">
           Đăng ký ngay
         </router-link>
       </p>

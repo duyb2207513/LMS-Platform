@@ -31,12 +31,13 @@ export const useCourseStore = defineStore('courses', () => {
       if (filters?.limit) params.limit = filters.limit
 
       const response = await api.get<PaginatedResponse<Course>>('/courses', params)
-      courses.value = response.data
+      courses.value = response.data || []
       if (response.meta) {
         meta.value = response.meta
       }
     } catch (e) {
       error.value = e instanceof Error ? e.message : 'Failed to fetch courses'
+      courses.value = []
     } finally {
       loading.value = false
     }
@@ -66,11 +67,10 @@ export const useCourseStore = defineStore('courses', () => {
     try {
       const api = useApi()
       const response = await api.get<ApiResponse<Course[]>>('/courses/my')
-      if (response.data) {
-        myCourses.value = response.data
-      }
+      myCourses.value = response.data || []
     } catch (e) {
       error.value = e instanceof Error ? e.message : 'Failed to fetch my courses'
+      myCourses.value = []
     } finally {
       loading.value = false
     }
@@ -134,5 +134,4 @@ export const useCourseStore = defineStore('courses', () => {
     publishCourse,
     updateCourseStatus,
   }
-}
-)
+})

@@ -60,7 +60,7 @@ onMounted(async () => {
       </svg>
       <h2 class="text-2xl font-bold text-slate-700">Khóa học không tồn tại</h2>
       <p class="text-slate-500 mt-2">Khóa học bạn tìm kiếm không tồn tại hoặc đã bị xóa</p>
-      <router-link to="/courses" class="mt-6 px-6 py-3 rounded-xl bg-indigo-600 text-white font-semibold hover:bg-indigo-700 transition-colors">
+      <router-link to="/courses" class="mt-6 px-6 py-3 rounded-xl bg-purple-600 text-white font-semibold hover:bg-purple-700 transition-colors">
         Quay lại danh sách khóa học
       </router-link>
     </div>
@@ -72,11 +72,11 @@ onMounted(async () => {
         <div class="lg:col-span-2 space-y-8">
           <!-- Breadcrumb -->
           <nav class="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
-            <router-link to="/courses" class="hover:text-indigo-600 transition-colors">Khóa học</router-link>
+            <router-link to="/courses" class="hover:text-purple-600 transition-colors">Khóa học</router-link>
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
             </svg>
-            <span v-if="courseStore.currentCourse.category" class="hover:text-indigo-600 dark:hover:text-indigo-400">
+            <span v-if="courseStore.currentCourse.category" class="hover:text-purple-600 dark:hover:text-purple-400">
               {{ courseStore.currentCourse.category.name }}
             </span>
           </nav>
@@ -109,7 +109,7 @@ onMounted(async () => {
           </div>
 
           <!-- Thumbnail -->
-          <div class="aspect-video rounded-2xl overflow-hidden bg-gradient-to-br from-indigo-100 to-purple-100">
+          <div class="aspect-video rounded-2xl overflow-hidden bg-gradient-to-br from-purple-100 to-purple-100">
             <img
               v-if="courseStore.currentCourse.thumbnailUrl"
               :src="courseStore.currentCourse.thumbnailUrl"
@@ -117,7 +117,7 @@ onMounted(async () => {
               class="w-full h-full object-cover"
             />
             <div v-else class="w-full h-full flex items-center justify-center">
-              <svg class="w-20 h-20 text-indigo-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-20 h-20 text-purple-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
               </svg>
             </div>
