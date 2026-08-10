@@ -33,7 +33,12 @@ export const useCourseStore = defineStore('courses', () => {
       const response = await api.get<PaginatedResponse<Course>>('/courses', params)
       courses.value = response.data || []
       if (response.meta) {
-        meta.value = response.meta
+        meta.value = {
+          total: response.meta.totalItems ?? response.meta.total ?? 0,
+          page: response.meta.page,
+          limit: response.meta.limit,
+          totalPages: response.meta.totalPages,
+        }
       }
     } catch (e) {
       error.value = e instanceof Error ? e.message : 'Failed to fetch courses'
@@ -66,7 +71,7 @@ export const useCourseStore = defineStore('courses', () => {
     error.value = null
     try {
       const api = useApi()
-      const response = await api.get<ApiResponse<Course[]>>('/courses/my')
+      const response = await api.get<PaginatedResponse<Course>>('/instructor/courses', { limit: 100 })
       myCourses.value = response.data || []
     } catch (e) {
       error.value = e instanceof Error ? e.message : 'Failed to fetch my courses'
@@ -87,7 +92,7 @@ export const useCourseStore = defineStore('courses', () => {
 
   async function updateCourse(id: string, data: Partial<CourseFormData>) {
     const api = useApi()
-    const response = await api.put<ApiResponse<Course>>(`/courses/${id}`, data)
+    const response = await api.patch<ApiResponse<Course>>(`/courses/${id}`, data)
     if (response.data) {
       const index = myCourses.value.findIndex((c) => c.id === id)
       if (index !== -1) {
@@ -101,12 +106,12 @@ export const useCourseStore = defineStore('courses', () => {
   }
 
   async function publishCourse(id: string) {
-    return updateCourse(id, {} as Partial<CourseFormData>)
+    return useApi().post<ApiResponse<Course>>(`/courses/${id}/publish`)
   }
 
   async function updateCourseStatus(id: string, status: CourseStatus) {
     const api = useApi()
-    const response = await api.put<ApiResponse<Course>>(`/courses/${id}`, { status } as any)
+    const response = status === CourseStatus.PUBLISHED ? await api.post<ApiResponse<Course>>(`/courses/${id}/publish`) : status === CourseStatus.DRAFT ? await api.post<ApiResponse<Course>>(`/courses/${id}/unpublish`) : await api.patch<ApiResponse<Course>>(`/courses/${id}`, { status } as any)
     if (response.data) {
       const index = myCourses.value.findIndex((c) => c.id === id)
       if (index !== -1) {

@@ -43,6 +43,18 @@ const router = createRouter({
       component: () => import('@/pages/student/DashboardPage.vue'),
       meta: { requiresAuth: true, roles: [UserRole.STUDENT] },
     },
+    { path: '/403', name: 'forbidden', component: () => import('@/pages/ForbiddenPage.vue') },
+    { path: '/profile', name: 'profile', component: () => import('@/pages/student/ProfilePage.vue'), meta: { requiresAuth: true } },
+    { path: '/change-password', name: 'change-password', component: () => import('@/pages/student/ChangePasswordPage.vue'), meta: { requiresAuth: true } },
+    { path: '/my-courses', name: 'my-courses', component: () => import('@/pages/student/MyCoursesPage.vue'), meta: { requiresAuth: true, roles: [UserRole.STUDENT] } },
+    { path: '/learn/:courseId', name: 'learning', component: () => import('@/pages/student/LearningPage.vue'), meta: { requiresAuth: true, roles: [UserRole.STUDENT] } },
+    { path: '/quiz/:quizId', name: 'take-quiz', component: () => import('@/pages/student/QuizPage.vue'), meta: { requiresAuth: true, roles: [UserRole.STUDENT] } },
+    { path: '/quiz-result', name: 'quiz-result', component: () => import('@/pages/student/QuizResultPage.vue'), meta: { requiresAuth: true, roles: [UserRole.STUDENT] } },
+    { path: '/orders', name: 'orders', component: () => import('@/pages/student/OrdersPage.vue'), meta: { requiresAuth: true, roles: [UserRole.STUDENT] } },
+    { path: '/checkout/:orderId', name: 'checkout', component: () => import('@/pages/student/CheckoutPage.vue'), meta: { requiresAuth: true, roles: [UserRole.STUDENT] } },
+    { path: '/payment-result/:orderId', name: 'payment-result', component: () => import('@/pages/student/PaymentResultPage.vue'), meta: { requiresAuth: true, roles: [UserRole.STUDENT] } },
+    { path: '/certificates', name: 'certificates', component: () => import('@/pages/student/CertificatesPage.vue'), meta: { requiresAuth: true, roles: [UserRole.STUDENT] } },
+    { path: '/certificates/verify/:code?', name: 'verify-certificate', component: () => import('@/pages/VerifyCertificatePage.vue') },
     // Instructor routes
     {
       path: '/instructor',
@@ -68,6 +80,8 @@ const router = createRouter({
       component: () => import('@/pages/instructor/EditCoursePage.vue'),
       meta: { requiresAuth: true, roles: [UserRole.INSTRUCTOR] },
     },
+    { path: '/instructor/courses/:courseId/builder', name: 'course-builder', component: () => import('@/pages/instructor/CourseBuilderPage.vue'), meta: { requiresAuth: true, roles: [UserRole.INSTRUCTOR, UserRole.ADMIN] } },
+    { path: '/instructor/lessons/:lessonId/quiz', name: 'quiz-builder', component: () => import('@/pages/instructor/QuizBuilderPage.vue'), meta: { requiresAuth: true, roles: [UserRole.INSTRUCTOR, UserRole.ADMIN] } },
     // Admin routes
     {
       path: '/admin',
@@ -120,9 +134,7 @@ router.beforeEach((to) => {
   if (to.meta.roles && auth.user) {
     const allowedRoles = to.meta.roles as UserRole[]
     if (!allowedRoles.includes(auth.user.role)) {
-      if (auth.isAdmin) return '/admin'
-      if (auth.isInstructor) return '/instructor'
-      return '/dashboard'
+      return '/403'
     }
   }
 })
