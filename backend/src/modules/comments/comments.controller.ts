@@ -1,0 +1,6 @@
+import type { Request, Response } from "express"; import { sendSuccess } from "../../common/utils/response.js"; import { createComment, deleteComment, listComments, updateComment } from "./comments.service.js"; import type { CreateCommentInput, UpdateCommentInput } from "./comments.types.js";
+const p = (request: Request, key: string) => String(request.params[key] ?? "");
+export async function listCommentsController(request: Request, response: Response) { sendSuccess(response, 200, "Lesson comments retrieved successfully", await listComments(p(request, "lessonId"), request.auth)); }
+export async function createCommentController(request: Request, response: Response) { sendSuccess(response, 201, "Comment created successfully", await createComment(p(request, "lessonId"), request.auth, request.body as CreateCommentInput)); }
+export async function updateCommentController(request: Request, response: Response) { sendSuccess(response, 200, "Comment updated successfully", await updateComment(p(request, "commentId"), request.auth, request.body as UpdateCommentInput)); }
+export async function deleteCommentController(request: Request, response: Response) { await deleteComment(p(request, "commentId"), request.auth); response.status(204).send(); }

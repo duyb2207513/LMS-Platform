@@ -44,6 +44,11 @@ enum EnrollmentStatus {
   CANCELLED
 }
 
+enum QuizAttemptStatus {
+  IN_PROGRESS
+  SUBMITTED
+}
+
 model User {
   id           String     @id @default(uuid()) @db.Uuid
   fullName     String     @map("full_name") @db.VarChar(100)
@@ -58,6 +63,9 @@ model User {
   courses        Course[]         @relation("InstructorCourses")
   enrollments    Enrollment[]     @relation("StudentEnrollments")
   lessonProgress LessonProgress[] @relation("StudentLessonProgress")
+  quizAttempts   QuizAttempt[]    @relation("StudentQuizAttempts")
+  reviews        Review[]
+  comments       Comment[]
 
   @@index([role])
   @@index([status])
@@ -100,6 +108,7 @@ model Course {
   category   Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
   sections    Section[]
   enrollments Enrollment[]
+  reviews     Review[]
 
   @@index([instructorId])
   @@index([categoryId])
@@ -142,6 +151,8 @@ model Lesson {
 
   section  Section          @relation(fields: [sectionId], references: [id], onDelete: Cascade)
   progress LessonProgress[]
+  quiz     Quiz?
+  comments Comment[]
 
   @@index([sectionId, position])
   @@index([isPublished])
@@ -181,4 +192,134 @@ model LessonProgress {
   @@unique([studentId, lessonId])
   @@index([lessonId])
   @@map("lesson_progress")
+}
+
+model Quiz {
+  id               String   @id @default(uuid()) @db.Uuid
+  lessonId         String   @unique @map("lesson_id") @db.Uuid
+  title            String   @db.VarChar(255)
+  description      String?
+  passingScore     Int      @default(70) @map("passing_score")
+  maxAttempts      Int      @default(3) @map("max_attempts")
+  timeLimitMinutes Int?     @map("time_limit_minutes")
+  isPublished      Boolean  @default(false) @map("is_published")
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt        DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  lesson    Lesson        @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  questions Question[]
+  attempts  QuizAttempt[]
+
+  @@index([isPublished])
+  @@map("quizzes")
+}
+
+model Question {
+  id          String   @id @default(uuid()) @db.Uuid
+  quizId      String   @map("quiz_id") @db.Uuid
+  text        String
+  explanation String?
+  points      Int      @default(1)
+  position    Int
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  quiz    Quiz            @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  options QuizOption[]
+  answers AttemptAnswer[]
+
+  @@index([quizId, position])
+  @@map("questions")
+}
+
+model QuizOption {
+  id         String   @id @default(uuid()) @db.Uuid
+  questionId String   @map("question_id") @db.Uuid
+  text       String
+  isCorrect  Boolean  @default(false) @map("is_correct")
+  position   Int
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt  DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  question Question       @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  answers  AttemptAnswer[]
+
+  @@index([questionId, position])
+  @@map("quiz_options")
+}
+
+model QuizAttempt {
+  id            String            @id @default(uuid()) @db.Uuid
+  quizId        String            @map("quiz_id") @db.Uuid
+  studentId     String            @map("student_id") @db.Uuid
+  attemptNumber Int               @map("attempt_number")
+  status        QuizAttemptStatus @default(IN_PROGRESS)
+  score         Decimal?          @db.Decimal(5, 2)
+  earnedPoints  Int?              @map("earned_points")
+  totalPoints   Int?              @map("total_points")
+  passed        Boolean?
+  startedAt     DateTime          @default(now()) @map("started_at") @db.Timestamptz(3)
+  submittedAt   DateTime?         @map("submitted_at") @db.Timestamptz(3)
+
+  quiz    Quiz            @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  student User            @relation("StudentQuizAttempts", fields: [studentId], references: [id], onDelete: Cascade)
+  answers AttemptAnswer[]
+
+  @@unique([quizId, studentId, attemptNumber])
+  @@index([studentId, quizId])
+  @@map("quiz_attempts")
+}
+
+model AttemptAnswer {
+  id           String  @id @default(uuid()) @db.Uuid
+  attemptId    String  @map("attempt_id") @db.Uuid
+  questionId   String  @map("question_id") @db.Uuid
+  optionId     String  @map("option_id") @db.Uuid
+  isCorrect    Boolean @map("is_correct")
+  pointsEarned Int     @default(0) @map("points_earned")
+
+  attempt  QuizAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  question Question    @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  option   QuizOption  @relation(fields: [optionId], references: [id], onDelete: Cascade)
+
+  @@unique([attemptId, questionId])
+  @@index([optionId])
+  @@map("attempt_answers")
+}
+
+model Review {
+  id        String   @id @default(uuid()) @db.Uuid
+  courseId  String   @map("course_id") @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  rating    Int
+  content   String?
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([courseId, userId])
+  @@index([courseId, createdAt])
+  @@map("reviews")
+}
+
+model Comment {
+  id        String    @id @default(uuid()) @db.Uuid
+  lessonId  String    @map("lesson_id") @db.Uuid
+  userId    String    @map("user_id") @db.Uuid
+  parentId  String?   @map("parent_id") @db.Uuid
+  content   String
+  deletedAt DateTime? @map("deleted_at") @db.Timestamptz(3)
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  lesson  Lesson    @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  user    User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parent  Comment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies Comment[] @relation("CommentReplies")
+
+  @@index([lessonId, createdAt])
+  @@index([parentId])
+  @@map("comments")
 }

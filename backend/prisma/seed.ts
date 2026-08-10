@@ -219,6 +219,42 @@ async function seedLearningContent(studentId: string) {
   });
 }
 
+async function seedSprint3(studentId: string, instructorId: string) {
+  const course = await prisma.course.findUniqueOrThrow({ where: { slug: "react-native-cho-nguoi-moi" } });
+  const lessonId = "20000000-0000-4000-8000-000000000003";
+  const quiz = await prisma.quiz.upsert({
+    where: { lessonId },
+    update: { title: "Kiểm tra kiến thức Axios", description: "Ôn tập cách kết nối REST API", passingScore: 70, maxAttempts: 3, isPublished: true },
+    create: { id: "30000000-0000-4000-8000-000000000001", lessonId, title: "Kiểm tra kiến thức Axios", description: "Ôn tập cách kết nối REST API", passingScore: 70, maxAttempts: 3, isPublished: true }
+  });
+  const question = await prisma.question.upsert({
+    where: { id: "31000000-0000-4000-8000-000000000001" },
+    update: { quizId: quiz.id, text: "Header nào dùng để gửi access token?", explanation: "REST API sử dụng Bearer token trong Authorization header.", points: 1, position: 1 },
+    create: { id: "31000000-0000-4000-8000-000000000001", quizId: quiz.id, text: "Header nào dùng để gửi access token?", explanation: "REST API sử dụng Bearer token trong Authorization header.", points: 1, position: 1 }
+  });
+  const options = [
+    { id: "32000000-0000-4000-8000-000000000001", text: "Authorization", isCorrect: true, position: 1 },
+    { id: "32000000-0000-4000-8000-000000000002", text: "Content-Length", isCorrect: false, position: 2 },
+    { id: "32000000-0000-4000-8000-000000000003", text: "Accept-Language", isCorrect: false, position: 3 }
+  ];
+  for (const option of options) await prisma.quizOption.upsert({ where: { id: option.id }, update: { ...option, questionId: question.id }, create: { ...option, questionId: question.id } });
+  await prisma.review.upsert({
+    where: { courseId_userId: { courseId: course.id, userId: studentId } },
+    update: { rating: 5, content: "Khóa học dễ hiểu và có ví dụ thực tế." },
+    create: { id: "40000000-0000-4000-8000-000000000001", courseId: course.id, userId: studentId, rating: 5, content: "Khóa học dễ hiểu và có ví dụ thực tế." }
+  });
+  const root = await prisma.comment.upsert({
+    where: { id: "50000000-0000-4000-8000-000000000001" },
+    update: { lessonId, userId: studentId, content: "Access token nên lưu ở đâu trên mobile?", deletedAt: null },
+    create: { id: "50000000-0000-4000-8000-000000000001", lessonId, userId: studentId, content: "Access token nên lưu ở đâu trên mobile?" }
+  });
+  await prisma.comment.upsert({
+    where: { id: "50000000-0000-4000-8000-000000000002" },
+    update: { lessonId, userId: instructorId, parentId: root.id, content: "Bạn nên dùng Expo SecureStore thay vì AsyncStorage.", deletedAt: null },
+    create: { id: "50000000-0000-4000-8000-000000000002", lessonId, userId: instructorId, parentId: root.id, content: "Bạn nên dùng Expo SecureStore thay vì AsyncStorage." }
+  });
+}
+
 async function main() {
   const passwordHash = await bcrypt.hash(TEST_PASSWORD, 12);
   const users = await seedUsers(passwordHash);
@@ -227,6 +263,7 @@ async function main() {
   const categories = await seedCategories();
   await seedCourses(instructor.id, categories);
   await seedLearningContent(student.id);
+  await seedSprint3(student.id, instructor.id);
 
   console.log("Seed completed successfully");
   console.log("Test password for every seeded account: Password123");

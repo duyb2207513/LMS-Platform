@@ -1,0 +1,6 @@
+import type { Request, Response } from "express"; import { sendSuccess } from "../../common/utils/response.js"; import type { ReviewInput, UpdateReviewInput } from "./reviews.types.js"; import { createReview, deleteReview, listReviews, updateReview } from "./reviews.service.js";
+const p = (request: Request, key: string) => String(request.params[key] ?? "");
+export async function listReviewsController(request: Request, response: Response) { sendSuccess(response, 200, "Course reviews retrieved successfully", await listReviews(p(request, "courseId"))); }
+export async function createReviewController(request: Request, response: Response) { sendSuccess(response, 201, "Course review created successfully", await createReview(p(request, "courseId"), request.auth.userId, request.body as ReviewInput)); }
+export async function updateReviewController(request: Request, response: Response) { sendSuccess(response, 200, "Course review updated successfully", await updateReview(p(request, "reviewId"), request.auth, request.body as UpdateReviewInput)); }
+export async function deleteReviewController(request: Request, response: Response) { await deleteReview(p(request, "reviewId"), request.auth); response.status(204).send(); }

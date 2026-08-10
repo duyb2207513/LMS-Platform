@@ -24,7 +24,7 @@ export async function getCourseContent(courseId: string, actor: AuthTokenPayload
       lessons: {
         where: manager ? {} : { isPublished: true },
         orderBy: [{ position: "asc" }, { createdAt: "asc" }],
-        select: { id: true, title: true, lessonType: true, content: true, videoUrl: true, documentUrl: true, durationSeconds: true, position: true, isPreview: true, isRequired: true, isPublished: true }
+        select: { id: true, title: true, lessonType: true, content: true, videoUrl: true, documentUrl: true, durationSeconds: true, position: true, isPreview: true, isRequired: true, isPublished: true, quiz: { where: manager ? {} : { isPublished: true }, select: { id: true, title: true, description: true, passingScore: true, maxAttempts: true, timeLimitMinutes: true, isPublished: true } } }
       }
     }
   });
