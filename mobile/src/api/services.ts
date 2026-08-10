@@ -1,6 +1,6 @@
 import type {
   ApiResponse, Category, Course, CourseContent, CourseInput, CourseProgress,
-  CourseSection, Enrollment, Lesson, LessonType, PaginatedResponse, User,
+  Comment, CourseSection, Enrollment, Lesson, LessonType, PaginatedResponse, Quiz, QuizAttempt, QuizOption, QuizQuestion, QuizResult, Review, User,
 } from '../types';
 import { apiClient } from './client';
 
@@ -98,4 +98,34 @@ export const learningApi = {
   progress: (courseId: string) => apiClient.get<ApiResponse<CourseProgress>>(`/courses/${courseId}/progress`),
   updateProgress: (lessonId: string, input: { lastWatchedSecond?: number; isCompleted?: boolean }) =>
     apiClient.patch<ApiResponse<{ lessonProgress: Lesson['progress']; courseProgress: CourseProgress }>>(`/lessons/${lessonId}/progress`, input),
+};
+
+export const quizzesApi = {
+  get: (quizId: string) => apiClient.get<ApiResponse<Quiz>>(`/quizzes/${quizId}`),
+  create: (lessonId: string, input: { title: string; description?: string | null; passingScore?: number; maxAttempts?: number; timeLimitMinutes?: number | null }) => apiClient.post<ApiResponse<Quiz>>(`/lessons/${lessonId}/quizzes`, input),
+  update: (quizId: string, input: Partial<{ title: string; description: string | null; passingScore: number; maxAttempts: number; timeLimitMinutes: number | null; isPublished: boolean }>) => apiClient.patch<ApiResponse<Quiz>>(`/quizzes/${quizId}`, input),
+  remove: (quizId: string) => apiClient.delete(`/quizzes/${quizId}`),
+  createQuestion: (quizId: string, input: { text: string; explanation?: string | null; points?: number }) => apiClient.post<ApiResponse<QuizQuestion>>(`/quizzes/${quizId}/questions`, input),
+  updateQuestion: (questionId: string, input: Partial<{ text: string; explanation: string | null; points: number }>) => apiClient.patch<ApiResponse<QuizQuestion>>(`/questions/${questionId}`, input),
+  removeQuestion: (questionId: string) => apiClient.delete(`/questions/${questionId}`),
+  createOption: (questionId: string, input: { text: string; isCorrect?: boolean }) => apiClient.post<ApiResponse<QuizOption>>(`/questions/${questionId}/options`, input),
+  updateOption: (optionId: string, input: Partial<{ text: string; isCorrect: boolean }>) => apiClient.patch<ApiResponse<QuizOption>>(`/options/${optionId}`, input),
+  removeOption: (optionId: string) => apiClient.delete(`/options/${optionId}`),
+  attempts: (quizId: string) => apiClient.get<ApiResponse<QuizAttempt[]>>(`/quizzes/${quizId}/attempts/me`),
+  start: (quizId: string) => apiClient.post<ApiResponse<QuizAttempt>>(`/quizzes/${quizId}/attempts`),
+  submit: (attemptId: string, answers: Array<{ questionId: string; optionId: string }>) => apiClient.post<ApiResponse<QuizResult>>(`/quiz-attempts/${attemptId}/submit`, { answers }),
+};
+
+export const reviewsApi = {
+  list: (courseId: string) => apiClient.get<ApiResponse<{ items: Review[]; summary: { averageRating: number; totalReviews: number } }>>(`/courses/${courseId}/reviews`),
+  create: (courseId: string, input: { rating: number; content?: string | null }) => apiClient.post<ApiResponse<Review>>(`/courses/${courseId}/reviews`, input),
+  update: (reviewId: string, input: { rating?: number; content?: string | null }) => apiClient.patch<ApiResponse<Review>>(`/reviews/${reviewId}`, input),
+  remove: (reviewId: string) => apiClient.delete(`/reviews/${reviewId}`),
+};
+
+export const commentsApi = {
+  list: (lessonId: string) => apiClient.get<ApiResponse<Comment[]>>(`/lessons/${lessonId}/comments`),
+  create: (lessonId: string, input: { content: string; parentId?: string | null }) => apiClient.post<ApiResponse<Comment>>(`/lessons/${lessonId}/comments`, input),
+  update: (commentId: string, content: string) => apiClient.patch<ApiResponse<Comment>>(`/comments/${commentId}`, { content }),
+  remove: (commentId: string) => apiClient.delete(`/comments/${commentId}`),
 };

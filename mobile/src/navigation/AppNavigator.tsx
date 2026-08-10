@@ -12,6 +12,7 @@ import { AdminCategoriesScreen } from '../screens/AdminCategoriesScreen';
 import { CourseFormScreen, InstructorCoursesScreen } from '../screens/InstructorScreens';
 import { CourseBuilderScreen } from '../screens/CourseBuilderScreen';
 import { LearningScreen, MyCoursesScreen } from '../screens/LearningScreens';
+import { QuizBuilderScreen, QuizResultScreen, QuizScreen } from '../screens/QuizScreens';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const navigationTheme = { ...DefaultTheme, colors: { ...DefaultTheme.colors, primary: colors.primary, background: colors.background, card: '#fff', text: colors.ink, border: colors.border } };
@@ -34,11 +35,14 @@ export function AppNavigator() {
         {user.role === 'STUDENT' && <>
           <Stack.Screen name="MyCourses" component={MyCoursesScreen} options={{ title: 'Khóa học của tôi' }} />
           <Stack.Screen name="Learning" component={LearningScreen} options={{ title: 'Học tập' }} />
+          <Stack.Screen name="Quiz" component={QuizScreen} options={{ title: 'Làm bài quiz' }} />
+          <Stack.Screen name="QuizResult" component={QuizResultScreen} options={{ title: 'Kết quả quiz' }} />
         </>}
         {(user.role === 'INSTRUCTOR' || user.role === 'ADMIN') && <>
           <Stack.Screen name="InstructorCourses" component={InstructorCoursesScreen} options={{ title: 'Quản lý khóa học' }} />
           <Stack.Screen name="CourseForm" component={CourseFormScreen} options={{ title: 'Thông tin khóa học' }} />
           <Stack.Screen name="CourseBuilder" component={CourseBuilderScreen} options={{ title: 'Xây dựng nội dung' }} />
+          <Stack.Screen name="QuizBuilder" component={QuizBuilderScreen} options={{ title: 'Quiz builder' }} />
         </>}
         {user.role === 'ADMIN' && <Stack.Screen name="AdminCategories" component={AdminCategoriesScreen} options={{ title: 'Quản lý danh mục' }} />}
       </>}
