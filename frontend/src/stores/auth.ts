@@ -7,6 +7,7 @@ import { useApi } from '@/composables/useApi'
 export const useAuthStore = defineStore('auth', () => {
   const user = ref<User | null>(null)
   const token = ref<string | null>(null)
+  const refreshToken = ref<string | null>(null)
 
   // Computed
   const isLoggedIn = computed(() => !!user.value && !!token.value)
@@ -26,9 +27,11 @@ export const useAuthStore = defineStore('auth', () => {
   // Initialize from localStorage
   function initialize() {
     const savedToken = localStorage.getItem('accessToken')
+    const savedRefreshToken = localStorage.getItem('refreshToken')
     const savedUser = localStorage.getItem('user')
     if (savedToken && savedUser) {
       token.value = savedToken
+      if (savedRefreshToken) refreshToken.value = savedRefreshToken
       try {
         user.value = JSON.parse(savedUser)
       } catch {
@@ -44,6 +47,10 @@ export const useAuthStore = defineStore('auth', () => {
     if (response.data) {
       user.value = response.data.user
       token.value = response.data.accessToken
+      if (response.data.refreshToken) {
+        refreshToken.value = response.data.refreshToken
+        localStorage.setItem('refreshToken', response.data.refreshToken)
+      }
       localStorage.setItem('accessToken', response.data.accessToken)
       localStorage.setItem('user', JSON.stringify(response.data.user))
     }
@@ -56,22 +63,38 @@ export const useAuthStore = defineStore('auth', () => {
     if (response.data) {
       user.value = response.data.user
       token.value = response.data.accessToken
+      if (response.data.refreshToken) {
+        refreshToken.value = response.data.refreshToken
+        localStorage.setItem('refreshToken', response.data.refreshToken)
+      }
       localStorage.setItem('accessToken', response.data.accessToken)
       localStorage.setItem('user', JSON.stringify(response.data.user))
     }
     return response
   }
 
+  function updateTokens(newAccessToken: string, newRefreshToken?: string) {
+    token.value = newAccessToken
+    localStorage.setItem('accessToken', newAccessToken)
+    if (newRefreshToken) {
+      refreshToken.value = newRefreshToken
+      localStorage.setItem('refreshToken', newRefreshToken)
+    }
+  }
+
   function logout() {
     user.value = null
     token.value = null
+    refreshToken.value = null
     localStorage.removeItem('accessToken')
+    localStorage.removeItem('refreshToken')
     localStorage.removeItem('user')
   }
 
   return {
     user,
     token,
+    refreshToken,
     isLoggedIn,
     isStudent,
     isInstructor,
@@ -81,5 +104,6 @@ export const useAuthStore = defineStore('auth', () => {
     login,
     register,
     logout,
+    updateTokens,
   }
 })

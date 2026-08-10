@@ -11,8 +11,14 @@ export function validateRegisterInput(body: unknown): RequestValidationResult<Re
   const input = body as Record<string, unknown>;
   const errors: Record<string, string> = {};
 
+  let role: "STUDENT" | "INSTRUCTOR" | undefined = undefined;
   if (Object.prototype.hasOwnProperty.call(input, "role")) {
-    errors.role = "Role cannot be set during registration";
+    const inputRole = input.role;
+    if (inputRole === "STUDENT" || inputRole === "INSTRUCTOR") {
+      role = inputRole;
+    } else {
+      errors.role = "Role cannot be set during registration";
+    }
   }
 
   const fullName = typeof input.fullName === "string" ? input.fullName.trim() : "";
@@ -43,7 +49,7 @@ export function validateRegisterInput(body: unknown): RequestValidationResult<Re
     return { errors };
   }
 
-  return { data: { fullName, email, password, confirmPassword } };
+  return { data: { fullName, email, password, confirmPassword, role } };
 }
 
 export function validateLoginInput(body: unknown): RequestValidationResult<LoginInput> {
