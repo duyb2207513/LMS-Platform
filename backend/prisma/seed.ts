@@ -156,8 +156,8 @@ async function seedCourses(instructorId: string, categories: Map<string, { id: s
       language: "Vietnamese",
       requirements: "Biết sử dụng terminal cơ bản",
       learningOutcomes: "Viết Dockerfile; sử dụng Docker Compose; quản lý container",
-      status: "DRAFT" as const,
-      publishedAt: null
+      status: "PUBLISHED" as const,
+      publishedAt: new Date("2026-08-04T08:00:00.000Z")
     }
   ];
 
@@ -284,6 +284,81 @@ async function seedSprint4(studentId: string) {
   });
 }
 
+async function seedAdditionalLearningContent(studentId: string) {
+  const definitions = [
+    {
+      slug: "expressjs-rest-api-tu-co-ban",
+      section: { id: "11000000-0000-4000-8000-000000000001", title: "Xây dựng REST API với ExpressJS" },
+      lessons: [
+        { id: "21000000-0000-4000-8000-000000000001", title: "REST API và cấu trúc dự án", lessonType: "TEXT" as const, content: "Tìm hiểu REST, HTTP method, status code và cách tổ chức backend ExpressJS theo module.", position: 1 },
+        { id: "21000000-0000-4000-8000-000000000002", title: "Middleware và xử lý lỗi", lessonType: "VIDEO" as const, videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4", durationSeconds: 600, position: 2 },
+        { id: "21000000-0000-4000-8000-000000000003", title: "Tài liệu HTTP status code", lessonType: "DOCUMENT" as const, documentUrl: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf", position: 3 }
+      ],
+      completedLessons: 3,
+      status: "COMPLETED" as const
+    },
+    {
+      slug: "postgresql-thiet-ke-database",
+      section: { id: "12000000-0000-4000-8000-000000000001", title: "Nền tảng PostgreSQL" },
+      lessons: [
+        { id: "22000000-0000-4000-8000-000000000001", title: "Thiết kế bảng và quan hệ", lessonType: "TEXT" as const, content: "Thiết kế bảng, khóa chính, khóa ngoại và các quan hệ one-to-one, one-to-many, many-to-many.", position: 1 },
+        { id: "22000000-0000-4000-8000-000000000002", title: "Index và tối ưu truy vấn", lessonType: "VIDEO" as const, videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4", durationSeconds: 720, position: 2 },
+        { id: "22000000-0000-4000-8000-000000000003", title: "Tài liệu thiết kế database", lessonType: "DOCUMENT" as const, documentUrl: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf", position: 3 }
+      ],
+      completedLessons: 1,
+      status: "ACTIVE" as const
+    }
+  ];
+
+  for (const definition of definitions) {
+    const course = await prisma.course.findUniqueOrThrow({ where: { slug: definition.slug } });
+    const section = await prisma.section.upsert({
+      where: { id: definition.section.id },
+      update: { courseId: course.id, title: definition.section.title, position: 1 },
+      create: { ...definition.section, courseId: course.id, position: 1 }
+    });
+
+    for (const lesson of definition.lessons) {
+      await prisma.lesson.upsert({
+        where: { id: lesson.id },
+        update: { ...lesson, sectionId: section.id, isPreview: lesson.position === 1, isRequired: true, isPublished: true },
+        create: { ...lesson, sectionId: section.id, isPreview: lesson.position === 1, isRequired: true, isPublished: true }
+      });
+      const isCompleted = lesson.position <= definition.completedLessons;
+      await prisma.lessonProgress.upsert({
+        where: { studentId_lessonId: { studentId, lessonId: lesson.id } },
+        update: { isCompleted, completedAt: isCompleted ? new Date("2026-08-06T08:00:00.000Z") : null, lastWatchedSecond: isCompleted ? (lesson.durationSeconds ?? 0) : 0 },
+        create: { studentId, lessonId: lesson.id, isCompleted, completedAt: isCompleted ? new Date("2026-08-06T08:00:00.000Z") : null, lastWatchedSecond: isCompleted ? (lesson.durationSeconds ?? 0) : 0 }
+      });
+    }
+
+    const progressPercent = Math.round((definition.completedLessons / definition.lessons.length) * 10000) / 100;
+    await prisma.enrollment.upsert({
+      where: { studentId_courseId: { studentId, courseId: course.id } },
+      update: { status: definition.status, progressPercent, completedAt: definition.status === "COMPLETED" ? new Date("2026-08-06T08:00:00.000Z") : null },
+      create: { studentId, courseId: course.id, status: definition.status, progressPercent, completedAt: definition.status === "COMPLETED" ? new Date("2026-08-06T08:00:00.000Z") : null }
+    });
+  }
+
+  const dockerCourse = await prisma.course.findUniqueOrThrow({ where: { slug: "docker-trien-khai-ung-dung" } });
+  const dockerSection = await prisma.section.upsert({
+    where: { id: "13000000-0000-4000-8000-000000000001" },
+    update: { courseId: dockerCourse.id, title: "Docker từ cơ bản đến triển khai", position: 1 },
+    create: { id: "13000000-0000-4000-8000-000000000001", courseId: dockerCourse.id, title: "Docker từ cơ bản đến triển khai", position: 1 }
+  });
+  const dockerLessons = [
+    { id: "23000000-0000-4000-8000-000000000001", title: "Container và image", lessonType: "TEXT" as const, content: "Tìm hiểu image, container, registry và vòng đời của một container Docker.", position: 1 },
+    { id: "23000000-0000-4000-8000-000000000002", title: "Triển khai với Docker Compose", lessonType: "VIDEO" as const, videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4", durationSeconds: 800, position: 2 }
+  ];
+  for (const lesson of dockerLessons) {
+    await prisma.lesson.upsert({
+      where: { id: lesson.id },
+      update: { ...lesson, sectionId: dockerSection.id, isPreview: lesson.position === 1, isRequired: true, isPublished: true },
+      create: { ...lesson, sectionId: dockerSection.id, isPreview: lesson.position === 1, isRequired: true, isPublished: true }
+    });
+  }
+}
+
 async function main() {
   const passwordHash = await bcrypt.hash(TEST_PASSWORD, 12);
   const users = await seedUsers(passwordHash);
@@ -294,6 +369,7 @@ async function main() {
   await seedLearningContent(student.id);
   await seedSprint3(student.id, instructor.id);
   await seedSprint4(student.id);
+  await seedAdditionalLearningContent(student.id);
 
   console.log("Seed completed successfully");
   console.log("Test password for every seeded account: Password123");
