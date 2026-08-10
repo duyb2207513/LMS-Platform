@@ -1,6 +1,6 @@
 import type {
   ApiResponse, Category, Course, CourseContent, CourseInput, CourseProgress,
-  Comment, CourseSection, Enrollment, Lesson, LessonType, PaginatedResponse, Quiz, QuizAttempt, QuizOption, QuizQuestion, QuizResult, Review, User,
+  Certificate, CertificateVerification, Comment, CourseSection, Enrollment, Lesson, LessonType, Order, PaginatedResponse, Payment, Quiz, QuizAttempt, QuizOption, QuizQuestion, QuizResult, Review, User,
 } from '../types';
 import { apiClient } from './client';
 
@@ -128,4 +128,19 @@ export const commentsApi = {
   create: (lessonId: string, input: { content: string; parentId?: string | null }) => apiClient.post<ApiResponse<Comment>>(`/lessons/${lessonId}/comments`, input),
   update: (commentId: string, content: string) => apiClient.patch<ApiResponse<Comment>>(`/comments/${commentId}`, { content }),
   remove: (commentId: string) => apiClient.delete(`/comments/${commentId}`),
+};
+
+export const ordersApi = {
+  create: (courseIds: string[]) => apiClient.post<ApiResponse<Order>>('/orders', { courseIds }),
+  mine: () => apiClient.get<ApiResponse<Order[]>>('/orders/me'),
+  get: (orderId: string) => apiClient.get<ApiResponse<Order>>(`/orders/${orderId}`),
+  cancel: (orderId: string) => apiClient.delete(`/orders/${orderId}`),
+  initiateMockPayment: (orderId: string) => apiClient.post<ApiResponse<{ payment: Payment; mockPaymentUrl: string }>>(`/orders/${orderId}/payments/mock`),
+};
+
+export const certificatesApi = {
+  issue: (courseId: string) => apiClient.post<ApiResponse<Certificate>>(`/courses/${courseId}/certificates`),
+  mine: () => apiClient.get<ApiResponse<Certificate[]>>('/certificates/me'),
+  get: (certificateId: string) => apiClient.get<ApiResponse<Certificate>>(`/certificates/${certificateId}`),
+  verify: (code: string) => apiClient.get<ApiResponse<CertificateVerification>>(`/certificates/verify/${encodeURIComponent(code)}`),
 };
