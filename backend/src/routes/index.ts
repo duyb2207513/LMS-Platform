@@ -12,6 +12,9 @@ import usersRouter from "../modules/users/users.routes.js";
 import { commentsRouter, lessonCommentsRouter } from "../modules/comments/comments.routes.js";
 import { lessonQuizzesRouter, optionsRouter, questionsRouter, quizAttemptsRouter, quizzesRouter } from "../modules/quizzes/quizzes.routes.js";
 import { courseReviewsRouter, reviewsRouter } from "../modules/reviews/reviews.routes.js";
+import certificatesRouter, { courseCertificatesRouter } from "../modules/certificates/certificates.routes.js";
+import ordersRouter from "../modules/orders/orders.routes.js";
+import { orderPaymentsRouter, paymentsRouter } from "../modules/payments/payments.routes.js";
 
 const router = Router();
 
@@ -22,6 +25,7 @@ router.use("/courses/:courseId/enroll", courseEnrollmentRouter);
 router.use("/courses/:courseId/content", courseLearningRouter);
 router.use("/courses/:courseId/progress", courseProgressRouter);
 router.use("/courses/:courseId/reviews", courseReviewsRouter);
+router.use("/courses/:courseId/certificates", courseCertificatesRouter);
 router.use("/courses", coursesRouter);
 router.use("/sections/:sectionId/lessons", sectionLessonsRouter);
 router.use("/sections", sectionsRouter);
@@ -35,6 +39,10 @@ router.use("/options", optionsRouter);
 router.use("/quiz-attempts", quizAttemptsRouter);
 router.use("/reviews", reviewsRouter);
 router.use("/comments", commentsRouter);
+router.use("/orders/:orderId/payments/mock", orderPaymentsRouter);
+router.use("/orders", ordersRouter);
+router.use("/payments", paymentsRouter);
+router.use("/certificates", certificatesRouter);
 router.use("/enrollments", enrollmentsRouter);
 router.use("/instructor", instructorCoursesRouter);
 router.use("/users", usersRouter);

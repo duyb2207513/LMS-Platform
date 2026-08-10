@@ -1,0 +1,16 @@
+import { randomBytes } from "node:crypto"; import { AppError } from "../../common/errors/AppError.js"; import { prisma } from "../../config/database.js"; import { UUID } from "../interactions/access.js"; import type { CreateOrderInput } from "./orders.types.js";
+const include = { items: { include: { course: { select: { slug: true, thumbnailUrl: true } } } }, payments: { orderBy: { createdAt: "desc" as const }, select: { id: true, provider: true, status: true, amount: true, currency: true, providerTransactionId: true, paidAt: true, createdAt: true } } };
+function serialize<T extends { subtotal: unknown; total: unknown; items: Array<{ priceSnapshot: unknown }>; payments?: Array<{ amount: unknown }> }>(order: T) { return { ...order, subtotal: Number(order.subtotal), total: Number(order.total), items: order.items.map(item => ({ ...item, priceSnapshot: Number(item.priceSnapshot) })), ...(order.payments ? { payments: order.payments.map(payment => ({ ...payment, amount: Number(payment.amount) })) } : {}) }; }
+function number() { return `ORD-${new Date().toISOString().slice(0, 10).replaceAll("-", "")}-${randomBytes(5).toString("hex").toUpperCase()}`; }
+export async function createOrder(userId: string, input: CreateOrderInput) {
+  const courses = await prisma.course.findMany({ where: { id: { in: input.courseIds } }, select: { id: true, title: true, price: true, isFree: true, status: true } });
+  if (courses.length !== input.courseIds.length || courses.some(course => course.status !== "PUBLISHED")) throw new AppError(404, "One or more published courses were not found");
+  if (courses.some(course => course.isFree || Number(course.price) <= 0)) throw new AppError(409, "Free courses must use the free enrollment endpoint");
+  if (await prisma.enrollment.count({ where: { studentId: userId, courseId: { in: input.courseIds }, status: { not: "CANCELLED" } } })) throw new AppError(409, "You are already enrolled in one or more selected courses");
+  const total = courses.reduce((sum, course) => sum + Number(course.price), 0);
+  const order = await prisma.order.create({ data: { orderNumber: number(), userId, subtotal: total, total, items: { create: courses.map(course => ({ courseId: course.id, courseTitleSnapshot: course.title, priceSnapshot: course.price })) } }, include });
+  return serialize(order);
+}
+export async function listMyOrders(userId: string) { return (await prisma.order.findMany({ where: { userId }, orderBy: { createdAt: "desc" }, include })).map(serialize); }
+export async function getOrder(orderId: string, userId: string, isAdmin = false) { if (!UUID.test(orderId)) throw new AppError(404, "Order not found"); const order = await prisma.order.findUnique({ where: { id: orderId }, include }); if (!order || (!isAdmin && order.userId !== userId)) throw new AppError(404, "Order not found"); return serialize(order); }
+export async function cancelOrder(orderId: string, userId: string) { if (!UUID.test(orderId)) throw new AppError(404, "Order not found"); const result = await prisma.order.updateMany({ where: { id: orderId, userId, status: "PENDING", payments: { none: { status: "SUCCEEDED" } } }, data: { status: "CANCELLED" } }); if (!result.count) throw new AppError(409, "Only a pending unpaid order can be cancelled"); }
