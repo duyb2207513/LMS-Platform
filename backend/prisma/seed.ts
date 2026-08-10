@@ -255,6 +255,35 @@ async function seedSprint3(studentId: string, instructorId: string) {
   });
 }
 
+async function seedSprint4(studentId: string) {
+  const course = await prisma.course.findUniqueOrThrow({ where: { slug: "expressjs-rest-api-tu-co-ban" } });
+  const order = await prisma.order.upsert({
+    where: { id: "60000000-0000-4000-8000-000000000001" },
+    update: { userId: studentId, status: "PAID", subtotal: 299000, total: 299000, paidAt: new Date("2026-08-05T08:00:00.000Z") },
+    create: { id: "60000000-0000-4000-8000-000000000001", orderNumber: "ORD-DEMO-PAID-001", userId: studentId, status: "PAID", subtotal: 299000, total: 299000, paidAt: new Date("2026-08-05T08:00:00.000Z") }
+  });
+  await prisma.orderItem.upsert({
+    where: { orderId_courseId: { orderId: order.id, courseId: course.id } },
+    update: { courseTitleSnapshot: course.title, priceSnapshot: 299000 },
+    create: { orderId: order.id, courseId: course.id, courseTitleSnapshot: course.title, priceSnapshot: 299000 }
+  });
+  await prisma.payment.upsert({
+    where: { idempotencyKey: "seed-demo-payment-001" },
+    update: { orderId: order.id, status: "SUCCEEDED", amount: 299000, providerTransactionId: "MOCK-SEED-001", paidAt: new Date("2026-08-05T08:00:00.000Z") },
+    create: { orderId: order.id, provider: "MOCK", status: "SUCCEEDED", amount: 299000, idempotencyKey: "seed-demo-payment-001", providerTransactionId: "MOCK-SEED-001", paidAt: new Date("2026-08-05T08:00:00.000Z") }
+  });
+  const enrollment = await prisma.enrollment.upsert({
+    where: { studentId_courseId: { studentId, courseId: course.id } },
+    update: { status: "COMPLETED", progressPercent: 100, completedAt: new Date("2026-08-06T08:00:00.000Z") },
+    create: { studentId, courseId: course.id, status: "COMPLETED", progressPercent: 100, completedAt: new Date("2026-08-06T08:00:00.000Z") }
+  });
+  await prisma.certificate.upsert({
+    where: { studentId_courseId: { studentId, courseId: course.id } },
+    update: { enrollmentId: enrollment.id, studentNameSnapshot: "Nguyễn Minh Student", courseTitleSnapshot: course.title, instructorNameSnapshot: "Trần Văn Instructor", revokedAt: null },
+    create: { certificateNumber: "LMS-2026-DEMO0001", verificationCode: "demo-certificate-verification-code", enrollmentId: enrollment.id, studentId, courseId: course.id, studentNameSnapshot: "Nguyễn Minh Student", courseTitleSnapshot: course.title, instructorNameSnapshot: "Trần Văn Instructor", issuedAt: new Date("2026-08-06T08:00:00.000Z") }
+  });
+}
+
 async function main() {
   const passwordHash = await bcrypt.hash(TEST_PASSWORD, 12);
   const users = await seedUsers(passwordHash);
@@ -264,6 +293,7 @@ async function main() {
   await seedCourses(instructor.id, categories);
   await seedLearningContent(student.id);
   await seedSprint3(student.id, instructor.id);
+  await seedSprint4(student.id);
 
   console.log("Seed completed successfully");
   console.log("Test password for every seeded account: Password123");

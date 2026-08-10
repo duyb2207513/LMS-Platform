@@ -1,5 +1,8 @@
 node_modules
 dist
-coverage
 .env
+uploads/*
+!uploads/.gitkeep
+test-results
+coverage
 .git

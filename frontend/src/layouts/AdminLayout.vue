@@ -18,6 +18,9 @@ const navItems = [
     to: '/admin/users',
     icon: '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>',
   },
+  { label: 'Quản lý khóa học', to: '/admin/courses', icon: '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13M3 6.253v13c3-1.5 6-1.5 9 0 3-1.5 6-1.5 9 0v-13c-3-1.5-6-1.5-9 0-3-1.5-6-1.5-9 0z"/></svg>' },
+  { label: 'Kiểm duyệt đánh giá', to: '/admin/reviews', icon: '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927l2.204 4.466 4.928.716-3.566 3.476.842 4.908-4.408-2.318-4.408 2.318.842-4.908-3.566-3.476 4.928-.716 2.204-4.466z"/></svg>' },
+  { label: 'Kiểm duyệt bình luận', to: '/admin/comments', icon: '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h8M8 14h5m-9 6l2-4a8 8 0 1114-5 8 8 0 01-8 8H4z"/></svg>' },
 ]
 </script>
 

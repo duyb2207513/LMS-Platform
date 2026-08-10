@@ -15,10 +15,12 @@ import { courseReviewsRouter, reviewsRouter } from "../modules/reviews/reviews.r
 import certificatesRouter, { courseCertificatesRouter } from "../modules/certificates/certificates.routes.js";
 import ordersRouter from "../modules/orders/orders.routes.js";
 import { orderPaymentsRouter, paymentsRouter } from "../modules/payments/payments.routes.js";
+import adminRouter from "../modules/admin/admin.routes.js";
 
 const router = Router();
 
 router.use("/auth", authRouter);
+router.use("/admin", adminRouter);
 router.use("/categories", categoriesRouter);
 router.use("/courses/:courseId/sections", courseSectionsRouter);
 router.use("/courses/:courseId/enroll", courseEnrollmentRouter);
