@@ -170,12 +170,63 @@ async function seedCourses(instructorId: string, categories: Map<string, { id: s
   }
 }
 
+async function seedLearningContent(studentId: string) {
+  const course = await prisma.course.findUniqueOrThrow({ where: { slug: "react-native-cho-nguoi-moi" } });
+  const sectionOne = await prisma.section.upsert({
+    where: { id: "10000000-0000-4000-8000-000000000001" },
+    update: { courseId: course.id, title: "Bắt đầu với React Native", position: 1 },
+    create: { id: "10000000-0000-4000-8000-000000000001", courseId: course.id, title: "Bắt đầu với React Native", position: 1 }
+  });
+  const sectionTwo = await prisma.section.upsert({
+    where: { id: "10000000-0000-4000-8000-000000000002" },
+    update: { courseId: course.id, title: "Kết nối REST API", position: 2 },
+    create: { id: "10000000-0000-4000-8000-000000000002", courseId: course.id, title: "Kết nối REST API", position: 2 }
+  });
+
+  const lessons = [
+    {
+      id: "20000000-0000-4000-8000-000000000001", sectionId: sectionOne.id,
+      title: "React Native và Expo là gì?", lessonType: "TEXT" as const,
+      content: "Tổng quan về React Native, Expo và cấu trúc một ứng dụng mobile.", position: 1,
+      isPreview: true, isRequired: true, isPublished: true
+    },
+    {
+      id: "20000000-0000-4000-8000-000000000002", sectionId: sectionOne.id,
+      title: "Tạo giao diện đầu tiên", lessonType: "VIDEO" as const,
+      videoUrl: "https://example.com/seed/react-native-ui.mp4", durationSeconds: 600, position: 2,
+      isPreview: false, isRequired: true, isPublished: true
+    },
+    {
+      id: "20000000-0000-4000-8000-000000000003", sectionId: sectionTwo.id,
+      title: "Gọi API bằng Axios", lessonType: "TEXT" as const,
+      content: "Cấu hình Axios, Bearer token và xử lý lỗi từ REST API.", position: 1,
+      isPreview: false, isRequired: true, isPublished: true
+    }
+  ];
+  for (const lesson of lessons) {
+    await prisma.lesson.upsert({ where: { id: lesson.id }, update: lesson, create: lesson });
+  }
+
+  await prisma.enrollment.upsert({
+    where: { studentId_courseId: { studentId, courseId: course.id } },
+    update: { status: "ACTIVE", progressPercent: 33.33, completedAt: null },
+    create: { studentId, courseId: course.id, progressPercent: 33.33 }
+  });
+  await prisma.lessonProgress.upsert({
+    where: { studentId_lessonId: { studentId, lessonId: lessons[0].id } },
+    update: { isCompleted: true, completedAt: new Date(), lastWatchedSecond: 0 },
+    create: { studentId, lessonId: lessons[0].id, isCompleted: true, completedAt: new Date() }
+  });
+}
+
 async function main() {
   const passwordHash = await bcrypt.hash(TEST_PASSWORD, 12);
   const users = await seedUsers(passwordHash);
   const instructor = users.find(user => user.role === "INSTRUCTOR")!;
+  const student = users.find(user => user.role === "STUDENT" && user.status === "ACTIVE")!;
   const categories = await seedCategories();
   await seedCourses(instructor.id, categories);
+  await seedLearningContent(student.id);
 
   console.log("Seed completed successfully");
   console.log("Test password for every seeded account: Password123");

@@ -473,6 +473,94 @@ const swaggerDefinition = {
           }
         }
       },
+      LessonType: {
+        type: "string",
+        enum: ["VIDEO", "TEXT", "DOCUMENT"]
+      },
+      Section: {
+        type: "object",
+        required: ["id", "courseId", "title", "position"],
+        properties: {
+          id: { type: "string", format: "uuid" },
+          courseId: { type: "string", format: "uuid" },
+          title: { type: "string", maxLength: 255, example: "Giới thiệu" },
+          position: { type: "integer", minimum: 1, example: 1 },
+          lessons: { type: "array", items: { $ref: "#/components/schemas/Lesson" } }
+        }
+      },
+      Lesson: {
+        type: "object",
+        required: ["id", "sectionId", "title", "lessonType", "position", "isPreview", "isRequired", "isPublished"],
+        properties: {
+          id: { type: "string", format: "uuid" },
+          sectionId: { type: "string", format: "uuid" },
+          title: { type: "string", maxLength: 255, example: "Cài đặt môi trường" },
+          lessonType: { $ref: "#/components/schemas/LessonType" },
+          content: { type: "string", nullable: true },
+          videoUrl: { type: "string", format: "uri", nullable: true },
+          documentUrl: { type: "string", format: "uri", nullable: true },
+          durationSeconds: { type: "integer", minimum: 0, nullable: true },
+          position: { type: "integer", minimum: 1 },
+          isPreview: { type: "boolean" },
+          isRequired: { type: "boolean" },
+          isPublished: { type: "boolean" }
+        }
+      },
+      CreateSectionRequest: {
+        type: "object", additionalProperties: false, required: ["title"],
+        properties: { title: { type: "string", maxLength: 255 }, position: { type: "integer", minimum: 1 } }
+      },
+      UpdateSectionRequest: {
+        type: "object", additionalProperties: false, minProperties: 1,
+        properties: { title: { type: "string", maxLength: 255 }, position: { type: "integer", minimum: 1 } }
+      },
+      CreateLessonRequest: {
+        type: "object", additionalProperties: false, required: ["title", "lessonType"],
+        properties: {
+          title: { type: "string", maxLength: 255 }, lessonType: { $ref: "#/components/schemas/LessonType" },
+          content: { type: "string", nullable: true }, durationSeconds: { type: "integer", minimum: 0, nullable: true },
+          position: { type: "integer", minimum: 1 }, isPreview: { type: "boolean", default: false },
+          isRequired: { type: "boolean", default: true }, isPublished: { type: "boolean", default: false }
+        }
+      },
+      UpdateLessonRequest: {
+        type: "object", additionalProperties: false, minProperties: 1,
+        properties: {
+          title: { type: "string", maxLength: 255 }, lessonType: { $ref: "#/components/schemas/LessonType" },
+          content: { type: "string", nullable: true }, durationSeconds: { type: "integer", minimum: 0, nullable: true },
+          position: { type: "integer", minimum: 1 }, isPreview: { type: "boolean" }, isRequired: { type: "boolean" }, isPublished: { type: "boolean" }
+        }
+      },
+      EnrollmentResponse: {
+        type: "object",
+        properties: {
+          success: { type: "boolean", enum: [true] }, message: { type: "string", example: "Course enrolled successfully" },
+          data: { type: "object", properties: { id: { type: "string", format: "uuid" }, courseId: { type: "string", format: "uuid" }, progressPercent: { type: "number", example: 0 }, status: { type: "string", enum: ["ACTIVE", "COMPLETED", "CANCELLED"] } } }
+        }
+      },
+      CourseContentResponse: {
+        type: "object",
+        properties: {
+          success: { type: "boolean", enum: [true] }, message: { type: "string" },
+          data: { type: "object", properties: { course: { type: "object", properties: { id: { type: "string", format: "uuid" }, title: { type: "string" } } }, sections: { type: "array", items: { $ref: "#/components/schemas/Section" } } } }
+        }
+      },
+      UpdateLessonProgressRequest: {
+        type: "object", additionalProperties: false, minProperties: 1,
+        properties: { lastWatchedSecond: { type: "integer", minimum: 0, example: 120 }, isCompleted: { type: "boolean", example: true } }
+      },
+      ProgressSummary: {
+        type: "object", required: ["totalLessons", "completedLessons", "progressPercent"],
+        properties: { totalLessons: { type: "integer", example: 10 }, completedLessons: { type: "integer", example: 4 }, progressPercent: { type: "number", format: "float", example: 40 } }
+      },
+      LessonProgressResponse: {
+        type: "object",
+        properties: { success: { type: "boolean", enum: [true] }, message: { type: "string" }, data: { type: "object", properties: { lessonProgress: { type: "object" }, courseProgress: { $ref: "#/components/schemas/ProgressSummary" } } } }
+      },
+      CourseProgressResponse: {
+        type: "object",
+        properties: { success: { type: "boolean", enum: [true] }, message: { type: "string" }, data: { $ref: "#/components/schemas/ProgressSummary" } }
+      },
       ErrorResponse: {
         type: "object",
         required: ["success", "message"],

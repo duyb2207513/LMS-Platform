@@ -42,3 +42,21 @@ export const CourseStatus = {
 } as const
 
 export type CourseStatus = (typeof CourseStatus)[keyof typeof CourseStatus]
+
+
+export const LessonType = {
+  VIDEO: 'VIDEO',
+  TEXT: 'TEXT',
+  DOCUMENT: 'DOCUMENT'
+} as const
+
+export type LessonType = (typeof LessonType)[keyof typeof LessonType]
+
+
+export const EnrollmentStatus = {
+  ACTIVE: 'ACTIVE',
+  COMPLETED: 'COMPLETED',
+  CANCELLED: 'CANCELLED'
+} as const
+
+export type EnrollmentStatus = (typeof EnrollmentStatus)[keyof typeof EnrollmentStatus]

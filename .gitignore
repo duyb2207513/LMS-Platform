@@ -28,3 +28,6 @@ uploads/
 # Playwright
 playwright-report/
 test-results/
+
+# Expo local state
+/.expo/
