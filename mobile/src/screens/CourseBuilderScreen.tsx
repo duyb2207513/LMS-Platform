@@ -14,7 +14,7 @@ type LessonDraft = { sectionId: string; lesson?: Lesson; title: string; lessonTy
 
 const blankLesson = (sectionId: string): LessonDraft => ({ sectionId, title: '', lessonType: 'TEXT', content: '', durationSeconds: '', isPreview: false, isRequired: true, isPublished: false });
 
-export function CourseBuilderScreen({ route }: Props) {
+export function CourseBuilderScreen({ route, navigation }: Props) {
   const { course } = route.params;
   const [sections, setSections] = useState<CourseSection[]>([]);
   const [loading, setLoading] = useState(true);
@@ -30,7 +30,7 @@ export function CourseBuilderScreen({ route }: Props) {
     catch (e) { setError(getApiMessage(e)); }
     finally { setLoading(false); }
   }, [course.id]);
-  useEffect(() => { void load(); }, [load]);
+  useEffect(() => navigation.addListener('focus', () => { void load(); }), [navigation, load]);
 
   async function saveSection() {
     if (!sectionDraft?.title.trim()) return;
@@ -101,6 +101,7 @@ export function CourseBuilderScreen({ route }: Props) {
         {section.lessons.map((lesson, lessonIndex) => <View key={lesson.id} style={styles.lessonRow}>
           <View style={{ flex: 1 }}><Text style={styles.lessonTitle}>{lessonIndex + 1}. {lesson.title}</Text><Text style={styles.meta}>{typeName[lesson.lessonType]} · {lesson.isPublished ? 'Đã xuất bản' : 'Bản nháp'}</Text></View>
           {(lesson.lessonType === 'VIDEO' || lesson.lessonType === 'DOCUMENT') && <Pressable disabled={uploadingId === lesson.id} onPress={() => void pickLessonFile(lesson)}><Text style={styles.link}>{uploadingId === lesson.id ? 'Đang tải...' : lesson.videoUrl || lesson.documentUrl ? 'Đổi file' : 'Tải file'}</Text></Pressable>}
+          <Pressable onPress={() => navigation.navigate('QuizBuilder', { lesson })}><Text style={styles.link}>{lesson.quiz ? 'Quiz' : '+ Quiz'}</Text></Pressable>
           <Pressable onPress={() => editLesson(section.id, lesson)}><Text style={styles.link}>Sửa</Text></Pressable>
           <Pressable onPress={() => removeLesson(lesson)}><Text style={styles.danger}>Xóa</Text></Pressable>
         </View>)}

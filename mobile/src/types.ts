@@ -79,7 +79,22 @@ export interface Lesson {
   isRequired: boolean;
   isPublished: boolean;
   progress?: LessonProgress;
+  quiz?: Quiz | null;
 }
+
+export interface QuizOption { id: string; questionId?: string; text: string; position: number; isCorrect?: boolean }
+export interface QuizQuestion { id: string; quizId?: string; text: string; explanation?: string | null; points: number; position: number; options: QuizOption[] }
+export interface Quiz {
+  id: string; lessonId?: string; title: string; description: string | null; passingScore: number;
+  maxAttempts: number; timeLimitMinutes: number | null; isPublished: boolean; questions?: QuizQuestion[];
+}
+export interface QuizAttempt { id: string; quizId: string; attemptNumber: number; status: 'IN_PROGRESS' | 'SUBMITTED'; score: number | null; passed: boolean | null; startedAt: string; submittedAt: string | null }
+export interface QuizResult {
+  id: string; quizId: string; attemptNumber: number; status: 'SUBMITTED'; score: number; earnedPoints: number; totalPoints: number; passed: boolean; submittedAt: string;
+  answers: Array<{ questionId: string; question: string; selectedOptionId: string | null; correctOptionId?: string; isCorrect: boolean; pointsEarned: number; explanation: string | null }>;
+}
+export interface Review { id: string; courseId: string; rating: number; content: string | null; createdAt: string; updatedAt: string; user: Pick<User, 'id' | 'fullName' | 'avatarUrl'> }
+export interface Comment { id: string; lessonId: string; parentId: string | null; content: string | null; isDeleted?: boolean; createdAt: string; updatedAt: string; user: Pick<User, 'id' | 'fullName' | 'avatarUrl' | 'role'>; replies?: Comment[] }
 
 export interface CourseSection {
   id: string;
@@ -143,5 +158,8 @@ export type RootStackParamList = {
   CourseBuilder: { course: Course };
   MyCourses: undefined;
   Learning: { courseId: string; courseTitle: string };
+  QuizBuilder: { lesson: Lesson };
+  Quiz: { quizId: string; title: string };
+  QuizResult: { result: QuizResult; quizTitle: string };
   AdminCategories: undefined;
 };
