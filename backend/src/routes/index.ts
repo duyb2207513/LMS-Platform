@@ -9,6 +9,9 @@ import { lessonsRouter, sectionLessonsRouter } from "../modules/lessons/lessons.
 import { courseProgressRouter, lessonProgressRouter } from "../modules/progress/progress.routes.js";
 import { courseSectionsRouter, sectionsRouter } from "../modules/sections/sections.routes.js";
 import usersRouter from "../modules/users/users.routes.js";
+import { commentsRouter, lessonCommentsRouter } from "../modules/comments/comments.routes.js";
+import { lessonQuizzesRouter, optionsRouter, questionsRouter, quizAttemptsRouter, quizzesRouter } from "../modules/quizzes/quizzes.routes.js";
+import { courseReviewsRouter, reviewsRouter } from "../modules/reviews/reviews.routes.js";
 
 const router = Router();
 
@@ -18,11 +21,20 @@ router.use("/courses/:courseId/sections", courseSectionsRouter);
 router.use("/courses/:courseId/enroll", courseEnrollmentRouter);
 router.use("/courses/:courseId/content", courseLearningRouter);
 router.use("/courses/:courseId/progress", courseProgressRouter);
+router.use("/courses/:courseId/reviews", courseReviewsRouter);
 router.use("/courses", coursesRouter);
 router.use("/sections/:sectionId/lessons", sectionLessonsRouter);
 router.use("/sections", sectionsRouter);
 router.use("/lessons/:lessonId/progress", lessonProgressRouter);
+router.use("/lessons/:lessonId/quizzes", lessonQuizzesRouter);
+router.use("/lessons/:lessonId/comments", lessonCommentsRouter);
 router.use("/lessons", lessonsRouter);
+router.use("/quizzes", quizzesRouter);
+router.use("/questions", questionsRouter);
+router.use("/options", optionsRouter);
+router.use("/quiz-attempts", quizAttemptsRouter);
+router.use("/reviews", reviewsRouter);
+router.use("/comments", commentsRouter);
 router.use("/enrollments", enrollmentsRouter);
 router.use("/instructor", instructorCoursesRouter);
 router.use("/users", usersRouter);

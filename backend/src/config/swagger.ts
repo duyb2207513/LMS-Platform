@@ -503,7 +503,8 @@ const swaggerDefinition = {
           position: { type: "integer", minimum: 1 },
           isPreview: { type: "boolean" },
           isRequired: { type: "boolean" },
-          isPublished: { type: "boolean" }
+          isPublished: { type: "boolean" },
+          quiz: { type: "object", nullable: true, description: "Quiz metadata (full questions/options are returned on instructor management endpoints)" }
         }
       },
       CreateSectionRequest: {
@@ -560,6 +561,50 @@ const swaggerDefinition = {
       CourseProgressResponse: {
         type: "object",
         properties: { success: { type: "boolean", enum: [true] }, message: { type: "string" }, data: { $ref: "#/components/schemas/ProgressSummary" } }
+      },
+      CreateQuizRequest: {
+        type: "object", additionalProperties: false, required: ["title"],
+        properties: { title: { type: "string", maxLength: 255 }, description: { type: "string", nullable: true }, passingScore: { type: "integer", minimum: 0, maximum: 100, default: 70 }, maxAttempts: { type: "integer", minimum: 1, maximum: 20, default: 3 }, timeLimitMinutes: { type: "integer", minimum: 1, maximum: 300, nullable: true }, isPublished: { type: "boolean", default: false } }
+      },
+      UpdateQuizRequest: {
+        type: "object", additionalProperties: false, minProperties: 1,
+        properties: { title: { type: "string", maxLength: 255 }, description: { type: "string", nullable: true }, passingScore: { type: "integer", minimum: 0, maximum: 100 }, maxAttempts: { type: "integer", minimum: 1, maximum: 20 }, timeLimitMinutes: { type: "integer", minimum: 1, maximum: 300, nullable: true }, isPublished: { type: "boolean" } }
+      },
+      CreateQuestionRequest: {
+        type: "object", additionalProperties: false, required: ["text"],
+        properties: { text: { type: "string", maxLength: 5000 }, explanation: { type: "string", nullable: true }, points: { type: "integer", minimum: 1, maximum: 100, default: 1 }, position: { type: "integer", minimum: 1 } }
+      },
+      UpdateQuestionRequest: {
+        type: "object", additionalProperties: false, minProperties: 1,
+        properties: { text: { type: "string", maxLength: 5000 }, explanation: { type: "string", nullable: true }, points: { type: "integer", minimum: 1, maximum: 100 }, position: { type: "integer", minimum: 1 } }
+      },
+      CreateQuizOptionRequest: {
+        type: "object", additionalProperties: false, required: ["text"],
+        properties: { text: { type: "string", maxLength: 2000 }, isCorrect: { type: "boolean", default: false }, position: { type: "integer", minimum: 1 } }
+      },
+      UpdateQuizOptionRequest: {
+        type: "object", additionalProperties: false, minProperties: 1,
+        properties: { text: { type: "string", maxLength: 2000 }, isCorrect: { type: "boolean" }, position: { type: "integer", minimum: 1 } }
+      },
+      SubmitQuizAttemptRequest: {
+        type: "object", additionalProperties: false, required: ["answers"],
+        properties: { answers: { type: "array", items: { type: "object", required: ["questionId", "optionId"], properties: { questionId: { type: "string", format: "uuid" }, optionId: { type: "string", format: "uuid" } } } } }
+      },
+      CreateReviewRequest: {
+        type: "object", additionalProperties: false, required: ["rating"],
+        properties: { rating: { type: "integer", minimum: 1, maximum: 5 }, content: { type: "string", maxLength: 2000, nullable: true } }
+      },
+      UpdateReviewRequest: {
+        type: "object", additionalProperties: false, minProperties: 1,
+        properties: { rating: { type: "integer", minimum: 1, maximum: 5 }, content: { type: "string", maxLength: 2000, nullable: true } }
+      },
+      CreateCommentRequest: {
+        type: "object", additionalProperties: false, required: ["content"],
+        properties: { content: { type: "string", maxLength: 5000 }, parentId: { type: "string", format: "uuid", nullable: true, description: "Top-level comment ID when creating a reply" } }
+      },
+      UpdateCommentRequest: {
+        type: "object", additionalProperties: false, required: ["content"],
+        properties: { content: { type: "string", maxLength: 5000 } }
       },
       ErrorResponse: {
         type: "object",
