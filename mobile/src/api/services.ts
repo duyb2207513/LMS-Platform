@@ -1,4 +1,7 @@
-import type { ApiResponse, Category, Course, CourseInput, PaginatedResponse, User } from '../types';
+import type {
+  ApiResponse, Category, Course, CourseContent, CourseInput, CourseProgress,
+  CourseSection, Enrollment, Lesson, LessonType, PaginatedResponse, User,
+} from '../types';
 import { apiClient } from './client';
 
 export const authApi = {
@@ -44,4 +47,55 @@ export const coursesApi = {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
   },
+};
+
+export const sectionsApi = {
+  list: (courseId: string) => apiClient.get<ApiResponse<CourseSection[]>>(`/courses/${courseId}/sections`),
+  create: (courseId: string, input: { title: string; position?: number }) =>
+    apiClient.post<ApiResponse<CourseSection>>(`/courses/${courseId}/sections`, input),
+  update: (sectionId: string, input: { title?: string; position?: number }) =>
+    apiClient.patch<ApiResponse<CourseSection>>(`/sections/${sectionId}`, input),
+  remove: (sectionId: string) => apiClient.delete(`/sections/${sectionId}`),
+};
+
+export interface LessonInput {
+  title: string;
+  lessonType: LessonType;
+  content?: string | null;
+  durationSeconds?: number | null;
+  position?: number;
+  isPreview?: boolean;
+  isRequired?: boolean;
+  isPublished?: boolean;
+}
+
+export const lessonsApi = {
+  create: (sectionId: string, input: LessonInput) =>
+    apiClient.post<ApiResponse<Lesson>>(`/sections/${sectionId}/lessons`, input),
+  update: (lessonId: string, input: Partial<LessonInput>) =>
+    apiClient.patch<ApiResponse<Lesson>>(`/lessons/${lessonId}`, input),
+  remove: (lessonId: string) => apiClient.delete(`/lessons/${lessonId}`),
+  uploadFile: (lessonId: string, file: { uri: string; name: string; mimeType?: string | null }) => {
+    const data = new FormData();
+    data.append('file', {
+      uri: file.uri,
+      name: file.name,
+      type: file.mimeType || 'application/octet-stream',
+    } as unknown as Blob);
+    return apiClient.post<ApiResponse<Lesson>>(`/lessons/${lessonId}/file`, data, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+  },
+};
+
+export const enrollmentsApi = {
+  enroll: (courseId: string) => apiClient.post<ApiResponse<Enrollment>>(`/courses/${courseId}/enroll`),
+  mine: () => apiClient.get<ApiResponse<Enrollment[]>>('/enrollments/me'),
+};
+
+export const learningApi = {
+  content: (courseId: string) => apiClient.get<ApiResponse<CourseContent>>(`/courses/${courseId}/content`),
+  progress: (courseId: string) => apiClient.get<ApiResponse<CourseProgress>>(`/courses/${courseId}/progress`),
+  updateProgress: (lessonId: string, input: { lastWatchedSecond?: number; isCompleted?: boolean }) =>
+    apiClient.patch<ApiResponse<{ lessonProgress: Lesson['progress']; courseProgress: CourseProgress }>>(`/lessons/${lessonId}/progress`, input),
 };

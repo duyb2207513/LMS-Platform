@@ -13,6 +13,7 @@ export function DashboardScreen({ navigation }: NativeStackScreenProps<RootStack
   if (!user) return <Screen><SectionTitle title="Bạn chưa đăng nhập" /><Button title="Đăng nhập" onPress={() => navigation.replace('Login')} /></Screen>;
   return <Screen><View style={styles.welcome}><Text style={styles.hello}>Xin chào,</Text><Text style={styles.name}>{user.fullName}</Text><Text style={styles.role}>{roleName[user.role]}</Text></View>
     <Menu title="Khám phá khóa học" note="Danh sách khóa học đang xuất bản" onPress={() => navigation.navigate('Courses')} />
+    {user.role === 'STUDENT' && <Menu title="Khóa học của tôi" note="Học tiếp và theo dõi tiến độ" onPress={() => navigation.navigate('MyCourses')} />}
     <Menu title="Hồ sơ cá nhân" note="Xem và cập nhật thông tin" onPress={() => navigation.navigate('Profile')} />
     <Menu title="Đổi mật khẩu" note="Bảo vệ tài khoản của bạn" onPress={() => navigation.navigate('ChangePassword')} />
     {(user.role === 'INSTRUCTOR' || user.role === 'ADMIN') && <Menu title="Quản lý khóa học" note="Tạo, sửa và xuất bản khóa học" onPress={() => navigation.navigate('InstructorCourses')} />}

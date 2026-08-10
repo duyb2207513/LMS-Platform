@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Image, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { categoriesApi, coursesApi } from '../api/services';
+import { categoriesApi, coursesApi, enrollmentsApi } from '../api/services';
 import { getApiMessage } from '../api/client';
 import { CourseCard, money } from '../components/CourseCard';
 import { Button, Field, Screen, SectionTitle, StateView } from '../components/ui';
 import type { Category, Course, RootStackParamList } from '../types';
 import { colors } from '../theme';
+import { useAuth } from '../auth/AuthContext';
 
 export function CoursesScreen({ navigation }: NativeStackScreenProps<RootStackParamList, 'Courses'>) {
   const [courses, setCourses] = useState<Course[]>([]); const [categories, setCategories] = useState<Category[]>([]);
@@ -34,9 +35,21 @@ export function CoursesScreen({ navigation }: NativeStackScreenProps<RootStackPa
 }
 
 export function CourseDetailScreen({ route, navigation }: NativeStackScreenProps<RootStackParamList, 'CourseDetail'>) {
+  const { user } = useAuth();
   const [course, setCourse] = useState<Course | null>(null); const [error, setError] = useState('');
+  const [enrolling, setEnrolling] = useState(false);
   const load = useCallback(async () => { try { setCourse((await coursesApi.detail(route.params.slug)).data.data); } catch (e) { setError(getApiMessage(e)); } }, [route.params.slug]);
   useEffect(() => { void load(); }, [load]);
+  async function enroll() {
+    if (!course) return;
+    setEnrolling(true);
+    try { await enrollmentsApi.enroll(course.id); navigation.navigate('MyCourses'); }
+    catch (e) {
+      const message = getApiMessage(e);
+      if (message.toLowerCase().includes('already enrolled')) navigation.navigate('MyCourses');
+      else setError(message);
+    } finally { setEnrolling(false); }
+  }
   if (!course) return <Screen><StateView loading={!error} error={error} onRetry={load} /></Screen>;
   return <Screen>{course.thumbnailUrl ? <Image source={{ uri: course.thumbnailUrl }} style={styles.heroImage} /> : <View style={[styles.heroImage, styles.placeholder]}><Text style={{ fontSize: 64, color: colors.primary }}>▤</Text></View>}
     <Text style={styles.category}>{course.category?.name}</Text><Text style={styles.title}>{course.title}</Text>
@@ -44,7 +57,8 @@ export function CourseDetailScreen({ route, navigation }: NativeStackScreenProps
     <Text style={styles.h2}>Giới thiệu</Text><Text style={styles.body}>{course.description}</Text>
     {!!course.learningOutcomes && <><Text style={styles.h2}>Bạn sẽ học được gì?</Text><Text style={styles.body}>{course.learningOutcomes}</Text></>}
     {!!course.requirements && <><Text style={styles.h2}>Yêu cầu</Text><Text style={styles.body}>{course.requirements}</Text></>}
-    <Button title="Đăng nhập để bắt đầu" onPress={() => navigation.navigate('Login')} />
+    {!user && <Button title="Đăng nhập để bắt đầu" onPress={() => navigation.navigate('Login')} />}
+    {user?.role === 'STUDENT' && course.isFree && <Button title="Đăng ký miễn phí" onPress={enroll} loading={enrolling} />}
   </Screen>;
 }
 
