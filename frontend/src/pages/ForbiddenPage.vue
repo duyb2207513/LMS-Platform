@@ -1,0 +1,2 @@
+<script setup lang="ts">import DefaultLayout from '@/layouts/DefaultLayout.vue'</script>
+<template><DefaultLayout><main class="mx-auto max-w-xl px-4 py-24 text-center"><p class="text-7xl font-black text-purple-600">403</p><h1 class="mt-4 text-3xl font-extrabold">Bạn không có quyền truy cập</h1><p class="mt-3 text-slate-500">Tài khoản hiện tại không có vai trò phù hợp với trang này.</p><RouterLink to="/" class="mt-7 inline-block rounded-xl bg-purple-600 px-6 py-3 font-bold text-white">Về trang chủ</RouterLink></main></DefaultLayout></template>

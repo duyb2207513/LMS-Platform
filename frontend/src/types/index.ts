@@ -78,7 +78,8 @@ export interface PaginatedResponse<T> {
   message: string
   data: T[]
   meta: {
-    total: number
+    total?: number
+    totalItems?: number
     page: number
     limit: number
     totalPages: number
@@ -94,7 +95,7 @@ export interface RegisterRequest {
   fullName: string
   email: string
   password: string
-  role?: UserRole
+  confirmPassword: string
 }
 
 export interface AuthResponse {
@@ -102,6 +103,24 @@ export interface AuthResponse {
   accessToken: string
   refreshToken: string
 }
+
+export interface Enrollment { id:string;courseId:string;progressPercent:number;status:'ACTIVE'|'COMPLETED'|'CANCELLED';enrolledAt:string;completedAt:string|null;course:Course }
+export interface LessonProgress { isCompleted:boolean;lastWatchedSecond:number;completedAt?:string|null }
+export interface Lesson { id:string;sectionId:string;title:string;lessonType:'VIDEO'|'TEXT'|'DOCUMENT';content:string|null;videoUrl:string|null;documentUrl:string|null;durationSeconds:number|null;position:number;isPreview:boolean;isRequired:boolean;isPublished:boolean;progress?:LessonProgress;quiz?:Quiz|null }
+export interface CourseSection { id:string;courseId:string;title:string;position:number;lessons:Lesson[] }
+export interface CourseContent { course:Pick<Course,'id'|'title'>;sections:CourseSection[] }
+export interface CourseProgress { totalLessons:number;completedLessons:number;progressPercent:number }
+export interface QuizOption { id:string;text:string;position:number;isCorrect?:boolean }
+export interface QuizQuestion { id:string;text:string;explanation?:string|null;points:number;position:number;options:QuizOption[] }
+export interface Quiz { id:string;lessonId:string;title:string;description:string|null;passingScore:number;maxAttempts:number;timeLimitMinutes:number|null;isPublished:boolean;questions?:QuizQuestion[] }
+export interface QuizAttempt { id:string;quizId:string;attemptNumber:number;status:'IN_PROGRESS'|'SUBMITTED';score:number|null;passed:boolean|null;startedAt:string;submittedAt:string|null }
+export interface QuizResult extends QuizAttempt { earnedPoints:number;totalPoints:number;score:number;passed:boolean;answers:Array<{questionId:string;question:string;selectedOptionId:string|null;correctOptionId?:string;isCorrect:boolean;pointsEarned:number;explanation:string|null}> }
+export interface Review { id:string;courseId:string;rating:number;content:string|null;createdAt:string;updatedAt:string;user:Pick<User,'id'|'fullName'|'avatarUrl'> }
+export interface Comment { id:string;lessonId:string;parentId:string|null;content:string|null;isDeleted?:boolean;createdAt:string;user:Pick<User,'id'|'fullName'|'avatarUrl'|'role'>;replies?:Comment[] }
+export interface Payment { id:string;status:'PENDING'|'SUCCEEDED'|'FAILED';amount:number;currency:string;createdAt:string;paidAt:string|null }
+export interface OrderItem { id:string;courseId:string;courseTitleSnapshot:string;priceSnapshot:number;course?:Pick<Course,'slug'|'thumbnailUrl'> }
+export interface Order { id:string;orderNumber:string;status:'PENDING'|'PAID'|'CANCELLED';subtotal:number;total:number;currency:string;paidAt:string|null;createdAt:string;items:OrderItem[];payments:Payment[] }
+export interface Certificate { id:string;certificateNumber:string;verificationCode:string;studentNameSnapshot:string;courseTitleSnapshot:string;instructorNameSnapshot:string;issuedAt:string;revokedAt:string|null;courseId:string }
 
 export interface CategoryFormData {
   name: string

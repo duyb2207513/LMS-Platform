@@ -44,7 +44,7 @@ async function handleSubmit() {
   loading.value = true
   try {
     const response = await courseStore.createCourse(form.value)
-    if (response.data) router.push('/instructor/courses')
+    if (response.data) router.push(`/instructor/courses/${response.data.id}/builder`)
   } catch (e) {
     error.value = e instanceof Error ? e.message : 'Tạo khóa học thất bại'
   } finally {
