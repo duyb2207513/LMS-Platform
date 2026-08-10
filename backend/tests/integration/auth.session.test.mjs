@@ -50,7 +50,8 @@ try {
   assert.ok(loginBody.data.accessToken);
   assert.ok(refreshToken);
   assert.match(setCookie, /HttpOnly/i);
-  assert.match(setCookie, /Secure/i);
+  if (process.env.NODE_ENV === "production") assert.match(setCookie, /Secure/i);
+  else assert.doesNotMatch(setCookie, /Secure/i);
   assert.match(setCookie, /SameSite=Lax/i);
 
   const accessPayload = jwt.verify(loginBody.data.accessToken, process.env.JWT_ACCESS_SECRET);

@@ -1,6 +1,8 @@
 generator client {
-  provider = "prisma-client"
-  output   = "../src/prisma"
+  provider            = "prisma-client"
+  output              = "../src/prisma"
+  moduleFormat        = "esm"
+  importFileExtension = "js"
 }
 
 datasource db {
@@ -30,6 +32,18 @@ enum CourseStatus {
   ARCHIVED
 }
 
+enum LessonType {
+  VIDEO
+  TEXT
+  DOCUMENT
+}
+
+enum EnrollmentStatus {
+  ACTIVE
+  COMPLETED
+  CANCELLED
+}
+
 model User {
   id           String     @id @default(uuid()) @db.Uuid
   fullName     String     @map("full_name") @db.VarChar(100)
@@ -41,7 +55,9 @@ model User {
   createdAt    DateTime   @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt    DateTime   @updatedAt @map("updated_at") @db.Timestamptz(3)
 
-  courses Course[] @relation("InstructorCourses")
+  courses        Course[]         @relation("InstructorCourses")
+  enrollments    Enrollment[]     @relation("StudentEnrollments")
+  lessonProgress LessonProgress[] @relation("StudentLessonProgress")
 
   @@index([role])
   @@index([status])
@@ -82,6 +98,8 @@ model Course {
 
   instructor User     @relation("InstructorCourses", fields: [instructorId], references: [id], onDelete: Restrict)
   category   Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  sections    Section[]
+  enrollments Enrollment[]
 
   @@index([instructorId])
   @@index([categoryId])
@@ -89,4 +107,78 @@ model Course {
   @@index([level])
   @@index([createdAt])
   @@map("courses")
+}
+
+model Section {
+  id        String   @id @default(uuid()) @db.Uuid
+  courseId  String   @map("course_id") @db.Uuid
+  title     String   @db.VarChar(255)
+  position  Int
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  course  Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  lessons Lesson[]
+
+  @@index([courseId, position])
+  @@map("sections")
+}
+
+model Lesson {
+  id              String     @id @default(uuid()) @db.Uuid
+  sectionId       String     @map("section_id") @db.Uuid
+  title           String     @db.VarChar(255)
+  lessonType      LessonType @map("lesson_type")
+  content         String?
+  videoUrl        String?    @map("video_url")
+  documentUrl     String?    @map("document_url")
+  durationSeconds Int?       @map("duration_seconds")
+  position        Int
+  isPreview       Boolean    @default(false) @map("is_preview")
+  isRequired      Boolean    @default(true) @map("is_required")
+  isPublished     Boolean    @default(false) @map("is_published")
+  createdAt       DateTime   @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt       DateTime   @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  section  Section          @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  progress LessonProgress[]
+
+  @@index([sectionId, position])
+  @@index([isPublished])
+  @@map("lessons")
+}
+
+model Enrollment {
+  id              String           @id @default(uuid()) @db.Uuid
+  studentId       String           @map("student_id") @db.Uuid
+  courseId        String           @map("course_id") @db.Uuid
+  enrolledAt      DateTime         @default(now()) @map("enrolled_at") @db.Timestamptz(3)
+  completedAt     DateTime?        @map("completed_at") @db.Timestamptz(3)
+  progressPercent Decimal          @default(0) @map("progress_percent") @db.Decimal(5, 2)
+  status          EnrollmentStatus @default(ACTIVE)
+
+  student User   @relation("StudentEnrollments", fields: [studentId], references: [id], onDelete: Cascade)
+  course  Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, courseId])
+  @@index([courseId])
+  @@index([status])
+  @@map("enrollments")
+}
+
+model LessonProgress {
+  id                String    @id @default(uuid()) @db.Uuid
+  studentId         String    @map("student_id") @db.Uuid
+  lessonId          String    @map("lesson_id") @db.Uuid
+  isCompleted       Boolean   @default(false) @map("is_completed")
+  lastWatchedSecond Int       @default(0) @map("last_watched_second")
+  completedAt       DateTime? @map("completed_at") @db.Timestamptz(3)
+  updatedAt         DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  student User   @relation("StudentLessonProgress", fields: [studentId], references: [id], onDelete: Cascade)
+  lesson  Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, lessonId])
+  @@index([lessonId])
+  @@map("lesson_progress")
 }

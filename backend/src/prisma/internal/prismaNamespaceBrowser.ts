@@ -53,7 +53,11 @@ export const AnyNull = runtime.AnyNull
 export const ModelName = {
   User: 'User',
   Category: 'Category',
-  Course: 'Course'
+  Course: 'Course',
+  Section: 'Section',
+  Lesson: 'Lesson',
+  Enrollment: 'Enrollment',
+  LessonProgress: 'LessonProgress'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -120,6 +124,64 @@ export const CourseScalarFieldEnum = {
 } as const
 
 export type CourseScalarFieldEnum = (typeof CourseScalarFieldEnum)[keyof typeof CourseScalarFieldEnum]
+
+
+export const SectionScalarFieldEnum = {
+  id: 'id',
+  courseId: 'courseId',
+  title: 'title',
+  position: 'position',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SectionScalarFieldEnum = (typeof SectionScalarFieldEnum)[keyof typeof SectionScalarFieldEnum]
+
+
+export const LessonScalarFieldEnum = {
+  id: 'id',
+  sectionId: 'sectionId',
+  title: 'title',
+  lessonType: 'lessonType',
+  content: 'content',
+  videoUrl: 'videoUrl',
+  documentUrl: 'documentUrl',
+  durationSeconds: 'durationSeconds',
+  position: 'position',
+  isPreview: 'isPreview',
+  isRequired: 'isRequired',
+  isPublished: 'isPublished',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type LessonScalarFieldEnum = (typeof LessonScalarFieldEnum)[keyof typeof LessonScalarFieldEnum]
+
+
+export const EnrollmentScalarFieldEnum = {
+  id: 'id',
+  studentId: 'studentId',
+  courseId: 'courseId',
+  enrolledAt: 'enrolledAt',
+  completedAt: 'completedAt',
+  progressPercent: 'progressPercent',
+  status: 'status'
+} as const
+
+export type EnrollmentScalarFieldEnum = (typeof EnrollmentScalarFieldEnum)[keyof typeof EnrollmentScalarFieldEnum]
+
+
+export const LessonProgressScalarFieldEnum = {
+  id: 'id',
+  studentId: 'studentId',
+  lessonId: 'lessonId',
+  isCompleted: 'isCompleted',
+  lastWatchedSecond: 'lastWatchedSecond',
+  completedAt: 'completedAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type LessonProgressScalarFieldEnum = (typeof LessonProgressScalarFieldEnum)[keyof typeof LessonProgressScalarFieldEnum]
 
 
 export const SortOrder = {

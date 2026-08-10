@@ -3,13 +3,27 @@ import authRouter from "../modules/auth/auth.routes.js";
 import categoriesRouter from "../modules/categories/categories.routes.js";
 import coursesRouter from "../modules/courses/courses.routes.js";
 import instructorCoursesRouter from "../modules/courses/instructor-courses.routes.js";
+import { courseEnrollmentRouter, enrollmentsRouter } from "../modules/enrollments/enrollments.routes.js";
+import { courseLearningRouter } from "../modules/learning/learning.routes.js";
+import { lessonsRouter, sectionLessonsRouter } from "../modules/lessons/lessons.routes.js";
+import { courseProgressRouter, lessonProgressRouter } from "../modules/progress/progress.routes.js";
+import { courseSectionsRouter, sectionsRouter } from "../modules/sections/sections.routes.js";
 import usersRouter from "../modules/users/users.routes.js";
 
 const router = Router();
 
 router.use("/auth", authRouter);
 router.use("/categories", categoriesRouter);
+router.use("/courses/:courseId/sections", courseSectionsRouter);
+router.use("/courses/:courseId/enroll", courseEnrollmentRouter);
+router.use("/courses/:courseId/content", courseLearningRouter);
+router.use("/courses/:courseId/progress", courseProgressRouter);
 router.use("/courses", coursesRouter);
+router.use("/sections/:sectionId/lessons", sectionLessonsRouter);
+router.use("/sections", sectionsRouter);
+router.use("/lessons/:lessonId/progress", lessonProgressRouter);
+router.use("/lessons", lessonsRouter);
+router.use("/enrollments", enrollmentsRouter);
 router.use("/instructor", instructorCoursesRouter);
 router.use("/users", usersRouter);
 
