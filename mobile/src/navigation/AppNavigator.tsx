@@ -13,6 +13,7 @@ import { CourseFormScreen, InstructorCoursesScreen } from '../screens/Instructor
 import { CourseBuilderScreen } from '../screens/CourseBuilderScreen';
 import { LearningScreen, MyCoursesScreen } from '../screens/LearningScreens';
 import { QuizBuilderScreen, QuizResultScreen, QuizScreen } from '../screens/QuizScreens';
+import { CertificatesScreen, CheckoutScreen, MockPaymentScreen, OrdersScreen, PaymentResultScreen, VerifyCertificateScreen } from '../screens/PaymentScreens';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const navigationTheme = { ...DefaultTheme, colors: { ...DefaultTheme.colors, primary: colors.primary, background: colors.background, card: '#fff', text: colors.ink, border: colors.border } };
@@ -23,6 +24,7 @@ export function AppNavigator() {
   return <NavigationContainer theme={navigationTheme}>
     <Stack.Navigator screenOptions={{ headerTintColor: colors.primary, headerTitleStyle: { fontWeight: '800' }, headerShadowVisible: false, contentStyle: { backgroundColor: colors.background } }}>
       <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="VerifyCertificate" component={VerifyCertificateScreen} options={{ title: 'Xác minh chứng chỉ' }} />
       <Stack.Screen name="Courses" component={CoursesScreen} options={{ title: 'Khóa học' }} />
       <Stack.Screen name="CourseDetail" component={CourseDetailScreen} options={{ title: 'Chi tiết khóa học' }} />
       <Stack.Screen name="Dashboard" component={DashboardScreen} options={{ title: 'Tài khoản' }} />
@@ -37,6 +39,11 @@ export function AppNavigator() {
           <Stack.Screen name="Learning" component={LearningScreen} options={{ title: 'Học tập' }} />
           <Stack.Screen name="Quiz" component={QuizScreen} options={{ title: 'Làm bài quiz' }} />
           <Stack.Screen name="QuizResult" component={QuizResultScreen} options={{ title: 'Kết quả quiz' }} />
+          <Stack.Screen name="Orders" component={OrdersScreen} options={{ title: 'Đơn hàng' }} />
+          <Stack.Screen name="Checkout" component={CheckoutScreen} options={{ title: 'Thanh toán' }} />
+          <Stack.Screen name="MockPayment" component={MockPaymentScreen} options={{ title: 'Cổng thanh toán' }} />
+          <Stack.Screen name="PaymentResult" component={PaymentResultScreen} options={{ title: 'Kết quả thanh toán', headerBackVisible: false }} />
+          <Stack.Screen name="Certificates" component={CertificatesScreen} options={{ title: 'Chứng chỉ' }} />
         </>}
         {(user.role === 'INSTRUCTOR' || user.role === 'ADMIN') && <>
           <Stack.Screen name="InstructorCourses" component={InstructorCoursesScreen} options={{ title: 'Quản lý khóa học' }} />

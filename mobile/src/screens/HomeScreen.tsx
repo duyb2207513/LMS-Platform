@@ -18,6 +18,7 @@ export function HomeScreen({ navigation }: Props) {
         <Text style={styles.copy}>Khám phá những khóa học chất lượng cao. Học mọi lúc, mọi nơi với trải nghiệm học tập hiện đại.</Text>
         <Pressable style={styles.primary} onPress={() => navigation.navigate('Courses')}><Text style={styles.primaryText}>Khám phá khóa học  →</Text></Pressable>
         <Pressable style={styles.secondary} onPress={() => navigation.navigate(user ? 'Dashboard' : 'Register')}><Text style={styles.secondaryText}>{user ? 'Vào trang của tôi' : 'Bắt đầu miễn phí'}</Text></Pressable>
+        <Pressable style={styles.verify} onPress={() => navigation.navigate('VerifyCertificate')}><Text style={styles.verifyText}>Xác minh chứng chỉ</Text></Pressable>
       </View>
       <View style={styles.stats}><Stat value="100+" label="Khóa học" /><Stat value="50+" label="Giảng viên" /><Stat value="1K+" label="Học viên" /></View>
     </SafeAreaView>
@@ -40,5 +41,6 @@ const styles = StyleSheet.create({
   copy: { color: '#eeeaff', fontSize: 17, lineHeight: 27, marginTop: 23 },
   primary: { backgroundColor: '#fff', borderRadius: 15, padding: 17, alignItems: 'center', marginTop: 28 }, primaryText: { color: '#4f35de', fontWeight: '800', fontSize: 16 },
   secondary: { borderRadius: 15, borderWidth: 1, borderColor: '#ffffff55', padding: 15, alignItems: 'center', marginTop: 12 }, secondaryText: { color: '#fff', fontWeight: '700', fontSize: 16 },
+  verify: { alignItems: 'center', padding: 12, marginTop: 4 }, verifyText: { color: '#fff', fontWeight: '700', textDecorationLine: 'underline' },
   stats: { flexDirection: 'row', justifyContent: 'space-between', paddingBottom: 26 }, statValue: { color: '#fff', fontSize: 25, fontWeight: '900' }, statLabel: { color: '#ddd5ff', marginTop: 3 },
 });

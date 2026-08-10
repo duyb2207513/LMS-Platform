@@ -128,6 +128,61 @@ export interface CourseProgress {
   progressPercent: number;
 }
 
+export type OrderStatus = 'PENDING' | 'PAID' | 'CANCELLED';
+export type PaymentStatus = 'PENDING' | 'SUCCEEDED' | 'FAILED';
+
+export interface OrderItem {
+  id: string;
+  courseId: string;
+  courseTitleSnapshot: string;
+  priceSnapshot: number;
+  course?: Pick<Course, 'slug' | 'thumbnailUrl'>;
+}
+
+export interface Payment {
+  id: string;
+  provider: 'MOCK' | 'VNPAY';
+  status: PaymentStatus;
+  amount: number;
+  currency: string;
+  providerTransactionId: string | null;
+  paidAt: string | null;
+  createdAt: string;
+}
+
+export interface Order {
+  id: string;
+  orderNumber: string;
+  status: OrderStatus;
+  subtotal: number;
+  total: number;
+  currency: string;
+  paidAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+  items: OrderItem[];
+  payments: Payment[];
+}
+
+export interface Certificate {
+  id: string;
+  certificateNumber: string;
+  verificationCode: string;
+  enrollmentId: string;
+  studentId: string;
+  courseId: string;
+  studentNameSnapshot: string;
+  courseTitleSnapshot: string;
+  instructorNameSnapshot: string;
+  issuedAt: string;
+  revokedAt: string | null;
+}
+
+export interface CertificateVerification {
+  valid: boolean;
+  certificate: Pick<Certificate, 'certificateNumber' | 'studentNameSnapshot' | 'courseTitleSnapshot' | 'instructorNameSnapshot' | 'issuedAt' | 'revokedAt'>;
+}
+
 export interface ApiResponse<T> {
   success: boolean;
   message: string;
@@ -162,4 +217,10 @@ export type RootStackParamList = {
   Quiz: { quizId: string; title: string };
   QuizResult: { result: QuizResult; quizTitle: string };
   AdminCategories: undefined;
+  Orders: undefined;
+  Checkout: { orderId: string };
+  MockPayment: { orderId: string; checkoutUrl: string };
+  PaymentResult: { orderId: string };
+  Certificates: undefined;
+  VerifyCertificate: { initialCode?: string } | undefined;
 };
