@@ -101,7 +101,7 @@ onMounted(async () => {
             v-model="search"
             type="text"
             placeholder="Tìm kiếm khóa học..."
-            class="w-full pl-12 pr-4 py-3.5 rounded-xl border-2 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-indigo-500 dark:focus:border-indigo-400 focus:outline-none transition-colors"
+            class="w-full pl-12 pr-4 py-3.5 rounded-xl border-2 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-purple-500 dark:focus:border-purple-400 focus:outline-none transition-colors"
           />
         </div>
 
@@ -111,7 +111,7 @@ onMounted(async () => {
           <select
             v-model="selectedCategory"
             @change="fetchWithFilters()"
-            class="px-4 py-2.5 rounded-xl border-2 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-sm font-medium text-slate-700 dark:text-slate-300 focus:border-indigo-500 dark:focus:border-indigo-400 focus:outline-none transition-colors cursor-pointer"
+            class="px-4 py-2.5 rounded-xl border-2 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-sm font-medium text-slate-700 dark:text-slate-300 focus:border-purple-500 dark:focus:border-purple-400 focus:outline-none transition-colors cursor-pointer"
           >
             <option value="">Tất cả danh mục</option>
             <option v-for="cat in categoryStore.categories" :key="cat.id" :value="cat.id">
@@ -123,7 +123,7 @@ onMounted(async () => {
           <select
             v-model="selectedLevel"
             @change="fetchWithFilters()"
-            class="px-4 py-2.5 rounded-xl border-2 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-sm font-medium text-slate-700 dark:text-slate-300 focus:border-indigo-500 dark:focus:border-indigo-400 focus:outline-none transition-colors cursor-pointer"
+            class="px-4 py-2.5 rounded-xl border-2 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-sm font-medium text-slate-700 dark:text-slate-300 focus:border-purple-500 dark:focus:border-purple-400 focus:outline-none transition-colors cursor-pointer"
           >
             <option v-for="lvl in levels" :key="lvl.value" :value="lvl.value">
               {{ lvl.label }}
@@ -134,7 +134,7 @@ onMounted(async () => {
           <select
             v-model="selectedFree"
             @change="fetchWithFilters()"
-            class="px-4 py-2.5 rounded-xl border-2 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-sm font-medium text-slate-700 dark:text-slate-300 focus:border-indigo-500 dark:focus:border-indigo-400 focus:outline-none transition-colors cursor-pointer"
+            class="px-4 py-2.5 rounded-xl border-2 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-sm font-medium text-slate-700 dark:text-slate-300 focus:border-purple-500 dark:focus:border-purple-400 focus:outline-none transition-colors cursor-pointer"
           >
             <option v-for="pf in priceFilters" :key="pf.value" :value="pf.value">
               {{ pf.label }}
@@ -169,7 +169,7 @@ onMounted(async () => {
         </svg>
         <h3 class="text-xl font-semibold text-slate-700 dark:text-slate-300">Không tìm thấy khóa học nào</h3>
         <p class="text-slate-500 dark:text-slate-400 mt-2">Thử thay đổi bộ lọc hoặc tìm kiếm khác</p>
-        <button @click="clearFilters" class="mt-4 px-6 py-2.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 font-semibold hover:bg-indigo-100 dark:hover:bg-indigo-900/40 transition-colors cursor-pointer">
+        <button @click="clearFilters" class="mt-4 px-6 py-2.5 rounded-xl bg-purple-600 dark:bg-purple-950/40 text-white dark:text-purple-400 font-semibold hover:bg-purple-700 dark:hover:bg-purple-900/40 shadow-lg shadow-purple-500/25 transition-colors cursor-pointer">
           Xóa bộ lọc
         </button>
       </div>
@@ -190,8 +190,8 @@ onMounted(async () => {
           :class="[
             'w-10 h-10 rounded-xl text-sm font-semibold transition-all cursor-pointer',
             page === courseStore.meta.page
-              ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/25'
-              : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-indigo-800 hover:text-indigo-600 dark:hover:text-indigo-400',
+              ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/25'
+              : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:bg-purple-600 hover:text-white hover:border-purple-600 dark:hover:border-purple-800 dark:hover:text-purple-400',
           ]"
         >
           {{ page }}

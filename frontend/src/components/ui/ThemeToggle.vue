@@ -29,7 +29,7 @@ const themeStore = useThemeStore()
     <!-- Moon Icon (shows when light mode is active) -->
     <svg
       v-else
-      class="w-5 h-5 text-indigo-600"
+      class="w-5 h-5 text-purple-600"
       fill="none"
       stroke="currentColor"
       viewBox="0 0 24 24"

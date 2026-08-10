@@ -23,7 +23,7 @@ onMounted(() => {
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10">
         <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-800 transition-colors duration-300">
           <div class="flex items-center gap-4">
-            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-indigo-500/25">
+            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-purple-500/25">
               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a4 4 0 014-4z"/></svg>
             </div>
             <div>
@@ -57,12 +57,12 @@ onMounted(() => {
       </div>
 
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <router-link to="/admin/categories" class="block bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-800 hover:shadow-md hover:border-indigo-200 dark:hover:border-indigo-800 transition-all duration-300 group">
-          <h3 class="text-lg font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">Quản lý danh mục</h3>
+        <router-link to="/admin/categories" class="block bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-800 hover:shadow-md hover:bg-purple-600 hover:border-purple-600 dark:hover:border-purple-800 transition-all duration-300 group">
+          <h3 class="text-lg font-bold text-slate-900 dark:text-white group-hover:text-white dark:group-hover:text-purple-400 transition-colors">Quản lý danh mục</h3>
           <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Tạo, sửa, xóa danh mục khóa học</p>
         </router-link>
-        <router-link to="/admin/users" class="block bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-800 hover:shadow-md hover:border-indigo-200 dark:hover:border-indigo-800 transition-all duration-300 group">
-          <h3 class="text-lg font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">Quản lý người dùng</h3>
+        <router-link to="/admin/users" class="block bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-800 hover:shadow-md hover:bg-purple-600 hover:border-purple-600 dark:hover:border-purple-800 transition-all duration-300 group">
+          <h3 class="text-lg font-bold text-slate-900 dark:text-white group-hover:text-white dark:group-hover:text-purple-400 transition-colors">Quản lý người dùng</h3>
           <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Xem và quản lý tài khoản người dùng</p>
         </router-link>
       </div>
