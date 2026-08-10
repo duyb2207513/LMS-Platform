@@ -140,7 +140,7 @@ onMounted(() => {
               </td>
               <td class="px-6 py-4 text-right">
                 <div class="flex items-center justify-end gap-2">
-                  <button @click="openEdit(cat)" class="p-2 rounded-lg text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 transition-colors cursor-pointer" title="Sửa">
+                  <button @click="openEdit(cat)" class="p-2 rounded-lg text-slate-400 hover:text-white dark:hover:text-purple-400 hover:bg-purple-600 dark:hover:bg-purple-950/40 transition-colors cursor-pointer" title="Sửa">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                   </button>
                   <button @click="openDelete(cat)" class="p-2 rounded-lg text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors cursor-pointer" title="Xóa">
@@ -161,7 +161,7 @@ onMounted(() => {
         <BaseInput id="cat-name" v-model="form.name" label="Tên danh mục" placeholder="VD: Lập trình web" :required="true" />
         <div class="space-y-1.5">
           <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Mô tả</label>
-          <textarea v-model="form.description" rows="3" placeholder="Mô tả ngắn..." class="w-full rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:border-indigo-500 dark:focus:border-indigo-400 focus:outline-none resize-none transition-colors duration-200" />
+          <textarea v-model="form.description" rows="3" placeholder="Mô tả ngắn..." class="w-full rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:border-purple-500 dark:focus:border-purple-400 focus:outline-none resize-none transition-colors duration-200" />
         </div>
         <div class="flex justify-end gap-3">
           <BaseButton variant="secondary" @click="showModal = false">Hủy</BaseButton>

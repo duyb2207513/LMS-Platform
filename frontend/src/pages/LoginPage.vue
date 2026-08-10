@@ -8,21 +8,67 @@ import { useAuthStore } from '@/stores/auth'
 
 const auth = useAuthStore()
 const router = useRouter()
-
 const email = ref('')
 const password = ref('')
 const loading = ref(false)
 const error = ref('')
 
+type LoginRole = 'student' | 'instructor' | 'admin'
+const selectedRole = ref<LoginRole>('student')
+
+const roleOptions = [
+  {
+    key: 'student' as LoginRole,
+    label: 'Học viên',
+    icon: '🎓',
+    description: 'Truy cập khóa học',
+    redirect: '/courses',
+  },
+  {
+    key: 'instructor' as LoginRole,
+    label: 'Giảng viên',
+    icon: '👩‍🏫',
+    description: 'Quản lý khóa học',
+    redirect: '/instructor/courses',
+  },
+  {
+    key: 'admin' as LoginRole,
+    label: 'Quản trị',
+    icon: '👑',
+    description: 'Quản lý hệ thống',
+    redirect: '/admin',
+  },
+]
+
 async function handleLogin() {
   error.value = ''
+
+  const trimmedEmail = email.value.trim()
+  if (!trimmedEmail) {
+    error.value = 'Email là bắt buộc'
+    return
+  }
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  if (!emailPattern.test(trimmedEmail)) {
+    error.value = 'Email không hợp lệ'
+    return
+  }
+
+  if (!password.value) {
+    error.value = 'Mật khẩu là bắt buộc'
+    return
+  }
+
   loading.value = true
   try {
-    await auth.login({ email: email.value, password: password.value })
-    // Redirect based on role
-    if (auth.isAdmin) router.push('/admin')
-    else if (auth.isInstructor) router.push('/instructor')
-    else router.push('/dashboard')
+    await auth.login({ email: trimmedEmail, password: password.value })
+    if (auth.isAdmin) {
+      router.push('/admin')
+    } else if (auth.isInstructor) {
+      router.push('/instructor/courses')
+    } else {
+      router.push('/courses')
+    }
   } catch (e) {
     error.value = e instanceof Error ? e.message : 'Đăng nhập thất bại'
   } finally {
@@ -37,6 +83,33 @@ async function handleLogin() {
       <div class="text-center">
         <h1 class="text-2xl font-bold text-slate-900 dark:text-white">Chào mừng trở lại!</h1>
         <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Đăng nhập để tiếp tục học tập</p>
+      </div>
+
+      <!-- Role Selection -->
+      <div class="space-y-2">
+        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Đăng nhập với vai trò</label>
+        <div class="grid grid-cols-3 gap-2">
+          <button
+            v-for="r in roleOptions"
+            :key="r.key"
+            type="button"
+            @click="selectedRole = r.key"
+            :class="[
+              'flex flex-col items-center p-3 rounded-xl border-2 transition-all cursor-pointer text-center',
+              selectedRole === r.key
+                ? 'border-purple-500 bg-purple-50 shadow-sm shadow-purple-500/10 dark:bg-slate-800 dark:border-slate-500 dark:shadow-none'
+                : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600',
+            ]"
+          >
+            <span class="text-xl mb-1">{{ r.icon }}</span>
+            <span :class="['text-xs font-semibold', selectedRole === r.key ? 'text-purple-700 dark:text-white' : 'text-slate-700 dark:text-slate-300']">
+              {{ r.label }}
+            </span>
+            <span :class="['text-[10px] mt-0.5 leading-tight', selectedRole === r.key ? 'text-purple-500 dark:text-slate-400' : 'text-slate-400 dark:text-slate-500']">
+              {{ r.description }}
+            </span>
+          </button>
+        </div>
       </div>
 
       <!-- Error Alert -->
@@ -55,7 +128,7 @@ async function handleLogin() {
           v-model="email"
           label="Email"
           type="email"
-          placeholder="your@email.com"
+          placeholder="your@gmail.com"
           :required="true"
         />
         <BaseInput
@@ -66,7 +139,6 @@ async function handleLogin() {
           placeholder="••••••••"
           :required="true"
         />
-
         <BaseButton
           type="submit"
           :loading="loading"
@@ -79,7 +151,7 @@ async function handleLogin() {
 
       <p class="text-center text-sm text-slate-500 dark:text-slate-400">
         Chưa có tài khoản?
-        <router-link to="/register" class="font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors">
+        <router-link to="/register" class="font-semibold text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-colors">
           Đăng ký ngay
         </router-link>
       </p>

@@ -1,4 +1,5 @@
 import { ref } from 'vue'
+import { useAuthStore } from '@/stores/auth'
 
 const configuredBaseUrl = String(import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000').replace(/\/$/, '')
 const BASE_URL = configuredBaseUrl.endsWith('/api/v1') ? configuredBaseUrl : `${configuredBaseUrl}/api/v1`
@@ -18,9 +19,71 @@ async function handleResponse<T>(response: Response): Promise<T> {
   if (response.status === 204) return undefined as T
   const data = await response.json()
   if (!response.ok) {
-    throw new Error(data.message || `HTTP error ${response.status}`)
+    const error = new Error(data.message || `HTTP error ${response.status}`) as any
+    error.status = response.status
+    throw error
   }
   return data
+}
+
+let isRefreshing = false
+let refreshPromise: Promise<boolean> | null = null
+
+async function doRefreshToken(): Promise<boolean> {
+  const refreshToken = localStorage.getItem('refreshToken')
+  if (!refreshToken) return false
+
+  try {
+    const response = await fetch(`${BASE_URL}/auth/refresh`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refreshToken })
+    })
+
+    if (!response.ok) throw new Error('Refresh failed')
+
+    const responseData = await response.json()
+    if (responseData.data && responseData.data.accessToken) {
+      const authStore = useAuthStore()
+      authStore.updateTokens(responseData.data.accessToken, responseData.data.refreshToken)
+      return true
+    }
+    return false
+  } catch (error) {
+    const authStore = useAuthStore()
+    authStore.logout()
+    if (window.location.pathname !== '/login') {
+      window.location.href = '/login'
+    }
+    return false
+  }
+}
+
+async function fetchWithAuth(url: string, options: RequestInit = {}): Promise<Response> {
+  let response = await fetch(url, {
+    ...options,
+    headers: { ...getAuthHeaders(), ...options.headers }
+  })
+
+  if (response.status === 401 && !url.includes('/auth/login') && !url.includes('/auth/refresh')) {
+    if (!isRefreshing) {
+      isRefreshing = true
+      refreshPromise = doRefreshToken().finally(() => {
+        isRefreshing = false
+      })
+    }
+
+    const refreshSuccess = await refreshPromise
+    if (refreshSuccess) {
+      // Retry with new headers
+      response = await fetch(url, {
+        ...options,
+        headers: { ...getAuthHeaders(), ...options.headers }
+      })
+    }
+  }
+
+  return response
 }
 
 export function useApi() {
@@ -42,7 +105,7 @@ export function useApi() {
         const queryString = searchParams.toString()
         if (queryString) url += `?${queryString}`
       }
-      const response = await fetch(url, { headers: getAuthHeaders() })
+      const response = await fetchWithAuth(url, { method: 'GET' })
       return await handleResponse<T>(response)
     } catch (e) {
       error.value = e instanceof Error ? e.message : 'An unknown error occurred'
@@ -56,9 +119,8 @@ export function useApi() {
     loading.value = true
     error.value = null
     try {
-      const response = await fetch(`${BASE_URL}${endpoint}`, {
+      const response = await fetchWithAuth(`${BASE_URL}${endpoint}`, {
         method: 'POST',
-        headers: getAuthHeaders(),
         body: body ? JSON.stringify(body) : undefined,
       })
       return await handleResponse<T>(response)
@@ -74,9 +136,8 @@ export function useApi() {
     loading.value = true
     error.value = null
     try {
-      const response = await fetch(`${BASE_URL}${endpoint}`, {
+      const response = await fetchWithAuth(`${BASE_URL}${endpoint}`, {
         method: 'PUT',
-        headers: getAuthHeaders(),
         body: body ? JSON.stringify(body) : undefined,
       })
       return await handleResponse<T>(response)
@@ -106,9 +167,8 @@ export function useApi() {
     loading.value = true
     error.value = null
     try {
-      const response = await fetch(`${BASE_URL}${endpoint}`, {
+      const response = await fetchWithAuth(`${BASE_URL}${endpoint}`, {
         method: 'DELETE',
-        headers: getAuthHeaders(),
       })
       return await handleResponse<T>(response)
     } catch (e) {

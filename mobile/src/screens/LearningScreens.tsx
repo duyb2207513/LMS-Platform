@@ -4,7 +4,7 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { VideoView, useVideoPlayer } from 'expo-video';
 import { useEventListener } from 'expo';
 import { WebView } from 'react-native-webview';
-import { commentsApi, enrollmentsApi, learningApi } from '../api/services';
+import { certificatesApi, commentsApi, enrollmentsApi, learningApi } from '../api/services';
 import { getApiMessage } from '../api/client';
 import { Button, Field, Screen, SectionTitle, StateView } from '../components/ui';
 import type { Comment, CourseContent, CourseProgress, Enrollment, Lesson, RootStackParamList } from '../types';
@@ -17,10 +17,11 @@ export function MyCoursesScreen({ navigation }: NativeStackScreenProps<RootStack
   const [error, setError] = useState('');
   const load = useCallback(async () => { setLoading(true); try { setItems((await enrollmentsApi.mine()).data.data); setError(''); } catch (e) { setError(getApiMessage(e)); } finally { setLoading(false); } }, []);
   useEffect(() => navigation.addListener('focus', () => { void load(); }), [navigation, load]);
+  async function issueCertificate(courseId: string) { try { await certificatesApi.issue(courseId); navigation.navigate('Certificates'); } catch (e) { Alert.alert('Chưa thể cấp chứng chỉ', getApiMessage(e)); } }
   return <Screen><SectionTitle title="Khóa học của tôi" subtitle="Tiếp tục học từ nơi bạn đã dừng lại" />
     {loading || error || !items.length ? <StateView loading={loading} error={error} empty="Bạn chưa đăng ký khóa học nào" onRetry={load} /> : items.map(item => <View key={item.id} style={styles.courseCard}>
       {item.course.thumbnailUrl ? <Image source={{ uri: item.course.thumbnailUrl }} style={styles.thumbnail} /> : <View style={[styles.thumbnail, styles.placeholder]}><Text style={styles.book}>▤</Text></View>}
-      <View style={{ flex: 1 }}><Text style={styles.courseTitle}>{item.course.title}</Text><Text style={styles.muted}>{item.course.instructor?.fullName || 'LMS Platform'}</Text><ProgressBar value={item.progressPercent} /><Text style={styles.percent}>{Math.round(item.progressPercent)}% hoàn thành</Text><Button title={item.progressPercent ? 'Tiếp tục học' : 'Bắt đầu học'} onPress={() => navigation.navigate('Learning', { courseId: item.course.id, courseTitle: item.course.title })} /></View>
+      <View style={{ flex: 1 }}><Text style={styles.courseTitle}>{item.course.title}</Text><Text style={styles.muted}>{item.course.instructor?.fullName || 'LMS Platform'}</Text><ProgressBar value={item.progressPercent} /><Text style={styles.percent}>{Math.round(item.progressPercent)}% hoàn thành</Text><Button title={item.progressPercent ? 'Tiếp tục học' : 'Bắt đầu học'} onPress={() => navigation.navigate('Learning', { courseId: item.course.id, courseTitle: item.course.title })} />{item.status === 'COMPLETED' && <Button title="Nhận chứng chỉ" variant="outline" onPress={() => issueCertificate(item.course.id)} />}</View>
     </View>)}
   </Screen>;
 }
