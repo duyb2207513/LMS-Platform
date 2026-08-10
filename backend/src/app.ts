@@ -8,8 +8,12 @@ import { notFound } from "./common/middlewares/notFound.js";
 import { env } from "./config/env.js";
 import { swaggerSpec } from "./config/swagger.js";
 import apiRouter from "./routes/index.js";
+import { apiRateLimiter, authRateLimiter, securityHeaders } from "./common/middlewares/security.js";
 
 const app = express();
+app.set("trust proxy", env.nodeEnv === "production" ? 1 : false);
+app.disable("x-powered-by");
+app.use(securityHeaders);
 
 app.use(
   cors({
@@ -29,6 +33,8 @@ app.use(
   swaggerUi.setup(swaggerSpec)
 );
 
+app.use("/api/v1", apiRateLimiter);
+app.use("/api/v1/auth", authRateLimiter);
 app.use("/api/v1", apiRouter);
 
 app.use(notFound);

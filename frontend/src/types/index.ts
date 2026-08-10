@@ -129,3 +129,15 @@ export interface CourseFilters {
   page?: number
   limit?: number
 }
+
+export interface AdminListResponse<T> extends ApiResponse<{ items: T[]; meta: { page: number; limit: number; totalItems: number; totalPages: number } }> {}
+export interface AdminDashboardStats {
+  users: { total: number; byRole: Record<string, number> }
+  courses: { total: number; byStatus: Record<string, number> }
+  learning: { enrollments: number; reviews: number; comments: number }
+  commerce: { paidOrders: number; revenue: number; currency: string }
+  certificates: number
+  recent: { users: User[]; orders: Array<{ id: string; orderNumber: string; status: string; total: number; currency: string; createdAt: string; user: { fullName: string; email: string } }> }
+}
+export interface AdminReview { id: string; rating: number; content: string | null; createdAt: string; user: Pick<User, 'id' | 'fullName' | 'email'>; course: Pick<Course, 'id' | 'title' | 'slug'> }
+export interface AdminComment { id: string; content: string | null; isDeleted: boolean; createdAt: string; user: Pick<User, 'id' | 'fullName' | 'email' | 'role'>; lesson: { id: string; title: string; section: { course: Pick<Course, 'id' | 'title'> } } }

@@ -87,6 +87,10 @@ const router = createRouter({
       component: () => import('@/pages/admin/UsersPage.vue'),
       meta: { requiresAuth: true, roles: [UserRole.ADMIN] },
     },
+    { path: '/admin/courses', name: 'admin-courses', component: () => import('@/pages/admin/CoursesPage.vue'), meta: { requiresAuth: true, roles: [UserRole.ADMIN] } },
+    { path: '/admin/reviews', name: 'admin-reviews', component: () => import('@/pages/admin/ReviewsPage.vue'), meta: { requiresAuth: true, roles: [UserRole.ADMIN] } },
+    { path: '/admin/comments', name: 'admin-comments', component: () => import('@/pages/admin/CommentsPage.vue'), meta: { requiresAuth: true, roles: [UserRole.ADMIN] } },
+
     // Catch all
     {
       path: '/:pathMatch(.*)*',
