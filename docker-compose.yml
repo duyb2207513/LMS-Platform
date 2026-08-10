@@ -42,6 +42,10 @@ services:
       JWT_ACCESS_SECRET: local-development-access-secret-change-me
       JWT_REFRESH_SECRET: local-development-refresh-secret-change-me
       MOCK_PAYMENT_WEBHOOK_SECRET: local-mock-payment-webhook-secret
+      RATE_LIMIT_WINDOW_MS: 900000
+      RATE_LIMIT_MAX: 300
+      AUTH_RATE_LIMIT_WINDOW_MS: 900000
+      AUTH_RATE_LIMIT_MAX: 20
 
     depends_on:
       postgres:
@@ -50,7 +54,9 @@ services:
     command: npm run dev
 
   frontend:
-    image: node:22-bookworm-slim
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
     container_name: lms-frontend
     working_dir: /app
 

@@ -630,6 +630,10 @@ const swaggerDefinition = {
         type: "object", required: ["id", "certificateNumber", "verificationCode", "studentNameSnapshot", "courseTitleSnapshot", "instructorNameSnapshot", "issuedAt"],
         properties: { id: { type: "string", format: "uuid" }, certificateNumber: { type: "string", example: "LMS-2026-A1B2C3D4" }, verificationCode: { type: "string" }, studentNameSnapshot: { type: "string" }, courseTitleSnapshot: { type: "string" }, instructorNameSnapshot: { type: "string" }, issuedAt: { type: "string", format: "date-time" }, revokedAt: { type: "string", format: "date-time", nullable: true } }
       },
+      AdminUserUpdateRequest: {
+        type: "object", additionalProperties: false,
+        properties: { role: { type: "string", enum: ["STUDENT", "INSTRUCTOR", "ADMIN"] }, status: { type: "string", enum: ["ACTIVE", "BLOCKED"] } }
+      },
       ErrorResponse: {
         type: "object",
         required: ["success", "message"],
