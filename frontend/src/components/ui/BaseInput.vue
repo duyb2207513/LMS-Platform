@@ -43,7 +43,7 @@ defineEmits<{
         'disabled:bg-slate-50 dark:disabled:bg-slate-900 disabled:text-slate-400 dark:disabled:text-slate-600 disabled:cursor-not-allowed',
         error
           ? 'border-red-300 focus:border-red-500'
-          : 'border-slate-200 dark:border-slate-700 focus:border-indigo-500 dark:focus:border-indigo-400 hover:border-slate-300 dark:hover:border-slate-600',
+          : 'border-slate-200 dark:border-slate-700 focus:border-purple-500 dark:focus:border-purple-400 hover:border-slate-300 dark:hover:border-slate-600',
       ]"
     />
     <p v-if="error" class="text-xs text-red-500 mt-1">{{ error }}</p>

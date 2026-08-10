@@ -36,7 +36,6 @@ const router = createRouter({
       name: 'course-detail',
       component: () => import('@/pages/CourseDetail.vue'),
     },
-
     // Student routes
     {
       path: '/dashboard',
@@ -44,7 +43,6 @@ const router = createRouter({
       component: () => import('@/pages/student/DashboardPage.vue'),
       meta: { requiresAuth: true, roles: [UserRole.STUDENT] },
     },
-
     // Instructor routes
     {
       path: '/instructor',
@@ -70,7 +68,6 @@ const router = createRouter({
       component: () => import('@/pages/instructor/EditCoursePage.vue'),
       meta: { requiresAuth: true, roles: [UserRole.INSTRUCTOR] },
     },
-
     // Admin routes
     {
       path: '/admin',
@@ -90,7 +87,6 @@ const router = createRouter({
       component: () => import('@/pages/admin/UsersPage.vue'),
       meta: { requiresAuth: true, roles: [UserRole.ADMIN] },
     },
-
     // Catch all
     {
       path: '/:pathMatch(.*)*',
@@ -102,6 +98,11 @@ const router = createRouter({
 // Navigation guards
 router.beforeEach((to) => {
   const auth = useAuthStore()
+
+  // Tự động khôi phục phiên đăng nhập từ localStorage trước khi kiểm tra quyền
+  if (!auth.isLoggedIn && localStorage.getItem('accessToken')) {
+    auth.initialize()
+  }
 
   // Redirect guests away from auth pages if logged in
   if (to.meta.guest && auth.isLoggedIn) {

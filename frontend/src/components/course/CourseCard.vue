@@ -28,10 +28,10 @@ function formatPrice(price: number, isFree: boolean) {
 <template>
   <router-link
     :to="`/courses/${course.slug}`"
-    class="group block bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-indigo-500/10 dark:hover:shadow-indigo-500/5 hover:-translate-y-1"
+    class="group block bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-purple-500/10 dark:hover:shadow-purple-500/5 hover:-translate-y-1"
   >
     <!-- Thumbnail -->
-    <div class="relative aspect-video bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-indigo-950 dark:to-purple-950 overflow-hidden">
+    <div class="relative aspect-video bg-gradient-to-br from-purple-100 to-purple-100 dark:from-purple-950 dark:to-purple-950 overflow-hidden">
       <img
         v-if="course.thumbnailUrl"
         :src="course.thumbnailUrl"
@@ -39,7 +39,7 @@ function formatPrice(price: number, isFree: boolean) {
         class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
       />
       <div v-else class="w-full h-full flex items-center justify-center">
-        <svg class="w-12 h-12 text-indigo-300 dark:text-indigo-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="w-12 h-12 text-purple-300 dark:text-purple-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
         </svg>
       </div>
@@ -66,12 +66,12 @@ function formatPrice(price: number, isFree: boolean) {
     <!-- Content -->
     <div class="p-5">
       <!-- Category -->
-      <p v-if="course.category" class="text-xs font-medium text-indigo-600 dark:text-indigo-400 mb-2 uppercase tracking-wide">
+      <p v-if="course.category" class="text-xs font-medium text-purple-600 dark:text-purple-400 mb-2 uppercase tracking-wide">
         {{ course.category.name }}
       </p>
 
       <!-- Title -->
-      <h3 class="text-base font-bold text-slate-900 dark:text-slate-100 line-clamp-2 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+      <h3 class="text-base font-bold text-slate-900 dark:text-slate-100 line-clamp-2 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
         {{ course.title }}
       </h3>
 
