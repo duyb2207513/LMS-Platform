@@ -1,0 +1,7 @@
+import type { Request, Response } from "express"; import { sendSuccess } from "../../common/utils/response.js"; import { getCertificate, issueCertificate, listMyCertificates, revokeCertificate, verifyCertificate } from "./certificates.service.js";
+const p = (request: Request, key: string) => String(request.params[key] ?? "");
+export async function issueCertificateController(request: Request, response: Response) { sendSuccess(response, 201, "Certificate issued successfully", await issueCertificate(p(request, "courseId"), request.auth.userId)); }
+export async function listMyCertificatesController(request: Request, response: Response) { sendSuccess(response, 200, "Certificates retrieved successfully", await listMyCertificates(request.auth.userId)); }
+export async function getCertificateController(request: Request, response: Response) { sendSuccess(response, 200, "Certificate retrieved successfully", await getCertificate(p(request, "certificateId"), request.auth.userId, request.auth.role === "ADMIN")); }
+export async function verifyCertificateController(request: Request, response: Response) { sendSuccess(response, 200, "Certificate verification completed", await verifyCertificate(p(request, "code"))); }
+export async function revokeCertificateController(request: Request, response: Response) { sendSuccess(response, 200, "Certificate revoked successfully", await revokeCertificate(p(request, "certificateId"))); }

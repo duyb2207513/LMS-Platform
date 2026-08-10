@@ -606,6 +606,30 @@ const swaggerDefinition = {
         type: "object", additionalProperties: false, required: ["content"],
         properties: { content: { type: "string", maxLength: 5000 } }
       },
+      CreateOrderRequest: {
+        type: "object", additionalProperties: false, required: ["courseIds"],
+        properties: { courseIds: { type: "array", minItems: 1, maxItems: 20, uniqueItems: true, items: { type: "string", format: "uuid" } } }
+      },
+      OrderItem: {
+        type: "object", required: ["courseId", "courseTitleSnapshot", "priceSnapshot"],
+        properties: { id: { type: "string", format: "uuid" }, courseId: { type: "string", format: "uuid" }, courseTitleSnapshot: { type: "string" }, priceSnapshot: { type: "number", example: 299000 } }
+      },
+      Order: {
+        type: "object", required: ["id", "orderNumber", "status", "subtotal", "total", "currency", "items"],
+        properties: { id: { type: "string", format: "uuid" }, orderNumber: { type: "string", example: "ORD-20260810-ABC123" }, status: { type: "string", enum: ["PENDING", "PAID", "CANCELLED"] }, subtotal: { type: "number" }, total: { type: "number" }, currency: { type: "string", enum: ["VND"] }, paidAt: { type: "string", format: "date-time", nullable: true }, items: { type: "array", items: { $ref: "#/components/schemas/OrderItem" } } }
+      },
+      MockPaymentCallbackRequest: {
+        type: "object", required: ["token", "status"],
+        properties: { token: { type: "string", description: "Opaque token embedded in mockPaymentUrl" }, status: { type: "string", enum: ["SUCCEEDED", "FAILED"] } }
+      },
+      MockPaymentWebhookRequest: {
+        type: "object", additionalProperties: false, required: ["eventId", "paymentId", "status", "providerTransactionId", "amount", "currency"],
+        properties: { eventId: { type: "string" }, paymentId: { type: "string", format: "uuid" }, status: { type: "string", enum: ["SUCCEEDED", "FAILED"] }, providerTransactionId: { type: "string" }, amount: { type: "number" }, currency: { type: "string", enum: ["VND"] } }
+      },
+      Certificate: {
+        type: "object", required: ["id", "certificateNumber", "verificationCode", "studentNameSnapshot", "courseTitleSnapshot", "instructorNameSnapshot", "issuedAt"],
+        properties: { id: { type: "string", format: "uuid" }, certificateNumber: { type: "string", example: "LMS-2026-A1B2C3D4" }, verificationCode: { type: "string" }, studentNameSnapshot: { type: "string" }, courseTitleSnapshot: { type: "string" }, instructorNameSnapshot: { type: "string" }, issuedAt: { type: "string", format: "date-time" }, revokedAt: { type: "string", format: "date-time", nullable: true } }
+      },
       ErrorResponse: {
         type: "object",
         required: ["success", "message"],
