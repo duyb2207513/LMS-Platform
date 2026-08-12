@@ -105,6 +105,18 @@ export const useCourseStore = defineStore('courses', () => {
     return response
   }
 
+  async function uploadCourseThumbnail(id: string, file: File) {
+    const body = new FormData()
+    body.append('thumbnail', file)
+    const response = await useApi().post<ApiResponse<{ thumbnailUrl: string }>>(`/courses/${id}/thumbnail`, body)
+    if (response.data) {
+      const course = myCourses.value.find((item) => item.id === id)
+      if (course) course.thumbnailUrl = response.data.thumbnailUrl
+      if (currentCourse.value?.id === id) currentCourse.value.thumbnailUrl = response.data.thumbnailUrl
+    }
+    return response
+  }
+
   async function publishCourse(id: string) {
     return useApi().post<ApiResponse<Course>>(`/courses/${id}/publish`)
   }
@@ -136,6 +148,7 @@ export const useCourseStore = defineStore('courses', () => {
     fetchMyCourses,
     createCourse,
     updateCourse,
+    uploadCourseThumbnail,
     publishCourse,
     updateCourseStatus,
   }

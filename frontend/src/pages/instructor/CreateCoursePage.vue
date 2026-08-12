@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 import InstructorLayout from '@/layouts/InstructorLayout.vue'
 import BaseInput from '@/components/ui/BaseInput.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
+import ImageFilePicker from '@/components/ui/ImageFilePicker.vue'
 import { useCourseStore } from '@/stores/courses'
 import { useCategoryStore } from '@/stores/categories'
 import { CourseLevel } from '@/types'
@@ -15,12 +16,13 @@ const categoryStore = useCategoryStore()
 
 const loading = ref(false)
 const error = ref('')
+const thumbnailFile = ref<File | null>(null)
+const createdCourseId = ref<string | null>(null)
 
 const form = ref<CourseFormData>({
   categoryId: '',
   title: '',
   description: '',
-  thumbnailUrl: '',
   level: CourseLevel.BEGINNER,
   price: 0,
   isFree: true,
@@ -40,11 +42,17 @@ async function handleSubmit() {
   if (!form.value.categoryId) { error.value = 'Vui lòng chọn danh mục'; return }
   if (!form.value.title.trim()) { error.value = 'Vui lòng nhập tên khóa học'; return }
   if (!form.value.description.trim()) { error.value = 'Vui lòng nhập mô tả'; return }
+  if (!thumbnailFile.value) { error.value = 'Vui lòng chọn ảnh đại diện cho khóa học'; return }
 
   loading.value = true
   try {
-    const response = await courseStore.createCourse(form.value)
-    if (response.data) router.push(`/instructor/courses/${response.data.id}/builder`)
+    if (!createdCourseId.value) {
+      const response = await courseStore.createCourse(form.value)
+      if (!response.data) throw new Error('Không nhận được thông tin khóa học vừa tạo')
+      createdCourseId.value = response.data.id
+    }
+    await courseStore.uploadCourseThumbnail(createdCourseId.value, thumbnailFile.value)
+    router.push(`/instructor/courses/${createdCourseId.value}/builder`)
   } catch (e) {
     error.value = e instanceof Error ? e.message : 'Tạo khóa học thất bại'
   } finally {
@@ -122,7 +130,14 @@ onMounted(() => { categoryStore.fetchCategories() })
             <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Yêu cầu</label>
             <textarea v-model="form.requirements" rows="3" placeholder="Yêu cầu trước khi học..." class="w-full rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:border-purple-500 dark:focus:border-purple-400 focus:outline-none resize-none transition-colors duration-200" />
           </div>
-          <BaseInput id="course-thumb" v-model="form.thumbnailUrl" label="URL hình ảnh đại diện" placeholder="https://example.com/image.jpg" />
+          <ImageFilePicker
+            id="course-thumb"
+            label="Ảnh đại diện khóa học"
+            required
+            :disabled="loading"
+            @change="thumbnailFile = $event"
+            @error="error = $event"
+          />
         </div>
 
         <div class="flex justify-end gap-4">

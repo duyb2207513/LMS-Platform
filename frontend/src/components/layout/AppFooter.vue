@@ -1,19 +1,12 @@
+<script setup lang="ts">
+import AppBrand from '@/components/layout/AppBrand.vue'
+</script>
+
 <template>
-  <footer class="border-t border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-950 mt-auto transition-colors duration-300">
-    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
-      <div class="flex flex-col md:flex-row items-center justify-between gap-4">
-        <div class="flex items-center gap-2">
-          <div class="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-600 to-purple-600">
-            <svg class="h-4 w-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-            </svg>
-          </div>
-          <span class="text-sm font-semibold text-slate-700 dark:text-slate-300">LMS Platform</span>
-        </div>
-        <p class="text-sm text-slate-500 dark:text-slate-400">
-          © {{ new Date().getFullYear() }} LMS Platform. All rights reserved.
-        </p>
-      </div>
+  <footer class="mt-auto border-t border-slate-200/80 bg-white dark:border-slate-800 dark:bg-slate-950">
+    <div class="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-4 py-6 sm:flex-row sm:px-6 lg:px-8">
+      <AppBrand icon-size="sm" />
+      <p class="text-center text-xs leading-5 text-slate-500 dark:text-slate-400 sm:text-right">© {{ new Date().getFullYear() }} LMS Platform. Học tập không giới hạn.</p>
     </div>
   </footer>
 </template>

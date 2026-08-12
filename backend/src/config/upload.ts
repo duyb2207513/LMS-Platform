@@ -7,10 +7,13 @@ import { AppError } from "../common/errors/AppError.js";
 
 export const COURSE_THUMBNAIL_DIRECTORY = path.resolve("uploads", "course-thumbnails");
 export const COURSE_THUMBNAIL_MAX_SIZE = 5 * 1024 * 1024;
+export const AVATAR_DIRECTORY = path.resolve("uploads", "avatars");
+export const AVATAR_MAX_SIZE = 5 * 1024 * 1024;
 export const LESSON_FILE_DIRECTORY = path.resolve("uploads", "lesson-files");
 export const LESSON_FILE_MAX_SIZE = 100 * 1024 * 1024;
 
 mkdirSync(COURSE_THUMBNAIL_DIRECTORY, { recursive: true });
+mkdirSync(AVATAR_DIRECTORY, { recursive: true });
 mkdirSync(LESSON_FILE_DIRECTORY, { recursive: true });
 
 const allowedMimeTypes = new Map([
@@ -71,6 +74,36 @@ export const uploadCourseThumbnail: import("express").RequestHandler = (
     }
 
     next(new AppError(400, "Invalid thumbnail upload"));
+  });
+};
+
+const avatarStorage = multer.diskStorage({
+  destination: AVATAR_DIRECTORY,
+  filename: (_request, file, callback) => {
+    callback(null, `${randomUUID()}${allowedMimeTypes.get(file.mimetype) ?? ""}`);
+  }
+});
+
+const multerAvatarUpload = multer({
+  storage: avatarStorage,
+  limits: { fileSize: AVATAR_MAX_SIZE, files: 1 },
+  fileFilter: (_request, file, callback) => {
+    if (!allowedMimeTypes.has(file.mimetype)) {
+      callback(new AppError(400, "Avatar must be a JPG, PNG, or WebP image"));
+      return;
+    }
+    callback(null, true);
+  }
+}).single("avatar");
+
+export const uploadAvatar: import("express").RequestHandler = (request, response, next) => {
+  multerAvatarUpload(request, response, (error) => {
+    if (!error) return next();
+    if (error instanceof AppError) return next(error);
+    if (error instanceof multer.MulterError && error.code === "LIMIT_FILE_SIZE") {
+      return next(new AppError(400, "Avatar must not exceed 5 MB"));
+    }
+    next(new AppError(400, "Invalid avatar upload"));
   });
 };
 
