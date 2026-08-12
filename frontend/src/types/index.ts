@@ -131,7 +131,6 @@ export interface CourseFormData {
   categoryId: string
   title: string
   description: string
-  thumbnailUrl?: string
   level: CourseLevel
   price: number
   isFree: boolean

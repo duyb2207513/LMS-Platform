@@ -55,6 +55,35 @@ export async function updateProfile(userId: string, input: UpdateProfileInput) {
   }
 }
 
+export async function setAvatar(userId: string, avatarUrl: string | null) {
+  try {
+    return await prisma.user.update({
+      where: { id: userId },
+      data: { avatarUrl },
+      select: {
+        id: true,
+        fullName: true,
+        email: true,
+        avatarUrl: true,
+        role: true,
+        status: true,
+        createdAt: true,
+        updatedAt: true
+      }
+    });
+  } catch (error) {
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "code" in error &&
+      error.code === "P2025"
+    ) {
+      throw new AppError(404, "User not found");
+    }
+    throw error;
+  }
+}
+
 export async function changePassword(userId: string, input: ChangePasswordInput): Promise<void> {
   const user = await prisma.user.findUnique({
     where: { id: userId },

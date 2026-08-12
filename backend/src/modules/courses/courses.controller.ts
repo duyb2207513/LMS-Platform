@@ -89,8 +89,8 @@ export async function updateCourseController(
   sendSuccess(response, 200, "Course updated successfully", course);
 }
 
-async function removeUploadedFile(filename: string): Promise<void> {
-  await unlink(path.join(COURSE_THUMBNAIL_DIRECTORY, path.basename(filename))).catch(() => undefined);
+async function removeUploadedFile(filenameOrUrl: string): Promise<void> {
+  await unlink(path.join(COURSE_THUMBNAIL_DIRECTORY, path.basename(filenameOrUrl))).catch(() => undefined);
 }
 
 export async function uploadCourseThumbnailController(
@@ -111,6 +111,9 @@ export async function uploadCourseThumbnailController(
       request.auth,
       thumbnailUrl
     );
+    if (result.previousThumbnailUrl?.includes("/uploads/course-thumbnails/")) {
+      await removeUploadedFile(result.previousThumbnailUrl);
+    }
     sendSuccess(response, 200, "Thumbnail uploaded successfully", {
       thumbnailUrl: result.thumbnailUrl
     });
