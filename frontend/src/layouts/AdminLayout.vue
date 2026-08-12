@@ -14,12 +14,4 @@ const navItems = [
 ]
 </script>
 
-<template>
-  <div class="flex min-h-screen flex-col bg-[var(--app-bg)] transition-colors duration-300">
-    <AppHeader workspace @toggle-workspace="sidebarOpen = true" />
-    <div class="flex flex-1">
-      <AppSidebar :items="navItems" :open="sidebarOpen" @close="sidebarOpen = false" />
-      <main class="min-w-0 flex-1 px-4 py-6 sm:px-6 lg:px-8 lg:py-8 xl:px-10"><slot /></main>
-    </div>
-  </div>
-</template>
+<template><div class="flex min-h-screen flex-col bg-[var(--app-bg)] transition-colors duration-300"><AppHeader workspace @toggle-workspace="sidebarOpen = true"/><div class="flex flex-1"><AppSidebar :items="navItems" :open="sidebarOpen" @close="sidebarOpen = false"/><main class="min-w-0 flex-1 px-4 py-6 sm:px-6 lg:px-8 lg:py-8 xl:px-10"><slot/></main></div></div></template>

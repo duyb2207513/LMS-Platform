@@ -1,91 +1,19 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
-import AdminLayout from "@/layouts/AdminLayout.vue";
-import LoadingSpinner from "@/components/ui/LoadingSpinner.vue";
-import { useApi } from "@/composables/useApi";
-import type { AdminListResponse, AdminReview } from "@/types";
-const api = useApi(),
-  items = ref<AdminReview[]>([]),
-  search = ref(""),
-  error = ref("");
-async function load() {
-  try {
-    const r = await api.get<AdminListResponse<AdminReview>>("/admin/reviews", {
-      search: search.value,
-      limit: 100,
-    });
-    items.value = r.data?.items || [];
-  } catch (e) {
-    error.value = e instanceof Error ? e.message : "Không thể tải đánh giá";
-  }
-}
-async function remove(id: string) {
-  if (!confirm("Xóa đánh giá này?")) return;
-  try {
-    await api.del(`/admin/reviews/${id}`);
-    items.value = items.value.filter((x) => x.id !== id);
-  } catch (e) {
-    alert(e instanceof Error ? e.message : "Không thể xóa");
-  }
-}
-onMounted(load);
+import { computed, onMounted, ref } from 'vue'
+import AdminLayout from '@/layouts/AdminLayout.vue'
+import BaseButton from '@/components/ui/BaseButton.vue'
+import BaseModal from '@/components/ui/BaseModal.vue'
+import StarRating from '@/components/ui/StarRating.vue'
+import LoadingSpinner from '@/components/ui/LoadingSpinner.vue'
+import { useApi } from '@/composables/useApi'
+import type { AdminListResponse, AdminReview } from '@/types'
+const api = useApi(), items = ref<AdminReview[]>([]), search = ref(''), error = ref(''), deleteTarget = ref<AdminReview | null>(null), deleting = ref(false)
+const average = computed(() => items.value.length ? (items.value.reduce((sum, item) => sum + item.rating, 0) / items.value.length).toFixed(1) : '0.0')
+async function load() { error.value = ''; try { const response = await api.get<AdminListResponse<AdminReview>>('/admin/reviews', { search: search.value.trim(), limit: 100 }); items.value = response.data?.items || [] } catch (cause) { error.value = cause instanceof Error ? cause.message : 'Không thể tải đánh giá' } }
+async function remove() { if (!deleteTarget.value) return; deleting.value = true; try { await api.del(`/admin/reviews/${deleteTarget.value.id}`); items.value = items.value.filter((item) => item.id !== deleteTarget.value?.id); deleteTarget.value = null } catch (cause) { error.value = cause instanceof Error ? cause.message : 'Không thể xóa đánh giá' } finally { deleting.value = false } }
+onMounted(load)
 </script>
-<template>
-  <AdminLayout
-    ><div class="max-w-6xl">
-      <h1 class="title">Kiểm duyệt đánh giá</h1>
-      <div class="search">
-        <input
-          v-model="search"
-          @keyup.enter="load"
-          placeholder="Học viên, khóa học, nội dung..."
-        /><button @click="load">Tìm</button>
-      </div>
-      <LoadingSpinner v-if="api.loading.value" />
-      <p v-else-if="error" class="text-red-600">{{ error }}</p>
-      <div v-else>
-        <article v-for="item in items" :key="item.id" class="card">
-          <div class="flex-1">
-            <div class="flex justify-between">
-              <b>{{ item.user.fullName }}</b
-              ><span class="stars"
-                >{{ "★".repeat(item.rating)
-                }}{{ "☆".repeat(5 - item.rating) }}</span
-              >
-            </div>
-            <p class="course">{{ item.course.title }}</p>
-            <p>{{ item.content || "Không có nhận xét" }}</p>
-          </div>
-          <button class="delete" @click="remove(item.id)">Xóa</button>
-        </article>
-      </div>
-    </div></AdminLayout
-  >
-</template>
-<style scoped>
-@reference "../../assets/main.css";
-.title {
-  @apply text-3xl font-extrabold dark:text-white mb-6;
-}
-.search {
-  @apply flex gap-3 mb-6;
-}
-.search input {
-  @apply flex-1 bg-white dark:bg-slate-900 dark:text-white border rounded-xl px-4;
-}
-.search button {
-  @apply bg-indigo-600 text-white rounded-xl px-6 py-3 font-bold;
-}
-.card {
-  @apply flex gap-5 bg-white dark:bg-slate-900 dark:text-white rounded-2xl border dark:border-slate-800 p-5 mb-3;
-}
-.course {
-  @apply text-sm text-indigo-600 font-semibold my-2;
-}
-.stars {
-  @apply text-amber-500;
-}
-.delete {
-  @apply text-red-600 font-bold;
-}
-</style>
+
+<template><AdminLayout><main class="app-page max-w-6xl"><header><p class="text-sm font-bold uppercase tracking-[.14em] text-purple-600">Nội dung cộng đồng</p><h1 class="app-page-title mt-2">Kiểm duyệt đánh giá</h1><p class="app-page-description">Theo dõi phản hồi học viên và loại bỏ nội dung không phù hợp.</p></header><section class="mt-7 grid gap-4 sm:grid-cols-2"><article class="moderation-metric"><span>Đánh giá đang hiển thị</span><b>{{ items.length }}</b></article><article class="moderation-metric"><span>Điểm trung bình</span><div class="flex items-center gap-2"><b>{{ average }}</b><StarRating :model-value="Math.round(Number(average))" readonly size="sm"/></div></article></section><form class="surface-card mt-6 flex gap-3 p-4" @submit.prevent="load"><input v-model="search" class="admin-search" placeholder="Tìm theo học viên, khóa học hoặc nội dung..."/><BaseButton type="submit">Tìm kiếm</BaseButton></form><p v-if="error" class="mt-5 rounded-2xl bg-red-50 p-4 text-sm text-red-700 dark:bg-red-950/30 dark:text-red-300">{{ error }}</p><LoadingSpinner v-if="api.loading.value && !items.length" class="py-20"/><section v-else-if="items.length" class="mt-6 space-y-4"><article v-for="item in items" :key="item.id" class="surface-card p-5 sm:p-6"><div class="flex items-start gap-4"><span class="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-violet-500 to-purple-700 font-bold text-white">{{ item.user.fullName.charAt(0) }}</span><div class="min-w-0 flex-1"><div class="flex flex-wrap items-start justify-between gap-3"><div><h2 class="font-extrabold">{{ item.user.fullName }}</h2><p class="mt-1 text-xs text-slate-500">{{ item.user.email }} · {{ new Date(item.createdAt).toLocaleDateString('vi-VN') }}</p></div><StarRating :model-value="item.rating" readonly/></div><RouterLink :to="`/courses/${item.course.slug}`" class="mt-4 inline-flex rounded-lg bg-purple-50 px-3 py-1.5 text-xs font-bold text-purple-700 dark:bg-purple-950/40 dark:text-purple-300">{{ item.course.title }}</RouterLink><p class="mt-4 leading-7 text-slate-600 dark:text-slate-300">{{ item.content || 'Học viên không để lại nội dung nhận xét.' }}</p><div class="mt-4 flex justify-end border-t border-slate-100 pt-4 dark:border-slate-800"><BaseButton size="sm" variant="ghost" @click="deleteTarget = item">Xóa đánh giá</BaseButton></div></div></div></article></section><section v-else-if="!api.loading.value" class="surface-card mt-6 py-16 text-center text-sm text-slate-500">Không có đánh giá phù hợp.</section></main><BaseModal :show="Boolean(deleteTarget)" title="Xóa đánh giá?" description="Đánh giá sẽ bị xóa khỏi khóa học và không thể khôi phục." size="sm" @close="!deleting && (deleteTarget = null)"><p class="text-sm text-slate-600 dark:text-slate-300">Xóa đánh giá {{ deleteTarget?.rating }} sao của <b>{{ deleteTarget?.user.fullName }}</b>?</p><div class="mt-6 flex justify-end gap-3"><BaseButton variant="secondary" :disabled="deleting" @click="deleteTarget = null">Hủy</BaseButton><BaseButton variant="danger" :loading="deleting" @click="remove">Xóa đánh giá</BaseButton></div></BaseModal></AdminLayout></template>
+
+<style scoped>.moderation-metric{display:flex;align-items:center;justify-content:space-between;border:1px solid var(--border);border-radius:1.1rem;background:var(--surface);padding:1rem 1.2rem}.moderation-metric span{font-size:.8rem;color:var(--text-muted)}.moderation-metric b{font-size:1.3rem}.admin-search{min-width:0;flex:1;border:1px solid var(--border);border-radius:.8rem;background:var(--surface-muted);padding:.7rem 1rem;color:var(--text);outline:none}.admin-search:focus{border-color:#a855f7;box-shadow:0 0 0 3px rgba(168,85,247,.1)}</style>

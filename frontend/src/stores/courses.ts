@@ -71,8 +71,22 @@ export const useCourseStore = defineStore('courses', () => {
     error.value = null
     try {
       const api = useApi()
-      const response = await api.get<PaginatedResponse<Course>>('/instructor/courses', { limit: 100 })
-      myCourses.value = response.data || []
+      // Backend giới hạn tối đa 50 bản ghi cho mỗi trang. Lấy trang đầu
+      // rồi ghép các trang còn lại để màn hình vẫn hiển thị đủ khóa học.
+      const firstPage = await api.get<PaginatedResponse<Course>>('/instructor/courses', { page: 1, limit: 50 })
+      const allCourses = [...(firstPage.data || [])]
+      const totalPages = firstPage.meta?.totalPages || 1
+
+      if (totalPages > 1) {
+        const remainingPages = await Promise.all(
+          Array.from({ length: totalPages - 1 }, (_, index) =>
+            api.get<PaginatedResponse<Course>>('/instructor/courses', { page: index + 2, limit: 50 }),
+          ),
+        )
+        remainingPages.forEach((response) => allCourses.push(...(response.data || [])))
+      }
+
+      myCourses.value = allCourses
     } catch (e) {
       error.value = e instanceof Error ? e.message : 'Failed to fetch my courses'
       myCourses.value = []
