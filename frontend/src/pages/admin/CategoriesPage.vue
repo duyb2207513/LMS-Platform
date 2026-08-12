@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import AdminLayout from '@/layouts/AdminLayout.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import BaseInput from '@/components/ui/BaseInput.vue'
@@ -9,176 +9,18 @@ import { useCategoryStore } from '@/stores/categories'
 import type { Category } from '@/types'
 
 const categoryStore = useCategoryStore()
-
-const showModal = ref(false)
-const showDeleteConfirm = ref(false)
-const isEditing = ref(false)
-const editingId = ref('')
-const deletingCategory = ref<Category | null>(null)
-const saving = ref(false)
-const deleting = ref(false)
-const formError = ref('')
-
+const showModal = ref(false), showDeleteConfirm = ref(false), isEditing = ref(false), editingId = ref(''), deletingCategory = ref<Category | null>(null), saving = ref(false), deleting = ref(false), formError = ref(''), search = ref('')
 const form = ref({ name: '', description: '' })
-
-function openCreate() {
-  isEditing.value = false
-  editingId.value = ''
-  form.value = { name: '', description: '' }
-  formError.value = ''
-  showModal.value = true
-}
-
-function openEdit(cat: Category) {
-  isEditing.value = true
-  editingId.value = cat.id
-  form.value = { name: cat.name, description: cat.description || '' }
-  formError.value = ''
-  showModal.value = true
-}
-
-function openDelete(cat: Category) {
-  deletingCategory.value = cat
-  showDeleteConfirm.value = true
-}
-
-async function handleSave() {
-  if (!form.value.name.trim()) {
-    formError.value = 'Tên danh mục không được để trống'
-    return
-  }
-  formError.value = ''
-  saving.value = true
-  try {
-    if (isEditing.value) {
-      await categoryStore.updateCategory(editingId.value, form.value)
-    } else {
-      await categoryStore.createCategory(form.value)
-    }
-    showModal.value = false
-  } catch (e) {
-    formError.value = e instanceof Error ? e.message : 'Lỗi khi lưu'
-  } finally {
-    saving.value = false
-  }
-}
-
-async function handleDelete() {
-  if (!deletingCategory.value) return
-  deleting.value = true
-  try {
-    await categoryStore.deleteCategory(deletingCategory.value.id)
-    showDeleteConfirm.value = false
-    deletingCategory.value = null
-  } catch (e) {
-    formError.value = e instanceof Error ? e.message : 'Lỗi khi xóa'
-  } finally {
-    deleting.value = false
-  }
-}
-
-function formatDate(d: string) {
-  return new Date(d).toLocaleDateString('vi-VN')
-}
-
-onMounted(() => {
-  categoryStore.fetchCategories()
-})
+const visibleCategories = computed(() => categoryStore.categories.filter((category) => `${category.name} ${category.slug} ${category.description || ''}`.toLowerCase().includes(search.value.trim().toLowerCase())))
+const totalCourses = computed(() => categoryStore.categories.reduce((sum, category) => sum + (category._count?.courses || 0), 0))
+function openCreate() { isEditing.value = false; editingId.value = ''; form.value = { name: '', description: '' }; formError.value = ''; showModal.value = true }
+function openEdit(category: Category) { isEditing.value = true; editingId.value = category.id; form.value = { name: category.name, description: category.description || '' }; formError.value = ''; showModal.value = true }
+function openDelete(category: Category) { deletingCategory.value = category; formError.value = ''; showDeleteConfirm.value = true }
+async function handleSave() { if (!form.value.name.trim()) { formError.value = 'Tên danh mục không được để trống'; return } saving.value = true; formError.value = ''; try { if (isEditing.value) await categoryStore.updateCategory(editingId.value, form.value); else await categoryStore.createCategory(form.value); showModal.value = false } catch (cause) { formError.value = cause instanceof Error ? cause.message : 'Không thể lưu danh mục' } finally { saving.value = false } }
+async function handleDelete() { if (!deletingCategory.value) return; deleting.value = true; formError.value = ''; try { await categoryStore.deleteCategory(deletingCategory.value.id); showDeleteConfirm.value = false; deletingCategory.value = null } catch (cause) { formError.value = cause instanceof Error ? cause.message : 'Không thể xóa danh mục' } finally { deleting.value = false } }
+onMounted(() => categoryStore.fetchCategories())
 </script>
 
-<template>
-  <AdminLayout>
-    <div class="max-w-4xl">
-      <div class="flex items-center justify-between mb-8">
-        <div>
-          <h1 class="text-3xl font-extrabold text-slate-900 dark:text-white">Quản lý danh mục</h1>
-          <p class="mt-2 text-slate-500 dark:text-slate-400">Tạo và quản lý danh mục khóa học</p>
-        </div>
-        <BaseButton @click="openCreate">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-          Thêm danh mục
-        </BaseButton>
-      </div>
+<template><AdminLayout><main class="app-page max-w-6xl"><header class="flex flex-wrap items-end justify-between gap-5"><div><p class="text-sm font-bold uppercase tracking-[.14em] text-purple-600">Tổ chức nội dung</p><h1 class="app-page-title mt-2">Quản lý danh mục</h1><p class="app-page-description">Xây dựng hệ thống chủ đề giúp học viên khám phá khóa học dễ dàng.</p></div><BaseButton size="lg" @click="openCreate">+ Thêm danh mục</BaseButton></header><section class="mt-7 grid gap-4 sm:grid-cols-2"><article class="category-metric"><span>Tổng danh mục</span><b>{{ categoryStore.categories.length }}</b></article><article class="category-metric"><span>Khóa học được phân loại</span><b>{{ totalCourses }}</b></article></section><label class="surface-card relative mt-6 block p-4"><span class="absolute left-8 top-1/2 -translate-y-1/2 text-slate-400">⌕</span><input v-model="search" class="category-search" placeholder="Tìm theo tên, slug hoặc mô tả..."/></label><LoadingSpinner v-if="categoryStore.loading && !categoryStore.categories.length" class="py-20"/><section v-else-if="visibleCategories.length" class="surface-card mt-6 overflow-hidden"><div class="overflow-x-auto"><table class="category-table"><thead><tr><th>Danh mục</th><th>Mô tả</th><th>Khóa học</th><th>Ngày tạo</th><th class="text-right">Thao tác</th></tr></thead><tbody><tr v-for="category in visibleCategories" :key="category.id"><td><div class="flex items-center gap-3"><span class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-violet-500 to-purple-700 font-bold text-white">{{ category.name.charAt(0).toUpperCase() }}</span><div><b>{{ category.name }}</b><p class="mt-1 font-mono text-xs text-slate-400">{{ category.slug }}</p></div></div></td><td class="max-w-sm text-sm leading-6 text-slate-500"><span class="line-clamp-2">{{ category.description || 'Chưa có mô tả' }}</span></td><td><span class="rounded-lg bg-purple-50 px-2.5 py-1 text-xs font-bold text-purple-700 dark:bg-purple-950/40 dark:text-purple-300">{{ category._count?.courses || 0 }} khóa</span></td><td class="text-sm text-slate-500">{{ new Date(category.createdAt).toLocaleDateString('vi-VN') }}</td><td><div class="flex justify-end gap-1"><BaseButton size="sm" variant="ghost" @click="openEdit(category)">Sửa</BaseButton><BaseButton size="sm" variant="ghost" @click="openDelete(category)">Xóa</BaseButton></div></td></tr></tbody></table></div></section><section v-else-if="!categoryStore.loading" class="surface-card mt-6 grid min-h-72 place-items-center p-8 text-center"><div><span class="text-4xl">◇</span><h2 class="mt-4 text-xl font-extrabold">{{ search ? 'Không tìm thấy danh mục' : 'Chưa có danh mục' }}</h2><p class="mt-2 text-sm text-slate-500">{{ search ? 'Thử tìm kiếm với từ khóa khác.' : 'Tạo danh mục đầu tiên để sắp xếp khóa học.' }}</p><BaseButton v-if="!search" class="mt-5" @click="openCreate">Tạo danh mục</BaseButton></div></section></main><BaseModal :show="showModal" :title="isEditing ? 'Chỉnh sửa danh mục' : 'Thêm danh mục mới'" description="Slug sẽ được hệ thống tự động tạo từ tên danh mục." @close="!saving && (showModal = false)"><form class="space-y-5" @submit.prevent="handleSave"><BaseInput id="category-name" v-model="form.name" label="Tên danh mục" placeholder="Ví dụ: Lập trình Web" required/><div class="space-y-2"><label for="category-description" class="text-sm font-semibold">Mô tả</label><textarea id="category-description" v-model="form.description" rows="4" class="category-textarea" placeholder="Mô tả ngắn về nhóm khóa học..."/></div><p v-if="formError" class="rounded-xl bg-red-50 p-3 text-sm text-red-700 dark:bg-red-950/30 dark:text-red-300">{{ formError }}</p><div class="flex justify-end gap-3"><BaseButton type="button" variant="secondary" :disabled="saving" @click="showModal = false">Hủy</BaseButton><BaseButton type="submit" :loading="saving">{{ isEditing ? 'Lưu thay đổi' : 'Tạo danh mục' }}</BaseButton></div></form></BaseModal><BaseModal :show="showDeleteConfirm" title="Xóa danh mục?" description="Danh mục đang có khóa học sẽ không thể bị xóa." size="sm" @close="!deleting && (showDeleteConfirm = false)"><p class="text-sm text-slate-600 dark:text-slate-300">Bạn có chắc muốn xóa <b>“{{ deletingCategory?.name }}”</b>?</p><p v-if="formError" class="mt-4 rounded-xl bg-red-50 p-3 text-sm text-red-700 dark:bg-red-950/30 dark:text-red-300">{{ formError }}</p><div class="mt-6 flex justify-end gap-3"><BaseButton variant="secondary" :disabled="deleting" @click="showDeleteConfirm = false">Hủy</BaseButton><BaseButton variant="danger" :loading="deleting" @click="handleDelete">Xóa danh mục</BaseButton></div></BaseModal></AdminLayout></template>
 
-      <LoadingSpinner v-if="categoryStore.loading" />
-
-      <div v-else-if="categoryStore.categories.length === 0" class="text-center py-20 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 transition-colors duration-300">
-        <svg class="w-16 h-16 mx-auto text-slate-300 dark:text-slate-700 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a4 4 0 014-4z"/></svg>
-        <h3 class="text-xl font-semibold text-slate-700 dark:text-slate-300">Chưa có danh mục nào</h3>
-        <p class="text-slate-500 dark:text-slate-400 mt-2 mb-6">Tạo danh mục đầu tiên</p>
-        <BaseButton @click="openCreate">Tạo danh mục</BaseButton>
-      </div>
-
-      <div v-else class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden transition-colors duration-300">
-        <table class="w-full">
-          <thead>
-            <tr class="border-b border-slate-100 dark:border-slate-800">
-              <th class="text-left px-6 py-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Tên</th>
-              <th class="text-left px-6 py-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider hidden sm:table-cell">Mô tả</th>
-              <th class="text-left px-6 py-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider hidden md:table-cell">Ngày tạo</th>
-              <th class="text-right px-6 py-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Hành động</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="cat in categoryStore.categories" :key="cat.id" class="border-b border-slate-50 dark:border-slate-800/50 hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
-              <td class="px-6 py-4">
-                <div class="flex items-center gap-3">
-                  <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
-                    {{ cat.name.charAt(0).toUpperCase() }}
-                  </div>
-                  <div>
-                    <p class="font-semibold text-slate-900 dark:text-white">{{ cat.name }}</p>
-                    <p class="text-xs text-slate-400 dark:text-slate-500">{{ cat.slug }}</p>
-                  </div>
-                </div>
-              </td>
-              <td class="px-6 py-4 text-sm text-slate-500 dark:text-slate-400 hidden sm:table-cell">
-                {{ cat.description || '—' }}
-              </td>
-              <td class="px-6 py-4 text-sm text-slate-500 dark:text-slate-400 hidden md:table-cell">
-                {{ formatDate(cat.createdAt) }}
-              </td>
-              <td class="px-6 py-4 text-right">
-                <div class="flex items-center justify-end gap-2">
-                  <button @click="openEdit(cat)" class="p-2 rounded-lg text-slate-400 hover:text-white dark:hover:text-purple-400 hover:bg-purple-600 dark:hover:bg-purple-950/40 transition-colors cursor-pointer" title="Sửa">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                  </button>
-                  <button @click="openDelete(cat)" class="p-2 rounded-lg text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors cursor-pointer" title="Xóa">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Create/Edit Modal -->
-    <BaseModal :show="showModal" :title="isEditing ? 'Sửa danh mục' : 'Thêm danh mục'" @close="showModal = false">
-      <form @submit.prevent="handleSave" class="space-y-5">
-        <div v-if="formError" class="p-3 rounded-lg bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900 text-sm text-red-600 dark:text-red-400">{{ formError }}</div>
-        <BaseInput id="cat-name" v-model="form.name" label="Tên danh mục" placeholder="VD: Lập trình web" :required="true" />
-        <div class="space-y-1.5">
-          <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Mô tả</label>
-          <textarea v-model="form.description" rows="3" placeholder="Mô tả ngắn..." class="w-full rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:border-purple-500 dark:focus:border-purple-400 focus:outline-none resize-none transition-colors duration-200" />
-        </div>
-        <div class="flex justify-end gap-3">
-          <BaseButton variant="secondary" @click="showModal = false">Hủy</BaseButton>
-          <BaseButton type="submit" :loading="saving">{{ isEditing ? 'Cập nhật' : 'Tạo mới' }}</BaseButton>
-        </div>
-      </form>
-    </BaseModal>
-
-    <!-- Delete Confirm Modal -->
-    <BaseModal :show="showDeleteConfirm" title="Xác nhận xóa" size="sm" @close="showDeleteConfirm = false">
-      <p class="text-sm text-slate-600 dark:text-slate-300">
-        Bạn có chắc muốn xóa danh mục <strong>{{ deletingCategory?.name }}</strong>? Hành động này không thể hoàn tác.
-      </p>
-      <div class="flex justify-end gap-3 mt-6">
-        <BaseButton variant="secondary" @click="showDeleteConfirm = false">Hủy</BaseButton>
-        <BaseButton variant="danger" :loading="deleting" @click="handleDelete">Xóa</BaseButton>
-      </div>
-    </BaseModal>
-  </AdminLayout>
-</template>
+<style scoped>.category-metric{display:flex;align-items:center;justify-content:space-between;border:1px solid var(--border);border-radius:1.1rem;background:var(--surface);padding:1rem 1.2rem}.category-metric span{font-size:.8rem;color:var(--text-muted)}.category-metric b{font-size:1.3rem}.category-search{min-height:2.75rem;width:100%;border:1px solid var(--border);border-radius:.85rem;background:var(--surface-muted);padding:.7rem 1rem .7rem 2.8rem;color:var(--text);outline:none}.category-search:focus{border-color:#a855f7;box-shadow:0 0 0 3px rgba(168,85,247,.1)}.category-table{width:100%;min-width:850px}.category-table th{background:var(--surface-muted);padding:.85rem 1.1rem;text-align:left;font-size:.67rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted)}.category-table td{border-top:1px solid var(--border);padding:1rem 1.1rem;vertical-align:middle}.category-table tbody tr:hover{background:color-mix(in srgb,var(--surface-muted) 60%,transparent)}.category-textarea{width:100%;resize:vertical;border:1px solid var(--border);border-radius:1rem;background:var(--surface-muted);padding:1rem;color:var(--text);outline:none}.category-textarea:focus{border-color:#a855f7;box-shadow:0 0 0 3px rgba(168,85,247,.1)}</style>
