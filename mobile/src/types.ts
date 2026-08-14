@@ -403,7 +403,6 @@ export type RootStackParamList = {
   CourseDetail: { slug: string };
   Login: undefined;
   Register: undefined;
-  Dashboard: undefined;
   Profile: undefined;
   ChangePassword: undefined;
   InstructorCourses: undefined;

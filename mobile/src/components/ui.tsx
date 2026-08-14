@@ -1,23 +1,23 @@
-import { useMemo, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import {
-  ActivityIndicator, Animated, KeyboardAvoidingView, Modal, PanResponder, Platform, Pressable, RefreshControl,
-  ScrollView, StyleSheet, Text, TextInput, type TextInputProps, View,
+  ActivityIndicator, Animated, Image, KeyboardAvoidingView, Modal, PanResponder, Platform, Pressable, RefreshControl,
+  ScrollView, StyleSheet, Text, TextInput, type ImageStyle, type StyleProp, type TextInputProps, type ViewStyle, View,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, shadow } from '../theme';
+import { colors, radius, shadow, shadows, spacing, typography } from '../theme';
 
-export function Screen({ children, scroll = true, topInset = false, refreshing = false, onRefresh, quickScroll = true }: {
-  children: ReactNode; scroll?: boolean; topInset?: boolean; refreshing?: boolean; onRefresh?(): void; quickScroll?: boolean;
+export function Screen({ children, scroll = true, topInset = false, refreshing = false, onRefresh, quickScroll = true, contentStyle }: {
+  children: ReactNode; scroll?: boolean; topInset?: boolean; refreshing?: boolean; onRefresh?(): void; quickScroll?: boolean; contentStyle?: StyleProp<ViewStyle>;
 }) {
   const ref = useRef<ScrollView>(null);
   const [awayFromTop, setAwayFromTop] = useState(false);
   const body = scroll
-    ? <ScrollView ref={ref} contentContainerStyle={styles.screenContent} keyboardShouldPersistTaps="handled"
+    ? <ScrollView ref={ref} contentContainerStyle={[styles.screenContent, contentStyle]} keyboardShouldPersistTaps="handled"
       showsVerticalScrollIndicator={false} scrollEventThrottle={16}
       refreshControl={onRefresh ? <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} /> : undefined}
       onScroll={event => setAwayFromTop(event.nativeEvent.contentOffset.y > 360)}>{children}</ScrollView>
-    : <View style={[styles.screenContent, { flex: 1 }]}>{children}</View>;
+    : <View style={[styles.screenContent, { flex: 1 }, contentStyle]}>{children}</View>;
   return <SafeAreaView style={styles.safe} edges={topInset ? ['top', 'bottom'] : ['bottom']}><KeyboardAvoidingView
     style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>{body}
     {scroll && quickScroll && awayFromTop && <Pressable accessibilityLabel="Cuộn lên đầu trang" onPress={() => ref.current?.scrollTo({ y: 0, animated: true })} style={styles.floatingScroll}><Ionicons name="arrow-up" size={22} color="#fff" /></Pressable>}
@@ -43,7 +43,72 @@ export function IconButton({ icon, label, onPress, badge }: { icon: keyof typeof
   </Pressable>;
 }
 
-export function Card({ children, style }: { children: ReactNode; style?: object }) { return <View style={[styles.card, style]}>{children}</View>; }
+export function Card({ children, style }: { children: ReactNode; style?: StyleProp<ViewStyle> }) { return <View style={[styles.card, style]}>{children}</View>; }
+
+type StatusTone = 'neutral' | 'primary' | 'success' | 'warning' | 'danger';
+const statusTones: Record<StatusTone, { background: string; foreground: string }> = {
+  neutral: { background: '#f1f3f7', foreground: colors.muted },
+  primary: { background: '#eee9ff', foreground: colors.primaryDark },
+  success: { background: '#eaf8f1', foreground: colors.success },
+  warning: { background: '#fff5dc', foreground: '#9a6700' },
+  danger: { background: '#ffebee', foreground: colors.danger },
+};
+
+export function StatusBadge({ label, tone = 'neutral', icon }: { label: string; tone?: StatusTone; icon?: keyof typeof Ionicons.glyphMap }) {
+  const palette = statusTones[tone];
+  return <View style={[styles.statusBadge, { backgroundColor: palette.background }]}>
+    {icon && <Ionicons name={icon} size={13} color={palette.foreground} />}
+    <Text style={[styles.statusBadgeText, { color: palette.foreground }]}>{label}</Text>
+  </View>;
+}
+
+export function ImageWithFallback({ uri, style, accessibilityLabel, fallbackIcon = 'book-outline' }: {
+  uri?: string | null; style: StyleProp<ImageStyle>; accessibilityLabel?: string; fallbackIcon?: keyof typeof Ionicons.glyphMap;
+}) {
+  const [failed, setFailed] = useState(false);
+  useEffect(() => setFailed(false), [uri]);
+  if (!uri || failed) return <View style={[style, styles.imageFallback]} accessibilityRole="image" accessibilityLabel={accessibilityLabel}>
+    <Ionicons name={fallbackIcon} size={38} color={colors.primary} />
+  </View>;
+  return <Image source={{ uri }} style={style} resizeMode="cover" accessibilityLabel={accessibilityLabel} onError={() => setFailed(true)} />;
+}
+
+export function Skeleton({ width = '100%', height = 16, radius: skeletonRadius = radius.sm, style }: {
+  width?: number | `${number}%`; height?: number; radius?: number; style?: StyleProp<ViewStyle>;
+}) {
+  const opacity = useRef(new Animated.Value(.45)).current;
+  useEffect(() => {
+    const animation = Animated.loop(Animated.sequence([
+      Animated.timing(opacity, { toValue: 1, duration: 650, useNativeDriver: true }),
+      Animated.timing(opacity, { toValue: .45, duration: 650, useNativeDriver: true }),
+    ]));
+    animation.start();
+    return () => animation.stop();
+  }, [opacity]);
+  return <Animated.View accessibilityLabel="Đang tải" style={[styles.skeleton, { width, height, borderRadius: skeletonRadius, opacity }, style]} />;
+}
+
+export function SkeletonCard() {
+  return <View style={styles.skeletonCard}><Skeleton height={148} radius={radius.lg} /><Skeleton width="42%" style={{ marginTop: spacing.md }} /><Skeleton height={22} style={{ marginTop: spacing.sm }} /><Skeleton width="72%" style={{ marginTop: spacing.xs }} /></View>;
+}
+
+export function Snackbar({ visible, message, tone = 'success', onDismiss, actionLabel, onAction }: {
+  visible: boolean; message: string; tone?: 'success' | 'danger' | 'neutral'; onDismiss(): void; actionLabel?: string; onAction?(): void;
+}) {
+  useEffect(() => {
+    if (!visible) return;
+    const timeout = setTimeout(onDismiss, 3200);
+    return () => clearTimeout(timeout);
+  }, [visible, onDismiss]);
+  if (!visible) return null;
+  const icon = tone === 'success' ? 'checkmark-circle' : tone === 'danger' ? 'alert-circle' : 'information-circle';
+  const foreground = tone === 'danger' ? '#ffd9de' : tone === 'success' ? '#c8f7df' : '#fff';
+  return <View accessibilityLiveRegion="polite" style={styles.snackbar}>
+    <Ionicons name={icon} size={21} color={foreground} />
+    <Text style={styles.snackbarText}>{message}</Text>
+    {actionLabel && onAction ? <Pressable onPress={onAction} hitSlop={8}><Text style={styles.snackbarAction}>{actionLabel}</Text></Pressable> : <Pressable accessibilityRole="button" accessibilityLabel="Đóng thông báo" onPress={onDismiss} hitSlop={8} style={styles.snackbarClose}><Ionicons name="close" size={21} color="#fff" /></Pressable>}
+  </View>;
+}
 
 export function MetricCard({ icon, label, value, tone = colors.primary }: { icon: keyof typeof Ionicons.glyphMap; label: string; value: string; tone?: string }) {
   return <View style={styles.metric}><View style={[styles.metricIcon, { backgroundColor: `${tone}18` }]}><Ionicons name={icon} size={22} color={tone} /></View><Text style={styles.metricValue}>{value}</Text><Text style={styles.metricLabel}>{label}</Text></View>;
@@ -74,6 +139,7 @@ export function Button({ title, onPress, loading, variant = 'primary', disabled 
   title: string; onPress(): void; loading?: boolean; variant?: 'primary' | 'outline' | 'danger' | 'ghost'; disabled?: boolean;
 }) {
   return <Pressable onPress={onPress} disabled={disabled || loading}
+    accessibilityRole="button" accessibilityState={{ disabled: disabled || loading, busy: loading }}
     style={({ pressed }) => [styles.button, styles[`button_${variant}`], (pressed || disabled) && { opacity: .65 }]}>
     {loading ? <ActivityIndicator color={variant === 'outline' || variant === 'ghost' ? colors.primary : '#fff'} />
       : <Text style={[styles.buttonText, (variant === 'outline' || variant === 'ghost') && { color: colors.primary }]}>{title}</Text>}
@@ -93,7 +159,8 @@ export function SectionTitle({ title, subtitle }: { title: string; subtitle?: st
   return <View style={{ marginBottom: 18 }}><Text style={styles.title}>{title}</Text>{subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}</View>;
 }
 
-export function StateView({ loading, error, empty, onRetry }: { loading?: boolean; error?: string; empty?: string; onRetry?(): void }) {
+export function StateView({ loading, error, empty, onRetry, variant = 'default' }: { loading?: boolean; error?: string; empty?: string; onRetry?(): void; variant?: 'default' | 'list' }) {
+  if (loading && variant === 'list') return <View style={styles.skeletonList}><SkeletonCard /><SkeletonCard /></View>;
   if (loading) return <View style={styles.state}><ActivityIndicator size="large" color={colors.primary} /><Text>Đang tải...</Text></View>;
   if (error) return <View style={styles.state}><Text style={styles.error}>{error}</Text>{onRetry && <Button title="Thử lại" onPress={onRetry} variant="outline" />}</View>;
   return <View style={styles.state}><Text style={styles.subtitle}>{empty || 'Chưa có dữ liệu'}</Text></View>;
@@ -101,27 +168,37 @@ export function StateView({ loading, error, empty, onRetry }: { loading?: boolea
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.background },
-  screenContent: { padding: 20, paddingBottom: 40, flexGrow: 1 },
-  button: { minHeight: 50, paddingHorizontal: 20, borderRadius: 14, alignItems: 'center', justifyContent: 'center', marginVertical: 6 },
+  screenContent: { padding: spacing.lg, paddingBottom: spacing.xxl + spacing.xs, flexGrow: 1 },
+  button: { minHeight: 50, paddingHorizontal: spacing.lg, borderRadius: radius.md, alignItems: 'center', justifyContent: 'center', marginVertical: spacing.xxs },
   button_primary: { backgroundColor: colors.primary, ...shadow },
   button_outline: { backgroundColor: '#fff', borderWidth: 1.5, borderColor: colors.primary },
   button_danger: { backgroundColor: colors.danger },
   button_ghost: { backgroundColor: 'transparent' },
-  buttonText: { color: '#fff', fontSize: 16, fontWeight: '700' },
-  fieldWrap: { marginBottom: 14 },
-  label: { color: colors.ink, fontSize: 14, fontWeight: '600', marginBottom: 7 },
-  input: { minHeight: 52, borderWidth: 1, borderColor: colors.border, borderRadius: 14, backgroundColor: '#fff', paddingHorizontal: 15, fontSize: 16, color: colors.ink },
-  textarea: { height: 110, textAlignVertical: 'top', paddingTop: 14 },
+  buttonText: { color: '#fff', ...typography.bodyStrong },
+  fieldWrap: { marginBottom: radius.md },
+  label: { color: colors.ink, ...typography.label, marginBottom: spacing.xs },
+  input: { minHeight: 52, borderWidth: 1, borderColor: colors.border, borderRadius: radius.md, backgroundColor: '#fff', paddingHorizontal: spacing.md, fontSize: 16, color: colors.ink },
+  textarea: { height: 110, textAlignVertical: 'top', paddingTop: radius.md },
   error: { color: colors.danger, marginTop: 5 },
-  title: { color: colors.ink, fontSize: 28, fontWeight: '800' },
-  subtitle: { color: colors.muted, fontSize: 15, lineHeight: 22, marginTop: 5 },
-  state: { flex: 1, minHeight: 240, gap: 14, alignItems: 'center', justifyContent: 'center', padding: 24 },
+  title: { color: colors.ink, ...typography.heading },
+  subtitle: { color: colors.muted, ...typography.body, marginTop: spacing.xxs },
+  state: { flex: 1, minHeight: 240, gap: radius.md, alignItems: 'center', justifyContent: 'center', padding: spacing.xl },
   floatingScroll: { position: 'absolute', right: 18, bottom: 18, width: 48, height: 48, borderRadius: 24, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center', ...shadow },
-  appBar: { minHeight: 64, flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 14, paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: colors.border, backgroundColor: '#fff' },
-  appBarTitle: { color: colors.ink, fontSize: 18, fontWeight: '900' }, appBarSubtitle: { color: colors.muted, fontSize: 11, marginTop: 2 },
-  iconButton: { width: 44, height: 44, borderRadius: 14, backgroundColor: '#f6f5fb', alignItems: 'center', justifyContent: 'center' },
+  appBar: { minHeight: 64, flexDirection: 'row', alignItems: 'center', gap: spacing.xs, paddingHorizontal: radius.md, paddingVertical: spacing.xs, borderBottomWidth: 1, borderBottomColor: colors.border, backgroundColor: '#fff' },
+  appBarTitle: { color: colors.ink, ...typography.title, fontWeight: '900' }, appBarSubtitle: { color: colors.muted, fontSize: 11, marginTop: 2 },
+  iconButton: { width: 44, height: 44, borderRadius: radius.md, backgroundColor: '#f6f5fb', alignItems: 'center', justifyContent: 'center' },
   iconBadge: { position: 'absolute', right: 2, top: 1, minWidth: 17, height: 17, paddingHorizontal: 3, borderRadius: 9, backgroundColor: colors.danger, alignItems: 'center', justifyContent: 'center' }, iconBadgeText: { color: '#fff', fontSize: 9, fontWeight: '900' },
-  card: { backgroundColor: '#fff', borderRadius: 20, padding: 16, marginBottom: 14, ...shadow },
+  card: { backgroundColor: '#fff', borderRadius: radius.lg, padding: spacing.md, marginBottom: radius.md, ...shadows.soft },
   metric: { width: 150, minHeight: 142, backgroundColor: '#fff', borderRadius: 20, padding: 16, marginRight: 12, ...shadow }, metricIcon: { width: 42, height: 42, borderRadius: 13, alignItems: 'center', justifyContent: 'center' }, metricValue: { color: colors.ink, fontSize: 23, fontWeight: '900', marginTop: 13 }, metricLabel: { color: colors.muted, fontSize: 12, lineHeight: 17, marginTop: 3 },
   sheetOverlay: { flex: 1, justifyContent: 'flex-end', backgroundColor: '#11182755' }, sheet: { maxHeight: '88%', backgroundColor: '#fff', borderTopLeftRadius: 28, borderTopRightRadius: 28, paddingHorizontal: 20, paddingTop: 8, ...shadow }, sheetHandle: { width: 42, height: 5, borderRadius: 4, backgroundColor: '#d7d8e0', alignSelf: 'center', marginBottom: 8 }, sheetHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }, sheetTitle: { color: colors.ink, fontSize: 21, fontWeight: '900' },
+  statusBadge: { minHeight: 27, alignSelf: 'flex-start', flexDirection: 'row', gap: 5, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 10, paddingVertical: 5, borderRadius: radius.pill },
+  statusBadgeText: { ...typography.caption, fontWeight: '800' },
+  imageFallback: { backgroundColor: '#eee9ff', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
+  skeleton: { backgroundColor: '#e6e7ee' },
+  skeletonCard: { backgroundColor: '#fff', borderRadius: radius.lg, padding: spacing.sm, marginBottom: spacing.md, ...shadows.soft },
+  skeletonList: { flex: 1, paddingTop: spacing.sm },
+  snackbar: { position: 'absolute', zIndex: 50, left: spacing.md, right: spacing.md, bottom: spacing.lg, minHeight: 58, borderRadius: radius.md, paddingLeft: spacing.md, paddingRight: spacing.xs, flexDirection: 'row', alignItems: 'center', gap: spacing.sm, backgroundColor: colors.ink, ...shadows.elevated },
+  snackbarText: { flex: 1, color: '#fff', ...typography.bodyStrong },
+  snackbarAction: { color: '#d8ccff', ...typography.label, padding: spacing.xs },
+  snackbarClose: { width: 40, height: 40, borderRadius: radius.sm, alignItems: 'center', justifyContent: 'center' },
 });

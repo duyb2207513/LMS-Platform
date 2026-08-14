@@ -6,7 +6,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../auth/AuthContext';
 import type { MainTabParamList, RootStackParamList } from '../types';
-import { colors, shadow } from '../theme';
+import { colors, shadows, typography } from '../theme';
 import { HomeScreen } from '../screens/HomeScreen';
 import { LoginScreen, RegisterScreen } from '../screens/AuthScreens';
 import { CoursesScreen, CourseDetailScreen } from '../screens/CourseScreens';
@@ -38,7 +38,7 @@ function MainTabs() {
     headerShown: false, tabBarHideOnKeyboard: true, tabBarActiveTintColor: colors.primary, tabBarInactiveTintColor: '#8b91a0',
     tabBarLabel: tabConfig[route.name].label, tabBarLabelStyle: { fontSize: 10, fontWeight: '800', marginTop: 2 },
     tabBarIcon: ({ focused, color, size }) => <Ionicons name={focused ? tabConfig[route.name].active : tabConfig[route.name].inactive} size={Math.max(22, size)} color={color} />,
-    tabBarStyle: { height: 62 + insets.bottom, paddingTop: 8, paddingBottom: Math.max(7, insets.bottom), borderTopWidth: 0, backgroundColor: '#fff', ...shadow },
+    tabBarStyle: { height: 62 + insets.bottom, paddingTop: 8, paddingBottom: Math.max(7, insets.bottom), borderTopWidth: 0, backgroundColor: colors.surface, ...shadows.elevated },
   })}>
     <Tabs.Screen name="HomeTab" component={HomeScreen} />
     <Tabs.Screen name="CoursesTab" component={CoursesScreen} />
@@ -52,12 +52,11 @@ export function AppNavigator() {
   const { isBooting } = useAuth();
   if (isBooting) return <View style={styles.boot}><View style={styles.logo}><Ionicons name="book-outline" size={34} color="#fff" /></View><ActivityIndicator size="large" color={colors.primary} /><Text style={styles.loading}>Đang chuẩn bị LMS...</Text></View>;
   return <NavigationContainer theme={navigationTheme}>
-    <Stack.Navigator screenOptions={{ headerTintColor: colors.primary, headerTitleStyle: { fontWeight: '800' }, headerShadowVisible: false, contentStyle: { backgroundColor: colors.background }, animation: 'slide_from_right', gestureEnabled: true }}>
+    <Stack.Navigator screenOptions={{ headerTintColor: colors.primary, headerStyle: { backgroundColor: colors.surface }, headerTitleAlign: 'center', headerTitleStyle: typography.title, headerBackButtonDisplayMode: 'minimal', headerShadowVisible: false, contentStyle: { backgroundColor: colors.background }, animation: 'slide_from_right', gestureEnabled: true }}>
       <Stack.Screen name="Main" component={MainTabs} options={{ headerShown: false }} />
       <Stack.Screen name="Login" component={LoginScreen} options={{ title: 'Đăng nhập', presentation: 'modal' }} />
       <Stack.Screen name="Register" component={RegisterScreen} options={{ title: 'Đăng ký', presentation: 'modal' }} />
       <Stack.Screen name="CourseDetail" component={CourseDetailScreen} options={{ title: 'Chi tiết khóa học' }} />
-      <Stack.Screen name="Dashboard" component={DashboardScreen} options={{ headerShown: false }} />
       <Stack.Screen name="VerifyCertificate" component={VerifyCertificateScreen} options={{ title: 'Xác minh chứng chỉ' }} />
       <Stack.Screen name="Profile" component={ProfileScreen} options={{ title: 'Hồ sơ' }} />
       <Stack.Screen name="ChangePassword" component={ChangePasswordScreen} options={{ title: 'Đổi mật khẩu' }} />
