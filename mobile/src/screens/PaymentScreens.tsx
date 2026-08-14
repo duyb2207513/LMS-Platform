@@ -2,20 +2,23 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Alert, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { WebView } from 'react-native-webview';
-import { certificatesApi, ordersApi } from '../api/services';
+import { certificatesApi, couponsApi, ordersApi, refundsApi } from '../api/services';
 import { getApiMessage } from '../api/client';
-import { Button, Field, Screen, SectionTitle, StateView } from '../components/ui';
-import type { Certificate, CertificateVerification, Order, RootStackParamList } from '../types';
+import { BottomSheet, Button, Field, Screen, SectionTitle, StateView } from '../components/ui';
+import type { Certificate, CertificateVerification, CouponValidation, Order, RootStackParamList } from '../types';
 import { colors, shadow } from '../theme';
 
 const money = (value: number, currency = 'VND') => `${new Intl.NumberFormat('vi-VN').format(value)} ${currency === 'VND' ? '₫' : currency}`;
 const date = (value: string | null) => value ? new Intl.DateTimeFormat('vi-VN', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value)) : '—';
-const orderLabel = { PENDING: 'Chờ thanh toán', PAID: 'Đã thanh toán', CANCELLED: 'Đã hủy' } as const;
+const orderLabel = { PENDING: 'Chờ thanh toán', PAID: 'Đã thanh toán', CANCELLED: 'Đã hủy', REFUNDED: 'Đã hoàn tiền' } as const;
 
 export function OrdersScreen({ navigation }: NativeStackScreenProps<RootStackParamList, 'Orders'>) {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [refundOrder, setRefundOrder] = useState<Order | null>(null);
+  const [reason, setReason] = useState('');
+  const [refunding, setRefunding] = useState(false);
   const load = useCallback(async () => {
     setLoading(true);
     try { setOrders((await ordersApi.mine()).data.data); setError(''); }
@@ -29,7 +32,12 @@ export function OrdersScreen({ navigation }: NativeStackScreenProps<RootStackPar
       { text: 'Hủy đơn', style: 'destructive', onPress: async () => { try { await ordersApi.cancel(order.id); await load(); } catch (e) { Alert.alert('Không thể hủy đơn', getApiMessage(e)); } } }
     ]);
   }
-  return <Screen scroll={false}><SectionTitle title="Đơn hàng của tôi" subtitle="Theo dõi trạng thái và tiếp tục thanh toán các khóa học" />
+  async function requestRefund() {
+    if (!refundOrder || reason.trim().length < 10) return Alert.alert('Lý do quá ngắn', 'Vui lòng mô tả lý do hoàn tiền ít nhất 10 ký tự.');
+    setRefunding(true); try { await refundsApi.create(refundOrder.id, reason.trim()); setRefundOrder(null); setReason(''); Alert.alert('Đã gửi yêu cầu', 'Bạn có thể theo dõi tại mục Hoàn tiền.'); }
+    catch (e) { Alert.alert('Không thể gửi yêu cầu', getApiMessage(e)); } finally { setRefunding(false); }
+  }
+  return <View style={{ flex: 1 }}><Screen scroll={false}><SectionTitle title="Đơn hàng của tôi" subtitle="Theo dõi trạng thái và tiếp tục thanh toán các khóa học" />
     {loading || error || !orders.length ? <StateView loading={loading} error={error} empty="Bạn chưa có đơn hàng nào" onRetry={load} /> : <ScrollView showsVerticalScrollIndicator={false} refreshControl={<RefreshControl refreshing={loading} onRefresh={load} />}>
       {orders.map(order => <View key={order.id} style={styles.card}>
         <View style={styles.row}><Text style={styles.orderNumber}>{order.orderNumber}</Text><StatusBadge status={order.status} /></View>
@@ -38,18 +46,22 @@ export function OrdersScreen({ navigation }: NativeStackScreenProps<RootStackPar
         {order.items.map(item => <View key={item.id} style={styles.itemRow}><Text style={styles.itemTitle}>{item.courseTitleSnapshot}</Text><Text style={styles.itemPrice}>{money(item.priceSnapshot, order.currency)}</Text></View>)}
         <View style={styles.totalRow}><Text style={styles.totalLabel}>Tổng cộng</Text><Text style={styles.total}>{money(order.total, order.currency)}</Text></View>
         {order.status === 'PENDING' && <View style={styles.actions}><View style={{ flex: 1 }}><Button title="Hủy" variant="ghost" onPress={() => cancel(order)} /></View><View style={{ flex: 1.4 }}><Button title="Thanh toán" onPress={() => navigation.navigate('Checkout', { orderId: order.id })} /></View></View>}
-        {order.status === 'PAID' && <Button title="Xem kết quả" variant="outline" onPress={() => navigation.navigate('PaymentResult', { orderId: order.id })} />}
+        {order.status === 'PAID' && <View style={styles.actions}><View style={{ flex: 1 }}><Button title="Chi tiết" variant="outline" onPress={() => navigation.navigate('PaymentResult', { orderId: order.id })} /></View><View style={{ flex: 1 }}><Button title="Hoàn tiền" variant="ghost" onPress={() => setRefundOrder(order)} /></View></View>}
       </View>)}
     </ScrollView>}
-  </Screen>;
+  </Screen><BottomSheet visible={!!refundOrder} title="Yêu cầu hoàn tiền" onClose={() => setRefundOrder(null)}><Text style={styles.noticeText}>Backend sẽ kiểm tra thời hạn mua và tiến độ học trước khi tiếp nhận.</Text><Field label="Lý do hoàn tiền" value={reason} onChangeText={setReason} multiline placeholder="Mô tả lý do bạn muốn hoàn tiền..." /><Button title="Gửi yêu cầu" onPress={() => void requestRefund()} loading={refunding} /></BottomSheet></View>;
 }
 
 export function CheckoutScreen({ route, navigation }: NativeStackScreenProps<RootStackParamList, 'Checkout'>) {
   const [order, setOrder] = useState<Order | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [couponCode, setCouponCode] = useState('');
+  const [coupon, setCoupon] = useState<CouponValidation | null>(null);
+  const [validating, setValidating] = useState(false);
+  const [loading, setLoading] = useState(!!route.params.orderId);
   const [paying, setPaying] = useState(false);
   const [error, setError] = useState('');
   const load = useCallback(async () => {
+    if (!route.params.orderId) { setLoading(false); return; }
     setLoading(true);
     try { setOrder((await ordersApi.get(route.params.orderId)).data.data); setError(''); }
     catch (e) { setError(getApiMessage(e, 'Không thể tải đơn hàng')); }
@@ -59,19 +71,25 @@ export function CheckoutScreen({ route, navigation }: NativeStackScreenProps<Roo
   async function pay() {
     setPaying(true);
     try {
-      const result = (await ordersApi.initiateMockPayment(route.params.orderId)).data.data;
-      navigation.navigate('MockPayment', { orderId: route.params.orderId, checkoutUrl: result.mockPaymentUrl });
+      let activeOrder = order;
+      if (!activeOrder && route.params.courseId) activeOrder = (await ordersApi.create([route.params.courseId], coupon?.coupon.code)).data.data;
+      if (!activeOrder) throw new Error('Không tìm thấy thông tin đơn hàng');
+      const result = (await ordersApi.initiateMockPayment(activeOrder.id)).data.data;
+      navigation.navigate('MockPayment', { orderId: activeOrder.id, checkoutUrl: result.mockPaymentUrl });
     } catch (e) { Alert.alert('Không thể tạo thanh toán', getApiMessage(e)); }
     finally { setPaying(false); }
   }
-  if (loading || error || !order) return <Screen><StateView loading={loading} error={error} onRetry={load} /></Screen>;
-  if (order.status !== 'PENDING') return <Screen><SectionTitle title="Đơn hàng đã được xử lý" /><StatusBadge status={order.status} /><Button title="Xem kết quả" onPress={() => navigation.replace('PaymentResult', { orderId: order.id })} /></Screen>;
-  return <Screen><SectionTitle title="Xác nhận thanh toán" subtitle={`Đơn hàng ${order.orderNumber}`} />
-    <View style={styles.summary}>{order.items.map(item => <View key={item.id} style={styles.checkoutItem}><View style={{ flex: 1 }}><Text style={styles.itemTitle}>{item.courseTitleSnapshot}</Text><Text style={styles.muted}>Quyền truy cập trọn đời</Text></View><Text style={styles.itemPrice}>{money(item.priceSnapshot, order.currency)}</Text></View>)}
-      <View style={styles.divider} /><View style={styles.totalRow}><Text style={styles.totalLabel}>Tổng thanh toán</Text><Text style={styles.total}>{money(order.total, order.currency)}</Text></View>
+  async function validateCoupon() { if (!route.params.courseId || !couponCode.trim()) return; setValidating(true); try { setCoupon((await couponsApi.validate(couponCode.trim().toUpperCase(), route.params.courseId)).data.data); setError(''); } catch (e) { setCoupon(null); Alert.alert('Coupon không hợp lệ', getApiMessage(e)); } finally { setValidating(false); } }
+  if (loading || error) return <Screen><StateView loading={loading} error={error} onRetry={load} /></Screen>;
+  if (order && order.status !== 'PENDING') return <Screen><SectionTitle title="Đơn hàng đã được xử lý" /><StatusBadge status={order.status} /><Button title="Xem kết quả" onPress={() => navigation.replace('PaymentResult', { orderId: order.id })} /></Screen>;
+  const subtotal = order?.subtotal ?? route.params.price ?? 0; const discount = order?.discount ?? coupon?.pricing.discountAmount ?? 0; const total = order?.total ?? coupon?.pricing.finalAmount ?? subtotal; const currency = order?.currency ?? coupon?.pricing.currency ?? 'VND';
+  return <Screen><SectionTitle title="Xác nhận thanh toán" subtitle={order ? `Đơn hàng ${order.orderNumber}` : 'Kiểm tra giá và ưu đãi trước khi tạo đơn'} />
+    <View style={styles.summary}>{order ? order.items.map(item => <View key={item.id} style={styles.checkoutItem}><View style={{ flex: 1 }}><Text style={styles.itemTitle}>{item.courseTitleSnapshot}</Text><Text style={styles.muted}>Quyền truy cập trọn đời</Text></View><Text style={styles.itemPrice}>{money(item.priceSnapshot, order.currency)}</Text></View>) : <View style={styles.checkoutItem}><View style={{ flex: 1 }}><Text style={styles.itemTitle}>{route.params.courseTitle}</Text><Text style={styles.muted}>Quyền truy cập trọn đời</Text></View><Text style={styles.itemPrice}>{money(subtotal)}</Text></View>}
+      <View style={styles.divider} /><View style={styles.info}><Text style={styles.infoLabel}>Tạm tính</Text><Text style={styles.infoValue}>{money(subtotal, currency)}</Text></View>{discount > 0 && <View style={styles.info}><Text style={styles.infoLabel}>Giảm giá {coupon?.coupon.code || order?.coupon?.code}</Text><Text style={[styles.infoValue, { color: colors.success }]}>−{money(discount, currency)}</Text></View>}<View style={styles.totalRow}><Text style={styles.totalLabel}>Tổng thanh toán</Text><Text style={styles.total}>{money(total, currency)}</Text></View>
     </View>
+    {!order && route.params.courseId && <View style={styles.couponBox}><Field label="Mã giảm giá" value={couponCode} onChangeText={value => { setCouponCode(value.toUpperCase()); setCoupon(null); }} autoCapitalize="characters" placeholder="WELCOME20" /><Button title={coupon ? '✓ Đã áp dụng' : 'Áp dụng coupon'} variant="outline" onPress={() => void validateCoupon()} loading={validating} disabled={!couponCode.trim()} /></View>}
     <View style={styles.notice}><Text style={styles.noticeTitle}>Thanh toán thử nghiệm</Text><Text style={styles.noticeText}>Sprint 4 đang dùng Mock Payment. Không có tiền thật được trừ khỏi tài khoản của bạn.</Text></View>
-    <Button title={`Thanh toán ${money(order.total, order.currency)}`} onPress={pay} loading={paying} />
+    <Button title={`Thanh toán ${money(total, currency)}`} onPress={pay} loading={paying} />
     <Button title="Quay lại lịch sử đơn" variant="ghost" onPress={() => navigation.navigate('Orders')} />
   </Screen>;
 }
@@ -160,9 +178,9 @@ const styles = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
   orderNumber: { color: colors.ink, fontWeight: '900', flex: 1 }, muted: { color: colors.muted, fontSize: 12, marginTop: 5 },
   badge: { borderRadius: 20, paddingHorizontal: 10, paddingVertical: 6 }, badgeText: { fontSize: 11, fontWeight: '900' },
-  badge_PENDING: { backgroundColor: '#fff4d6' }, badgeText_PENDING: { color: '#a36300' }, badge_PAID: { backgroundColor: '#dcfce7' }, badgeText_PAID: { color: colors.success }, badge_CANCELLED: { backgroundColor: '#f1f2f4' }, badgeText_CANCELLED: { color: colors.muted },
+  badge_PENDING: { backgroundColor: '#fff4d6' }, badgeText_PENDING: { color: '#a36300' }, badge_PAID: { backgroundColor: '#dcfce7' }, badgeText_PAID: { color: colors.success }, badge_CANCELLED: { backgroundColor: '#f1f2f4' }, badgeText_CANCELLED: { color: colors.muted }, badge_REFUNDED: { backgroundColor: '#e0f2fe' }, badgeText_REFUNDED: { color: '#0369a1' },
   divider: { height: 1, backgroundColor: colors.border, marginVertical: 14 }, itemRow: { flexDirection: 'row', justifyContent: 'space-between', gap: 12, marginBottom: 10 }, itemTitle: { color: colors.ink, fontWeight: '700', flex: 1 }, itemPrice: { color: colors.ink, fontWeight: '800' }, totalRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 8 }, totalLabel: { color: colors.ink, fontSize: 16, fontWeight: '800' }, total: { color: colors.primary, fontSize: 21, fontWeight: '900' }, actions: { flexDirection: 'row', gap: 8, marginTop: 10 },
-  summary: { backgroundColor: '#fff', borderRadius: 20, padding: 18, ...shadow }, checkoutItem: { flexDirection: 'row', gap: 10, paddingVertical: 8 }, notice: { backgroundColor: '#eee9ff', borderRadius: 16, padding: 16, marginVertical: 18 }, noticeTitle: { color: colors.primary, fontWeight: '900' }, noticeText: { color: colors.muted, lineHeight: 21, marginTop: 5 }, webviewPage: { flex: 1, backgroundColor: '#fff' },
+  summary: { backgroundColor: '#fff', borderRadius: 20, padding: 18, ...shadow }, checkoutItem: { flexDirection: 'row', gap: 10, paddingVertical: 8 }, couponBox: { backgroundColor: '#fff', borderRadius: 18, padding: 15, marginTop: 15 }, notice: { backgroundColor: '#eee9ff', borderRadius: 16, padding: 16, marginVertical: 18 }, noticeTitle: { color: colors.primary, fontWeight: '900' }, noticeText: { color: colors.muted, lineHeight: 21, marginTop: 5 }, webviewPage: { flex: 1, backgroundColor: '#fff' },
   resultIcon: { width: 88, height: 88, borderRadius: 44, alignSelf: 'center', alignItems: 'center', justifyContent: 'center', marginTop: 20 }, resultSuccess: { backgroundColor: '#dcfce7' }, resultFailure: { backgroundColor: '#fee2e2' }, resultMark: { color: colors.success, fontSize: 48, fontWeight: '900' }, resultTitle: { color: colors.ink, fontSize: 28, fontWeight: '900', textAlign: 'center', marginTop: 20 }, resultText: { color: colors.muted, lineHeight: 23, textAlign: 'center', marginTop: 8 }, receipt: { backgroundColor: '#fff', borderRadius: 18, padding: 17, marginVertical: 22, ...shadow }, info: { flexDirection: 'row', justifyContent: 'space-between', gap: 14, paddingVertical: 8 }, infoLabel: { color: colors.muted, flex: 1 }, infoValue: { color: colors.ink, fontWeight: '800', flex: 1.5, textAlign: 'right' },
   certificate: { backgroundColor: '#fff', borderRadius: 22, padding: 20, marginBottom: 16, borderWidth: 2, borderColor: '#e6ddff', ...shadow }, ribbon: { width: 54, height: 54, borderRadius: 17, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center' }, ribbonText: { color: '#fff', fontWeight: '900' }, certificateLabel: { color: colors.primary, fontSize: 11, fontWeight: '900', letterSpacing: 1.3, marginTop: 18 }, certificateCourse: { color: colors.ink, fontSize: 22, lineHeight: 29, fontWeight: '900', marginTop: 8 }, certificateStudent: { color: colors.muted, fontSize: 17, marginTop: 6, marginBottom: 12 }, revoked: { color: colors.danger, fontWeight: '900', textAlign: 'center', marginVertical: 10 },
   invalidBox: { backgroundColor: '#fee2e2', borderRadius: 16, padding: 16, marginTop: 16 }, invalidTitle: { color: colors.danger, fontWeight: '900' }, verifyCard: { borderRadius: 20, padding: 20, marginTop: 20, borderWidth: 1.5 }, verifyValid: { backgroundColor: '#f0fdf4', borderColor: '#86efac' }, verifyInvalid: { backgroundColor: '#fff1f2', borderColor: '#fda4af' }, verifyIcon: { color: colors.success, fontSize: 40, fontWeight: '900', textAlign: 'center' }, verifyTitle: { color: colors.ink, fontSize: 21, fontWeight: '900', textAlign: 'center', marginBottom: 14 },
