@@ -1,15 +1,15 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Alert, Image, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { categoriesApi, coursesApi, enrollmentsApi, ordersApi, reviewsApi } from '../api/services';
+import { categoriesApi, coursesApi, enrollmentsApi, reviewsApi } from '../api/services';
 import { getApiMessage } from '../api/client';
 import { CourseCard, money } from '../components/CourseCard';
-import { Button, Field, Screen, SectionTitle, StateView } from '../components/ui';
+import { AppBar, Button, Field, Screen, SectionTitle, StateView } from '../components/ui';
 import type { Category, Course, Review, RootStackParamList } from '../types';
 import { colors } from '../theme';
 import { useAuth } from '../auth/AuthContext';
 
-export function CoursesScreen({ navigation }: NativeStackScreenProps<RootStackParamList, 'Courses'>) {
+export function CoursesScreen({ navigation }: { navigation: any }) {
   const [courses, setCourses] = useState<Course[]>([]); const [categories, setCategories] = useState<Category[]>([]);
   const [search, setSearch] = useState(''); const [categoryId, setCategory] = useState('');
   const [loading, setLoading] = useState(true); const [error, setError] = useState('');
@@ -21,7 +21,7 @@ export function CoursesScreen({ navigation }: NativeStackScreenProps<RootStackPa
     } catch (e) { setError(getApiMessage(e, 'Không thể tải khóa học')); } finally { setLoading(false); }
   }, [search, categoryId]);
   useEffect(() => { void load(); }, [load]);
-  return <Screen scroll={false}><SectionTitle title="Khóa học" subtitle="Tìm khóa học phù hợp với mục tiêu của bạn" />
+  return <Screen scroll={false} topInset><AppBar title="Khóa học" subtitle="Khám phá nội dung đang xuất bản" onSearch={() => navigation.navigate('SearchTab')} />
     <Field label="Tìm kiếm" value={search} onChangeText={setSearch} placeholder="Nhập tên khóa học..." returnKeyType="search" onSubmitEditing={load} />
     <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flexGrow: 0, marginBottom: 12 }}>
       <Chip label="Tất cả" active={!categoryId} onPress={() => setCategory('')} />
@@ -56,8 +56,8 @@ export function CourseDetailScreen({ route, navigation }: NativeStackScreenProps
   async function checkout() {
     if (!course) return;
     setOrdering(true);
-    try { const order = (await ordersApi.create([course.id])).data.data; navigation.navigate('Checkout', { orderId: order.id }); }
-    catch (e) { Alert.alert('Không thể tạo đơn hàng', getApiMessage(e)); }
+    try { navigation.navigate('Checkout', { courseId: course.id, courseTitle: course.title, price: course.price }); }
+    catch (e) { Alert.alert('Không thể mở thanh toán', getApiMessage(e)); }
     finally { setOrdering(false); }
   }
   async function saveReview() { if (!course || !rating) return; setSavingReview(true); try { const own = reviews.find(item => item.user.id === user?.id); if (own) await reviewsApi.update(own.id, { rating, content: reviewText.trim() || null }); else await reviewsApi.create(course.id, { rating, content: reviewText.trim() || null }); await loadReviews(course.id); Alert.alert('Cảm ơn bạn', 'Đánh giá đã được lưu.'); } catch (e) { Alert.alert('Không thể đánh giá', getApiMessage(e)); } finally { setSavingReview(false); } }
