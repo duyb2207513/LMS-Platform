@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import * as SecureStore from 'expo-secure-store';
 import { ACCESS_TOKEN_KEY, setSessionExpiredHandler } from '../api/client';
+import { normalizeMediaUrls } from '../api/media';
 import { authApi, usersApi } from '../api/services';
 import type { User } from '../types';
 
@@ -31,8 +32,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const setUser = useCallback(async (nextUser: User) => {
-    await SecureStore.setItemAsync(USER_KEY, JSON.stringify(nextUser));
-    setUserState(nextUser);
+    const normalizedUser = normalizeMediaUrls(nextUser);
+    await SecureStore.setItemAsync(USER_KEY, JSON.stringify(normalizedUser));
+    setUserState(normalizedUser);
   }, []);
 
   useEffect(() => {
@@ -42,7 +44,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       SecureStore.getItemAsync(USER_KEY),
     ]).then(([token, savedUser]) => {
       if (token && savedUser) {
-        try { setUserState(JSON.parse(savedUser) as User); } catch { void clearSession(); }
+        try { setUserState(normalizeMediaUrls(JSON.parse(savedUser) as User)); } catch { void clearSession(); }
       }
     }).finally(() => setBooting(false));
   }, [clearSession]);

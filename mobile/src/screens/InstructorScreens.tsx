@@ -5,6 +5,7 @@ import { Picker } from '@react-native-picker/picker';
 import * as ImagePicker from 'expo-image-picker';
 import { categoriesApi, coursesApi } from '../api/services';
 import { getApiMessage } from '../api/client';
+import { imageUploadFile, type MobileUploadFile } from '../api/media';
 import { Button, Field, Screen, SectionTitle, StateView } from '../components/ui';
 import type { Category, Course, CourseInput, CourseLevel, RootStackParamList } from '../types';
 import { colors, shadow } from '../theme';
@@ -25,15 +26,15 @@ export function InstructorCoursesScreen({ navigation }: NativeStackScreenProps<R
 }
 
 export function CourseFormScreen({ route, navigation }: NativeStackScreenProps<RootStackParamList, 'CourseForm'>) {
-  const course = route.params?.course; const [categories, setCategories] = useState<Category[]>([]); const [saving, setSaving] = useState(false); const [error, setError] = useState(''); const [imageUri, setImageUri] = useState<string | null>(null);
+  const course = route.params?.course; const [categories, setCategories] = useState<Category[]>([]); const [saving, setSaving] = useState(false); const [error, setError] = useState(''); const [imageFile, setImageFile] = useState<MobileUploadFile | null>(null);
   const [form, setForm] = useState({ title: course?.title || '', description: course?.description || '', categoryId: course?.categoryId || course?.category?.id || '', level: course?.level || 'BEGINNER' as CourseLevel, price: String(course?.price || 0), isFree: course?.isFree || false, language: course?.language || 'Vietnamese', requirements: course?.requirements || '', learningOutcomes: course?.learningOutcomes || '' });
   useEffect(() => { categoriesApi.list().then(({ data }) => { setCategories(data.data); if (!form.categoryId && data.data[0]) setForm(old => ({ ...old, categoryId: data.data[0].id })); }).catch(e => setError(getApiMessage(e))); }, []);
   const set = (key: keyof typeof form) => (value: string | boolean) => setForm(old => ({ ...old, [key]: value }));
-  async function pickImage() { const permission = await ImagePicker.requestMediaLibraryPermissionsAsync(); if (!permission.granted) return Alert.alert('Cần quyền truy cập ảnh'); const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: .8, allowsEditing: true, aspect: [16, 9] }); if (!result.canceled) setImageUri(result.assets[0].uri); }
+  async function pickImage() { const permission = await ImagePicker.requestMediaLibraryPermissionsAsync(); if (!permission.granted) return Alert.alert('Cần quyền truy cập ảnh'); const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: .8, allowsEditing: true, aspect: [16, 9] }); if (!result.canceled) setImageFile(await imageUploadFile(result.assets[0], 'thumbnail')); }
   async function save() {
     const input: CourseInput = { title: form.title.trim(), description: form.description.trim(), categoryId: form.categoryId, level: form.level, price: form.isFree ? 0 : Number(form.price), isFree: form.isFree, language: form.language.trim(), requirements: form.requirements.trim() || null, learningOutcomes: form.learningOutcomes.trim() || null };
     setSaving(true); setError('');
-    try { const saved = course ? (await coursesApi.update(course.id, input)).data.data : (await coursesApi.create(input)).data.data; if (imageUri) await coursesApi.uploadThumbnail(saved.id, imageUri); Alert.alert('Thành công', course ? 'Đã cập nhật khóa học.' : 'Đã tạo khóa học nháp.', [{ text: 'OK', onPress: navigation.goBack }]); }
+    try { const saved = course ? (await coursesApi.update(course.id, input)).data.data : (await coursesApi.create(input)).data.data; if (imageFile) await coursesApi.uploadThumbnail(saved.id, imageFile); Alert.alert('Thành công', course ? 'Đã cập nhật khóa học.' : 'Đã tạo khóa học nháp.', [{ text: 'OK', onPress: navigation.goBack }]); }
     catch (e) { setError(getApiMessage(e, 'Không thể lưu khóa học')); } finally { setSaving(false); }
   }
   return <Screen><SectionTitle title={course ? 'Chỉnh sửa khóa học' : 'Tạo khóa học'} subtitle="Thông tin đầy đủ giúp khóa học dễ được tìm thấy" />
@@ -46,8 +47,8 @@ export function CourseFormScreen({ route, navigation }: NativeStackScreenProps<R
     <Field label="Ngôn ngữ" value={form.language} onChangeText={set('language')} />
     <Field label="Yêu cầu" value={form.requirements} onChangeText={set('requirements')} multiline />
     <Field label="Kết quả học tập" value={form.learningOutcomes} onChangeText={set('learningOutcomes')} multiline />
-    <Button title={imageUri ? 'Đã chọn ảnh — chọn lại' : 'Chọn ảnh thumbnail'} variant="outline" onPress={pickImage} />
-    {!!imageUri && <Image source={{ uri: imageUri }} style={styles.preview} />}{!!error && <Text style={styles.error}>{error}</Text>}
+    <Button title={imageFile ? 'Đã chọn ảnh — chọn lại' : 'Chọn ảnh thumbnail'} variant="outline" onPress={pickImage} />
+    {!!imageFile && <Image source={{ uri: imageFile.uri }} style={styles.preview} />}{!!error && <Text style={styles.error}>{error}</Text>}
     <Button title={course ? 'Lưu thay đổi' : 'Tạo khóa học'} onPress={save} loading={saving} disabled={!form.title.trim() || !form.description.trim() || !form.categoryId} />
   </Screen>;
 }

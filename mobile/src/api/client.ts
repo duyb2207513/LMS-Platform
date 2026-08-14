@@ -1,15 +1,10 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
-import { Platform } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 import type { ApiResponse } from '../types';
+import { API_URL } from './clientConfig';
+import { normalizeMediaUrls } from './media';
 
-const developmentHost = Platform.select({
-  android: 'http://10.0.2.2:3000/api/v1',
-  ios: 'http://localhost:3000/api/v1',
-  default: 'http://localhost:3000/api/v1',
-});
-
-export const API_URL = process.env.EXPO_PUBLIC_API_URL || developmentHost;
+export { API_URL } from './clientConfig';
 export const ACCESS_TOKEN_KEY = 'lms.accessToken';
 
 export const apiClient = axios.create({
@@ -33,7 +28,10 @@ apiClient.interceptors.request.use(async (config: InternalAxiosRequestConfig) =>
 });
 
 apiClient.interceptors.response.use(
-  response => response,
+  response => {
+    response.data = normalizeMediaUrls(response.data);
+    return response;
+  },
   async (error: AxiosError<ApiResponse<unknown>>) => {
     const original = error.config as (InternalAxiosRequestConfig & { _retry?: boolean }) | undefined;
     const isAuthRoute = original?.url?.includes('/auth/login') ||

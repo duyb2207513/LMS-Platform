@@ -6,6 +6,7 @@ import type {
   Review, StudentAnalyticsOverview, User,
 } from '../types';
 import { apiClient } from './client';
+import type { MobileUploadFile } from './media';
 
 export const authApi = {
   register: (input: { fullName: string; email: string; password: string; confirmPassword: string }) =>
@@ -21,9 +22,9 @@ export const usersApi = {
     apiClient.patch<ApiResponse<User>>('/users/me', input),
   changePassword: (input: { currentPassword: string; newPassword: string; confirmNewPassword: string }) =>
     apiClient.patch<ApiResponse<null>>('/users/me/password', input),
-  uploadAvatar: (uri: string) => {
+  uploadAvatar: (file: MobileUploadFile) => {
     const data = new FormData();
-    data.append('avatar', { uri, name: 'avatar.jpg', type: 'image/jpeg' } as unknown as Blob);
+    data.append('avatar', file as unknown as Blob);
     return apiClient.post<ApiResponse<User>>('/users/me/avatar', data, { headers: { 'Content-Type': 'multipart/form-data' } });
   },
 };
@@ -48,9 +49,9 @@ export const coursesApi = {
   publish: (id: string) => apiClient.post<ApiResponse<Course>>(`/courses/${id}/publish`),
   unpublish: (id: string) => apiClient.post<ApiResponse<Course>>(`/courses/${id}/unpublish`),
   remove: (id: string) => apiClient.delete(`/courses/${id}`),
-  uploadThumbnail: (id: string, uri: string) => {
+  uploadThumbnail: (id: string, file: MobileUploadFile) => {
     const data = new FormData();
-    data.append('thumbnail', { uri, name: 'thumbnail.jpg', type: 'image/jpeg' } as unknown as Blob);
+    data.append('thumbnail', file as unknown as Blob);
     return apiClient.post<ApiResponse<{ thumbnailUrl: string }>>(`/courses/${id}/thumbnail`, data, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
