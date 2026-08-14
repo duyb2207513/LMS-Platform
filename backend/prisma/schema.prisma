@@ -72,6 +72,11 @@ enum AuthTokenType {
   CHANGE_EMAIL
 }
 
+enum AssignmentSubmissionStatus {
+  SUBMITTED
+  GRADED
+}
+
 model User {
   id           String     @id @default(uuid()) @db.Uuid
   fullName     String     @map("full_name") @db.VarChar(100)
@@ -93,6 +98,8 @@ model User {
   enrollments    Enrollment[]     @relation("StudentEnrollments")
   lessonProgress LessonProgress[] @relation("StudentLessonProgress")
   quizAttempts   QuizAttempt[]    @relation("StudentQuizAttempts")
+  assignmentSubmissions AssignmentSubmission[] @relation("StudentAssignmentSubmissions")
+  submissionFeedback SubmissionFeedback[] @relation("GraderSubmissionFeedback")
   reviews        Review[]
   comments       Comment[]
   orders         Order[]
@@ -198,6 +205,8 @@ model Course {
   reviews     Review[]
   orderItems  OrderItem[]
   certificates Certificate[]
+  assignments Assignment[]
+  gradeRule CourseGradeRule?
 
   @@index([instructorId])
   @@index([categoryId])
@@ -375,6 +384,96 @@ model AttemptAnswer {
   @@unique([attemptId, questionId])
   @@index([optionId])
   @@map("attempt_answers")
+}
+
+model Assignment {
+  id                   String   @id @default(uuid()) @db.Uuid
+  courseId             String   @map("course_id") @db.Uuid
+  title                String   @db.VarChar(255)
+  description          String?
+  instructions         String?
+  dueAt                DateTime @map("due_at") @db.Timestamptz(3)
+  maxScore             Decimal  @default(100) @map("max_score") @db.Decimal(8, 2)
+  allowResubmission    Boolean  @default(false) @map("allow_resubmission")
+  maxSubmissions       Int      @default(1) @map("max_submissions")
+  allowLateSubmissions Boolean  @default(false) @map("allow_late_submissions")
+  isPublished          Boolean  @default(false) @map("is_published")
+  createdAt            DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt            DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  course      Course                 @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  submissions AssignmentSubmission[]
+
+  @@index([courseId, dueAt])
+  @@index([isPublished])
+  @@map("assignments")
+}
+
+model AssignmentSubmission {
+  id            String                     @id @default(uuid()) @db.Uuid
+  assignmentId  String                     @map("assignment_id") @db.Uuid
+  studentId     String                     @map("student_id") @db.Uuid
+  attemptNumber Int                        @map("attempt_number")
+  textContent   String?                    @map("text_content")
+  status        AssignmentSubmissionStatus @default(SUBMITTED)
+  submittedAt   DateTime                   @default(now()) @map("submitted_at") @db.Timestamptz(3)
+  updatedAt     DateTime                   @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  assignment Assignment         @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  student    User               @relation("StudentAssignmentSubmissions", fields: [studentId], references: [id], onDelete: Cascade)
+  files      SubmissionFile[]
+  feedback   SubmissionFeedback?
+
+  @@unique([assignmentId, studentId, attemptNumber])
+  @@index([assignmentId, submittedAt])
+  @@index([studentId, submittedAt])
+  @@map("assignment_submissions")
+}
+
+model SubmissionFile {
+  id           String   @id @default(uuid()) @db.Uuid
+  submissionId String   @map("submission_id") @db.Uuid
+  originalName String   @map("original_name") @db.VarChar(255)
+  storedName   String   @map("stored_name") @db.VarChar(255)
+  fileUrl      String   @map("file_url")
+  mimeType     String   @map("mime_type") @db.VarChar(150)
+  sizeBytes    Int      @map("size_bytes")
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  submission AssignmentSubmission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+
+  @@index([submissionId])
+  @@map("submission_files")
+}
+
+model SubmissionFeedback {
+  id           String   @id @default(uuid()) @db.Uuid
+  submissionId String   @unique @map("submission_id") @db.Uuid
+  graderId     String   @map("grader_id") @db.Uuid
+  score        Decimal  @db.Decimal(8, 2)
+  comment      String?
+  gradedAt     DateTime @default(now()) @map("graded_at") @db.Timestamptz(3)
+  updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  submission AssignmentSubmission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  grader     User                 @relation("GraderSubmissionFeedback", fields: [graderId], references: [id], onDelete: Restrict)
+
+  @@index([graderId, gradedAt])
+  @@map("submission_feedback")
+}
+
+model CourseGradeRule {
+  id               String   @id @default(uuid()) @db.Uuid
+  courseId         String   @unique @map("course_id") @db.Uuid
+  assignmentWeight Decimal  @default(60) @map("assignment_weight") @db.Decimal(5, 2)
+  quizWeight       Decimal  @default(40) @map("quiz_weight") @db.Decimal(5, 2)
+  passingScore     Decimal  @default(70) @map("passing_score") @db.Decimal(5, 2)
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt        DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@map("course_grade_rules")
 }
 
 model Review {

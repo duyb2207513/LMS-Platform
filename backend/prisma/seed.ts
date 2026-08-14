@@ -360,6 +360,54 @@ async function seedAdditionalLearningContent(studentId: string) {
   }
 }
 
+async function seedSprint7(studentId: string, instructorId: string) {
+  const course = await prisma.course.findUniqueOrThrow({ where: { slug: "react-native-cho-nguoi-moi" } });
+  const assignments = [
+    {
+      id: "70000000-0000-4000-8000-000000000001",
+      title: "Xây dựng màn hình đăng nhập React Native",
+      description: "Tạo giao diện đăng nhập, validation và kết nối REST API của LMS.",
+      instructions: "Nộp phần mô tả giải pháp hoặc file PDF/Word/ZIP. Giao diện cần xử lý loading và hiển thị lỗi từ API.",
+      dueAt: new Date("2026-09-01T16:59:59.000Z"),
+      maxScore: 100,
+      allowResubmission: true,
+      maxSubmissions: 3,
+      allowLateSubmissions: false,
+      isPublished: true
+    },
+    {
+      id: "70000000-0000-4000-8000-000000000002",
+      title: "Thiết kế luồng refresh token trên mobile",
+      description: "Mô tả interceptor và cách lưu token an toàn trên thiết bị.",
+      instructions: "Trình bày bằng văn bản hoặc sơ đồ. Nêu rõ cách xử lý khi refresh token hết hạn.",
+      dueAt: new Date("2026-09-10T16:59:59.000Z"),
+      maxScore: 50,
+      allowResubmission: false,
+      maxSubmissions: 1,
+      allowLateSubmissions: true,
+      isPublished: true
+    }
+  ];
+  for (const assignment of assignments) {
+    await prisma.assignment.upsert({ where: { id: assignment.id }, update: { ...assignment, courseId: course.id }, create: { ...assignment, courseId: course.id } });
+  }
+  const submission = await prisma.assignmentSubmission.upsert({
+    where: { id: "71000000-0000-4000-8000-000000000001" },
+    update: { assignmentId: assignments[0].id, studentId, attemptNumber: 1, textContent: "Em đã hoàn thành form đăng nhập, validation email và xử lý trạng thái loading.", status: "GRADED", submittedAt: new Date("2026-08-13T08:00:00.000Z") },
+    create: { id: "71000000-0000-4000-8000-000000000001", assignmentId: assignments[0].id, studentId, attemptNumber: 1, textContent: "Em đã hoàn thành form đăng nhập, validation email và xử lý trạng thái loading.", status: "GRADED", submittedAt: new Date("2026-08-13T08:00:00.000Z") }
+  });
+  await prisma.submissionFeedback.upsert({
+    where: { submissionId: submission.id },
+    update: { graderId: instructorId, score: 88, comment: "Giao diện rõ ràng và xử lý lỗi tốt. Cần bổ sung kiểm thử khi mất mạng." },
+    create: { submissionId: submission.id, graderId: instructorId, score: 88, comment: "Giao diện rõ ràng và xử lý lỗi tốt. Cần bổ sung kiểm thử khi mất mạng." }
+  });
+  await prisma.courseGradeRule.upsert({
+    where: { courseId: course.id },
+    update: { assignmentWeight: 60, quizWeight: 40, passingScore: 70 },
+    create: { courseId: course.id, assignmentWeight: 60, quizWeight: 40, passingScore: 70 }
+  });
+}
+
 async function main() {
   const passwordHash = await bcrypt.hash(TEST_PASSWORD, 12);
   const users = await seedUsers(passwordHash);
@@ -371,6 +419,7 @@ async function main() {
   await seedSprint3(student.id, instructor.id);
   await seedSprint4(student.id);
   await seedAdditionalLearningContent(student.id);
+  await seedSprint7(student.id, instructor.id);
 
   console.log("Seed completed successfully");
   console.log("Test password for every seeded account: Password123");

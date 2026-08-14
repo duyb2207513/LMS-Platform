@@ -11,10 +11,14 @@ export const AVATAR_DIRECTORY = path.resolve("uploads", "avatars");
 export const AVATAR_MAX_SIZE = 5 * 1024 * 1024;
 export const LESSON_FILE_DIRECTORY = path.resolve("uploads", "lesson-files");
 export const LESSON_FILE_MAX_SIZE = 100 * 1024 * 1024;
+export const SUBMISSION_FILE_DIRECTORY = path.resolve("uploads", "submissions");
+export const SUBMISSION_FILE_MAX_SIZE = 20 * 1024 * 1024;
+export const SUBMISSION_TOTAL_MAX_SIZE = 50 * 1024 * 1024;
 
 mkdirSync(COURSE_THUMBNAIL_DIRECTORY, { recursive: true });
 mkdirSync(AVATAR_DIRECTORY, { recursive: true });
 mkdirSync(LESSON_FILE_DIRECTORY, { recursive: true });
+mkdirSync(SUBMISSION_FILE_DIRECTORY, { recursive: true });
 
 const allowedMimeTypes = new Map([
   ["image/jpeg", ".jpg"],
@@ -30,6 +34,17 @@ const allowedLessonMimeTypes = new Map([
   ["application/vnd.openxmlformats-officedocument.wordprocessingml.document", ".docx"],
   ["application/vnd.ms-powerpoint", ".ppt"],
   ["application/vnd.openxmlformats-officedocument.presentationml.presentation", ".pptx"]
+]);
+
+const allowedSubmissionMimeTypes = new Map([
+  ...allowedMimeTypes,
+  ["application/pdf", ".pdf"],
+  ["text/plain", ".txt"],
+  ["application/msword", ".doc"],
+  ["application/vnd.openxmlformats-officedocument.wordprocessingml.document", ".docx"],
+  ["application/vnd.ms-excel", ".xls"],
+  ["application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", ".xlsx"],
+  ["application/zip", ".zip"]
 ]);
 
 const storage = multer.diskStorage({
@@ -174,6 +189,57 @@ export async function isValidStoredLessonFile(filePath: string, mimeType: string
     if (mimeType === "video/webm") return bytesRead >= 4 && header.subarray(0, 4).equals(Buffer.from([0x1a, 0x45, 0xdf, 0xa3]));
     if (mimeType.includes("openxmlformats")) return bytesRead >= 2 && header[0] === 0x50 && header[1] === 0x4b;
     if (mimeType === "application/msword" || mimeType === "application/vnd.ms-powerpoint") {
+      return bytesRead >= 8 && header.subarray(0, 8).equals(Buffer.from([0xd0, 0xcf, 0x11, 0xe0, 0xa1, 0xb1, 0x1a, 0xe1]));
+    }
+    return false;
+  } finally {
+    await handle.close();
+  }
+}
+
+const submissionStorage = multer.diskStorage({
+  destination: SUBMISSION_FILE_DIRECTORY,
+  filename: (_request, file, callback) => callback(null, `${randomUUID()}${allowedSubmissionMimeTypes.get(file.mimetype) ?? ""}`)
+});
+
+const multerSubmissionUpload = multer({
+  storage: submissionStorage,
+  limits: { fileSize: SUBMISSION_FILE_MAX_SIZE, files: 5 },
+  fileFilter: (_request, file, callback) => {
+    if (!allowedSubmissionMimeTypes.has(file.mimetype)) {
+      callback(new AppError(400, "Submission files must be JPG, PNG, WebP, PDF, TXT, Word, Excel, or ZIP"));
+      return;
+    }
+    callback(null, true);
+  }
+}).array("files", 5);
+
+export const uploadSubmissionFiles: import("express").RequestHandler = (request, response, next) => {
+  multerSubmissionUpload(request, response, error => {
+    if (!error) return next();
+    if (error instanceof AppError) return next(error);
+    if (error instanceof multer.MulterError && error.code === "LIMIT_FILE_SIZE") {
+      return next(new AppError(400, "Each submission file must not exceed 20 MB"));
+    }
+    if (error instanceof multer.MulterError && error.code === "LIMIT_FILE_COUNT") {
+      return next(new AppError(400, "A submission accepts at most 5 files"));
+    }
+    next(new AppError(400, "Invalid submission file upload"));
+  });
+};
+
+export async function isValidStoredSubmissionFile(filePath: string, mimeType: string): Promise<boolean> {
+  if (allowedMimeTypes.has(mimeType)) return isValidStoredImage(filePath, mimeType);
+  const handle = await open(filePath, "r");
+  try {
+    const header = Buffer.alloc(512);
+    const { bytesRead } = await handle.read(header, 0, header.length, 0);
+    if (mimeType === "application/pdf") return bytesRead >= 4 && header.subarray(0, 4).toString() === "%PDF";
+    if (mimeType === "text/plain") return bytesRead === 0 || !header.subarray(0, bytesRead).includes(0);
+    if (mimeType === "application/zip" || mimeType.includes("openxmlformats")) {
+      return bytesRead >= 4 && header[0] === 0x50 && header[1] === 0x4b && [0x03, 0x05, 0x07].includes(header[2] ?? -1);
+    }
+    if (mimeType === "application/msword" || mimeType === "application/vnd.ms-excel") {
       return bytesRead >= 8 && header.subarray(0, 8).equals(Buffer.from([0xd0, 0xcf, 0x11, 0xe0, 0xa1, 0xb1, 0x1a, 0xe1]));
     }
     return false;

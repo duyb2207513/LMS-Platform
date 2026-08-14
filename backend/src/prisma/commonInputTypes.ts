@@ -510,6 +510,23 @@ export type BoolNullableWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedBoolNullableFilter<$PrismaModel>
 }
 
+export type EnumAssignmentSubmissionStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.AssignmentSubmissionStatus | Prisma.EnumAssignmentSubmissionStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.AssignmentSubmissionStatus[] | Prisma.ListEnumAssignmentSubmissionStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.AssignmentSubmissionStatus[] | Prisma.ListEnumAssignmentSubmissionStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumAssignmentSubmissionStatusFilter<$PrismaModel> | $Enums.AssignmentSubmissionStatus
+}
+
+export type EnumAssignmentSubmissionStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.AssignmentSubmissionStatus | Prisma.EnumAssignmentSubmissionStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.AssignmentSubmissionStatus[] | Prisma.ListEnumAssignmentSubmissionStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.AssignmentSubmissionStatus[] | Prisma.ListEnumAssignmentSubmissionStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumAssignmentSubmissionStatusWithAggregatesFilter<$PrismaModel> | $Enums.AssignmentSubmissionStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumAssignmentSubmissionStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumAssignmentSubmissionStatusFilter<$PrismaModel>
+}
+
 export type EnumOrderStatusFilter<$PrismaModel = never> = {
   equals?: $Enums.OrderStatus | Prisma.EnumOrderStatusFieldRefInput<$PrismaModel>
   in?: $Enums.OrderStatus[] | Prisma.ListEnumOrderStatusFieldRefInput<$PrismaModel>
@@ -1088,6 +1105,23 @@ export type NestedBoolNullableWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
   _min?: Prisma.NestedBoolNullableFilter<$PrismaModel>
   _max?: Prisma.NestedBoolNullableFilter<$PrismaModel>
+}
+
+export type NestedEnumAssignmentSubmissionStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.AssignmentSubmissionStatus | Prisma.EnumAssignmentSubmissionStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.AssignmentSubmissionStatus[] | Prisma.ListEnumAssignmentSubmissionStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.AssignmentSubmissionStatus[] | Prisma.ListEnumAssignmentSubmissionStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumAssignmentSubmissionStatusFilter<$PrismaModel> | $Enums.AssignmentSubmissionStatus
+}
+
+export type NestedEnumAssignmentSubmissionStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.AssignmentSubmissionStatus | Prisma.EnumAssignmentSubmissionStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.AssignmentSubmissionStatus[] | Prisma.ListEnumAssignmentSubmissionStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.AssignmentSubmissionStatus[] | Prisma.ListEnumAssignmentSubmissionStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumAssignmentSubmissionStatusWithAggregatesFilter<$PrismaModel> | $Enums.AssignmentSubmissionStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumAssignmentSubmissionStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumAssignmentSubmissionStatusFilter<$PrismaModel>
 }
 
 export type NestedEnumOrderStatusFilter<$PrismaModel = never> = {

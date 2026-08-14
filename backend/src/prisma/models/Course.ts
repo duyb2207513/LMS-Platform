@@ -319,6 +319,8 @@ export type CourseWhereInput = {
   reviews?: Prisma.ReviewListRelationFilter
   orderItems?: Prisma.OrderItemListRelationFilter
   certificates?: Prisma.CertificateListRelationFilter
+  assignments?: Prisma.AssignmentListRelationFilter
+  gradeRule?: Prisma.XOR<Prisma.CourseGradeRuleNullableScalarRelationFilter, Prisma.CourseGradeRuleWhereInput> | null
 }
 
 export type CourseOrderByWithRelationInput = {
@@ -346,6 +348,8 @@ export type CourseOrderByWithRelationInput = {
   reviews?: Prisma.ReviewOrderByRelationAggregateInput
   orderItems?: Prisma.OrderItemOrderByRelationAggregateInput
   certificates?: Prisma.CertificateOrderByRelationAggregateInput
+  assignments?: Prisma.AssignmentOrderByRelationAggregateInput
+  gradeRule?: Prisma.CourseGradeRuleOrderByWithRelationInput
 }
 
 export type CourseWhereUniqueInput = Prisma.AtLeast<{
@@ -376,6 +380,8 @@ export type CourseWhereUniqueInput = Prisma.AtLeast<{
   reviews?: Prisma.ReviewListRelationFilter
   orderItems?: Prisma.OrderItemListRelationFilter
   certificates?: Prisma.CertificateListRelationFilter
+  assignments?: Prisma.AssignmentListRelationFilter
+  gradeRule?: Prisma.XOR<Prisma.CourseGradeRuleNullableScalarRelationFilter, Prisma.CourseGradeRuleWhereInput> | null
 }, "id" | "slug">
 
 export type CourseOrderByWithAggregationInput = {
@@ -449,6 +455,8 @@ export type CourseCreateInput = {
   reviews?: Prisma.ReviewCreateNestedManyWithoutCourseInput
   orderItems?: Prisma.OrderItemCreateNestedManyWithoutCourseInput
   certificates?: Prisma.CertificateCreateNestedManyWithoutCourseInput
+  assignments?: Prisma.AssignmentCreateNestedManyWithoutCourseInput
+  gradeRule?: Prisma.CourseGradeRuleCreateNestedOneWithoutCourseInput
 }
 
 export type CourseUncheckedCreateInput = {
@@ -474,6 +482,8 @@ export type CourseUncheckedCreateInput = {
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutCourseInput
   orderItems?: Prisma.OrderItemUncheckedCreateNestedManyWithoutCourseInput
   certificates?: Prisma.CertificateUncheckedCreateNestedManyWithoutCourseInput
+  assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutCourseInput
+  gradeRule?: Prisma.CourseGradeRuleUncheckedCreateNestedOneWithoutCourseInput
 }
 
 export type CourseUpdateInput = {
@@ -499,6 +509,8 @@ export type CourseUpdateInput = {
   reviews?: Prisma.ReviewUpdateManyWithoutCourseNestedInput
   orderItems?: Prisma.OrderItemUpdateManyWithoutCourseNestedInput
   certificates?: Prisma.CertificateUpdateManyWithoutCourseNestedInput
+  assignments?: Prisma.AssignmentUpdateManyWithoutCourseNestedInput
+  gradeRule?: Prisma.CourseGradeRuleUpdateOneWithoutCourseNestedInput
 }
 
 export type CourseUncheckedUpdateInput = {
@@ -524,6 +536,8 @@ export type CourseUncheckedUpdateInput = {
   reviews?: Prisma.ReviewUncheckedUpdateManyWithoutCourseNestedInput
   orderItems?: Prisma.OrderItemUncheckedUpdateManyWithoutCourseNestedInput
   certificates?: Prisma.CertificateUncheckedUpdateManyWithoutCourseNestedInput
+  assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutCourseNestedInput
+  gradeRule?: Prisma.CourseGradeRuleUncheckedUpdateOneWithoutCourseNestedInput
 }
 
 export type CourseCreateManyInput = {
@@ -799,6 +813,34 @@ export type CourseUpdateOneRequiredWithoutEnrollmentsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.CourseUpdateToOneWithWhereWithoutEnrollmentsInput, Prisma.CourseUpdateWithoutEnrollmentsInput>, Prisma.CourseUncheckedUpdateWithoutEnrollmentsInput>
 }
 
+export type CourseCreateNestedOneWithoutAssignmentsInput = {
+  create?: Prisma.XOR<Prisma.CourseCreateWithoutAssignmentsInput, Prisma.CourseUncheckedCreateWithoutAssignmentsInput>
+  connectOrCreate?: Prisma.CourseCreateOrConnectWithoutAssignmentsInput
+  connect?: Prisma.CourseWhereUniqueInput
+}
+
+export type CourseUpdateOneRequiredWithoutAssignmentsNestedInput = {
+  create?: Prisma.XOR<Prisma.CourseCreateWithoutAssignmentsInput, Prisma.CourseUncheckedCreateWithoutAssignmentsInput>
+  connectOrCreate?: Prisma.CourseCreateOrConnectWithoutAssignmentsInput
+  upsert?: Prisma.CourseUpsertWithoutAssignmentsInput
+  connect?: Prisma.CourseWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.CourseUpdateToOneWithWhereWithoutAssignmentsInput, Prisma.CourseUpdateWithoutAssignmentsInput>, Prisma.CourseUncheckedUpdateWithoutAssignmentsInput>
+}
+
+export type CourseCreateNestedOneWithoutGradeRuleInput = {
+  create?: Prisma.XOR<Prisma.CourseCreateWithoutGradeRuleInput, Prisma.CourseUncheckedCreateWithoutGradeRuleInput>
+  connectOrCreate?: Prisma.CourseCreateOrConnectWithoutGradeRuleInput
+  connect?: Prisma.CourseWhereUniqueInput
+}
+
+export type CourseUpdateOneRequiredWithoutGradeRuleNestedInput = {
+  create?: Prisma.XOR<Prisma.CourseCreateWithoutGradeRuleInput, Prisma.CourseUncheckedCreateWithoutGradeRuleInput>
+  connectOrCreate?: Prisma.CourseCreateOrConnectWithoutGradeRuleInput
+  upsert?: Prisma.CourseUpsertWithoutGradeRuleInput
+  connect?: Prisma.CourseWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.CourseUpdateToOneWithWhereWithoutGradeRuleInput, Prisma.CourseUpdateWithoutGradeRuleInput>, Prisma.CourseUncheckedUpdateWithoutGradeRuleInput>
+}
+
 export type CourseCreateNestedOneWithoutReviewsInput = {
   create?: Prisma.XOR<Prisma.CourseCreateWithoutReviewsInput, Prisma.CourseUncheckedCreateWithoutReviewsInput>
   connectOrCreate?: Prisma.CourseCreateOrConnectWithoutReviewsInput
@@ -863,6 +905,8 @@ export type CourseCreateWithoutInstructorInput = {
   reviews?: Prisma.ReviewCreateNestedManyWithoutCourseInput
   orderItems?: Prisma.OrderItemCreateNestedManyWithoutCourseInput
   certificates?: Prisma.CertificateCreateNestedManyWithoutCourseInput
+  assignments?: Prisma.AssignmentCreateNestedManyWithoutCourseInput
+  gradeRule?: Prisma.CourseGradeRuleCreateNestedOneWithoutCourseInput
 }
 
 export type CourseUncheckedCreateWithoutInstructorInput = {
@@ -887,6 +931,8 @@ export type CourseUncheckedCreateWithoutInstructorInput = {
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutCourseInput
   orderItems?: Prisma.OrderItemUncheckedCreateNestedManyWithoutCourseInput
   certificates?: Prisma.CertificateUncheckedCreateNestedManyWithoutCourseInput
+  assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutCourseInput
+  gradeRule?: Prisma.CourseGradeRuleUncheckedCreateNestedOneWithoutCourseInput
 }
 
 export type CourseCreateOrConnectWithoutInstructorInput = {
@@ -960,6 +1006,8 @@ export type CourseCreateWithoutCategoryInput = {
   reviews?: Prisma.ReviewCreateNestedManyWithoutCourseInput
   orderItems?: Prisma.OrderItemCreateNestedManyWithoutCourseInput
   certificates?: Prisma.CertificateCreateNestedManyWithoutCourseInput
+  assignments?: Prisma.AssignmentCreateNestedManyWithoutCourseInput
+  gradeRule?: Prisma.CourseGradeRuleCreateNestedOneWithoutCourseInput
 }
 
 export type CourseUncheckedCreateWithoutCategoryInput = {
@@ -984,6 +1032,8 @@ export type CourseUncheckedCreateWithoutCategoryInput = {
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutCourseInput
   orderItems?: Prisma.OrderItemUncheckedCreateNestedManyWithoutCourseInput
   certificates?: Prisma.CertificateUncheckedCreateNestedManyWithoutCourseInput
+  assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutCourseInput
+  gradeRule?: Prisma.CourseGradeRuleUncheckedCreateNestedOneWithoutCourseInput
 }
 
 export type CourseCreateOrConnectWithoutCategoryInput = {
@@ -1034,6 +1084,8 @@ export type CourseCreateWithoutSectionsInput = {
   reviews?: Prisma.ReviewCreateNestedManyWithoutCourseInput
   orderItems?: Prisma.OrderItemCreateNestedManyWithoutCourseInput
   certificates?: Prisma.CertificateCreateNestedManyWithoutCourseInput
+  assignments?: Prisma.AssignmentCreateNestedManyWithoutCourseInput
+  gradeRule?: Prisma.CourseGradeRuleCreateNestedOneWithoutCourseInput
 }
 
 export type CourseUncheckedCreateWithoutSectionsInput = {
@@ -1058,6 +1110,8 @@ export type CourseUncheckedCreateWithoutSectionsInput = {
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutCourseInput
   orderItems?: Prisma.OrderItemUncheckedCreateNestedManyWithoutCourseInput
   certificates?: Prisma.CertificateUncheckedCreateNestedManyWithoutCourseInput
+  assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutCourseInput
+  gradeRule?: Prisma.CourseGradeRuleUncheckedCreateNestedOneWithoutCourseInput
 }
 
 export type CourseCreateOrConnectWithoutSectionsInput = {
@@ -1098,6 +1152,8 @@ export type CourseUpdateWithoutSectionsInput = {
   reviews?: Prisma.ReviewUpdateManyWithoutCourseNestedInput
   orderItems?: Prisma.OrderItemUpdateManyWithoutCourseNestedInput
   certificates?: Prisma.CertificateUpdateManyWithoutCourseNestedInput
+  assignments?: Prisma.AssignmentUpdateManyWithoutCourseNestedInput
+  gradeRule?: Prisma.CourseGradeRuleUpdateOneWithoutCourseNestedInput
 }
 
 export type CourseUncheckedUpdateWithoutSectionsInput = {
@@ -1122,6 +1178,8 @@ export type CourseUncheckedUpdateWithoutSectionsInput = {
   reviews?: Prisma.ReviewUncheckedUpdateManyWithoutCourseNestedInput
   orderItems?: Prisma.OrderItemUncheckedUpdateManyWithoutCourseNestedInput
   certificates?: Prisma.CertificateUncheckedUpdateManyWithoutCourseNestedInput
+  assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutCourseNestedInput
+  gradeRule?: Prisma.CourseGradeRuleUncheckedUpdateOneWithoutCourseNestedInput
 }
 
 export type CourseCreateWithoutEnrollmentsInput = {
@@ -1146,6 +1204,8 @@ export type CourseCreateWithoutEnrollmentsInput = {
   reviews?: Prisma.ReviewCreateNestedManyWithoutCourseInput
   orderItems?: Prisma.OrderItemCreateNestedManyWithoutCourseInput
   certificates?: Prisma.CertificateCreateNestedManyWithoutCourseInput
+  assignments?: Prisma.AssignmentCreateNestedManyWithoutCourseInput
+  gradeRule?: Prisma.CourseGradeRuleCreateNestedOneWithoutCourseInput
 }
 
 export type CourseUncheckedCreateWithoutEnrollmentsInput = {
@@ -1170,6 +1230,8 @@ export type CourseUncheckedCreateWithoutEnrollmentsInput = {
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutCourseInput
   orderItems?: Prisma.OrderItemUncheckedCreateNestedManyWithoutCourseInput
   certificates?: Prisma.CertificateUncheckedCreateNestedManyWithoutCourseInput
+  assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutCourseInput
+  gradeRule?: Prisma.CourseGradeRuleUncheckedCreateNestedOneWithoutCourseInput
 }
 
 export type CourseCreateOrConnectWithoutEnrollmentsInput = {
@@ -1210,6 +1272,8 @@ export type CourseUpdateWithoutEnrollmentsInput = {
   reviews?: Prisma.ReviewUpdateManyWithoutCourseNestedInput
   orderItems?: Prisma.OrderItemUpdateManyWithoutCourseNestedInput
   certificates?: Prisma.CertificateUpdateManyWithoutCourseNestedInput
+  assignments?: Prisma.AssignmentUpdateManyWithoutCourseNestedInput
+  gradeRule?: Prisma.CourseGradeRuleUpdateOneWithoutCourseNestedInput
 }
 
 export type CourseUncheckedUpdateWithoutEnrollmentsInput = {
@@ -1234,6 +1298,248 @@ export type CourseUncheckedUpdateWithoutEnrollmentsInput = {
   reviews?: Prisma.ReviewUncheckedUpdateManyWithoutCourseNestedInput
   orderItems?: Prisma.OrderItemUncheckedUpdateManyWithoutCourseNestedInput
   certificates?: Prisma.CertificateUncheckedUpdateManyWithoutCourseNestedInput
+  assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutCourseNestedInput
+  gradeRule?: Prisma.CourseGradeRuleUncheckedUpdateOneWithoutCourseNestedInput
+}
+
+export type CourseCreateWithoutAssignmentsInput = {
+  id?: string
+  title: string
+  slug: string
+  description: string
+  thumbnailUrl?: string | null
+  level: $Enums.CourseLevel
+  price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  isFree?: boolean
+  language?: string
+  requirements?: string | null
+  learningOutcomes?: string | null
+  status?: $Enums.CourseStatus
+  publishedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  instructor: Prisma.UserCreateNestedOneWithoutCoursesInput
+  category: Prisma.CategoryCreateNestedOneWithoutCoursesInput
+  sections?: Prisma.SectionCreateNestedManyWithoutCourseInput
+  enrollments?: Prisma.EnrollmentCreateNestedManyWithoutCourseInput
+  reviews?: Prisma.ReviewCreateNestedManyWithoutCourseInput
+  orderItems?: Prisma.OrderItemCreateNestedManyWithoutCourseInput
+  certificates?: Prisma.CertificateCreateNestedManyWithoutCourseInput
+  gradeRule?: Prisma.CourseGradeRuleCreateNestedOneWithoutCourseInput
+}
+
+export type CourseUncheckedCreateWithoutAssignmentsInput = {
+  id?: string
+  instructorId: string
+  categoryId: string
+  title: string
+  slug: string
+  description: string
+  thumbnailUrl?: string | null
+  level: $Enums.CourseLevel
+  price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  isFree?: boolean
+  language?: string
+  requirements?: string | null
+  learningOutcomes?: string | null
+  status?: $Enums.CourseStatus
+  publishedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  sections?: Prisma.SectionUncheckedCreateNestedManyWithoutCourseInput
+  enrollments?: Prisma.EnrollmentUncheckedCreateNestedManyWithoutCourseInput
+  reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutCourseInput
+  orderItems?: Prisma.OrderItemUncheckedCreateNestedManyWithoutCourseInput
+  certificates?: Prisma.CertificateUncheckedCreateNestedManyWithoutCourseInput
+  gradeRule?: Prisma.CourseGradeRuleUncheckedCreateNestedOneWithoutCourseInput
+}
+
+export type CourseCreateOrConnectWithoutAssignmentsInput = {
+  where: Prisma.CourseWhereUniqueInput
+  create: Prisma.XOR<Prisma.CourseCreateWithoutAssignmentsInput, Prisma.CourseUncheckedCreateWithoutAssignmentsInput>
+}
+
+export type CourseUpsertWithoutAssignmentsInput = {
+  update: Prisma.XOR<Prisma.CourseUpdateWithoutAssignmentsInput, Prisma.CourseUncheckedUpdateWithoutAssignmentsInput>
+  create: Prisma.XOR<Prisma.CourseCreateWithoutAssignmentsInput, Prisma.CourseUncheckedCreateWithoutAssignmentsInput>
+  where?: Prisma.CourseWhereInput
+}
+
+export type CourseUpdateToOneWithWhereWithoutAssignmentsInput = {
+  where?: Prisma.CourseWhereInput
+  data: Prisma.XOR<Prisma.CourseUpdateWithoutAssignmentsInput, Prisma.CourseUncheckedUpdateWithoutAssignmentsInput>
+}
+
+export type CourseUpdateWithoutAssignmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  thumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.EnumCourseLevelFieldUpdateOperationsInput | $Enums.CourseLevel
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  isFree?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  language?: Prisma.StringFieldUpdateOperationsInput | string
+  requirements?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningOutcomes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumCourseStatusFieldUpdateOperationsInput | $Enums.CourseStatus
+  publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  instructor?: Prisma.UserUpdateOneRequiredWithoutCoursesNestedInput
+  category?: Prisma.CategoryUpdateOneRequiredWithoutCoursesNestedInput
+  sections?: Prisma.SectionUpdateManyWithoutCourseNestedInput
+  enrollments?: Prisma.EnrollmentUpdateManyWithoutCourseNestedInput
+  reviews?: Prisma.ReviewUpdateManyWithoutCourseNestedInput
+  orderItems?: Prisma.OrderItemUpdateManyWithoutCourseNestedInput
+  certificates?: Prisma.CertificateUpdateManyWithoutCourseNestedInput
+  gradeRule?: Prisma.CourseGradeRuleUpdateOneWithoutCourseNestedInput
+}
+
+export type CourseUncheckedUpdateWithoutAssignmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  instructorId?: Prisma.StringFieldUpdateOperationsInput | string
+  categoryId?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  thumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.EnumCourseLevelFieldUpdateOperationsInput | $Enums.CourseLevel
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  isFree?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  language?: Prisma.StringFieldUpdateOperationsInput | string
+  requirements?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningOutcomes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumCourseStatusFieldUpdateOperationsInput | $Enums.CourseStatus
+  publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sections?: Prisma.SectionUncheckedUpdateManyWithoutCourseNestedInput
+  enrollments?: Prisma.EnrollmentUncheckedUpdateManyWithoutCourseNestedInput
+  reviews?: Prisma.ReviewUncheckedUpdateManyWithoutCourseNestedInput
+  orderItems?: Prisma.OrderItemUncheckedUpdateManyWithoutCourseNestedInput
+  certificates?: Prisma.CertificateUncheckedUpdateManyWithoutCourseNestedInput
+  gradeRule?: Prisma.CourseGradeRuleUncheckedUpdateOneWithoutCourseNestedInput
+}
+
+export type CourseCreateWithoutGradeRuleInput = {
+  id?: string
+  title: string
+  slug: string
+  description: string
+  thumbnailUrl?: string | null
+  level: $Enums.CourseLevel
+  price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  isFree?: boolean
+  language?: string
+  requirements?: string | null
+  learningOutcomes?: string | null
+  status?: $Enums.CourseStatus
+  publishedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  instructor: Prisma.UserCreateNestedOneWithoutCoursesInput
+  category: Prisma.CategoryCreateNestedOneWithoutCoursesInput
+  sections?: Prisma.SectionCreateNestedManyWithoutCourseInput
+  enrollments?: Prisma.EnrollmentCreateNestedManyWithoutCourseInput
+  reviews?: Prisma.ReviewCreateNestedManyWithoutCourseInput
+  orderItems?: Prisma.OrderItemCreateNestedManyWithoutCourseInput
+  certificates?: Prisma.CertificateCreateNestedManyWithoutCourseInput
+  assignments?: Prisma.AssignmentCreateNestedManyWithoutCourseInput
+}
+
+export type CourseUncheckedCreateWithoutGradeRuleInput = {
+  id?: string
+  instructorId: string
+  categoryId: string
+  title: string
+  slug: string
+  description: string
+  thumbnailUrl?: string | null
+  level: $Enums.CourseLevel
+  price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  isFree?: boolean
+  language?: string
+  requirements?: string | null
+  learningOutcomes?: string | null
+  status?: $Enums.CourseStatus
+  publishedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  sections?: Prisma.SectionUncheckedCreateNestedManyWithoutCourseInput
+  enrollments?: Prisma.EnrollmentUncheckedCreateNestedManyWithoutCourseInput
+  reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutCourseInput
+  orderItems?: Prisma.OrderItemUncheckedCreateNestedManyWithoutCourseInput
+  certificates?: Prisma.CertificateUncheckedCreateNestedManyWithoutCourseInput
+  assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutCourseInput
+}
+
+export type CourseCreateOrConnectWithoutGradeRuleInput = {
+  where: Prisma.CourseWhereUniqueInput
+  create: Prisma.XOR<Prisma.CourseCreateWithoutGradeRuleInput, Prisma.CourseUncheckedCreateWithoutGradeRuleInput>
+}
+
+export type CourseUpsertWithoutGradeRuleInput = {
+  update: Prisma.XOR<Prisma.CourseUpdateWithoutGradeRuleInput, Prisma.CourseUncheckedUpdateWithoutGradeRuleInput>
+  create: Prisma.XOR<Prisma.CourseCreateWithoutGradeRuleInput, Prisma.CourseUncheckedCreateWithoutGradeRuleInput>
+  where?: Prisma.CourseWhereInput
+}
+
+export type CourseUpdateToOneWithWhereWithoutGradeRuleInput = {
+  where?: Prisma.CourseWhereInput
+  data: Prisma.XOR<Prisma.CourseUpdateWithoutGradeRuleInput, Prisma.CourseUncheckedUpdateWithoutGradeRuleInput>
+}
+
+export type CourseUpdateWithoutGradeRuleInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  thumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.EnumCourseLevelFieldUpdateOperationsInput | $Enums.CourseLevel
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  isFree?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  language?: Prisma.StringFieldUpdateOperationsInput | string
+  requirements?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningOutcomes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumCourseStatusFieldUpdateOperationsInput | $Enums.CourseStatus
+  publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  instructor?: Prisma.UserUpdateOneRequiredWithoutCoursesNestedInput
+  category?: Prisma.CategoryUpdateOneRequiredWithoutCoursesNestedInput
+  sections?: Prisma.SectionUpdateManyWithoutCourseNestedInput
+  enrollments?: Prisma.EnrollmentUpdateManyWithoutCourseNestedInput
+  reviews?: Prisma.ReviewUpdateManyWithoutCourseNestedInput
+  orderItems?: Prisma.OrderItemUpdateManyWithoutCourseNestedInput
+  certificates?: Prisma.CertificateUpdateManyWithoutCourseNestedInput
+  assignments?: Prisma.AssignmentUpdateManyWithoutCourseNestedInput
+}
+
+export type CourseUncheckedUpdateWithoutGradeRuleInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  instructorId?: Prisma.StringFieldUpdateOperationsInput | string
+  categoryId?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  thumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.EnumCourseLevelFieldUpdateOperationsInput | $Enums.CourseLevel
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  isFree?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  language?: Prisma.StringFieldUpdateOperationsInput | string
+  requirements?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningOutcomes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumCourseStatusFieldUpdateOperationsInput | $Enums.CourseStatus
+  publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sections?: Prisma.SectionUncheckedUpdateManyWithoutCourseNestedInput
+  enrollments?: Prisma.EnrollmentUncheckedUpdateManyWithoutCourseNestedInput
+  reviews?: Prisma.ReviewUncheckedUpdateManyWithoutCourseNestedInput
+  orderItems?: Prisma.OrderItemUncheckedUpdateManyWithoutCourseNestedInput
+  certificates?: Prisma.CertificateUncheckedUpdateManyWithoutCourseNestedInput
+  assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutCourseNestedInput
 }
 
 export type CourseCreateWithoutReviewsInput = {
@@ -1258,6 +1564,8 @@ export type CourseCreateWithoutReviewsInput = {
   enrollments?: Prisma.EnrollmentCreateNestedManyWithoutCourseInput
   orderItems?: Prisma.OrderItemCreateNestedManyWithoutCourseInput
   certificates?: Prisma.CertificateCreateNestedManyWithoutCourseInput
+  assignments?: Prisma.AssignmentCreateNestedManyWithoutCourseInput
+  gradeRule?: Prisma.CourseGradeRuleCreateNestedOneWithoutCourseInput
 }
 
 export type CourseUncheckedCreateWithoutReviewsInput = {
@@ -1282,6 +1590,8 @@ export type CourseUncheckedCreateWithoutReviewsInput = {
   enrollments?: Prisma.EnrollmentUncheckedCreateNestedManyWithoutCourseInput
   orderItems?: Prisma.OrderItemUncheckedCreateNestedManyWithoutCourseInput
   certificates?: Prisma.CertificateUncheckedCreateNestedManyWithoutCourseInput
+  assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutCourseInput
+  gradeRule?: Prisma.CourseGradeRuleUncheckedCreateNestedOneWithoutCourseInput
 }
 
 export type CourseCreateOrConnectWithoutReviewsInput = {
@@ -1322,6 +1632,8 @@ export type CourseUpdateWithoutReviewsInput = {
   enrollments?: Prisma.EnrollmentUpdateManyWithoutCourseNestedInput
   orderItems?: Prisma.OrderItemUpdateManyWithoutCourseNestedInput
   certificates?: Prisma.CertificateUpdateManyWithoutCourseNestedInput
+  assignments?: Prisma.AssignmentUpdateManyWithoutCourseNestedInput
+  gradeRule?: Prisma.CourseGradeRuleUpdateOneWithoutCourseNestedInput
 }
 
 export type CourseUncheckedUpdateWithoutReviewsInput = {
@@ -1346,6 +1658,8 @@ export type CourseUncheckedUpdateWithoutReviewsInput = {
   enrollments?: Prisma.EnrollmentUncheckedUpdateManyWithoutCourseNestedInput
   orderItems?: Prisma.OrderItemUncheckedUpdateManyWithoutCourseNestedInput
   certificates?: Prisma.CertificateUncheckedUpdateManyWithoutCourseNestedInput
+  assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutCourseNestedInput
+  gradeRule?: Prisma.CourseGradeRuleUncheckedUpdateOneWithoutCourseNestedInput
 }
 
 export type CourseCreateWithoutOrderItemsInput = {
@@ -1370,6 +1684,8 @@ export type CourseCreateWithoutOrderItemsInput = {
   enrollments?: Prisma.EnrollmentCreateNestedManyWithoutCourseInput
   reviews?: Prisma.ReviewCreateNestedManyWithoutCourseInput
   certificates?: Prisma.CertificateCreateNestedManyWithoutCourseInput
+  assignments?: Prisma.AssignmentCreateNestedManyWithoutCourseInput
+  gradeRule?: Prisma.CourseGradeRuleCreateNestedOneWithoutCourseInput
 }
 
 export type CourseUncheckedCreateWithoutOrderItemsInput = {
@@ -1394,6 +1710,8 @@ export type CourseUncheckedCreateWithoutOrderItemsInput = {
   enrollments?: Prisma.EnrollmentUncheckedCreateNestedManyWithoutCourseInput
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutCourseInput
   certificates?: Prisma.CertificateUncheckedCreateNestedManyWithoutCourseInput
+  assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutCourseInput
+  gradeRule?: Prisma.CourseGradeRuleUncheckedCreateNestedOneWithoutCourseInput
 }
 
 export type CourseCreateOrConnectWithoutOrderItemsInput = {
@@ -1434,6 +1752,8 @@ export type CourseUpdateWithoutOrderItemsInput = {
   enrollments?: Prisma.EnrollmentUpdateManyWithoutCourseNestedInput
   reviews?: Prisma.ReviewUpdateManyWithoutCourseNestedInput
   certificates?: Prisma.CertificateUpdateManyWithoutCourseNestedInput
+  assignments?: Prisma.AssignmentUpdateManyWithoutCourseNestedInput
+  gradeRule?: Prisma.CourseGradeRuleUpdateOneWithoutCourseNestedInput
 }
 
 export type CourseUncheckedUpdateWithoutOrderItemsInput = {
@@ -1458,6 +1778,8 @@ export type CourseUncheckedUpdateWithoutOrderItemsInput = {
   enrollments?: Prisma.EnrollmentUncheckedUpdateManyWithoutCourseNestedInput
   reviews?: Prisma.ReviewUncheckedUpdateManyWithoutCourseNestedInput
   certificates?: Prisma.CertificateUncheckedUpdateManyWithoutCourseNestedInput
+  assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutCourseNestedInput
+  gradeRule?: Prisma.CourseGradeRuleUncheckedUpdateOneWithoutCourseNestedInput
 }
 
 export type CourseCreateWithoutCertificatesInput = {
@@ -1482,6 +1804,8 @@ export type CourseCreateWithoutCertificatesInput = {
   enrollments?: Prisma.EnrollmentCreateNestedManyWithoutCourseInput
   reviews?: Prisma.ReviewCreateNestedManyWithoutCourseInput
   orderItems?: Prisma.OrderItemCreateNestedManyWithoutCourseInput
+  assignments?: Prisma.AssignmentCreateNestedManyWithoutCourseInput
+  gradeRule?: Prisma.CourseGradeRuleCreateNestedOneWithoutCourseInput
 }
 
 export type CourseUncheckedCreateWithoutCertificatesInput = {
@@ -1506,6 +1830,8 @@ export type CourseUncheckedCreateWithoutCertificatesInput = {
   enrollments?: Prisma.EnrollmentUncheckedCreateNestedManyWithoutCourseInput
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutCourseInput
   orderItems?: Prisma.OrderItemUncheckedCreateNestedManyWithoutCourseInput
+  assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutCourseInput
+  gradeRule?: Prisma.CourseGradeRuleUncheckedCreateNestedOneWithoutCourseInput
 }
 
 export type CourseCreateOrConnectWithoutCertificatesInput = {
@@ -1546,6 +1872,8 @@ export type CourseUpdateWithoutCertificatesInput = {
   enrollments?: Prisma.EnrollmentUpdateManyWithoutCourseNestedInput
   reviews?: Prisma.ReviewUpdateManyWithoutCourseNestedInput
   orderItems?: Prisma.OrderItemUpdateManyWithoutCourseNestedInput
+  assignments?: Prisma.AssignmentUpdateManyWithoutCourseNestedInput
+  gradeRule?: Prisma.CourseGradeRuleUpdateOneWithoutCourseNestedInput
 }
 
 export type CourseUncheckedUpdateWithoutCertificatesInput = {
@@ -1570,6 +1898,8 @@ export type CourseUncheckedUpdateWithoutCertificatesInput = {
   enrollments?: Prisma.EnrollmentUncheckedUpdateManyWithoutCourseNestedInput
   reviews?: Prisma.ReviewUncheckedUpdateManyWithoutCourseNestedInput
   orderItems?: Prisma.OrderItemUncheckedUpdateManyWithoutCourseNestedInput
+  assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutCourseNestedInput
+  gradeRule?: Prisma.CourseGradeRuleUncheckedUpdateOneWithoutCourseNestedInput
 }
 
 export type CourseCreateManyInstructorInput = {
@@ -1613,6 +1943,8 @@ export type CourseUpdateWithoutInstructorInput = {
   reviews?: Prisma.ReviewUpdateManyWithoutCourseNestedInput
   orderItems?: Prisma.OrderItemUpdateManyWithoutCourseNestedInput
   certificates?: Prisma.CertificateUpdateManyWithoutCourseNestedInput
+  assignments?: Prisma.AssignmentUpdateManyWithoutCourseNestedInput
+  gradeRule?: Prisma.CourseGradeRuleUpdateOneWithoutCourseNestedInput
 }
 
 export type CourseUncheckedUpdateWithoutInstructorInput = {
@@ -1637,6 +1969,8 @@ export type CourseUncheckedUpdateWithoutInstructorInput = {
   reviews?: Prisma.ReviewUncheckedUpdateManyWithoutCourseNestedInput
   orderItems?: Prisma.OrderItemUncheckedUpdateManyWithoutCourseNestedInput
   certificates?: Prisma.CertificateUncheckedUpdateManyWithoutCourseNestedInput
+  assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutCourseNestedInput
+  gradeRule?: Prisma.CourseGradeRuleUncheckedUpdateOneWithoutCourseNestedInput
 }
 
 export type CourseUncheckedUpdateManyWithoutInstructorInput = {
@@ -1699,6 +2033,8 @@ export type CourseUpdateWithoutCategoryInput = {
   reviews?: Prisma.ReviewUpdateManyWithoutCourseNestedInput
   orderItems?: Prisma.OrderItemUpdateManyWithoutCourseNestedInput
   certificates?: Prisma.CertificateUpdateManyWithoutCourseNestedInput
+  assignments?: Prisma.AssignmentUpdateManyWithoutCourseNestedInput
+  gradeRule?: Prisma.CourseGradeRuleUpdateOneWithoutCourseNestedInput
 }
 
 export type CourseUncheckedUpdateWithoutCategoryInput = {
@@ -1723,6 +2059,8 @@ export type CourseUncheckedUpdateWithoutCategoryInput = {
   reviews?: Prisma.ReviewUncheckedUpdateManyWithoutCourseNestedInput
   orderItems?: Prisma.OrderItemUncheckedUpdateManyWithoutCourseNestedInput
   certificates?: Prisma.CertificateUncheckedUpdateManyWithoutCourseNestedInput
+  assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutCourseNestedInput
+  gradeRule?: Prisma.CourseGradeRuleUncheckedUpdateOneWithoutCourseNestedInput
 }
 
 export type CourseUncheckedUpdateManyWithoutCategoryInput = {
@@ -1755,6 +2093,7 @@ export type CourseCountOutputType = {
   reviews: number
   orderItems: number
   certificates: number
+  assignments: number
 }
 
 export type CourseCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1763,6 +2102,7 @@ export type CourseCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions
   reviews?: boolean | CourseCountOutputTypeCountReviewsArgs
   orderItems?: boolean | CourseCountOutputTypeCountOrderItemsArgs
   certificates?: boolean | CourseCountOutputTypeCountCertificatesArgs
+  assignments?: boolean | CourseCountOutputTypeCountAssignmentsArgs
 }
 
 /**
@@ -1810,6 +2150,13 @@ export type CourseCountOutputTypeCountCertificatesArgs<ExtArgs extends runtime.T
   where?: Prisma.CertificateWhereInput
 }
 
+/**
+ * CourseCountOutputType without action
+ */
+export type CourseCountOutputTypeCountAssignmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AssignmentWhereInput
+}
+
 
 export type CourseSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1836,6 +2183,8 @@ export type CourseSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   reviews?: boolean | Prisma.Course$reviewsArgs<ExtArgs>
   orderItems?: boolean | Prisma.Course$orderItemsArgs<ExtArgs>
   certificates?: boolean | Prisma.Course$certificatesArgs<ExtArgs>
+  assignments?: boolean | Prisma.Course$assignmentsArgs<ExtArgs>
+  gradeRule?: boolean | Prisma.Course$gradeRuleArgs<ExtArgs>
   _count?: boolean | Prisma.CourseCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["course"]>
 
@@ -1912,6 +2261,8 @@ export type CourseInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   reviews?: boolean | Prisma.Course$reviewsArgs<ExtArgs>
   orderItems?: boolean | Prisma.Course$orderItemsArgs<ExtArgs>
   certificates?: boolean | Prisma.Course$certificatesArgs<ExtArgs>
+  assignments?: boolean | Prisma.Course$assignmentsArgs<ExtArgs>
+  gradeRule?: boolean | Prisma.Course$gradeRuleArgs<ExtArgs>
   _count?: boolean | Prisma.CourseCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type CourseIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1933,6 +2284,8 @@ export type $CoursePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     reviews: Prisma.$ReviewPayload<ExtArgs>[]
     orderItems: Prisma.$OrderItemPayload<ExtArgs>[]
     certificates: Prisma.$CertificatePayload<ExtArgs>[]
+    assignments: Prisma.$AssignmentPayload<ExtArgs>[]
+    gradeRule: Prisma.$CourseGradeRulePayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2353,6 +2706,8 @@ export interface Prisma__CourseClient<T, Null = never, ExtArgs extends runtime.T
   reviews<T extends Prisma.Course$reviewsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Course$reviewsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReviewPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   orderItems<T extends Prisma.Course$orderItemsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Course$orderItemsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OrderItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   certificates<T extends Prisma.Course$certificatesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Course$certificatesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CertificatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  assignments<T extends Prisma.Course$assignmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Course$assignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  gradeRule<T extends Prisma.Course$gradeRuleArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Course$gradeRuleArgs<ExtArgs>>): Prisma.Prisma__CourseGradeRuleClient<runtime.Types.Result.GetResult<Prisma.$CourseGradeRulePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2917,6 +3272,49 @@ export type Course$certificatesArgs<ExtArgs extends runtime.Types.Extensions.Int
   take?: number
   skip?: number
   distinct?: Prisma.CertificateScalarFieldEnum | Prisma.CertificateScalarFieldEnum[]
+}
+
+/**
+ * Course.assignments
+ */
+export type Course$assignmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Assignment
+   */
+  select?: Prisma.AssignmentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Assignment
+   */
+  omit?: Prisma.AssignmentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AssignmentInclude<ExtArgs> | null
+  where?: Prisma.AssignmentWhereInput
+  orderBy?: Prisma.AssignmentOrderByWithRelationInput | Prisma.AssignmentOrderByWithRelationInput[]
+  cursor?: Prisma.AssignmentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AssignmentScalarFieldEnum | Prisma.AssignmentScalarFieldEnum[]
+}
+
+/**
+ * Course.gradeRule
+ */
+export type Course$gradeRuleArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the CourseGradeRule
+   */
+  select?: Prisma.CourseGradeRuleSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the CourseGradeRule
+   */
+  omit?: Prisma.CourseGradeRuleOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CourseGradeRuleInclude<ExtArgs> | null
+  where?: Prisma.CourseGradeRuleWhereInput
 }
 
 /**

@@ -116,6 +116,9 @@ onMounted(async () => {
                 <router-link :to="`/instructor/courses/${course.id}/builder`">
                   <BaseButton size="sm">Nội dung</BaseButton>
                 </router-link>
+                <router-link :to="`/instructor/courses/${course.id}/assignments`">
+                  <BaseButton variant="secondary" size="sm">Bài tập</BaseButton>
+                </router-link>
                 <router-link :to="`/instructor/courses/${course.id}/edit`">
                   <BaseButton variant="outline" size="sm">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
