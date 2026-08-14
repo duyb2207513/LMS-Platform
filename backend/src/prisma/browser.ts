@@ -93,6 +93,31 @@ export type QuizAttempt = Prisma.QuizAttemptModel
  */
 export type AttemptAnswer = Prisma.AttemptAnswerModel
 /**
+ * Model Assignment
+ * 
+ */
+export type Assignment = Prisma.AssignmentModel
+/**
+ * Model AssignmentSubmission
+ * 
+ */
+export type AssignmentSubmission = Prisma.AssignmentSubmissionModel
+/**
+ * Model SubmissionFile
+ * 
+ */
+export type SubmissionFile = Prisma.SubmissionFileModel
+/**
+ * Model SubmissionFeedback
+ * 
+ */
+export type SubmissionFeedback = Prisma.SubmissionFeedbackModel
+/**
+ * Model CourseGradeRule
+ * 
+ */
+export type CourseGradeRule = Prisma.CourseGradeRuleModel
+/**
  * Model Review
  * 
  */

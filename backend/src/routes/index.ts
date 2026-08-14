@@ -18,6 +18,7 @@ import { orderPaymentsRouter, paymentsRouter } from "../modules/payments/payment
 import adminRouter from "../modules/admin/admin.routes.js";
 import { prisma } from "../config/database.js";
 import { asyncHandler } from "../common/utils/asyncHandler.js";
+import { assignmentsRouter, courseAssignmentsRouter, courseGradesRouter, submissionFilesRouter, submissionsRouter } from "../modules/assignments/assignments.routes.js";
 
 const router = Router();
 
@@ -30,6 +31,8 @@ router.use("/courses/:courseId/content", courseLearningRouter);
 router.use("/courses/:courseId/progress", courseProgressRouter);
 router.use("/courses/:courseId/reviews", courseReviewsRouter);
 router.use("/courses/:courseId/certificates", courseCertificatesRouter);
+router.use("/courses/:courseId/assignments", courseAssignmentsRouter);
+router.use("/courses/:courseId/grades", courseGradesRouter);
 router.use("/courses", coursesRouter);
 router.use("/sections/:sectionId/lessons", sectionLessonsRouter);
 router.use("/sections", sectionsRouter);
@@ -41,6 +44,9 @@ router.use("/quizzes", quizzesRouter);
 router.use("/questions", questionsRouter);
 router.use("/options", optionsRouter);
 router.use("/quiz-attempts", quizAttemptsRouter);
+router.use("/assignments", assignmentsRouter);
+router.use("/submissions", submissionsRouter);
+router.use("/submission-files", submissionFilesRouter);
 router.use("/reviews", reviewsRouter);
 router.use("/comments", commentsRouter);
 router.use("/orders/:orderId/payments/mock", orderPaymentsRouter);

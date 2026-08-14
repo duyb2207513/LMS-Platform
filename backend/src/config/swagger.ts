@@ -630,6 +630,33 @@ const swaggerDefinition = {
         type: "object", required: ["id", "certificateNumber", "verificationCode", "studentNameSnapshot", "courseTitleSnapshot", "instructorNameSnapshot", "issuedAt"],
         properties: { id: { type: "string", format: "uuid" }, certificateNumber: { type: "string", example: "LMS-2026-A1B2C3D4" }, verificationCode: { type: "string" }, studentNameSnapshot: { type: "string" }, courseTitleSnapshot: { type: "string" }, instructorNameSnapshot: { type: "string" }, issuedAt: { type: "string", format: "date-time" }, revokedAt: { type: "string", format: "date-time", nullable: true } }
       },
+      AssignmentRequest: {
+        type: "object", additionalProperties: false, required: ["title", "dueAt"],
+        properties: {
+          title: { type: "string", maxLength: 255, example: "Thiết kế REST API cho LMS" },
+          description: { type: "string", nullable: true, maxLength: 10000 },
+          instructions: { type: "string", nullable: true, maxLength: 30000 },
+          dueAt: { type: "string", format: "date-time", example: "2026-09-01T16:59:59.000Z" },
+          maxScore: { type: "number", minimum: 0.01, maximum: 100000, default: 100 },
+          allowResubmission: { type: "boolean", default: false },
+          maxSubmissions: { type: "integer", minimum: 1, maximum: 20, default: 1 },
+          allowLateSubmissions: { type: "boolean", default: false },
+          isPublished: { type: "boolean", default: false }
+        }
+      },
+      GradeSubmissionRequest: {
+        type: "object", additionalProperties: false, required: ["score"],
+        properties: { score: { type: "number", minimum: 0, example: 85 }, comment: { type: "string", nullable: true, maxLength: 10000, example: "Bài làm tốt, cần bổ sung kiểm thử." } }
+      },
+      CourseGradeRuleRequest: {
+        type: "object", additionalProperties: false, required: ["assignmentWeight", "quizWeight", "passingScore"],
+        properties: {
+          assignmentWeight: { type: "number", minimum: 0, maximum: 100, example: 60 },
+          quizWeight: { type: "number", minimum: 0, maximum: 100, example: 40 },
+          passingScore: { type: "number", minimum: 0, maximum: 100, example: 70 }
+        },
+        description: "assignmentWeight and quizWeight must total 100"
+      },
       AdminUserUpdateRequest: {
         type: "object", additionalProperties: false,
         properties: { role: { type: "string", enum: ["STUDENT", "INSTRUCTOR", "ADMIN"] }, status: { type: "string", enum: ["ACTIVE", "BLOCKED"] } }

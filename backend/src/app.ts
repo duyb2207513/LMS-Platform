@@ -34,7 +34,9 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use("/uploads", express.static(path.resolve("uploads")));
+app.use("/uploads/course-thumbnails", express.static(path.resolve("uploads", "course-thumbnails")));
+app.use("/uploads/avatars", express.static(path.resolve("uploads", "avatars")));
+app.use("/uploads/lesson-files", express.static(path.resolve("uploads", "lesson-files")));
 
 app.use(
   "/api-docs",

@@ -103,3 +103,11 @@ export const AuthTokenType = {
 } as const
 
 export type AuthTokenType = (typeof AuthTokenType)[keyof typeof AuthTokenType]
+
+
+export const AssignmentSubmissionStatus = {
+  SUBMITTED: 'SUBMITTED',
+  GRADED: 'GRADED'
+} as const
+
+export type AssignmentSubmissionStatus = (typeof AssignmentSubmissionStatus)[keyof typeof AssignmentSubmissionStatus]

@@ -71,6 +71,33 @@ test('instructor mở được course builder', async ({ page }) => {
   await expect(page.getByRole('button', { name: /Thêm chương/ })).toBeVisible()
 })
 
+test('học viên xem bài tập, điểm và nhận xét Sprint 7', async ({ page }) => {
+  await login(page, 'student@lms.test')
+  await expect(page).toHaveURL(/\/dashboard$/)
+  await page.goto('/my-courses')
+  const course = page.getByRole('article').filter({ hasText: 'React Native cho người mới' })
+  await course.getByRole('link', { name: 'Bài tập & điểm' }).click()
+  await expect(page.getByRole('heading', { name: 'Kết quả học tập' })).toBeVisible()
+  await expect(page.getByText('Xây dựng màn hình đăng nhập React Native')).toBeVisible()
+  await page.getByText('Xây dựng màn hình đăng nhập React Native').click()
+  await expect(page.getByRole('heading', { name: 'Xây dựng màn hình đăng nhập React Native' })).toBeVisible()
+  await expect(page.getByText('Nhận xét của giảng viên')).toBeVisible()
+})
+
+test('instructor mở danh sách bài nộp và form chấm điểm Sprint 7', async ({ page }) => {
+  await login(page, 'instructor@lms.test')
+  await expect(page).toHaveURL(/\/instructor\/courses$/)
+  const course = page
+    .getByText('React Native cho người mới', { exact: true })
+    .locator('xpath=ancestor::div[contains(@class,"overflow-hidden")][1]')
+  await course.getByRole('link', { name: 'Bài tập' }).click()
+  await expect(page.getByRole('heading', { name: 'Bài tập và chấm điểm' })).toBeVisible()
+  const assignment = page.getByRole('article').filter({ hasText: 'Xây dựng màn hình đăng nhập React Native' })
+  await assignment.getByRole('link', { name: 'Xem & chấm bài' }).click()
+  await expect(page.getByRole('heading', { name: 'Xây dựng màn hình đăng nhập React Native' })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Cập nhật điểm' })).toBeVisible()
+})
+
 test('admin mở được dashboard và các khu vực quản trị', async ({ page }) => {
   await login(page, 'admin@lms.test')
   await expect(page).toHaveURL(/\/admin$/)

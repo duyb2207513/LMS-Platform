@@ -66,6 +66,11 @@ export const ModelName = {
   QuizOption: 'QuizOption',
   QuizAttempt: 'QuizAttempt',
   AttemptAnswer: 'AttemptAnswer',
+  Assignment: 'Assignment',
+  AssignmentSubmission: 'AssignmentSubmission',
+  SubmissionFile: 'SubmissionFile',
+  SubmissionFeedback: 'SubmissionFeedback',
+  CourseGradeRule: 'CourseGradeRule',
   Review: 'Review',
   Comment: 'Comment',
   Order: 'Order',
@@ -319,6 +324,79 @@ export const AttemptAnswerScalarFieldEnum = {
 } as const
 
 export type AttemptAnswerScalarFieldEnum = (typeof AttemptAnswerScalarFieldEnum)[keyof typeof AttemptAnswerScalarFieldEnum]
+
+
+export const AssignmentScalarFieldEnum = {
+  id: 'id',
+  courseId: 'courseId',
+  title: 'title',
+  description: 'description',
+  instructions: 'instructions',
+  dueAt: 'dueAt',
+  maxScore: 'maxScore',
+  allowResubmission: 'allowResubmission',
+  maxSubmissions: 'maxSubmissions',
+  allowLateSubmissions: 'allowLateSubmissions',
+  isPublished: 'isPublished',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AssignmentScalarFieldEnum = (typeof AssignmentScalarFieldEnum)[keyof typeof AssignmentScalarFieldEnum]
+
+
+export const AssignmentSubmissionScalarFieldEnum = {
+  id: 'id',
+  assignmentId: 'assignmentId',
+  studentId: 'studentId',
+  attemptNumber: 'attemptNumber',
+  textContent: 'textContent',
+  status: 'status',
+  submittedAt: 'submittedAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AssignmentSubmissionScalarFieldEnum = (typeof AssignmentSubmissionScalarFieldEnum)[keyof typeof AssignmentSubmissionScalarFieldEnum]
+
+
+export const SubmissionFileScalarFieldEnum = {
+  id: 'id',
+  submissionId: 'submissionId',
+  originalName: 'originalName',
+  storedName: 'storedName',
+  fileUrl: 'fileUrl',
+  mimeType: 'mimeType',
+  sizeBytes: 'sizeBytes',
+  createdAt: 'createdAt'
+} as const
+
+export type SubmissionFileScalarFieldEnum = (typeof SubmissionFileScalarFieldEnum)[keyof typeof SubmissionFileScalarFieldEnum]
+
+
+export const SubmissionFeedbackScalarFieldEnum = {
+  id: 'id',
+  submissionId: 'submissionId',
+  graderId: 'graderId',
+  score: 'score',
+  comment: 'comment',
+  gradedAt: 'gradedAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SubmissionFeedbackScalarFieldEnum = (typeof SubmissionFeedbackScalarFieldEnum)[keyof typeof SubmissionFeedbackScalarFieldEnum]
+
+
+export const CourseGradeRuleScalarFieldEnum = {
+  id: 'id',
+  courseId: 'courseId',
+  assignmentWeight: 'assignmentWeight',
+  quizWeight: 'quizWeight',
+  passingScore: 'passingScore',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CourseGradeRuleScalarFieldEnum = (typeof CourseGradeRuleScalarFieldEnum)[keyof typeof CourseGradeRuleScalarFieldEnum]
 
 
 export const ReviewScalarFieldEnum = {
