@@ -75,6 +75,8 @@ export const ModelName = {
   NotificationPreference: 'NotificationPreference',
   EmailLog: 'EmailLog',
   CourseAnnouncement: 'CourseAnnouncement',
+  LearningEvent: 'LearningEvent',
+  VideoWatchEvent: 'VideoWatchEvent',
   Review: 'Review',
   Comment: 'Comment',
   Order: 'Order',
@@ -463,6 +465,40 @@ export const CourseAnnouncementScalarFieldEnum = {
 } as const
 
 export type CourseAnnouncementScalarFieldEnum = (typeof CourseAnnouncementScalarFieldEnum)[keyof typeof CourseAnnouncementScalarFieldEnum]
+
+
+export const LearningEventScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  courseId: 'courseId',
+  lessonId: 'lessonId',
+  eventType: 'eventType',
+  sessionId: 'sessionId',
+  durationSeconds: 'durationSeconds',
+  metadata: 'metadata',
+  occurredAt: 'occurredAt',
+  createdAt: 'createdAt'
+} as const
+
+export type LearningEventScalarFieldEnum = (typeof LearningEventScalarFieldEnum)[keyof typeof LearningEventScalarFieldEnum]
+
+
+export const VideoWatchEventScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  courseId: 'courseId',
+  lessonId: 'lessonId',
+  sessionId: 'sessionId',
+  startedAt: 'startedAt',
+  endedAt: 'endedAt',
+  startPositionSeconds: 'startPositionSeconds',
+  endPositionSeconds: 'endPositionSeconds',
+  watchedSeconds: 'watchedSeconds',
+  completed: 'completed',
+  createdAt: 'createdAt'
+} as const
+
+export type VideoWatchEventScalarFieldEnum = (typeof VideoWatchEventScalarFieldEnum)[keyof typeof VideoWatchEventScalarFieldEnum]
 
 
 export const ReviewScalarFieldEnum = {

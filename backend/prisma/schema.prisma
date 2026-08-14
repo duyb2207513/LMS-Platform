@@ -98,40 +98,51 @@ enum AnnouncementStatus {
   PUBLISHED
 }
 
-model User {
-  id           String     @id @default(uuid()) @db.Uuid
-  fullName     String     @map("full_name") @db.VarChar(100)
-  email        String     @unique @db.VarChar(255)
-  passwordHash String?    @map("password_hash")
-  avatarUrl    String?    @map("avatar_url")
-  googleId     String?    @unique @map("google_id") @db.VarChar(255)
-  githubId     String?    @unique @map("github_id") @db.VarChar(255)
-  emailVerifiedAt DateTime? @map("email_verified_at") @db.Timestamptz(3)
-  failedLoginAttempts Int @default(0) @map("failed_login_attempts")
-  lockedUntil DateTime? @map("locked_until") @db.Timestamptz(3)
-  lastLoginAt DateTime? @map("last_login_at") @db.Timestamptz(3)
-  role         UserRole   @default(STUDENT)
-  status       UserStatus @default(ACTIVE)
-  createdAt    DateTime   @default(now()) @map("created_at") @db.Timestamptz(3)
-  updatedAt    DateTime   @updatedAt @map("updated_at") @db.Timestamptz(3)
+enum LearningEventType {
+  COURSE_OPENED
+  LESSON_STARTED
+  LESSON_COMPLETED
+  QUIZ_STARTED
+  QUIZ_SUBMITTED
+  STUDY_SESSION
+}
 
-  courses        Course[]         @relation("InstructorCourses")
-  enrollments    Enrollment[]     @relation("StudentEnrollments")
-  lessonProgress LessonProgress[] @relation("StudentLessonProgress")
-  quizAttempts   QuizAttempt[]    @relation("StudentQuizAttempts")
-  assignmentSubmissions AssignmentSubmission[] @relation("StudentAssignmentSubmissions")
-  submissionFeedback SubmissionFeedback[] @relation("GraderSubmissionFeedback")
-  reviews        Review[]
-  comments       Comment[]
-  orders         Order[]
-  certificates   Certificate[]
-  authSessions   AuthSession[]
-  authTokens     AuthToken[]
-  auditLogs      AuditLog[]      @relation("AuditActor")
-  notifications Notification[]
+model User {
+  id                  String     @id @default(uuid()) @db.Uuid
+  fullName            String     @map("full_name") @db.VarChar(100)
+  email               String     @unique @db.VarChar(255)
+  passwordHash        String?    @map("password_hash")
+  avatarUrl           String?    @map("avatar_url")
+  googleId            String?    @unique @map("google_id") @db.VarChar(255)
+  githubId            String?    @unique @map("github_id") @db.VarChar(255)
+  emailVerifiedAt     DateTime?  @map("email_verified_at") @db.Timestamptz(3)
+  failedLoginAttempts Int        @default(0) @map("failed_login_attempts")
+  lockedUntil         DateTime?  @map("locked_until") @db.Timestamptz(3)
+  lastLoginAt         DateTime?  @map("last_login_at") @db.Timestamptz(3)
+  role                UserRole   @default(STUDENT)
+  status              UserStatus @default(ACTIVE)
+  createdAt           DateTime   @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt           DateTime   @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  courses                Course[]                @relation("InstructorCourses")
+  enrollments            Enrollment[]            @relation("StudentEnrollments")
+  lessonProgress         LessonProgress[]        @relation("StudentLessonProgress")
+  quizAttempts           QuizAttempt[]           @relation("StudentQuizAttempts")
+  assignmentSubmissions  AssignmentSubmission[]  @relation("StudentAssignmentSubmissions")
+  submissionFeedback     SubmissionFeedback[]    @relation("GraderSubmissionFeedback")
+  reviews                Review[]
+  comments               Comment[]
+  orders                 Order[]
+  certificates           Certificate[]
+  authSessions           AuthSession[]
+  authTokens             AuthToken[]
+  auditLogs              AuditLog[]              @relation("AuditActor")
+  notifications          Notification[]
   notificationPreference NotificationPreference?
-  emailLogs EmailLog[]
-  courseAnnouncements CourseAnnouncement[] @relation("AnnouncementAuthor")
+  emailLogs              EmailLog[]
+  courseAnnouncements    CourseAnnouncement[]    @relation("AnnouncementAuthor")
+  learningEvents         LearningEvent[]
+  videoWatchEvents       VideoWatchEvent[]
 
   @@index([role])
   @@index([status])
@@ -223,16 +234,18 @@ model Course {
   createdAt        DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt        DateTime     @updatedAt @map("updated_at") @db.Timestamptz(3)
 
-  instructor User     @relation("InstructorCourses", fields: [instructorId], references: [id], onDelete: Restrict)
-  category   Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
-  sections    Section[]
-  enrollments Enrollment[]
-  reviews     Review[]
-  orderItems  OrderItem[]
-  certificates Certificate[]
-  assignments Assignment[]
-  gradeRule CourseGradeRule?
-  announcements CourseAnnouncement[]
+  instructor       User                 @relation("InstructorCourses", fields: [instructorId], references: [id], onDelete: Restrict)
+  category         Category             @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  sections         Section[]
+  enrollments      Enrollment[]
+  reviews          Review[]
+  orderItems       OrderItem[]
+  certificates     Certificate[]
+  assignments      Assignment[]
+  gradeRule        CourseGradeRule?
+  announcements    CourseAnnouncement[]
+  learningEvents   LearningEvent[]
+  videoWatchEvents VideoWatchEvent[]
 
   @@index([instructorId])
   @@index([categoryId])
@@ -273,10 +286,12 @@ model Lesson {
   createdAt       DateTime   @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt       DateTime   @updatedAt @map("updated_at") @db.Timestamptz(3)
 
-  section  Section          @relation(fields: [sectionId], references: [id], onDelete: Cascade)
-  progress LessonProgress[]
-  quiz     Quiz?
-  comments Comment[]
+  section          Section           @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  progress         LessonProgress[]
+  quiz             Quiz?
+  comments         Comment[]
+  learningEvents   LearningEvent[]
+  videoWatchEvents VideoWatchEvent[]
 
   @@index([sectionId, position])
   @@index([isPublished])
@@ -292,8 +307,8 @@ model Enrollment {
   progressPercent Decimal          @default(0) @map("progress_percent") @db.Decimal(5, 2)
   status          EnrollmentStatus @default(ACTIVE)
 
-  student User   @relation("StudentEnrollments", fields: [studentId], references: [id], onDelete: Cascade)
-  course  Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  student     User         @relation("StudentEnrollments", fields: [studentId], references: [id], onDelete: Cascade)
+  course      Course       @relation(fields: [courseId], references: [id], onDelete: Cascade)
   certificate Certificate?
 
   @@unique([studentId, courseId])
@@ -366,7 +381,7 @@ model QuizOption {
   createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt  DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
 
-  question Question       @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  question Question        @relation(fields: [questionId], references: [id], onDelete: Cascade)
   answers  AttemptAnswer[]
 
   @@index([questionId, position])
@@ -445,8 +460,8 @@ model AssignmentSubmission {
   submittedAt   DateTime                   @default(now()) @map("submitted_at") @db.Timestamptz(3)
   updatedAt     DateTime                   @updatedAt @map("updated_at") @db.Timestamptz(3)
 
-  assignment Assignment         @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
-  student    User               @relation("StudentAssignmentSubmissions", fields: [studentId], references: [id], onDelete: Cascade)
+  assignment Assignment          @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  student    User                @relation("StudentAssignmentSubmissions", fields: [studentId], references: [id], onDelete: Cascade)
   files      SubmissionFile[]
   feedback   SubmissionFeedback?
 
@@ -573,6 +588,55 @@ model CourseAnnouncement {
   @@index([courseId, status, publishedAt(sort: Desc)])
   @@index([authorId])
   @@map("course_announcements")
+}
+
+model LearningEvent {
+  id              String            @id @default(uuid()) @db.Uuid
+  userId          String            @map("user_id") @db.Uuid
+  courseId        String            @map("course_id") @db.Uuid
+  lessonId        String?           @map("lesson_id") @db.Uuid
+  eventType       LearningEventType @map("event_type")
+  sessionId       String            @map("session_id") @db.Uuid
+  durationSeconds Int?              @map("duration_seconds")
+  metadata        Json?
+  occurredAt      DateTime          @map("occurred_at") @db.Timestamptz(3)
+  createdAt       DateTime          @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Course  @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  lesson Lesson? @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, sessionId, eventType, occurredAt])
+  @@index([userId, occurredAt])
+  @@index([courseId, occurredAt])
+  @@index([lessonId, eventType])
+  @@index([userId, courseId, occurredAt])
+  @@map("learning_events")
+}
+
+model VideoWatchEvent {
+  id                   String    @id @default(uuid()) @db.Uuid
+  userId               String    @map("user_id") @db.Uuid
+  courseId             String    @map("course_id") @db.Uuid
+  lessonId             String    @map("lesson_id") @db.Uuid
+  sessionId            String    @map("session_id") @db.Uuid
+  startedAt            DateTime  @map("started_at") @db.Timestamptz(3)
+  endedAt              DateTime? @map("ended_at") @db.Timestamptz(3)
+  startPositionSeconds Int       @map("start_position_seconds")
+  endPositionSeconds   Int?      @map("end_position_seconds")
+  watchedSeconds       Int       @map("watched_seconds")
+  completed            Boolean   @default(false)
+  createdAt            DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, sessionId, startedAt])
+  @@index([userId, lessonId, startedAt])
+  @@index([courseId, lessonId])
+  @@index([userId, courseId, startedAt])
+  @@map("video_watch_events")
 }
 
 model Review {

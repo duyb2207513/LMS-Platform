@@ -162,6 +162,16 @@ export type EmailLog = Prisma.EmailLogModel
  */
 export type CourseAnnouncement = Prisma.CourseAnnouncementModel
 /**
+ * Model LearningEvent
+ * 
+ */
+export type LearningEvent = Prisma.LearningEventModel
+/**
+ * Model VideoWatchEvent
+ * 
+ */
+export type VideoWatchEvent = Prisma.VideoWatchEventModel
+/**
  * Model Review
  * 
  */

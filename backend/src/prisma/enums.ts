@@ -141,3 +141,15 @@ export const AnnouncementStatus = {
 } as const
 
 export type AnnouncementStatus = (typeof AnnouncementStatus)[keyof typeof AnnouncementStatus]
+
+
+export const LearningEventType = {
+  COURSE_OPENED: 'COURSE_OPENED',
+  LESSON_STARTED: 'LESSON_STARTED',
+  LESSON_COMPLETED: 'LESSON_COMPLETED',
+  QUIZ_STARTED: 'QUIZ_STARTED',
+  QUIZ_SUBMITTED: 'QUIZ_SUBMITTED',
+  STUDY_SESSION: 'STUDY_SESSION'
+} as const
+
+export type LearningEventType = (typeof LearningEventType)[keyof typeof LearningEventType]

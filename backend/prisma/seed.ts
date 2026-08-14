@@ -432,6 +432,44 @@ async function seedSprint8(studentId: string, instructorId: string) {
   });
 }
 
+async function seedSprint9(studentId: string) {
+  const course = await prisma.course.findUniqueOrThrow({ where: { slug: "react-native-cho-nguoi-moi" } });
+  const textLessonId = "20000000-0000-4000-8000-000000000001";
+  const videoLessonId = "20000000-0000-4000-8000-000000000002";
+  const events = [
+    { sessionId: "90000000-0000-4000-8000-000000000001", lessonId: textLessonId, eventType: "LESSON_STARTED" as const, durationSeconds: null, occurredAt: new Date("2026-08-10T02:00:00.000Z") },
+    { sessionId: "90000000-0000-4000-8000-000000000002", lessonId: textLessonId, eventType: "STUDY_SESSION" as const, durationSeconds: 300, occurredAt: new Date("2026-08-10T02:01:00.000Z") },
+    { sessionId: "90000000-0000-4000-8000-000000000003", lessonId: textLessonId, eventType: "LESSON_COMPLETED" as const, durationSeconds: null, occurredAt: new Date("2026-08-10T02:21:00.000Z") },
+    { sessionId: "90000000-0000-4000-8000-000000000004", lessonId: videoLessonId, eventType: "LESSON_STARTED" as const, durationSeconds: null, occurredAt: new Date("2026-08-11T03:00:00.000Z") },
+    { sessionId: "90000000-0000-4000-8000-000000000005", lessonId: videoLessonId, eventType: "STUDY_SESSION" as const, durationSeconds: 300, occurredAt: new Date("2026-08-12T03:00:00.000Z") },
+    { sessionId: "90000000-0000-4000-8000-000000000006", lessonId: videoLessonId, eventType: "STUDY_SESSION" as const, durationSeconds: 300, occurredAt: new Date("2026-08-13T03:00:00.000Z") },
+    { sessionId: "90000000-0000-4000-8000-000000000007", lessonId: videoLessonId, eventType: "STUDY_SESSION" as const, durationSeconds: 300, occurredAt: new Date("2026-08-14T03:00:00.000Z") }
+  ];
+  for (const event of events) {
+    await prisma.learningEvent.upsert({
+      where: { userId_sessionId_eventType_occurredAt: { userId: studentId, sessionId: event.sessionId, eventType: event.eventType, occurredAt: event.occurredAt } },
+      update: { courseId: course.id, lessonId: event.lessonId, durationSeconds: event.durationSeconds },
+      create: { ...event, userId: studentId, courseId: course.id }
+    });
+  }
+  await prisma.videoWatchEvent.upsert({
+    where: { userId_sessionId_startedAt: { userId: studentId, sessionId: "91000000-0000-4000-8000-000000000001", startedAt: new Date("2026-08-14T03:10:00.000Z") } },
+    update: { watchedSeconds: 180, endPositionSeconds: 180 },
+    create: {
+      userId: studentId,
+      courseId: course.id,
+      lessonId: videoLessonId,
+      sessionId: "91000000-0000-4000-8000-000000000001",
+      startedAt: new Date("2026-08-14T03:10:00.000Z"),
+      endedAt: new Date("2026-08-14T03:13:00.000Z"),
+      startPositionSeconds: 0,
+      endPositionSeconds: 180,
+      watchedSeconds: 180,
+      completed: false
+    }
+  });
+}
+
 async function main() {
   const passwordHash = await bcrypt.hash(TEST_PASSWORD, 12);
   const users = await seedUsers(passwordHash);
@@ -445,6 +483,7 @@ async function main() {
   await seedAdditionalLearningContent(student.id);
   await seedSprint7(student.id, instructor.id);
   await seedSprint8(student.id, instructor.id);
+  await seedSprint9(student.id);
 
   console.log("Seed completed successfully");
   console.log("Test password for every seeded account: Password123");
