@@ -1,6 +1,6 @@
 # LMS Platform
 
-Nền tảng học trực tuyến gồm REST API Express/TypeScript, PostgreSQL/Prisma, web Vue 3 và mobile React Native/Expo. Dự án đã bao phủ đăng nhập, khóa học, học tập, quiz/tương tác, mock payment, certificate và quản trị.
+Nền tảng học trực tuyến gồm REST API Express/TypeScript, PostgreSQL/Prisma, web Vue 3 và mobile React Native/Expo. Dự án đã bao phủ đăng nhập, khóa học, học tập, quiz/tương tác, assignment, mock payment, certificate, notification realtime và quản trị.
 
 ## Chạy local bằng Docker
 
@@ -29,7 +29,7 @@ Tài khoản demo, cùng mật khẩu `Password123`:
 | Admin | `admin@lms.test` |
 | Blocked | `blocked@lms.test` |
 
-Seed có category, course miễn phí/trả phí, section/lesson, quiz, review/comment, một đơn đã thanh toán, enrollment hoàn thành và certificate `LMS-2026-DEMO0001`.
+Seed có category, course miễn phí/trả phí, section/lesson, quiz, assignment, review/comment, announcement, notification, email log, một đơn đã thanh toán, enrollment hoàn thành và certificate `LMS-2026-DEMO0001`.
 
 ## Cấu trúc
 
@@ -80,6 +80,8 @@ docker compose exec frontend npm run test:e2e
 ```
 
 E2E bao phủ xem course công khai và hành trình đăng nhập Admin qua dashboard, user, course, review và comment. CI nằm tại `.github/workflows/ci.yml`.
+
+Backend Sprint 8 bổ sung notification/preferences, course announcement, Socket.IO, email log và reminder assignment. Chi tiết tại `docs/SPRINT_8_BACKEND_IMPLEMENTATION.md`.
 
 ## Deploy production
 

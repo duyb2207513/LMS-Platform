@@ -1,0 +1,23 @@
+import assert from "node:assert/strict";
+import { validatePreferenceInput } from "../../dist/modules/notification-preferences/preference.validation.js";
+import { validateCreateAnnouncement, validateUpdateAnnouncement } from "../../dist/modules/announcements/announcement.validation.js";
+import { parseNotificationQuery } from "../../dist/modules/notifications/notification.validation.js";
+import { allowsInApp } from "../../dist/modules/notifications/notification.service.js";
+import { allowsEmail } from "../../dist/services/email/email.service.js";
+
+assert.deepEqual(validatePreferenceInput({ emailEnabled: false }).data, { emailEnabled: false });
+assert.ok(validatePreferenceInput({ emailEnabled: "false" }).errors.emailEnabled);
+assert.ok(validatePreferenceInput({ userId: "forbidden" }).errors.userId);
+assert.ok(validatePreferenceInput({}).errors.body);
+assert.equal(validateCreateAnnouncement({ title: "Thông báo", content: "Nội dung" }).data.title, "Thông báo");
+assert.ok(validateCreateAnnouncement({ title: "", content: "Nội dung" }).errors.title);
+assert.ok(validateUpdateAnnouncement({ status: "PUBLISHED" }).errors.status);
+assert.deepEqual(parseNotificationQuery({ page: "2", limit: "10", isRead: "false" }), { page: 2, limit: 10, isRead: false });
+assert.throws(() => parseNotificationQuery({ limit: "101" }));
+const muted = { inAppEnabled: true, emailEnabled: true, courseUpdates: false, assignmentReminders: false, quizResults: false, certificateUpdates: false };
+assert.equal(allowsInApp("WELCOME", muted), true);
+assert.equal(allowsInApp("COURSE_ANNOUNCEMENT", muted), false);
+assert.equal(allowsInApp("ASSIGNMENT_DUE", muted), false);
+assert.equal(allowsEmail("COURSE_ENROLLED", muted), false);
+assert.equal(allowsEmail("WELCOME", { ...muted, emailEnabled: false }), false);
+console.log("Sprint 8 notification and announcement validation tests passed");

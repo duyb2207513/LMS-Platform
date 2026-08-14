@@ -71,6 +71,10 @@ export const ModelName = {
   SubmissionFile: 'SubmissionFile',
   SubmissionFeedback: 'SubmissionFeedback',
   CourseGradeRule: 'CourseGradeRule',
+  Notification: 'Notification',
+  NotificationPreference: 'NotificationPreference',
+  EmailLog: 'EmailLog',
+  CourseAnnouncement: 'CourseAnnouncement',
   Review: 'Review',
   Comment: 'Comment',
   Order: 'Order',
@@ -397,6 +401,68 @@ export const CourseGradeRuleScalarFieldEnum = {
 } as const
 
 export type CourseGradeRuleScalarFieldEnum = (typeof CourseGradeRuleScalarFieldEnum)[keyof typeof CourseGradeRuleScalarFieldEnum]
+
+
+export const NotificationScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  type: 'type',
+  title: 'title',
+  message: 'message',
+  data: 'data',
+  isRead: 'isRead',
+  readAt: 'readAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]
+
+
+export const NotificationPreferenceScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  inAppEnabled: 'inAppEnabled',
+  emailEnabled: 'emailEnabled',
+  courseUpdates: 'courseUpdates',
+  assignmentReminders: 'assignmentReminders',
+  quizResults: 'quizResults',
+  certificateUpdates: 'certificateUpdates',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type NotificationPreferenceScalarFieldEnum = (typeof NotificationPreferenceScalarFieldEnum)[keyof typeof NotificationPreferenceScalarFieldEnum]
+
+
+export const EmailLogScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  toEmail: 'toEmail',
+  subject: 'subject',
+  template: 'template',
+  status: 'status',
+  errorMessage: 'errorMessage',
+  sentAt: 'sentAt',
+  createdAt: 'createdAt'
+} as const
+
+export type EmailLogScalarFieldEnum = (typeof EmailLogScalarFieldEnum)[keyof typeof EmailLogScalarFieldEnum]
+
+
+export const CourseAnnouncementScalarFieldEnum = {
+  id: 'id',
+  courseId: 'courseId',
+  authorId: 'authorId',
+  title: 'title',
+  content: 'content',
+  status: 'status',
+  publishedAt: 'publishedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CourseAnnouncementScalarFieldEnum = (typeof CourseAnnouncementScalarFieldEnum)[keyof typeof CourseAnnouncementScalarFieldEnum]
 
 
 export const ReviewScalarFieldEnum = {

@@ -19,6 +19,9 @@ import adminRouter from "../modules/admin/admin.routes.js";
 import { prisma } from "../config/database.js";
 import { asyncHandler } from "../common/utils/asyncHandler.js";
 import { assignmentsRouter, courseAssignmentsRouter, courseGradesRouter, submissionFilesRouter, submissionsRouter } from "../modules/assignments/assignments.routes.js";
+import notificationsRouter from "../modules/notifications/notification.routes.js";
+import preferencesRouter from "../modules/notification-preferences/preference.routes.js";
+import { announcementsRouter, courseAnnouncementsRouter } from "../modules/announcements/announcement.routes.js";
 
 const router = Router();
 
@@ -33,6 +36,7 @@ router.use("/courses/:courseId/reviews", courseReviewsRouter);
 router.use("/courses/:courseId/certificates", courseCertificatesRouter);
 router.use("/courses/:courseId/assignments", courseAssignmentsRouter);
 router.use("/courses/:courseId/grades", courseGradesRouter);
+router.use("/courses/:courseId/announcements", courseAnnouncementsRouter);
 router.use("/courses", coursesRouter);
 router.use("/sections/:sectionId/lessons", sectionLessonsRouter);
 router.use("/sections", sectionsRouter);
@@ -47,6 +51,9 @@ router.use("/quiz-attempts", quizAttemptsRouter);
 router.use("/assignments", assignmentsRouter);
 router.use("/submissions", submissionsRouter);
 router.use("/submission-files", submissionFilesRouter);
+router.use("/announcements", announcementsRouter);
+router.use("/notifications", notificationsRouter);
+router.use("/notification-preferences", preferencesRouter);
 router.use("/reviews", reviewsRouter);
 router.use("/comments", commentsRouter);
 router.use("/orders/:orderId/payments/mock", orderPaymentsRouter);

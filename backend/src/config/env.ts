@@ -35,6 +35,7 @@ export const env = {
   smtpUser: process.env.SMTP_USER ?? "",
   smtpPassword: process.env.SMTP_PASSWORD ?? "",
   mailFrom: process.env.MAIL_FROM ?? "LMS Platform <no-reply@lms.local>",
+  assignmentReminderIntervalMinutes: Number(process.env.ASSIGNMENT_REMINDER_INTERVAL_MINUTES ?? 15),
   sentryDsn: process.env.SENTRY_DSN ?? "",
   logLevel: process.env.LOG_LEVEL ?? (process.env.NODE_ENV === "production" ? "info" : "debug")
 } as const;

@@ -77,6 +77,27 @@ enum AssignmentSubmissionStatus {
   GRADED
 }
 
+enum NotificationType {
+  WELCOME
+  COURSE_ENROLLED
+  NEW_LESSON
+  ASSIGNMENT_DUE
+  QUIZ_RESULT
+  CERTIFICATE_ISSUED
+  COURSE_ANNOUNCEMENT
+}
+
+enum EmailStatus {
+  PENDING
+  SENT
+  FAILED
+}
+
+enum AnnouncementStatus {
+  DRAFT
+  PUBLISHED
+}
+
 model User {
   id           String     @id @default(uuid()) @db.Uuid
   fullName     String     @map("full_name") @db.VarChar(100)
@@ -107,6 +128,10 @@ model User {
   authSessions   AuthSession[]
   authTokens     AuthToken[]
   auditLogs      AuditLog[]      @relation("AuditActor")
+  notifications Notification[]
+  notificationPreference NotificationPreference?
+  emailLogs EmailLog[]
+  courseAnnouncements CourseAnnouncement[] @relation("AnnouncementAuthor")
 
   @@index([role])
   @@index([status])
@@ -207,6 +232,7 @@ model Course {
   certificates Certificate[]
   assignments Assignment[]
   gradeRule CourseGradeRule?
+  announcements CourseAnnouncement[]
 
   @@index([instructorId])
   @@index([categoryId])
@@ -474,6 +500,79 @@ model CourseGradeRule {
   course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
   @@map("course_grade_rules")
+}
+
+model Notification {
+  id        String           @id @default(uuid()) @db.Uuid
+  userId    String           @map("user_id") @db.Uuid
+  type      NotificationType
+  title     String           @db.VarChar(255)
+  message   String
+  data      Json?
+  isRead    Boolean          @default(false) @map("is_read")
+  readAt    DateTime?        @map("read_at") @db.Timestamptz(3)
+  createdAt DateTime         @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime         @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([userId, isRead])
+  @@map("notifications")
+}
+
+model NotificationPreference {
+  id                  String   @id @default(uuid()) @db.Uuid
+  userId              String   @unique @map("user_id") @db.Uuid
+  inAppEnabled        Boolean  @default(true) @map("in_app_enabled")
+  emailEnabled        Boolean  @default(true) @map("email_enabled")
+  courseUpdates       Boolean  @default(true) @map("course_updates")
+  assignmentReminders Boolean  @default(true) @map("assignment_reminders")
+  quizResults         Boolean  @default(true) @map("quiz_results")
+  certificateUpdates  Boolean  @default(true) @map("certificate_updates")
+  createdAt           DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt           DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notification_preferences")
+}
+
+model EmailLog {
+  id           String      @id @default(uuid()) @db.Uuid
+  userId       String?     @map("user_id") @db.Uuid
+  toEmail      String      @map("to_email") @db.VarChar(255)
+  subject      String      @db.VarChar(255)
+  template     String      @db.VarChar(100)
+  status       EmailStatus @default(PENDING)
+  errorMessage String?     @map("error_message")
+  sentAt       DateTime?   @map("sent_at") @db.Timestamptz(3)
+  createdAt    DateTime    @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([status, createdAt])
+  @@map("email_logs")
+}
+
+model CourseAnnouncement {
+  id          String             @id @default(uuid()) @db.Uuid
+  courseId    String             @map("course_id") @db.Uuid
+  authorId    String             @map("author_id") @db.Uuid
+  title       String             @db.VarChar(255)
+  content     String
+  status      AnnouncementStatus @default(DRAFT)
+  publishedAt DateTime?          @map("published_at") @db.Timestamptz(3)
+  createdAt   DateTime           @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime           @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  author User   @relation("AnnouncementAuthor", fields: [authorId], references: [id], onDelete: Restrict)
+
+  @@index([courseId, status, publishedAt(sort: Desc)])
+  @@index([authorId])
+  @@map("course_announcements")
 }
 
 model Review {
