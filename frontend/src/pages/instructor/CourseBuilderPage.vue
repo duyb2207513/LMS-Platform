@@ -5,8 +5,12 @@ import InstructorLayout from '@/layouts/InstructorLayout.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import BaseInput from '@/components/ui/BaseInput.vue'
 import BaseModal from '@/components/ui/BaseModal.vue'
-import { useApi } from '@/composables/useApi'
+import { API_BASE_URL, useApi } from '@/composables/useApi'
 import type { ApiResponse, CourseSection, Lesson } from '@/types'
+import VueOfficePdf from '@vue-office/pdf'
+import VueOfficeDocx from '@vue-office/docx'
+import '@vue-office/docx/lib/index.css'
+import VueOfficePptx from '@vue-office/pptx'
 
 type LessonType = 'VIDEO' | 'TEXT' | 'DOCUMENT'
 const route = useRoute()
@@ -34,6 +38,31 @@ const publishedLessons = computed(() => sections.value.flatMap((section) => sect
 const acceptedLessonFiles = computed(() => lessonForm.lessonType === 'VIDEO' ? 'video/mp4,video/webm' : '.pdf,.doc,.docx,.ppt,.pptx,application/pdf')
 const currentLessonFileUrl = computed(() => !editingLesson.value ? null : editingLesson.value.lessonType === 'VIDEO' ? editingLesson.value.videoUrl : editingLesson.value.documentUrl)
 const lessonTypeLabel = (type: LessonType) => ({ TEXT: 'Văn bản', VIDEO: 'Video', DOCUMENT: 'Tài liệu' }[type])
+
+const asset = (url: string | null) => !url ? '' : url.startsWith('http') ? url : `${API_BASE_URL.replace('/api/v1', '')}${url}`
+
+const previewSrc = computed(() => {
+  if (lessonFile.value) return lessonFile.value
+  if (editingLesson.value && editingLesson.value.lessonType === lessonForm.lessonType) {
+    const url = editingLesson.value.lessonType === 'VIDEO' ? editingLesson.value.videoUrl : editingLesson.value.documentUrl
+    return url ? asset(url) : null
+  }
+  return null
+})
+
+const previewType = computed(() => {
+  if (lessonForm.lessonType !== 'DOCUMENT') return ''
+  let name = ''
+  if (lessonFile.value) {
+    name = lessonFile.value.name.toLowerCase()
+  } else if (editingLesson.value?.documentUrl) {
+    name = editingLesson.value.documentUrl.toLowerCase()
+  }
+  if (name.endsWith('.pdf')) return 'pdf'
+  if (name.endsWith('.pptx') || name.endsWith('.ppt')) return 'pptx'
+  if (name.endsWith('.docx') || name.endsWith('.doc')) return 'docx'
+  return ''
+})
 
 watch(() => lessonForm.lessonType, () => { lessonFile.value = null; fileInputKey.value += 1 })
 
@@ -150,7 +179,7 @@ onMounted(load)
 
     <BaseModal :show="sectionModalOpen" :title="editingSection ? 'Đổi tên chương' : 'Thêm chương mới'" description="Tên chương nên ngắn gọn và thể hiện rõ nhóm kiến thức." @close="closeSectionModal"><form class="space-y-5" @submit.prevent="saveSection"><BaseInput id="section-title" v-model="sectionTitle" label="Tên chương" placeholder="Ví dụ: Làm quen với ExpressJS" required /><div class="flex justify-end gap-3"><BaseButton type="button" variant="secondary" @click="closeSectionModal">Hủy</BaseButton><BaseButton type="submit" :loading="sectionSaving">{{ editingSection ? 'Lưu thay đổi' : 'Thêm chương' }}</BaseButton></div></form></BaseModal>
 
-    <BaseModal :show="lessonModalOpen" :title="editingLesson ? 'Cập nhật bài học' : 'Tạo bài học'" :description="targetSection ? `Thuộc chương: ${targetSection.title}` : undefined" size="lg" @close="closeLessonModal"><form class="space-y-5" @submit.prevent="saveLesson"><BaseInput id="lesson-title" v-model="lessonForm.title" label="Tên bài học" placeholder="Nhập tên bài học" required /><div class="space-y-2"><label class="block text-sm font-semibold">Loại nội dung</label><div class="grid grid-cols-3 gap-2"><button v-for="type in (['TEXT','VIDEO','DOCUMENT'] as LessonType[])" :key="type" type="button" :class="['content-type', lessonForm.lessonType === type ? 'content-type--active' : '']" @click="lessonForm.lessonType = type">{{ lessonTypeLabel(type) }}</button></div></div><div v-if="lessonForm.lessonType === 'TEXT'" class="space-y-2"><label for="lesson-content" class="block text-sm font-semibold">Nội dung bài học</label><textarea id="lesson-content" v-model="lessonForm.content" rows="10" class="builder-textarea" placeholder="Soạn nội dung bài học..." /></div><div v-else class="file-drop"><label for="lesson-file" class="cursor-pointer"><span class="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-purple-100 text-xl text-purple-700 dark:bg-purple-950/50 dark:text-purple-300">↑</span><b class="mt-3 block">{{ lessonFile ? lessonFile.name : lessonForm.lessonType === 'VIDEO' ? 'Chọn video từ máy' : 'Chọn tài liệu từ máy' }}</b><span class="mt-1 block text-xs text-slate-500">{{ lessonForm.lessonType === 'VIDEO' ? 'MP4, WebM' : 'PDF, DOC, DOCX, PPT, PPTX' }} · tối đa 100 MB</span></label><a v-if="currentLessonFileUrl && editingLesson?.lessonType === lessonForm.lessonType" :href="currentLessonFileUrl" target="_blank" class="mt-3 inline-block text-sm font-bold text-purple-600">Xem file hiện tại ↗</a><input :key="fileInputKey" id="lesson-file" type="file" :accept="acceptedLessonFiles" class="sr-only" @change="selectLessonFile" /></div><div class="grid gap-3 rounded-2xl bg-slate-50 p-4 dark:bg-slate-800/60 sm:grid-cols-2"><label class="flex items-start gap-3 text-sm"><input v-model="lessonForm.isPreview" type="checkbox" class="mt-1 accent-purple-600"><span><b class="block">Cho phép học thử</b><span class="text-xs text-slate-500">Khách có thể xem trước bài này.</span></span></label><label class="flex items-start gap-3 text-sm"><input v-model="lessonForm.isRequired" type="checkbox" class="mt-1 accent-purple-600"><span><b class="block">Bài học bắt buộc</b><span class="text-xs text-slate-500">Tính vào tiến độ hoàn thành.</span></span></label></div><p v-if="error" class="rounded-xl bg-red-50 p-3 text-sm text-red-700 dark:bg-red-950/30 dark:text-red-300">{{ error }}</p><div class="flex justify-end gap-3"><BaseButton type="button" variant="secondary" :disabled="lessonSaving" @click="closeLessonModal">Hủy</BaseButton><BaseButton type="submit" :loading="lessonSaving">{{ editingLesson ? 'Lưu bài học' : 'Tạo bài học' }}</BaseButton></div></form></BaseModal>
+    <BaseModal :show="lessonModalOpen" :title="editingLesson ? 'Cập nhật bài học' : 'Tạo bài học'" :description="targetSection ? `Thuộc chương: ${targetSection.title}` : undefined" size="lg" @close="closeLessonModal"><form class="space-y-5" @submit.prevent="saveLesson"><BaseInput id="lesson-title" v-model="lessonForm.title" label="Tên bài học" placeholder="Nhập tên bài học" required /><div class="space-y-2"><label class="block text-sm font-semibold">Loại nội dung</label><div class="grid grid-cols-3 gap-2"><button v-for="type in (['TEXT','VIDEO','DOCUMENT'] as LessonType[])" :key="type" type="button" :class="['content-type', lessonForm.lessonType === type ? 'content-type--active' : '']" @click="lessonForm.lessonType = type">{{ lessonTypeLabel(type) }}</button></div></div><div v-if="lessonForm.lessonType === 'TEXT'" class="space-y-2"><label for="lesson-content" class="block text-sm font-semibold">Nội dung bài học</label><textarea id="lesson-content" v-model="lessonForm.content" rows="10" class="builder-textarea" placeholder="Soạn nội dung bài học..." /></div><div v-else class="file-drop"><label for="lesson-file" class="cursor-pointer"><span class="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-purple-100 text-xl text-purple-700 dark:bg-purple-950/50 dark:text-purple-300">↑</span><b class="mt-3 block">{{ lessonFile ? lessonFile.name : lessonForm.lessonType === 'VIDEO' ? 'Chọn video từ máy' : 'Chọn tài liệu từ máy' }}</b><span class="mt-1 block text-xs text-slate-500">{{ lessonForm.lessonType === 'VIDEO' ? 'MP4, WebM' : 'PDF, DOC, DOCX, PPT, PPTX' }} · tối đa 100 MB</span></label><a v-if="currentLessonFileUrl && editingLesson?.lessonType === lessonForm.lessonType" :href="asset(currentLessonFileUrl)" target="_blank" class="mt-3 inline-block text-sm font-bold text-purple-600">Xem file hiện tại ↗</a><input :key="fileInputKey" id="lesson-file" type="file" :accept="acceptedLessonFiles" class="sr-only" @change="selectLessonFile" /></div><div v-if="lessonForm.lessonType === 'DOCUMENT' && previewSrc" class="mt-4 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden bg-slate-50 dark:bg-slate-900"><div class="flex items-center justify-between px-4 py-2 bg-slate-100 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-800"><span class="text-xs font-semibold text-slate-600 dark:text-slate-400">Xem trước tài liệu</span><button v-if="lessonFile" type="button" class="text-xs font-bold text-red-600 hover:text-red-500" @click="lessonFile = null; fileInputKey += 1">Gỡ file</button></div><div class="h-[40vh] min-h-[300px] w-full overflow-y-auto bg-white"><VueOfficePdf v-if="previewType === 'pdf'" :src="previewSrc" class="h-full w-full" /><VueOfficePptx v-else-if="previewType === 'pptx'" :src="previewSrc" class="h-full w-full" /><VueOfficeDocx v-else-if="previewType === 'docx'" :src="previewSrc" class="h-full w-full" /><div v-else class="p-6 text-center text-sm text-slate-500">Định dạng này không hỗ trợ xem trước.</div></div></div><div class="grid gap-3 rounded-2xl bg-slate-50 p-4 dark:bg-slate-800/60 sm:grid-cols-2"><label class="flex items-start gap-3 text-sm"><input v-model="lessonForm.isPreview" type="checkbox" class="mt-1 accent-purple-600"><span><b class="block">Cho phép học thử</b><span class="text-xs text-slate-500">Khách có thể xem trước bài này.</span></span></label><label class="flex items-start gap-3 text-sm"><input v-model="lessonForm.isRequired" type="checkbox" class="mt-1 accent-purple-600"><span><b class="block">Bài học bắt buộc</b><span class="text-xs text-slate-500">Tính vào tiến độ hoàn thành.</span></span></label></div><p v-if="error" class="rounded-xl bg-red-50 p-3 text-sm text-red-700 dark:bg-red-950/30 dark:text-red-300">{{ error }}</p><div class="flex justify-end gap-3"><BaseButton type="button" variant="secondary" :disabled="lessonSaving" @click="closeLessonModal">Hủy</BaseButton><BaseButton type="submit" :loading="lessonSaving">{{ editingLesson ? 'Lưu bài học' : 'Tạo bài học' }}</BaseButton></div></form></BaseModal>
 
     <BaseModal :show="Boolean(deleteTarget)" title="Xác nhận xóa" :description="deleteTarget?.kind === 'section' ? 'Toàn bộ bài học trong chương cũng sẽ bị xóa.' : 'Thao tác này không thể hoàn tác.'" size="sm" @close="!deleting && (deleteTarget = null)"><p class="text-sm leading-6 text-slate-600 dark:text-slate-300">Bạn có chắc muốn xóa <b>“{{ deleteTarget?.title }}”</b>?</p><div class="mt-6 flex justify-end gap-3"><BaseButton variant="secondary" :disabled="deleting" @click="deleteTarget = null">Hủy</BaseButton><BaseButton variant="danger" :loading="deleting" @click="confirmDelete">Xóa nội dung</BaseButton></div></BaseModal>
   </InstructorLayout>

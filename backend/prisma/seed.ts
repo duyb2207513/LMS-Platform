@@ -77,6 +77,11 @@ async function seedCategories() {
       name: "DevOps",
       slug: "devops",
       description: "Docker, triển khai và vận hành phần mềm"
+    },
+    {
+      name: "Khoa học dữ liệu & AI",
+      slug: "khoa-hoc-du-lieu-ai",
+      description: "Các khóa học về Trí tuệ nhân tạo, Machine Learning và Khoa học dữ liệu"
     }
   ];
 
@@ -101,6 +106,7 @@ async function seedCourses(instructorId: string, categories: Map<string, { id: s
   const mobileCategory = categories.get("lap-trinh-mobile")!;
   const databaseCategory = categories.get("co-so-du-lieu")!;
   const devopsCategory = categories.get("devops")!;
+  const aiCategory = categories.get("khoa-hoc-du-lieu-ai")!;
 
   const courses = [
     {
@@ -158,6 +164,34 @@ async function seedCourses(instructorId: string, categories: Map<string, { id: s
       learningOutcomes: "Viết Dockerfile; sử dụng Docker Compose; quản lý container",
       status: "PUBLISHED" as const,
       publishedAt: new Date("2026-08-04T08:00:00.000Z")
+    },
+    {
+      slug: "decision-tree-sieu-de-hieu",
+      title: "Mô hình Cây Quyết Định (Decision Tree) siêu dễ hiểu",
+      description: "Học cách máy tính ra quyết định thông qua ví dụ thực tế về việc 'Hôm nay có nên đi chơi hay không?' mà không cần bất kỳ công thức toán phức tạp nào.",
+      categoryId: aiCategory.id,
+      level: "BEGINNER" as const,
+      price: 0,
+      isFree: true,
+      language: "Vietnamese",
+      requirements: "Không cần kiến thức lập trình trước đó",
+      learningOutcomes: "Hiểu mô hình Cây quyết định; biết vẽ và giải thích cây; hiểu khái niệm cơ bản về AI/Machine Learning",
+      status: "PUBLISHED" as const,
+      publishedAt: new Date("2026-08-05T08:00:00.000Z")
+    },
+    {
+      slug: "nhap-mon-mang-no-ron-nhan-tao",
+      title: "Nhập môn Mạng Nơ-ron Nhân tạo (Neural Network)",
+      description: "Khóa học nhập môn giúp bạn hiểu nguyên lý hoạt động của Mạng Nơ-ron Nhân tạo (ANN) - nền tảng của Deep Learning và Trí tuệ Nhân tạo hiện đại.",
+      categoryId: aiCategory.id,
+      level: "BEGINNER" as const,
+      price: 0,
+      isFree: true,
+      language: "Vietnamese",
+      requirements: "Kiến thức toán học cơ bản",
+      learningOutcomes: "Hiểu cấu trúc của một Neuron nhân tạo; nắm vững cơ chế lan truyền xuôi và lan truyền ngược; hiểu cách mạng học từ dữ liệu",
+      status: "PUBLISHED" as const,
+      publishedAt: new Date("2026-08-06T08:00:00.000Z")
     }
   ];
 
@@ -306,6 +340,50 @@ async function seedAdditionalLearningContent(studentId: string) {
         { id: "22000000-0000-4000-8000-000000000003", title: "Tài liệu thiết kế database", lessonType: "DOCUMENT" as const, documentUrl: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf", position: 3 }
       ],
       completedLessons: 1,
+      status: "ACTIVE" as const
+    },
+    {
+      slug: "decision-tree-sieu-de-hieu",
+      section: { id: "14000000-0000-4000-8000-000000000001", title: "Cơ bản về Cây quyết định" },
+      lessons: [
+        {
+          id: "24000000-0000-4000-8000-000000000001",
+          title: "Giới thiệu giải thuật Cây Quyết Định (Decision Tree)",
+          lessonType: "TEXT" as const,
+          content: "Cây Quyết Định (Decision Tree) là một thuật toán học máy có giám sát (Supervised Learning) phổ biến nhất hiện nay. Nó có thể dùng cho cả bài toán phân lớp (Classification) lẫn bài toán hồi quy (Regression).\n\nMô hình hoạt động bằng cách phân chia dữ liệu thành các nhóm nhỏ hơn dựa trên các đặc trưng (features) đầu vào.\n\nCÁC GIẢI THUẬT XÂY DỰNG CÂY PHỔ BIẾN:\n1. ID3 (Iterative Dichotomiser 3): Sử dụng Entropy và Information Gain (độ tăng thông tin) để chọn các đặc trưng phân chia.\n2. C4.5: Bản nâng cấp của ID3, hỗ trợ dữ liệu liên tục và xử lý các giá trị bị thiếu.\n3. CART (Classification and Regression Trees): Sử dụng chỉ số Gini Impurity (độ vẩn đục Gini) để phân chia dữ liệu.\n\nNGUYÊN LÝ CỐT LÕI:\nThuật toán bắt đầu ở nút gốc (Root Node) chứa toàn bộ dữ liệu, sau đó tìm câu hỏi phân chia tốt nhất dựa trên một trong các tiêu chí đo lường (như Entropy hay Gini). Quá trình này lặp lại cho các nút con (Internal Nodes) cho đến khi đạt được các nút lá (Leaf Nodes) là kết quả phân lớp cuối cùng, không thể phân chia thêm.",
+          position: 1
+        },
+        {
+          id: "24000000-0000-4000-8000-000000000002",
+          title: "Bài toán cụ thể: Dự đoán khách hàng mua laptop",
+          lessonType: "TEXT" as const,
+          content: "Để hiểu rõ hơn về giải thuật, hãy cùng xem xét một bài toán thực tế: Dự đoán xem một người có mua máy tính xách tay (Laptop) hay không dựa trên 3 thông tin:\n- Độ tuổi (Trẻ / Trung niên / Già)\n- Thu nhập (Cao / Trung bình / Thấp)\n- Là học sinh/sinh viên? (Có / Không)\n\nDưới đây là bảng dữ liệu lịch sử gồm 8 khách hàng:\n\n┌────┬───────────┬───────────┬───────────┬─────────────┐\n│ ID │  Độ tuổi  │ Thu nhập  │ Học sinh? │ Mua Laptop? │\n├────┼───────────┼───────────┼───────────┼─────────────┤\n│ 1  │ Trẻ       │ Cao       │ Không     │ KHÔNG       │\n│ 2  │ Trẻ       │ Cao       │ Có        │ CÓ          │\n│ 3  │ Trung niên│ Cao       │ Không     │ CÓ          │\n│ 4  │ Già       │ Trung bình│ Không     │ CÓ          │\n│ 5  │ Già       │ Thấp      │ Có        │ KHÔNG       │\n│ 6  │ Trẻ       │ Trung bình│ Không     │ KHÔNG       │\n│ 7  │ Trung niên│ Thấp      │ Có        │ CÓ          │\n│ 8  │ Già       │ Trung bình│ Có        │ CÓ          │\n└────┴───────────┴───────────┴───────────┴─────────────┘\n\nMục tiêu của chúng ta là xây dựng một Cây Quyết Định từ bảng dữ liệu này để tự động dự đoán cho một khách hàng mới.",
+          position: 2
+        },
+        {
+          id: "24000000-0000-4000-8000-000000000003",
+          title: "Cách tính Entropy và xây dựng cây quyết định",
+          lessonType: "TEXT" as const,
+          content: "Bây giờ chúng ta sẽ cùng tính toán để xem máy tính chọn đặc trưng nào làm Nút gốc (Root Node) bằng giải thuật ID3:\n\nBƯỚC 1: TÍNH ENTROPY CỦA TOÀN BỘ DỮ LIỆU BAN ĐẦU\n- Tổng số mẫu: 8 (5 mẫu CÓ mua, 3 mẫu KHÔNG mua).\n- Công thức Entropy: H(S) = - (p_yes * log2(p_yes) + p_no * log2(p_no))\n- H(S) = - (5/8 * log2(5/8) + 3/8 * log2(3/8)) ≈ 0.954 (Độ hỗn loạn cao vì tỷ lệ mua/không mua khá cân bằng).\n\nBƯỚC 2: TÍNH ENTROPY SAU KHI PHÂN CHIA THEO THUỘC TÍNH\nHãy thử phân chia dữ liệu theo đặc trưng Độ tuổi:\n1. Nhóm Trẻ (3 mẫu: ID 1, 2, 6): có 1 người mua (CÓ) và 2 người không mua (KHÔNG).\n   - Entropy(Trẻ) = - (1/3 * log2(1/3) + 2/3 * log2(2/3)) ≈ 0.918\n2. Nhóm Trung niên (2 mẫu: ID 3, 7): cả 2 đều mua (CÓ).\n   - Entropy(Trung niên) = 0 (Độ tinh khiết tuyệt đối, phân lớp hoàn toàn).\n3. Nhóm Già (3 mẫu: ID 4, 5, 8): có 2 người mua (CÓ) và 1 người không mua (KHÔNG).\n   - Entropy(Già) = - (2/3 * log2(2/3) + 1/3 * log2(1/3)) ≈ 0.918\n\nEntropy trung bình khi chia theo Độ tuổi:\n- H(S, Độ tuổi) = (3/8 * 0.918) + (2/8 * 0) + (3/8 * 0.918) ≈ 0.688\n\nBƯỚC 3: TÍNH ĐỘ TĂNG THÔNG TIN (INFORMATION GAIN - IG)\n- IG(Độ tuổi) = H(S) - H(S, Độ tuổi) = 0.954 - 0.688 = 0.266\n\nThực hiện tương tự cho Thu nhập và Học sinh?, ta được:\n- IG(Học sinh?) ≈ 0.311 (Lớn nhất!)\n- IG(Thu nhập) ≈ 0.048\n\nKẾT LUẬN:\nVì Học sinh? có Information Gain lớn nhất (0.311), thuật toán ID3 sẽ chọn đặc trưng này làm Nút gốc để chia nhánh đầu tiên!",
+          position: 3
+        }
+      ],
+      completedLessons: 1,
+      status: "ACTIVE" as const
+    },
+    {
+      slug: "nhap-mon-mang-no-ron-nhan-tao",
+      section: { id: "2f0f5ef2-33ef-4352-bc85-87be958085b7", title: "Chương 1: Giới thiệu về các giải thuật máy học" },
+      lessons: [
+        {
+          id: "1fb4a708-78db-4e1d-bbc2-4c6f024246d6",
+          title: "Mạng nơ-ron nhân tạo",
+          lessonType: "DOCUMENT" as const,
+          documentUrl: "http://localhost:3000/uploads/lesson-files/5996132d-d94e-4d3a-91d2-5b890269644e.pdf",
+          position: 1
+        }
+      ],
+      completedLessons: 0,
       status: "ACTIVE" as const
     }
   ];
