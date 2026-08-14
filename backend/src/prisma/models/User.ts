@@ -313,6 +313,8 @@ export type UserWhereInput = {
   notificationPreference?: Prisma.XOR<Prisma.NotificationPreferenceNullableScalarRelationFilter, Prisma.NotificationPreferenceWhereInput> | null
   emailLogs?: Prisma.EmailLogListRelationFilter
   courseAnnouncements?: Prisma.CourseAnnouncementListRelationFilter
+  learningEvents?: Prisma.LearningEventListRelationFilter
+  videoWatchEvents?: Prisma.VideoWatchEventListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -348,6 +350,8 @@ export type UserOrderByWithRelationInput = {
   notificationPreference?: Prisma.NotificationPreferenceOrderByWithRelationInput
   emailLogs?: Prisma.EmailLogOrderByRelationAggregateInput
   courseAnnouncements?: Prisma.CourseAnnouncementOrderByRelationAggregateInput
+  learningEvents?: Prisma.LearningEventOrderByRelationAggregateInput
+  videoWatchEvents?: Prisma.VideoWatchEventOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -386,6 +390,8 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   notificationPreference?: Prisma.XOR<Prisma.NotificationPreferenceNullableScalarRelationFilter, Prisma.NotificationPreferenceWhereInput> | null
   emailLogs?: Prisma.EmailLogListRelationFilter
   courseAnnouncements?: Prisma.CourseAnnouncementListRelationFilter
+  learningEvents?: Prisma.LearningEventListRelationFilter
+  videoWatchEvents?: Prisma.VideoWatchEventListRelationFilter
 }, "id" | "email" | "googleId" | "githubId">
 
 export type UserOrderByWithAggregationInput = {
@@ -465,6 +471,8 @@ export type UserCreateInput = {
   notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
   emailLogs?: Prisma.EmailLogCreateNestedManyWithoutUserInput
   courseAnnouncements?: Prisma.CourseAnnouncementCreateNestedManyWithoutAuthorInput
+  learningEvents?: Prisma.LearningEventCreateNestedManyWithoutUserInput
+  videoWatchEvents?: Prisma.VideoWatchEventCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -500,6 +508,8 @@ export type UserUncheckedCreateInput = {
   notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
   emailLogs?: Prisma.EmailLogUncheckedCreateNestedManyWithoutUserInput
   courseAnnouncements?: Prisma.CourseAnnouncementUncheckedCreateNestedManyWithoutAuthorInput
+  learningEvents?: Prisma.LearningEventUncheckedCreateNestedManyWithoutUserInput
+  videoWatchEvents?: Prisma.VideoWatchEventUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -535,6 +545,8 @@ export type UserUpdateInput = {
   notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
   emailLogs?: Prisma.EmailLogUpdateManyWithoutUserNestedInput
   courseAnnouncements?: Prisma.CourseAnnouncementUpdateManyWithoutAuthorNestedInput
+  learningEvents?: Prisma.LearningEventUpdateManyWithoutUserNestedInput
+  videoWatchEvents?: Prisma.VideoWatchEventUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -570,6 +582,8 @@ export type UserUncheckedUpdateInput = {
   notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
   emailLogs?: Prisma.EmailLogUncheckedUpdateManyWithoutUserNestedInput
   courseAnnouncements?: Prisma.CourseAnnouncementUncheckedUpdateManyWithoutAuthorNestedInput
+  learningEvents?: Prisma.LearningEventUncheckedUpdateManyWithoutUserNestedInput
+  videoWatchEvents?: Prisma.VideoWatchEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -916,6 +930,34 @@ export type UserUpdateOneRequiredWithoutCourseAnnouncementsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutCourseAnnouncementsInput, Prisma.UserUpdateWithoutCourseAnnouncementsInput>, Prisma.UserUncheckedUpdateWithoutCourseAnnouncementsInput>
 }
 
+export type UserCreateNestedOneWithoutLearningEventsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutLearningEventsInput, Prisma.UserUncheckedCreateWithoutLearningEventsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutLearningEventsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutLearningEventsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutLearningEventsInput, Prisma.UserUncheckedCreateWithoutLearningEventsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutLearningEventsInput
+  upsert?: Prisma.UserUpsertWithoutLearningEventsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutLearningEventsInput, Prisma.UserUpdateWithoutLearningEventsInput>, Prisma.UserUncheckedUpdateWithoutLearningEventsInput>
+}
+
+export type UserCreateNestedOneWithoutVideoWatchEventsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutVideoWatchEventsInput, Prisma.UserUncheckedCreateWithoutVideoWatchEventsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutVideoWatchEventsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutVideoWatchEventsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutVideoWatchEventsInput, Prisma.UserUncheckedCreateWithoutVideoWatchEventsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutVideoWatchEventsInput
+  upsert?: Prisma.UserUpsertWithoutVideoWatchEventsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutVideoWatchEventsInput, Prisma.UserUpdateWithoutVideoWatchEventsInput>, Prisma.UserUncheckedUpdateWithoutVideoWatchEventsInput>
+}
+
 export type UserCreateNestedOneWithoutReviewsInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutReviewsInput, Prisma.UserUncheckedCreateWithoutReviewsInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutReviewsInput
@@ -1004,6 +1046,8 @@ export type UserCreateWithoutAuthSessionsInput = {
   notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
   emailLogs?: Prisma.EmailLogCreateNestedManyWithoutUserInput
   courseAnnouncements?: Prisma.CourseAnnouncementCreateNestedManyWithoutAuthorInput
+  learningEvents?: Prisma.LearningEventCreateNestedManyWithoutUserInput
+  videoWatchEvents?: Prisma.VideoWatchEventCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAuthSessionsInput = {
@@ -1038,6 +1082,8 @@ export type UserUncheckedCreateWithoutAuthSessionsInput = {
   notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
   emailLogs?: Prisma.EmailLogUncheckedCreateNestedManyWithoutUserInput
   courseAnnouncements?: Prisma.CourseAnnouncementUncheckedCreateNestedManyWithoutAuthorInput
+  learningEvents?: Prisma.LearningEventUncheckedCreateNestedManyWithoutUserInput
+  videoWatchEvents?: Prisma.VideoWatchEventUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAuthSessionsInput = {
@@ -1088,6 +1134,8 @@ export type UserUpdateWithoutAuthSessionsInput = {
   notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
   emailLogs?: Prisma.EmailLogUpdateManyWithoutUserNestedInput
   courseAnnouncements?: Prisma.CourseAnnouncementUpdateManyWithoutAuthorNestedInput
+  learningEvents?: Prisma.LearningEventUpdateManyWithoutUserNestedInput
+  videoWatchEvents?: Prisma.VideoWatchEventUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAuthSessionsInput = {
@@ -1122,6 +1170,8 @@ export type UserUncheckedUpdateWithoutAuthSessionsInput = {
   notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
   emailLogs?: Prisma.EmailLogUncheckedUpdateManyWithoutUserNestedInput
   courseAnnouncements?: Prisma.CourseAnnouncementUncheckedUpdateManyWithoutAuthorNestedInput
+  learningEvents?: Prisma.LearningEventUncheckedUpdateManyWithoutUserNestedInput
+  videoWatchEvents?: Prisma.VideoWatchEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutAuthTokensInput = {
@@ -1156,6 +1206,8 @@ export type UserCreateWithoutAuthTokensInput = {
   notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
   emailLogs?: Prisma.EmailLogCreateNestedManyWithoutUserInput
   courseAnnouncements?: Prisma.CourseAnnouncementCreateNestedManyWithoutAuthorInput
+  learningEvents?: Prisma.LearningEventCreateNestedManyWithoutUserInput
+  videoWatchEvents?: Prisma.VideoWatchEventCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAuthTokensInput = {
@@ -1190,6 +1242,8 @@ export type UserUncheckedCreateWithoutAuthTokensInput = {
   notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
   emailLogs?: Prisma.EmailLogUncheckedCreateNestedManyWithoutUserInput
   courseAnnouncements?: Prisma.CourseAnnouncementUncheckedCreateNestedManyWithoutAuthorInput
+  learningEvents?: Prisma.LearningEventUncheckedCreateNestedManyWithoutUserInput
+  videoWatchEvents?: Prisma.VideoWatchEventUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAuthTokensInput = {
@@ -1240,6 +1294,8 @@ export type UserUpdateWithoutAuthTokensInput = {
   notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
   emailLogs?: Prisma.EmailLogUpdateManyWithoutUserNestedInput
   courseAnnouncements?: Prisma.CourseAnnouncementUpdateManyWithoutAuthorNestedInput
+  learningEvents?: Prisma.LearningEventUpdateManyWithoutUserNestedInput
+  videoWatchEvents?: Prisma.VideoWatchEventUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAuthTokensInput = {
@@ -1274,6 +1330,8 @@ export type UserUncheckedUpdateWithoutAuthTokensInput = {
   notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
   emailLogs?: Prisma.EmailLogUncheckedUpdateManyWithoutUserNestedInput
   courseAnnouncements?: Prisma.CourseAnnouncementUncheckedUpdateManyWithoutAuthorNestedInput
+  learningEvents?: Prisma.LearningEventUncheckedUpdateManyWithoutUserNestedInput
+  videoWatchEvents?: Prisma.VideoWatchEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutAuditLogsInput = {
@@ -1308,6 +1366,8 @@ export type UserCreateWithoutAuditLogsInput = {
   notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
   emailLogs?: Prisma.EmailLogCreateNestedManyWithoutUserInput
   courseAnnouncements?: Prisma.CourseAnnouncementCreateNestedManyWithoutAuthorInput
+  learningEvents?: Prisma.LearningEventCreateNestedManyWithoutUserInput
+  videoWatchEvents?: Prisma.VideoWatchEventCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAuditLogsInput = {
@@ -1342,6 +1402,8 @@ export type UserUncheckedCreateWithoutAuditLogsInput = {
   notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
   emailLogs?: Prisma.EmailLogUncheckedCreateNestedManyWithoutUserInput
   courseAnnouncements?: Prisma.CourseAnnouncementUncheckedCreateNestedManyWithoutAuthorInput
+  learningEvents?: Prisma.LearningEventUncheckedCreateNestedManyWithoutUserInput
+  videoWatchEvents?: Prisma.VideoWatchEventUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAuditLogsInput = {
@@ -1392,6 +1454,8 @@ export type UserUpdateWithoutAuditLogsInput = {
   notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
   emailLogs?: Prisma.EmailLogUpdateManyWithoutUserNestedInput
   courseAnnouncements?: Prisma.CourseAnnouncementUpdateManyWithoutAuthorNestedInput
+  learningEvents?: Prisma.LearningEventUpdateManyWithoutUserNestedInput
+  videoWatchEvents?: Prisma.VideoWatchEventUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAuditLogsInput = {
@@ -1426,6 +1490,8 @@ export type UserUncheckedUpdateWithoutAuditLogsInput = {
   notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
   emailLogs?: Prisma.EmailLogUncheckedUpdateManyWithoutUserNestedInput
   courseAnnouncements?: Prisma.CourseAnnouncementUncheckedUpdateManyWithoutAuthorNestedInput
+  learningEvents?: Prisma.LearningEventUncheckedUpdateManyWithoutUserNestedInput
+  videoWatchEvents?: Prisma.VideoWatchEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutCoursesInput = {
@@ -1460,6 +1526,8 @@ export type UserCreateWithoutCoursesInput = {
   notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
   emailLogs?: Prisma.EmailLogCreateNestedManyWithoutUserInput
   courseAnnouncements?: Prisma.CourseAnnouncementCreateNestedManyWithoutAuthorInput
+  learningEvents?: Prisma.LearningEventCreateNestedManyWithoutUserInput
+  videoWatchEvents?: Prisma.VideoWatchEventCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutCoursesInput = {
@@ -1494,6 +1562,8 @@ export type UserUncheckedCreateWithoutCoursesInput = {
   notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
   emailLogs?: Prisma.EmailLogUncheckedCreateNestedManyWithoutUserInput
   courseAnnouncements?: Prisma.CourseAnnouncementUncheckedCreateNestedManyWithoutAuthorInput
+  learningEvents?: Prisma.LearningEventUncheckedCreateNestedManyWithoutUserInput
+  videoWatchEvents?: Prisma.VideoWatchEventUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutCoursesInput = {
@@ -1544,6 +1614,8 @@ export type UserUpdateWithoutCoursesInput = {
   notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
   emailLogs?: Prisma.EmailLogUpdateManyWithoutUserNestedInput
   courseAnnouncements?: Prisma.CourseAnnouncementUpdateManyWithoutAuthorNestedInput
+  learningEvents?: Prisma.LearningEventUpdateManyWithoutUserNestedInput
+  videoWatchEvents?: Prisma.VideoWatchEventUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCoursesInput = {
@@ -1578,6 +1650,8 @@ export type UserUncheckedUpdateWithoutCoursesInput = {
   notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
   emailLogs?: Prisma.EmailLogUncheckedUpdateManyWithoutUserNestedInput
   courseAnnouncements?: Prisma.CourseAnnouncementUncheckedUpdateManyWithoutAuthorNestedInput
+  learningEvents?: Prisma.LearningEventUncheckedUpdateManyWithoutUserNestedInput
+  videoWatchEvents?: Prisma.VideoWatchEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutEnrollmentsInput = {
@@ -1612,6 +1686,8 @@ export type UserCreateWithoutEnrollmentsInput = {
   notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
   emailLogs?: Prisma.EmailLogCreateNestedManyWithoutUserInput
   courseAnnouncements?: Prisma.CourseAnnouncementCreateNestedManyWithoutAuthorInput
+  learningEvents?: Prisma.LearningEventCreateNestedManyWithoutUserInput
+  videoWatchEvents?: Prisma.VideoWatchEventCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutEnrollmentsInput = {
@@ -1646,6 +1722,8 @@ export type UserUncheckedCreateWithoutEnrollmentsInput = {
   notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
   emailLogs?: Prisma.EmailLogUncheckedCreateNestedManyWithoutUserInput
   courseAnnouncements?: Prisma.CourseAnnouncementUncheckedCreateNestedManyWithoutAuthorInput
+  learningEvents?: Prisma.LearningEventUncheckedCreateNestedManyWithoutUserInput
+  videoWatchEvents?: Prisma.VideoWatchEventUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutEnrollmentsInput = {
@@ -1696,6 +1774,8 @@ export type UserUpdateWithoutEnrollmentsInput = {
   notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
   emailLogs?: Prisma.EmailLogUpdateManyWithoutUserNestedInput
   courseAnnouncements?: Prisma.CourseAnnouncementUpdateManyWithoutAuthorNestedInput
+  learningEvents?: Prisma.LearningEventUpdateManyWithoutUserNestedInput
+  videoWatchEvents?: Prisma.VideoWatchEventUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutEnrollmentsInput = {
@@ -1730,6 +1810,8 @@ export type UserUncheckedUpdateWithoutEnrollmentsInput = {
   notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
   emailLogs?: Prisma.EmailLogUncheckedUpdateManyWithoutUserNestedInput
   courseAnnouncements?: Prisma.CourseAnnouncementUncheckedUpdateManyWithoutAuthorNestedInput
+  learningEvents?: Prisma.LearningEventUncheckedUpdateManyWithoutUserNestedInput
+  videoWatchEvents?: Prisma.VideoWatchEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutLessonProgressInput = {
@@ -1764,6 +1846,8 @@ export type UserCreateWithoutLessonProgressInput = {
   notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
   emailLogs?: Prisma.EmailLogCreateNestedManyWithoutUserInput
   courseAnnouncements?: Prisma.CourseAnnouncementCreateNestedManyWithoutAuthorInput
+  learningEvents?: Prisma.LearningEventCreateNestedManyWithoutUserInput
+  videoWatchEvents?: Prisma.VideoWatchEventCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutLessonProgressInput = {
@@ -1798,6 +1882,8 @@ export type UserUncheckedCreateWithoutLessonProgressInput = {
   notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
   emailLogs?: Prisma.EmailLogUncheckedCreateNestedManyWithoutUserInput
   courseAnnouncements?: Prisma.CourseAnnouncementUncheckedCreateNestedManyWithoutAuthorInput
+  learningEvents?: Prisma.LearningEventUncheckedCreateNestedManyWithoutUserInput
+  videoWatchEvents?: Prisma.VideoWatchEventUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutLessonProgressInput = {
@@ -1848,6 +1934,8 @@ export type UserUpdateWithoutLessonProgressInput = {
   notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
   emailLogs?: Prisma.EmailLogUpdateManyWithoutUserNestedInput
   courseAnnouncements?: Prisma.CourseAnnouncementUpdateManyWithoutAuthorNestedInput
+  learningEvents?: Prisma.LearningEventUpdateManyWithoutUserNestedInput
+  videoWatchEvents?: Prisma.VideoWatchEventUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutLessonProgressInput = {
@@ -1882,6 +1970,8 @@ export type UserUncheckedUpdateWithoutLessonProgressInput = {
   notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
   emailLogs?: Prisma.EmailLogUncheckedUpdateManyWithoutUserNestedInput
   courseAnnouncements?: Prisma.CourseAnnouncementUncheckedUpdateManyWithoutAuthorNestedInput
+  learningEvents?: Prisma.LearningEventUncheckedUpdateManyWithoutUserNestedInput
+  videoWatchEvents?: Prisma.VideoWatchEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutQuizAttemptsInput = {
@@ -1916,6 +2006,8 @@ export type UserCreateWithoutQuizAttemptsInput = {
   notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
   emailLogs?: Prisma.EmailLogCreateNestedManyWithoutUserInput
   courseAnnouncements?: Prisma.CourseAnnouncementCreateNestedManyWithoutAuthorInput
+  learningEvents?: Prisma.LearningEventCreateNestedManyWithoutUserInput
+  videoWatchEvents?: Prisma.VideoWatchEventCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutQuizAttemptsInput = {
@@ -1950,6 +2042,8 @@ export type UserUncheckedCreateWithoutQuizAttemptsInput = {
   notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
   emailLogs?: Prisma.EmailLogUncheckedCreateNestedManyWithoutUserInput
   courseAnnouncements?: Prisma.CourseAnnouncementUncheckedCreateNestedManyWithoutAuthorInput
+  learningEvents?: Prisma.LearningEventUncheckedCreateNestedManyWithoutUserInput
+  videoWatchEvents?: Prisma.VideoWatchEventUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutQuizAttemptsInput = {
@@ -2000,6 +2094,8 @@ export type UserUpdateWithoutQuizAttemptsInput = {
   notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
   emailLogs?: Prisma.EmailLogUpdateManyWithoutUserNestedInput
   courseAnnouncements?: Prisma.CourseAnnouncementUpdateManyWithoutAuthorNestedInput
+  learningEvents?: Prisma.LearningEventUpdateManyWithoutUserNestedInput
+  videoWatchEvents?: Prisma.VideoWatchEventUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutQuizAttemptsInput = {
@@ -2034,6 +2130,8 @@ export type UserUncheckedUpdateWithoutQuizAttemptsInput = {
   notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
   emailLogs?: Prisma.EmailLogUncheckedUpdateManyWithoutUserNestedInput
   courseAnnouncements?: Prisma.CourseAnnouncementUncheckedUpdateManyWithoutAuthorNestedInput
+  learningEvents?: Prisma.LearningEventUncheckedUpdateManyWithoutUserNestedInput
+  videoWatchEvents?: Prisma.VideoWatchEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutAssignmentSubmissionsInput = {
@@ -2068,6 +2166,8 @@ export type UserCreateWithoutAssignmentSubmissionsInput = {
   notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
   emailLogs?: Prisma.EmailLogCreateNestedManyWithoutUserInput
   courseAnnouncements?: Prisma.CourseAnnouncementCreateNestedManyWithoutAuthorInput
+  learningEvents?: Prisma.LearningEventCreateNestedManyWithoutUserInput
+  videoWatchEvents?: Prisma.VideoWatchEventCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAssignmentSubmissionsInput = {
@@ -2102,6 +2202,8 @@ export type UserUncheckedCreateWithoutAssignmentSubmissionsInput = {
   notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
   emailLogs?: Prisma.EmailLogUncheckedCreateNestedManyWithoutUserInput
   courseAnnouncements?: Prisma.CourseAnnouncementUncheckedCreateNestedManyWithoutAuthorInput
+  learningEvents?: Prisma.LearningEventUncheckedCreateNestedManyWithoutUserInput
+  videoWatchEvents?: Prisma.VideoWatchEventUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAssignmentSubmissionsInput = {
@@ -2152,6 +2254,8 @@ export type UserUpdateWithoutAssignmentSubmissionsInput = {
   notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
   emailLogs?: Prisma.EmailLogUpdateManyWithoutUserNestedInput
   courseAnnouncements?: Prisma.CourseAnnouncementUpdateManyWithoutAuthorNestedInput
+  learningEvents?: Prisma.LearningEventUpdateManyWithoutUserNestedInput
+  videoWatchEvents?: Prisma.VideoWatchEventUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAssignmentSubmissionsInput = {
@@ -2186,6 +2290,8 @@ export type UserUncheckedUpdateWithoutAssignmentSubmissionsInput = {
   notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
   emailLogs?: Prisma.EmailLogUncheckedUpdateManyWithoutUserNestedInput
   courseAnnouncements?: Prisma.CourseAnnouncementUncheckedUpdateManyWithoutAuthorNestedInput
+  learningEvents?: Prisma.LearningEventUncheckedUpdateManyWithoutUserNestedInput
+  videoWatchEvents?: Prisma.VideoWatchEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutSubmissionFeedbackInput = {
@@ -2220,6 +2326,8 @@ export type UserCreateWithoutSubmissionFeedbackInput = {
   notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
   emailLogs?: Prisma.EmailLogCreateNestedManyWithoutUserInput
   courseAnnouncements?: Prisma.CourseAnnouncementCreateNestedManyWithoutAuthorInput
+  learningEvents?: Prisma.LearningEventCreateNestedManyWithoutUserInput
+  videoWatchEvents?: Prisma.VideoWatchEventCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSubmissionFeedbackInput = {
@@ -2254,6 +2362,8 @@ export type UserUncheckedCreateWithoutSubmissionFeedbackInput = {
   notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
   emailLogs?: Prisma.EmailLogUncheckedCreateNestedManyWithoutUserInput
   courseAnnouncements?: Prisma.CourseAnnouncementUncheckedCreateNestedManyWithoutAuthorInput
+  learningEvents?: Prisma.LearningEventUncheckedCreateNestedManyWithoutUserInput
+  videoWatchEvents?: Prisma.VideoWatchEventUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSubmissionFeedbackInput = {
@@ -2304,6 +2414,8 @@ export type UserUpdateWithoutSubmissionFeedbackInput = {
   notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
   emailLogs?: Prisma.EmailLogUpdateManyWithoutUserNestedInput
   courseAnnouncements?: Prisma.CourseAnnouncementUpdateManyWithoutAuthorNestedInput
+  learningEvents?: Prisma.LearningEventUpdateManyWithoutUserNestedInput
+  videoWatchEvents?: Prisma.VideoWatchEventUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSubmissionFeedbackInput = {
@@ -2338,6 +2450,8 @@ export type UserUncheckedUpdateWithoutSubmissionFeedbackInput = {
   notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
   emailLogs?: Prisma.EmailLogUncheckedUpdateManyWithoutUserNestedInput
   courseAnnouncements?: Prisma.CourseAnnouncementUncheckedUpdateManyWithoutAuthorNestedInput
+  learningEvents?: Prisma.LearningEventUncheckedUpdateManyWithoutUserNestedInput
+  videoWatchEvents?: Prisma.VideoWatchEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutNotificationsInput = {
@@ -2372,6 +2486,8 @@ export type UserCreateWithoutNotificationsInput = {
   notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
   emailLogs?: Prisma.EmailLogCreateNestedManyWithoutUserInput
   courseAnnouncements?: Prisma.CourseAnnouncementCreateNestedManyWithoutAuthorInput
+  learningEvents?: Prisma.LearningEventCreateNestedManyWithoutUserInput
+  videoWatchEvents?: Prisma.VideoWatchEventCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutNotificationsInput = {
@@ -2406,6 +2522,8 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
   notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
   emailLogs?: Prisma.EmailLogUncheckedCreateNestedManyWithoutUserInput
   courseAnnouncements?: Prisma.CourseAnnouncementUncheckedCreateNestedManyWithoutAuthorInput
+  learningEvents?: Prisma.LearningEventUncheckedCreateNestedManyWithoutUserInput
+  videoWatchEvents?: Prisma.VideoWatchEventUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutNotificationsInput = {
@@ -2456,6 +2574,8 @@ export type UserUpdateWithoutNotificationsInput = {
   notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
   emailLogs?: Prisma.EmailLogUpdateManyWithoutUserNestedInput
   courseAnnouncements?: Prisma.CourseAnnouncementUpdateManyWithoutAuthorNestedInput
+  learningEvents?: Prisma.LearningEventUpdateManyWithoutUserNestedInput
+  videoWatchEvents?: Prisma.VideoWatchEventUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutNotificationsInput = {
@@ -2490,6 +2610,8 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
   notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
   emailLogs?: Prisma.EmailLogUncheckedUpdateManyWithoutUserNestedInput
   courseAnnouncements?: Prisma.CourseAnnouncementUncheckedUpdateManyWithoutAuthorNestedInput
+  learningEvents?: Prisma.LearningEventUncheckedUpdateManyWithoutUserNestedInput
+  videoWatchEvents?: Prisma.VideoWatchEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutNotificationPreferenceInput = {
@@ -2524,6 +2646,8 @@ export type UserCreateWithoutNotificationPreferenceInput = {
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   emailLogs?: Prisma.EmailLogCreateNestedManyWithoutUserInput
   courseAnnouncements?: Prisma.CourseAnnouncementCreateNestedManyWithoutAuthorInput
+  learningEvents?: Prisma.LearningEventCreateNestedManyWithoutUserInput
+  videoWatchEvents?: Prisma.VideoWatchEventCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutNotificationPreferenceInput = {
@@ -2558,6 +2682,8 @@ export type UserUncheckedCreateWithoutNotificationPreferenceInput = {
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   emailLogs?: Prisma.EmailLogUncheckedCreateNestedManyWithoutUserInput
   courseAnnouncements?: Prisma.CourseAnnouncementUncheckedCreateNestedManyWithoutAuthorInput
+  learningEvents?: Prisma.LearningEventUncheckedCreateNestedManyWithoutUserInput
+  videoWatchEvents?: Prisma.VideoWatchEventUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutNotificationPreferenceInput = {
@@ -2608,6 +2734,8 @@ export type UserUpdateWithoutNotificationPreferenceInput = {
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   emailLogs?: Prisma.EmailLogUpdateManyWithoutUserNestedInput
   courseAnnouncements?: Prisma.CourseAnnouncementUpdateManyWithoutAuthorNestedInput
+  learningEvents?: Prisma.LearningEventUpdateManyWithoutUserNestedInput
+  videoWatchEvents?: Prisma.VideoWatchEventUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutNotificationPreferenceInput = {
@@ -2642,6 +2770,8 @@ export type UserUncheckedUpdateWithoutNotificationPreferenceInput = {
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   emailLogs?: Prisma.EmailLogUncheckedUpdateManyWithoutUserNestedInput
   courseAnnouncements?: Prisma.CourseAnnouncementUncheckedUpdateManyWithoutAuthorNestedInput
+  learningEvents?: Prisma.LearningEventUncheckedUpdateManyWithoutUserNestedInput
+  videoWatchEvents?: Prisma.VideoWatchEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutEmailLogsInput = {
@@ -2676,6 +2806,8 @@ export type UserCreateWithoutEmailLogsInput = {
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
   courseAnnouncements?: Prisma.CourseAnnouncementCreateNestedManyWithoutAuthorInput
+  learningEvents?: Prisma.LearningEventCreateNestedManyWithoutUserInput
+  videoWatchEvents?: Prisma.VideoWatchEventCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutEmailLogsInput = {
@@ -2710,6 +2842,8 @@ export type UserUncheckedCreateWithoutEmailLogsInput = {
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
   courseAnnouncements?: Prisma.CourseAnnouncementUncheckedCreateNestedManyWithoutAuthorInput
+  learningEvents?: Prisma.LearningEventUncheckedCreateNestedManyWithoutUserInput
+  videoWatchEvents?: Prisma.VideoWatchEventUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutEmailLogsInput = {
@@ -2760,6 +2894,8 @@ export type UserUpdateWithoutEmailLogsInput = {
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
   courseAnnouncements?: Prisma.CourseAnnouncementUpdateManyWithoutAuthorNestedInput
+  learningEvents?: Prisma.LearningEventUpdateManyWithoutUserNestedInput
+  videoWatchEvents?: Prisma.VideoWatchEventUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutEmailLogsInput = {
@@ -2794,6 +2930,8 @@ export type UserUncheckedUpdateWithoutEmailLogsInput = {
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
   courseAnnouncements?: Prisma.CourseAnnouncementUncheckedUpdateManyWithoutAuthorNestedInput
+  learningEvents?: Prisma.LearningEventUncheckedUpdateManyWithoutUserNestedInput
+  videoWatchEvents?: Prisma.VideoWatchEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutCourseAnnouncementsInput = {
@@ -2828,6 +2966,8 @@ export type UserCreateWithoutCourseAnnouncementsInput = {
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
   emailLogs?: Prisma.EmailLogCreateNestedManyWithoutUserInput
+  learningEvents?: Prisma.LearningEventCreateNestedManyWithoutUserInput
+  videoWatchEvents?: Prisma.VideoWatchEventCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutCourseAnnouncementsInput = {
@@ -2862,6 +3002,8 @@ export type UserUncheckedCreateWithoutCourseAnnouncementsInput = {
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
   emailLogs?: Prisma.EmailLogUncheckedCreateNestedManyWithoutUserInput
+  learningEvents?: Prisma.LearningEventUncheckedCreateNestedManyWithoutUserInput
+  videoWatchEvents?: Prisma.VideoWatchEventUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutCourseAnnouncementsInput = {
@@ -2912,6 +3054,8 @@ export type UserUpdateWithoutCourseAnnouncementsInput = {
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
   emailLogs?: Prisma.EmailLogUpdateManyWithoutUserNestedInput
+  learningEvents?: Prisma.LearningEventUpdateManyWithoutUserNestedInput
+  videoWatchEvents?: Prisma.VideoWatchEventUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCourseAnnouncementsInput = {
@@ -2946,6 +3090,328 @@ export type UserUncheckedUpdateWithoutCourseAnnouncementsInput = {
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
   emailLogs?: Prisma.EmailLogUncheckedUpdateManyWithoutUserNestedInput
+  learningEvents?: Prisma.LearningEventUncheckedUpdateManyWithoutUserNestedInput
+  videoWatchEvents?: Prisma.VideoWatchEventUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutLearningEventsInput = {
+  id?: string
+  fullName: string
+  email: string
+  passwordHash?: string | null
+  avatarUrl?: string | null
+  googleId?: string | null
+  githubId?: string | null
+  emailVerifiedAt?: Date | string | null
+  failedLoginAttempts?: number
+  lockedUntil?: Date | string | null
+  lastLoginAt?: Date | string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  courses?: Prisma.CourseCreateNestedManyWithoutInstructorInput
+  enrollments?: Prisma.EnrollmentCreateNestedManyWithoutStudentInput
+  lessonProgress?: Prisma.LessonProgressCreateNestedManyWithoutStudentInput
+  quizAttempts?: Prisma.QuizAttemptCreateNestedManyWithoutStudentInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionCreateNestedManyWithoutStudentInput
+  submissionFeedback?: Prisma.SubmissionFeedbackCreateNestedManyWithoutGraderInput
+  reviews?: Prisma.ReviewCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentCreateNestedManyWithoutUserInput
+  orders?: Prisma.OrderCreateNestedManyWithoutUserInput
+  certificates?: Prisma.CertificateCreateNestedManyWithoutStudentInput
+  authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
+  authTokens?: Prisma.AuthTokenCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
+  emailLogs?: Prisma.EmailLogCreateNestedManyWithoutUserInput
+  courseAnnouncements?: Prisma.CourseAnnouncementCreateNestedManyWithoutAuthorInput
+  videoWatchEvents?: Prisma.VideoWatchEventCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutLearningEventsInput = {
+  id?: string
+  fullName: string
+  email: string
+  passwordHash?: string | null
+  avatarUrl?: string | null
+  googleId?: string | null
+  githubId?: string | null
+  emailVerifiedAt?: Date | string | null
+  failedLoginAttempts?: number
+  lockedUntil?: Date | string | null
+  lastLoginAt?: Date | string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  courses?: Prisma.CourseUncheckedCreateNestedManyWithoutInstructorInput
+  enrollments?: Prisma.EnrollmentUncheckedCreateNestedManyWithoutStudentInput
+  lessonProgress?: Prisma.LessonProgressUncheckedCreateNestedManyWithoutStudentInput
+  quizAttempts?: Prisma.QuizAttemptUncheckedCreateNestedManyWithoutStudentInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionUncheckedCreateNestedManyWithoutStudentInput
+  submissionFeedback?: Prisma.SubmissionFeedbackUncheckedCreateNestedManyWithoutGraderInput
+  reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput
+  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
+  certificates?: Prisma.CertificateUncheckedCreateNestedManyWithoutStudentInput
+  authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
+  authTokens?: Prisma.AuthTokenUncheckedCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
+  emailLogs?: Prisma.EmailLogUncheckedCreateNestedManyWithoutUserInput
+  courseAnnouncements?: Prisma.CourseAnnouncementUncheckedCreateNestedManyWithoutAuthorInput
+  videoWatchEvents?: Prisma.VideoWatchEventUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutLearningEventsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutLearningEventsInput, Prisma.UserUncheckedCreateWithoutLearningEventsInput>
+}
+
+export type UserUpsertWithoutLearningEventsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutLearningEventsInput, Prisma.UserUncheckedUpdateWithoutLearningEventsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutLearningEventsInput, Prisma.UserUncheckedCreateWithoutLearningEventsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutLearningEventsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutLearningEventsInput, Prisma.UserUncheckedUpdateWithoutLearningEventsInput>
+}
+
+export type UserUpdateWithoutLearningEventsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  githubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failedLoginAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  courses?: Prisma.CourseUpdateManyWithoutInstructorNestedInput
+  enrollments?: Prisma.EnrollmentUpdateManyWithoutStudentNestedInput
+  lessonProgress?: Prisma.LessonProgressUpdateManyWithoutStudentNestedInput
+  quizAttempts?: Prisma.QuizAttemptUpdateManyWithoutStudentNestedInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionUpdateManyWithoutStudentNestedInput
+  submissionFeedback?: Prisma.SubmissionFeedbackUpdateManyWithoutGraderNestedInput
+  reviews?: Prisma.ReviewUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutUserNestedInput
+  orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
+  certificates?: Prisma.CertificateUpdateManyWithoutStudentNestedInput
+  authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
+  authTokens?: Prisma.AuthTokenUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
+  emailLogs?: Prisma.EmailLogUpdateManyWithoutUserNestedInput
+  courseAnnouncements?: Prisma.CourseAnnouncementUpdateManyWithoutAuthorNestedInput
+  videoWatchEvents?: Prisma.VideoWatchEventUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutLearningEventsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  githubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failedLoginAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  courses?: Prisma.CourseUncheckedUpdateManyWithoutInstructorNestedInput
+  enrollments?: Prisma.EnrollmentUncheckedUpdateManyWithoutStudentNestedInput
+  lessonProgress?: Prisma.LessonProgressUncheckedUpdateManyWithoutStudentNestedInput
+  quizAttempts?: Prisma.QuizAttemptUncheckedUpdateManyWithoutStudentNestedInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionUncheckedUpdateManyWithoutStudentNestedInput
+  submissionFeedback?: Prisma.SubmissionFeedbackUncheckedUpdateManyWithoutGraderNestedInput
+  reviews?: Prisma.ReviewUncheckedUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput
+  orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
+  certificates?: Prisma.CertificateUncheckedUpdateManyWithoutStudentNestedInput
+  authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
+  authTokens?: Prisma.AuthTokenUncheckedUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
+  emailLogs?: Prisma.EmailLogUncheckedUpdateManyWithoutUserNestedInput
+  courseAnnouncements?: Prisma.CourseAnnouncementUncheckedUpdateManyWithoutAuthorNestedInput
+  videoWatchEvents?: Prisma.VideoWatchEventUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutVideoWatchEventsInput = {
+  id?: string
+  fullName: string
+  email: string
+  passwordHash?: string | null
+  avatarUrl?: string | null
+  googleId?: string | null
+  githubId?: string | null
+  emailVerifiedAt?: Date | string | null
+  failedLoginAttempts?: number
+  lockedUntil?: Date | string | null
+  lastLoginAt?: Date | string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  courses?: Prisma.CourseCreateNestedManyWithoutInstructorInput
+  enrollments?: Prisma.EnrollmentCreateNestedManyWithoutStudentInput
+  lessonProgress?: Prisma.LessonProgressCreateNestedManyWithoutStudentInput
+  quizAttempts?: Prisma.QuizAttemptCreateNestedManyWithoutStudentInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionCreateNestedManyWithoutStudentInput
+  submissionFeedback?: Prisma.SubmissionFeedbackCreateNestedManyWithoutGraderInput
+  reviews?: Prisma.ReviewCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentCreateNestedManyWithoutUserInput
+  orders?: Prisma.OrderCreateNestedManyWithoutUserInput
+  certificates?: Prisma.CertificateCreateNestedManyWithoutStudentInput
+  authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
+  authTokens?: Prisma.AuthTokenCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
+  emailLogs?: Prisma.EmailLogCreateNestedManyWithoutUserInput
+  courseAnnouncements?: Prisma.CourseAnnouncementCreateNestedManyWithoutAuthorInput
+  learningEvents?: Prisma.LearningEventCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutVideoWatchEventsInput = {
+  id?: string
+  fullName: string
+  email: string
+  passwordHash?: string | null
+  avatarUrl?: string | null
+  googleId?: string | null
+  githubId?: string | null
+  emailVerifiedAt?: Date | string | null
+  failedLoginAttempts?: number
+  lockedUntil?: Date | string | null
+  lastLoginAt?: Date | string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  courses?: Prisma.CourseUncheckedCreateNestedManyWithoutInstructorInput
+  enrollments?: Prisma.EnrollmentUncheckedCreateNestedManyWithoutStudentInput
+  lessonProgress?: Prisma.LessonProgressUncheckedCreateNestedManyWithoutStudentInput
+  quizAttempts?: Prisma.QuizAttemptUncheckedCreateNestedManyWithoutStudentInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionUncheckedCreateNestedManyWithoutStudentInput
+  submissionFeedback?: Prisma.SubmissionFeedbackUncheckedCreateNestedManyWithoutGraderInput
+  reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput
+  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
+  certificates?: Prisma.CertificateUncheckedCreateNestedManyWithoutStudentInput
+  authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
+  authTokens?: Prisma.AuthTokenUncheckedCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
+  emailLogs?: Prisma.EmailLogUncheckedCreateNestedManyWithoutUserInput
+  courseAnnouncements?: Prisma.CourseAnnouncementUncheckedCreateNestedManyWithoutAuthorInput
+  learningEvents?: Prisma.LearningEventUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutVideoWatchEventsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutVideoWatchEventsInput, Prisma.UserUncheckedCreateWithoutVideoWatchEventsInput>
+}
+
+export type UserUpsertWithoutVideoWatchEventsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutVideoWatchEventsInput, Prisma.UserUncheckedUpdateWithoutVideoWatchEventsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutVideoWatchEventsInput, Prisma.UserUncheckedCreateWithoutVideoWatchEventsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutVideoWatchEventsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutVideoWatchEventsInput, Prisma.UserUncheckedUpdateWithoutVideoWatchEventsInput>
+}
+
+export type UserUpdateWithoutVideoWatchEventsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  githubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failedLoginAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  courses?: Prisma.CourseUpdateManyWithoutInstructorNestedInput
+  enrollments?: Prisma.EnrollmentUpdateManyWithoutStudentNestedInput
+  lessonProgress?: Prisma.LessonProgressUpdateManyWithoutStudentNestedInput
+  quizAttempts?: Prisma.QuizAttemptUpdateManyWithoutStudentNestedInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionUpdateManyWithoutStudentNestedInput
+  submissionFeedback?: Prisma.SubmissionFeedbackUpdateManyWithoutGraderNestedInput
+  reviews?: Prisma.ReviewUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutUserNestedInput
+  orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
+  certificates?: Prisma.CertificateUpdateManyWithoutStudentNestedInput
+  authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
+  authTokens?: Prisma.AuthTokenUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
+  emailLogs?: Prisma.EmailLogUpdateManyWithoutUserNestedInput
+  courseAnnouncements?: Prisma.CourseAnnouncementUpdateManyWithoutAuthorNestedInput
+  learningEvents?: Prisma.LearningEventUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutVideoWatchEventsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  githubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failedLoginAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  courses?: Prisma.CourseUncheckedUpdateManyWithoutInstructorNestedInput
+  enrollments?: Prisma.EnrollmentUncheckedUpdateManyWithoutStudentNestedInput
+  lessonProgress?: Prisma.LessonProgressUncheckedUpdateManyWithoutStudentNestedInput
+  quizAttempts?: Prisma.QuizAttemptUncheckedUpdateManyWithoutStudentNestedInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionUncheckedUpdateManyWithoutStudentNestedInput
+  submissionFeedback?: Prisma.SubmissionFeedbackUncheckedUpdateManyWithoutGraderNestedInput
+  reviews?: Prisma.ReviewUncheckedUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput
+  orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
+  certificates?: Prisma.CertificateUncheckedUpdateManyWithoutStudentNestedInput
+  authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
+  authTokens?: Prisma.AuthTokenUncheckedUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
+  emailLogs?: Prisma.EmailLogUncheckedUpdateManyWithoutUserNestedInput
+  courseAnnouncements?: Prisma.CourseAnnouncementUncheckedUpdateManyWithoutAuthorNestedInput
+  learningEvents?: Prisma.LearningEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutReviewsInput = {
@@ -2980,6 +3446,8 @@ export type UserCreateWithoutReviewsInput = {
   notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
   emailLogs?: Prisma.EmailLogCreateNestedManyWithoutUserInput
   courseAnnouncements?: Prisma.CourseAnnouncementCreateNestedManyWithoutAuthorInput
+  learningEvents?: Prisma.LearningEventCreateNestedManyWithoutUserInput
+  videoWatchEvents?: Prisma.VideoWatchEventCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutReviewsInput = {
@@ -3014,6 +3482,8 @@ export type UserUncheckedCreateWithoutReviewsInput = {
   notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
   emailLogs?: Prisma.EmailLogUncheckedCreateNestedManyWithoutUserInput
   courseAnnouncements?: Prisma.CourseAnnouncementUncheckedCreateNestedManyWithoutAuthorInput
+  learningEvents?: Prisma.LearningEventUncheckedCreateNestedManyWithoutUserInput
+  videoWatchEvents?: Prisma.VideoWatchEventUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutReviewsInput = {
@@ -3064,6 +3534,8 @@ export type UserUpdateWithoutReviewsInput = {
   notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
   emailLogs?: Prisma.EmailLogUpdateManyWithoutUserNestedInput
   courseAnnouncements?: Prisma.CourseAnnouncementUpdateManyWithoutAuthorNestedInput
+  learningEvents?: Prisma.LearningEventUpdateManyWithoutUserNestedInput
+  videoWatchEvents?: Prisma.VideoWatchEventUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReviewsInput = {
@@ -3098,6 +3570,8 @@ export type UserUncheckedUpdateWithoutReviewsInput = {
   notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
   emailLogs?: Prisma.EmailLogUncheckedUpdateManyWithoutUserNestedInput
   courseAnnouncements?: Prisma.CourseAnnouncementUncheckedUpdateManyWithoutAuthorNestedInput
+  learningEvents?: Prisma.LearningEventUncheckedUpdateManyWithoutUserNestedInput
+  videoWatchEvents?: Prisma.VideoWatchEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutCommentsInput = {
@@ -3132,6 +3606,8 @@ export type UserCreateWithoutCommentsInput = {
   notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
   emailLogs?: Prisma.EmailLogCreateNestedManyWithoutUserInput
   courseAnnouncements?: Prisma.CourseAnnouncementCreateNestedManyWithoutAuthorInput
+  learningEvents?: Prisma.LearningEventCreateNestedManyWithoutUserInput
+  videoWatchEvents?: Prisma.VideoWatchEventCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutCommentsInput = {
@@ -3166,6 +3642,8 @@ export type UserUncheckedCreateWithoutCommentsInput = {
   notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
   emailLogs?: Prisma.EmailLogUncheckedCreateNestedManyWithoutUserInput
   courseAnnouncements?: Prisma.CourseAnnouncementUncheckedCreateNestedManyWithoutAuthorInput
+  learningEvents?: Prisma.LearningEventUncheckedCreateNestedManyWithoutUserInput
+  videoWatchEvents?: Prisma.VideoWatchEventUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutCommentsInput = {
@@ -3216,6 +3694,8 @@ export type UserUpdateWithoutCommentsInput = {
   notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
   emailLogs?: Prisma.EmailLogUpdateManyWithoutUserNestedInput
   courseAnnouncements?: Prisma.CourseAnnouncementUpdateManyWithoutAuthorNestedInput
+  learningEvents?: Prisma.LearningEventUpdateManyWithoutUserNestedInput
+  videoWatchEvents?: Prisma.VideoWatchEventUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCommentsInput = {
@@ -3250,6 +3730,8 @@ export type UserUncheckedUpdateWithoutCommentsInput = {
   notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
   emailLogs?: Prisma.EmailLogUncheckedUpdateManyWithoutUserNestedInput
   courseAnnouncements?: Prisma.CourseAnnouncementUncheckedUpdateManyWithoutAuthorNestedInput
+  learningEvents?: Prisma.LearningEventUncheckedUpdateManyWithoutUserNestedInput
+  videoWatchEvents?: Prisma.VideoWatchEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutOrdersInput = {
@@ -3284,6 +3766,8 @@ export type UserCreateWithoutOrdersInput = {
   notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
   emailLogs?: Prisma.EmailLogCreateNestedManyWithoutUserInput
   courseAnnouncements?: Prisma.CourseAnnouncementCreateNestedManyWithoutAuthorInput
+  learningEvents?: Prisma.LearningEventCreateNestedManyWithoutUserInput
+  videoWatchEvents?: Prisma.VideoWatchEventCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutOrdersInput = {
@@ -3318,6 +3802,8 @@ export type UserUncheckedCreateWithoutOrdersInput = {
   notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
   emailLogs?: Prisma.EmailLogUncheckedCreateNestedManyWithoutUserInput
   courseAnnouncements?: Prisma.CourseAnnouncementUncheckedCreateNestedManyWithoutAuthorInput
+  learningEvents?: Prisma.LearningEventUncheckedCreateNestedManyWithoutUserInput
+  videoWatchEvents?: Prisma.VideoWatchEventUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutOrdersInput = {
@@ -3368,6 +3854,8 @@ export type UserUpdateWithoutOrdersInput = {
   notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
   emailLogs?: Prisma.EmailLogUpdateManyWithoutUserNestedInput
   courseAnnouncements?: Prisma.CourseAnnouncementUpdateManyWithoutAuthorNestedInput
+  learningEvents?: Prisma.LearningEventUpdateManyWithoutUserNestedInput
+  videoWatchEvents?: Prisma.VideoWatchEventUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutOrdersInput = {
@@ -3402,6 +3890,8 @@ export type UserUncheckedUpdateWithoutOrdersInput = {
   notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
   emailLogs?: Prisma.EmailLogUncheckedUpdateManyWithoutUserNestedInput
   courseAnnouncements?: Prisma.CourseAnnouncementUncheckedUpdateManyWithoutAuthorNestedInput
+  learningEvents?: Prisma.LearningEventUncheckedUpdateManyWithoutUserNestedInput
+  videoWatchEvents?: Prisma.VideoWatchEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutCertificatesInput = {
@@ -3436,6 +3926,8 @@ export type UserCreateWithoutCertificatesInput = {
   notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
   emailLogs?: Prisma.EmailLogCreateNestedManyWithoutUserInput
   courseAnnouncements?: Prisma.CourseAnnouncementCreateNestedManyWithoutAuthorInput
+  learningEvents?: Prisma.LearningEventCreateNestedManyWithoutUserInput
+  videoWatchEvents?: Prisma.VideoWatchEventCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutCertificatesInput = {
@@ -3470,6 +3962,8 @@ export type UserUncheckedCreateWithoutCertificatesInput = {
   notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
   emailLogs?: Prisma.EmailLogUncheckedCreateNestedManyWithoutUserInput
   courseAnnouncements?: Prisma.CourseAnnouncementUncheckedCreateNestedManyWithoutAuthorInput
+  learningEvents?: Prisma.LearningEventUncheckedCreateNestedManyWithoutUserInput
+  videoWatchEvents?: Prisma.VideoWatchEventUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutCertificatesInput = {
@@ -3520,6 +4014,8 @@ export type UserUpdateWithoutCertificatesInput = {
   notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
   emailLogs?: Prisma.EmailLogUpdateManyWithoutUserNestedInput
   courseAnnouncements?: Prisma.CourseAnnouncementUpdateManyWithoutAuthorNestedInput
+  learningEvents?: Prisma.LearningEventUpdateManyWithoutUserNestedInput
+  videoWatchEvents?: Prisma.VideoWatchEventUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCertificatesInput = {
@@ -3554,6 +4050,8 @@ export type UserUncheckedUpdateWithoutCertificatesInput = {
   notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
   emailLogs?: Prisma.EmailLogUncheckedUpdateManyWithoutUserNestedInput
   courseAnnouncements?: Prisma.CourseAnnouncementUncheckedUpdateManyWithoutAuthorNestedInput
+  learningEvents?: Prisma.LearningEventUncheckedUpdateManyWithoutUserNestedInput
+  videoWatchEvents?: Prisma.VideoWatchEventUncheckedUpdateManyWithoutUserNestedInput
 }
 
 
@@ -3578,6 +4076,8 @@ export type UserCountOutputType = {
   notifications: number
   emailLogs: number
   courseAnnouncements: number
+  learningEvents: number
+  videoWatchEvents: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -3597,6 +4097,8 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   notifications?: boolean | UserCountOutputTypeCountNotificationsArgs
   emailLogs?: boolean | UserCountOutputTypeCountEmailLogsArgs
   courseAnnouncements?: boolean | UserCountOutputTypeCountCourseAnnouncementsArgs
+  learningEvents?: boolean | UserCountOutputTypeCountLearningEventsArgs
+  videoWatchEvents?: boolean | UserCountOutputTypeCountVideoWatchEventsArgs
 }
 
 /**
@@ -3721,6 +4223,20 @@ export type UserCountOutputTypeCountCourseAnnouncementsArgs<ExtArgs extends runt
   where?: Prisma.CourseAnnouncementWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountLearningEventsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.LearningEventWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountVideoWatchEventsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.VideoWatchEventWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -3755,6 +4271,8 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   notificationPreference?: boolean | Prisma.User$notificationPreferenceArgs<ExtArgs>
   emailLogs?: boolean | Prisma.User$emailLogsArgs<ExtArgs>
   courseAnnouncements?: boolean | Prisma.User$courseAnnouncementsArgs<ExtArgs>
+  learningEvents?: boolean | Prisma.User$learningEventsArgs<ExtArgs>
+  videoWatchEvents?: boolean | Prisma.User$videoWatchEventsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -3831,6 +4349,8 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   notificationPreference?: boolean | Prisma.User$notificationPreferenceArgs<ExtArgs>
   emailLogs?: boolean | Prisma.User$emailLogsArgs<ExtArgs>
   courseAnnouncements?: boolean | Prisma.User$courseAnnouncementsArgs<ExtArgs>
+  learningEvents?: boolean | Prisma.User$learningEventsArgs<ExtArgs>
+  videoWatchEvents?: boolean | Prisma.User$videoWatchEventsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -3856,6 +4376,8 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     notificationPreference: Prisma.$NotificationPreferencePayload<ExtArgs> | null
     emailLogs: Prisma.$EmailLogPayload<ExtArgs>[]
     courseAnnouncements: Prisma.$CourseAnnouncementPayload<ExtArgs>[]
+    learningEvents: Prisma.$LearningEventPayload<ExtArgs>[]
+    videoWatchEvents: Prisma.$VideoWatchEventPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -4284,6 +4806,8 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   notificationPreference<T extends Prisma.User$notificationPreferenceArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$notificationPreferenceArgs<ExtArgs>>): Prisma.Prisma__NotificationPreferenceClient<runtime.Types.Result.GetResult<Prisma.$NotificationPreferencePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   emailLogs<T extends Prisma.User$emailLogsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$emailLogsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EmailLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   courseAnnouncements<T extends Prisma.User$courseAnnouncementsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$courseAnnouncementsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CourseAnnouncementPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  learningEvents<T extends Prisma.User$learningEventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$learningEventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LearningEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  videoWatchEvents<T extends Prisma.User$videoWatchEventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$videoWatchEventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VideoWatchEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -5121,6 +5645,54 @@ export type User$courseAnnouncementsArgs<ExtArgs extends runtime.Types.Extension
   take?: number
   skip?: number
   distinct?: Prisma.CourseAnnouncementScalarFieldEnum | Prisma.CourseAnnouncementScalarFieldEnum[]
+}
+
+/**
+ * User.learningEvents
+ */
+export type User$learningEventsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the LearningEvent
+   */
+  select?: Prisma.LearningEventSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the LearningEvent
+   */
+  omit?: Prisma.LearningEventOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.LearningEventInclude<ExtArgs> | null
+  where?: Prisma.LearningEventWhereInput
+  orderBy?: Prisma.LearningEventOrderByWithRelationInput | Prisma.LearningEventOrderByWithRelationInput[]
+  cursor?: Prisma.LearningEventWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.LearningEventScalarFieldEnum | Prisma.LearningEventScalarFieldEnum[]
+}
+
+/**
+ * User.videoWatchEvents
+ */
+export type User$videoWatchEventsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the VideoWatchEvent
+   */
+  select?: Prisma.VideoWatchEventSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the VideoWatchEvent
+   */
+  omit?: Prisma.VideoWatchEventOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.VideoWatchEventInclude<ExtArgs> | null
+  where?: Prisma.VideoWatchEventWhereInput
+  orderBy?: Prisma.VideoWatchEventOrderByWithRelationInput | Prisma.VideoWatchEventOrderByWithRelationInput[]
+  cursor?: Prisma.VideoWatchEventWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.VideoWatchEventScalarFieldEnum | Prisma.VideoWatchEventScalarFieldEnum[]
 }
 
 /**

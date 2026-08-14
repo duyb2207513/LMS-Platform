@@ -322,6 +322,8 @@ export type CourseWhereInput = {
   assignments?: Prisma.AssignmentListRelationFilter
   gradeRule?: Prisma.XOR<Prisma.CourseGradeRuleNullableScalarRelationFilter, Prisma.CourseGradeRuleWhereInput> | null
   announcements?: Prisma.CourseAnnouncementListRelationFilter
+  learningEvents?: Prisma.LearningEventListRelationFilter
+  videoWatchEvents?: Prisma.VideoWatchEventListRelationFilter
 }
 
 export type CourseOrderByWithRelationInput = {
@@ -352,6 +354,8 @@ export type CourseOrderByWithRelationInput = {
   assignments?: Prisma.AssignmentOrderByRelationAggregateInput
   gradeRule?: Prisma.CourseGradeRuleOrderByWithRelationInput
   announcements?: Prisma.CourseAnnouncementOrderByRelationAggregateInput
+  learningEvents?: Prisma.LearningEventOrderByRelationAggregateInput
+  videoWatchEvents?: Prisma.VideoWatchEventOrderByRelationAggregateInput
 }
 
 export type CourseWhereUniqueInput = Prisma.AtLeast<{
@@ -385,6 +389,8 @@ export type CourseWhereUniqueInput = Prisma.AtLeast<{
   assignments?: Prisma.AssignmentListRelationFilter
   gradeRule?: Prisma.XOR<Prisma.CourseGradeRuleNullableScalarRelationFilter, Prisma.CourseGradeRuleWhereInput> | null
   announcements?: Prisma.CourseAnnouncementListRelationFilter
+  learningEvents?: Prisma.LearningEventListRelationFilter
+  videoWatchEvents?: Prisma.VideoWatchEventListRelationFilter
 }, "id" | "slug">
 
 export type CourseOrderByWithAggregationInput = {
@@ -461,6 +467,8 @@ export type CourseCreateInput = {
   assignments?: Prisma.AssignmentCreateNestedManyWithoutCourseInput
   gradeRule?: Prisma.CourseGradeRuleCreateNestedOneWithoutCourseInput
   announcements?: Prisma.CourseAnnouncementCreateNestedManyWithoutCourseInput
+  learningEvents?: Prisma.LearningEventCreateNestedManyWithoutCourseInput
+  videoWatchEvents?: Prisma.VideoWatchEventCreateNestedManyWithoutCourseInput
 }
 
 export type CourseUncheckedCreateInput = {
@@ -489,6 +497,8 @@ export type CourseUncheckedCreateInput = {
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutCourseInput
   gradeRule?: Prisma.CourseGradeRuleUncheckedCreateNestedOneWithoutCourseInput
   announcements?: Prisma.CourseAnnouncementUncheckedCreateNestedManyWithoutCourseInput
+  learningEvents?: Prisma.LearningEventUncheckedCreateNestedManyWithoutCourseInput
+  videoWatchEvents?: Prisma.VideoWatchEventUncheckedCreateNestedManyWithoutCourseInput
 }
 
 export type CourseUpdateInput = {
@@ -517,6 +527,8 @@ export type CourseUpdateInput = {
   assignments?: Prisma.AssignmentUpdateManyWithoutCourseNestedInput
   gradeRule?: Prisma.CourseGradeRuleUpdateOneWithoutCourseNestedInput
   announcements?: Prisma.CourseAnnouncementUpdateManyWithoutCourseNestedInput
+  learningEvents?: Prisma.LearningEventUpdateManyWithoutCourseNestedInput
+  videoWatchEvents?: Prisma.VideoWatchEventUpdateManyWithoutCourseNestedInput
 }
 
 export type CourseUncheckedUpdateInput = {
@@ -545,6 +557,8 @@ export type CourseUncheckedUpdateInput = {
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutCourseNestedInput
   gradeRule?: Prisma.CourseGradeRuleUncheckedUpdateOneWithoutCourseNestedInput
   announcements?: Prisma.CourseAnnouncementUncheckedUpdateManyWithoutCourseNestedInput
+  learningEvents?: Prisma.LearningEventUncheckedUpdateManyWithoutCourseNestedInput
+  videoWatchEvents?: Prisma.VideoWatchEventUncheckedUpdateManyWithoutCourseNestedInput
 }
 
 export type CourseCreateManyInput = {
@@ -862,6 +876,34 @@ export type CourseUpdateOneRequiredWithoutAnnouncementsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.CourseUpdateToOneWithWhereWithoutAnnouncementsInput, Prisma.CourseUpdateWithoutAnnouncementsInput>, Prisma.CourseUncheckedUpdateWithoutAnnouncementsInput>
 }
 
+export type CourseCreateNestedOneWithoutLearningEventsInput = {
+  create?: Prisma.XOR<Prisma.CourseCreateWithoutLearningEventsInput, Prisma.CourseUncheckedCreateWithoutLearningEventsInput>
+  connectOrCreate?: Prisma.CourseCreateOrConnectWithoutLearningEventsInput
+  connect?: Prisma.CourseWhereUniqueInput
+}
+
+export type CourseUpdateOneRequiredWithoutLearningEventsNestedInput = {
+  create?: Prisma.XOR<Prisma.CourseCreateWithoutLearningEventsInput, Prisma.CourseUncheckedCreateWithoutLearningEventsInput>
+  connectOrCreate?: Prisma.CourseCreateOrConnectWithoutLearningEventsInput
+  upsert?: Prisma.CourseUpsertWithoutLearningEventsInput
+  connect?: Prisma.CourseWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.CourseUpdateToOneWithWhereWithoutLearningEventsInput, Prisma.CourseUpdateWithoutLearningEventsInput>, Prisma.CourseUncheckedUpdateWithoutLearningEventsInput>
+}
+
+export type CourseCreateNestedOneWithoutVideoWatchEventsInput = {
+  create?: Prisma.XOR<Prisma.CourseCreateWithoutVideoWatchEventsInput, Prisma.CourseUncheckedCreateWithoutVideoWatchEventsInput>
+  connectOrCreate?: Prisma.CourseCreateOrConnectWithoutVideoWatchEventsInput
+  connect?: Prisma.CourseWhereUniqueInput
+}
+
+export type CourseUpdateOneRequiredWithoutVideoWatchEventsNestedInput = {
+  create?: Prisma.XOR<Prisma.CourseCreateWithoutVideoWatchEventsInput, Prisma.CourseUncheckedCreateWithoutVideoWatchEventsInput>
+  connectOrCreate?: Prisma.CourseCreateOrConnectWithoutVideoWatchEventsInput
+  upsert?: Prisma.CourseUpsertWithoutVideoWatchEventsInput
+  connect?: Prisma.CourseWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.CourseUpdateToOneWithWhereWithoutVideoWatchEventsInput, Prisma.CourseUpdateWithoutVideoWatchEventsInput>, Prisma.CourseUncheckedUpdateWithoutVideoWatchEventsInput>
+}
+
 export type CourseCreateNestedOneWithoutReviewsInput = {
   create?: Prisma.XOR<Prisma.CourseCreateWithoutReviewsInput, Prisma.CourseUncheckedCreateWithoutReviewsInput>
   connectOrCreate?: Prisma.CourseCreateOrConnectWithoutReviewsInput
@@ -929,6 +971,8 @@ export type CourseCreateWithoutInstructorInput = {
   assignments?: Prisma.AssignmentCreateNestedManyWithoutCourseInput
   gradeRule?: Prisma.CourseGradeRuleCreateNestedOneWithoutCourseInput
   announcements?: Prisma.CourseAnnouncementCreateNestedManyWithoutCourseInput
+  learningEvents?: Prisma.LearningEventCreateNestedManyWithoutCourseInput
+  videoWatchEvents?: Prisma.VideoWatchEventCreateNestedManyWithoutCourseInput
 }
 
 export type CourseUncheckedCreateWithoutInstructorInput = {
@@ -956,6 +1000,8 @@ export type CourseUncheckedCreateWithoutInstructorInput = {
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutCourseInput
   gradeRule?: Prisma.CourseGradeRuleUncheckedCreateNestedOneWithoutCourseInput
   announcements?: Prisma.CourseAnnouncementUncheckedCreateNestedManyWithoutCourseInput
+  learningEvents?: Prisma.LearningEventUncheckedCreateNestedManyWithoutCourseInput
+  videoWatchEvents?: Prisma.VideoWatchEventUncheckedCreateNestedManyWithoutCourseInput
 }
 
 export type CourseCreateOrConnectWithoutInstructorInput = {
@@ -1032,6 +1078,8 @@ export type CourseCreateWithoutCategoryInput = {
   assignments?: Prisma.AssignmentCreateNestedManyWithoutCourseInput
   gradeRule?: Prisma.CourseGradeRuleCreateNestedOneWithoutCourseInput
   announcements?: Prisma.CourseAnnouncementCreateNestedManyWithoutCourseInput
+  learningEvents?: Prisma.LearningEventCreateNestedManyWithoutCourseInput
+  videoWatchEvents?: Prisma.VideoWatchEventCreateNestedManyWithoutCourseInput
 }
 
 export type CourseUncheckedCreateWithoutCategoryInput = {
@@ -1059,6 +1107,8 @@ export type CourseUncheckedCreateWithoutCategoryInput = {
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutCourseInput
   gradeRule?: Prisma.CourseGradeRuleUncheckedCreateNestedOneWithoutCourseInput
   announcements?: Prisma.CourseAnnouncementUncheckedCreateNestedManyWithoutCourseInput
+  learningEvents?: Prisma.LearningEventUncheckedCreateNestedManyWithoutCourseInput
+  videoWatchEvents?: Prisma.VideoWatchEventUncheckedCreateNestedManyWithoutCourseInput
 }
 
 export type CourseCreateOrConnectWithoutCategoryInput = {
@@ -1112,6 +1162,8 @@ export type CourseCreateWithoutSectionsInput = {
   assignments?: Prisma.AssignmentCreateNestedManyWithoutCourseInput
   gradeRule?: Prisma.CourseGradeRuleCreateNestedOneWithoutCourseInput
   announcements?: Prisma.CourseAnnouncementCreateNestedManyWithoutCourseInput
+  learningEvents?: Prisma.LearningEventCreateNestedManyWithoutCourseInput
+  videoWatchEvents?: Prisma.VideoWatchEventCreateNestedManyWithoutCourseInput
 }
 
 export type CourseUncheckedCreateWithoutSectionsInput = {
@@ -1139,6 +1191,8 @@ export type CourseUncheckedCreateWithoutSectionsInput = {
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutCourseInput
   gradeRule?: Prisma.CourseGradeRuleUncheckedCreateNestedOneWithoutCourseInput
   announcements?: Prisma.CourseAnnouncementUncheckedCreateNestedManyWithoutCourseInput
+  learningEvents?: Prisma.LearningEventUncheckedCreateNestedManyWithoutCourseInput
+  videoWatchEvents?: Prisma.VideoWatchEventUncheckedCreateNestedManyWithoutCourseInput
 }
 
 export type CourseCreateOrConnectWithoutSectionsInput = {
@@ -1182,6 +1236,8 @@ export type CourseUpdateWithoutSectionsInput = {
   assignments?: Prisma.AssignmentUpdateManyWithoutCourseNestedInput
   gradeRule?: Prisma.CourseGradeRuleUpdateOneWithoutCourseNestedInput
   announcements?: Prisma.CourseAnnouncementUpdateManyWithoutCourseNestedInput
+  learningEvents?: Prisma.LearningEventUpdateManyWithoutCourseNestedInput
+  videoWatchEvents?: Prisma.VideoWatchEventUpdateManyWithoutCourseNestedInput
 }
 
 export type CourseUncheckedUpdateWithoutSectionsInput = {
@@ -1209,6 +1265,8 @@ export type CourseUncheckedUpdateWithoutSectionsInput = {
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutCourseNestedInput
   gradeRule?: Prisma.CourseGradeRuleUncheckedUpdateOneWithoutCourseNestedInput
   announcements?: Prisma.CourseAnnouncementUncheckedUpdateManyWithoutCourseNestedInput
+  learningEvents?: Prisma.LearningEventUncheckedUpdateManyWithoutCourseNestedInput
+  videoWatchEvents?: Prisma.VideoWatchEventUncheckedUpdateManyWithoutCourseNestedInput
 }
 
 export type CourseCreateWithoutEnrollmentsInput = {
@@ -1236,6 +1294,8 @@ export type CourseCreateWithoutEnrollmentsInput = {
   assignments?: Prisma.AssignmentCreateNestedManyWithoutCourseInput
   gradeRule?: Prisma.CourseGradeRuleCreateNestedOneWithoutCourseInput
   announcements?: Prisma.CourseAnnouncementCreateNestedManyWithoutCourseInput
+  learningEvents?: Prisma.LearningEventCreateNestedManyWithoutCourseInput
+  videoWatchEvents?: Prisma.VideoWatchEventCreateNestedManyWithoutCourseInput
 }
 
 export type CourseUncheckedCreateWithoutEnrollmentsInput = {
@@ -1263,6 +1323,8 @@ export type CourseUncheckedCreateWithoutEnrollmentsInput = {
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutCourseInput
   gradeRule?: Prisma.CourseGradeRuleUncheckedCreateNestedOneWithoutCourseInput
   announcements?: Prisma.CourseAnnouncementUncheckedCreateNestedManyWithoutCourseInput
+  learningEvents?: Prisma.LearningEventUncheckedCreateNestedManyWithoutCourseInput
+  videoWatchEvents?: Prisma.VideoWatchEventUncheckedCreateNestedManyWithoutCourseInput
 }
 
 export type CourseCreateOrConnectWithoutEnrollmentsInput = {
@@ -1306,6 +1368,8 @@ export type CourseUpdateWithoutEnrollmentsInput = {
   assignments?: Prisma.AssignmentUpdateManyWithoutCourseNestedInput
   gradeRule?: Prisma.CourseGradeRuleUpdateOneWithoutCourseNestedInput
   announcements?: Prisma.CourseAnnouncementUpdateManyWithoutCourseNestedInput
+  learningEvents?: Prisma.LearningEventUpdateManyWithoutCourseNestedInput
+  videoWatchEvents?: Prisma.VideoWatchEventUpdateManyWithoutCourseNestedInput
 }
 
 export type CourseUncheckedUpdateWithoutEnrollmentsInput = {
@@ -1333,6 +1397,8 @@ export type CourseUncheckedUpdateWithoutEnrollmentsInput = {
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutCourseNestedInput
   gradeRule?: Prisma.CourseGradeRuleUncheckedUpdateOneWithoutCourseNestedInput
   announcements?: Prisma.CourseAnnouncementUncheckedUpdateManyWithoutCourseNestedInput
+  learningEvents?: Prisma.LearningEventUncheckedUpdateManyWithoutCourseNestedInput
+  videoWatchEvents?: Prisma.VideoWatchEventUncheckedUpdateManyWithoutCourseNestedInput
 }
 
 export type CourseCreateWithoutAssignmentsInput = {
@@ -1360,6 +1426,8 @@ export type CourseCreateWithoutAssignmentsInput = {
   certificates?: Prisma.CertificateCreateNestedManyWithoutCourseInput
   gradeRule?: Prisma.CourseGradeRuleCreateNestedOneWithoutCourseInput
   announcements?: Prisma.CourseAnnouncementCreateNestedManyWithoutCourseInput
+  learningEvents?: Prisma.LearningEventCreateNestedManyWithoutCourseInput
+  videoWatchEvents?: Prisma.VideoWatchEventCreateNestedManyWithoutCourseInput
 }
 
 export type CourseUncheckedCreateWithoutAssignmentsInput = {
@@ -1387,6 +1455,8 @@ export type CourseUncheckedCreateWithoutAssignmentsInput = {
   certificates?: Prisma.CertificateUncheckedCreateNestedManyWithoutCourseInput
   gradeRule?: Prisma.CourseGradeRuleUncheckedCreateNestedOneWithoutCourseInput
   announcements?: Prisma.CourseAnnouncementUncheckedCreateNestedManyWithoutCourseInput
+  learningEvents?: Prisma.LearningEventUncheckedCreateNestedManyWithoutCourseInput
+  videoWatchEvents?: Prisma.VideoWatchEventUncheckedCreateNestedManyWithoutCourseInput
 }
 
 export type CourseCreateOrConnectWithoutAssignmentsInput = {
@@ -1430,6 +1500,8 @@ export type CourseUpdateWithoutAssignmentsInput = {
   certificates?: Prisma.CertificateUpdateManyWithoutCourseNestedInput
   gradeRule?: Prisma.CourseGradeRuleUpdateOneWithoutCourseNestedInput
   announcements?: Prisma.CourseAnnouncementUpdateManyWithoutCourseNestedInput
+  learningEvents?: Prisma.LearningEventUpdateManyWithoutCourseNestedInput
+  videoWatchEvents?: Prisma.VideoWatchEventUpdateManyWithoutCourseNestedInput
 }
 
 export type CourseUncheckedUpdateWithoutAssignmentsInput = {
@@ -1457,6 +1529,8 @@ export type CourseUncheckedUpdateWithoutAssignmentsInput = {
   certificates?: Prisma.CertificateUncheckedUpdateManyWithoutCourseNestedInput
   gradeRule?: Prisma.CourseGradeRuleUncheckedUpdateOneWithoutCourseNestedInput
   announcements?: Prisma.CourseAnnouncementUncheckedUpdateManyWithoutCourseNestedInput
+  learningEvents?: Prisma.LearningEventUncheckedUpdateManyWithoutCourseNestedInput
+  videoWatchEvents?: Prisma.VideoWatchEventUncheckedUpdateManyWithoutCourseNestedInput
 }
 
 export type CourseCreateWithoutGradeRuleInput = {
@@ -1484,6 +1558,8 @@ export type CourseCreateWithoutGradeRuleInput = {
   certificates?: Prisma.CertificateCreateNestedManyWithoutCourseInput
   assignments?: Prisma.AssignmentCreateNestedManyWithoutCourseInput
   announcements?: Prisma.CourseAnnouncementCreateNestedManyWithoutCourseInput
+  learningEvents?: Prisma.LearningEventCreateNestedManyWithoutCourseInput
+  videoWatchEvents?: Prisma.VideoWatchEventCreateNestedManyWithoutCourseInput
 }
 
 export type CourseUncheckedCreateWithoutGradeRuleInput = {
@@ -1511,6 +1587,8 @@ export type CourseUncheckedCreateWithoutGradeRuleInput = {
   certificates?: Prisma.CertificateUncheckedCreateNestedManyWithoutCourseInput
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutCourseInput
   announcements?: Prisma.CourseAnnouncementUncheckedCreateNestedManyWithoutCourseInput
+  learningEvents?: Prisma.LearningEventUncheckedCreateNestedManyWithoutCourseInput
+  videoWatchEvents?: Prisma.VideoWatchEventUncheckedCreateNestedManyWithoutCourseInput
 }
 
 export type CourseCreateOrConnectWithoutGradeRuleInput = {
@@ -1554,6 +1632,8 @@ export type CourseUpdateWithoutGradeRuleInput = {
   certificates?: Prisma.CertificateUpdateManyWithoutCourseNestedInput
   assignments?: Prisma.AssignmentUpdateManyWithoutCourseNestedInput
   announcements?: Prisma.CourseAnnouncementUpdateManyWithoutCourseNestedInput
+  learningEvents?: Prisma.LearningEventUpdateManyWithoutCourseNestedInput
+  videoWatchEvents?: Prisma.VideoWatchEventUpdateManyWithoutCourseNestedInput
 }
 
 export type CourseUncheckedUpdateWithoutGradeRuleInput = {
@@ -1581,6 +1661,8 @@ export type CourseUncheckedUpdateWithoutGradeRuleInput = {
   certificates?: Prisma.CertificateUncheckedUpdateManyWithoutCourseNestedInput
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutCourseNestedInput
   announcements?: Prisma.CourseAnnouncementUncheckedUpdateManyWithoutCourseNestedInput
+  learningEvents?: Prisma.LearningEventUncheckedUpdateManyWithoutCourseNestedInput
+  videoWatchEvents?: Prisma.VideoWatchEventUncheckedUpdateManyWithoutCourseNestedInput
 }
 
 export type CourseCreateWithoutAnnouncementsInput = {
@@ -1608,6 +1690,8 @@ export type CourseCreateWithoutAnnouncementsInput = {
   certificates?: Prisma.CertificateCreateNestedManyWithoutCourseInput
   assignments?: Prisma.AssignmentCreateNestedManyWithoutCourseInput
   gradeRule?: Prisma.CourseGradeRuleCreateNestedOneWithoutCourseInput
+  learningEvents?: Prisma.LearningEventCreateNestedManyWithoutCourseInput
+  videoWatchEvents?: Prisma.VideoWatchEventCreateNestedManyWithoutCourseInput
 }
 
 export type CourseUncheckedCreateWithoutAnnouncementsInput = {
@@ -1635,6 +1719,8 @@ export type CourseUncheckedCreateWithoutAnnouncementsInput = {
   certificates?: Prisma.CertificateUncheckedCreateNestedManyWithoutCourseInput
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutCourseInput
   gradeRule?: Prisma.CourseGradeRuleUncheckedCreateNestedOneWithoutCourseInput
+  learningEvents?: Prisma.LearningEventUncheckedCreateNestedManyWithoutCourseInput
+  videoWatchEvents?: Prisma.VideoWatchEventUncheckedCreateNestedManyWithoutCourseInput
 }
 
 export type CourseCreateOrConnectWithoutAnnouncementsInput = {
@@ -1678,6 +1764,8 @@ export type CourseUpdateWithoutAnnouncementsInput = {
   certificates?: Prisma.CertificateUpdateManyWithoutCourseNestedInput
   assignments?: Prisma.AssignmentUpdateManyWithoutCourseNestedInput
   gradeRule?: Prisma.CourseGradeRuleUpdateOneWithoutCourseNestedInput
+  learningEvents?: Prisma.LearningEventUpdateManyWithoutCourseNestedInput
+  videoWatchEvents?: Prisma.VideoWatchEventUpdateManyWithoutCourseNestedInput
 }
 
 export type CourseUncheckedUpdateWithoutAnnouncementsInput = {
@@ -1705,6 +1793,272 @@ export type CourseUncheckedUpdateWithoutAnnouncementsInput = {
   certificates?: Prisma.CertificateUncheckedUpdateManyWithoutCourseNestedInput
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutCourseNestedInput
   gradeRule?: Prisma.CourseGradeRuleUncheckedUpdateOneWithoutCourseNestedInput
+  learningEvents?: Prisma.LearningEventUncheckedUpdateManyWithoutCourseNestedInput
+  videoWatchEvents?: Prisma.VideoWatchEventUncheckedUpdateManyWithoutCourseNestedInput
+}
+
+export type CourseCreateWithoutLearningEventsInput = {
+  id?: string
+  title: string
+  slug: string
+  description: string
+  thumbnailUrl?: string | null
+  level: $Enums.CourseLevel
+  price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  isFree?: boolean
+  language?: string
+  requirements?: string | null
+  learningOutcomes?: string | null
+  status?: $Enums.CourseStatus
+  publishedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  instructor: Prisma.UserCreateNestedOneWithoutCoursesInput
+  category: Prisma.CategoryCreateNestedOneWithoutCoursesInput
+  sections?: Prisma.SectionCreateNestedManyWithoutCourseInput
+  enrollments?: Prisma.EnrollmentCreateNestedManyWithoutCourseInput
+  reviews?: Prisma.ReviewCreateNestedManyWithoutCourseInput
+  orderItems?: Prisma.OrderItemCreateNestedManyWithoutCourseInput
+  certificates?: Prisma.CertificateCreateNestedManyWithoutCourseInput
+  assignments?: Prisma.AssignmentCreateNestedManyWithoutCourseInput
+  gradeRule?: Prisma.CourseGradeRuleCreateNestedOneWithoutCourseInput
+  announcements?: Prisma.CourseAnnouncementCreateNestedManyWithoutCourseInput
+  videoWatchEvents?: Prisma.VideoWatchEventCreateNestedManyWithoutCourseInput
+}
+
+export type CourseUncheckedCreateWithoutLearningEventsInput = {
+  id?: string
+  instructorId: string
+  categoryId: string
+  title: string
+  slug: string
+  description: string
+  thumbnailUrl?: string | null
+  level: $Enums.CourseLevel
+  price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  isFree?: boolean
+  language?: string
+  requirements?: string | null
+  learningOutcomes?: string | null
+  status?: $Enums.CourseStatus
+  publishedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  sections?: Prisma.SectionUncheckedCreateNestedManyWithoutCourseInput
+  enrollments?: Prisma.EnrollmentUncheckedCreateNestedManyWithoutCourseInput
+  reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutCourseInput
+  orderItems?: Prisma.OrderItemUncheckedCreateNestedManyWithoutCourseInput
+  certificates?: Prisma.CertificateUncheckedCreateNestedManyWithoutCourseInput
+  assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutCourseInput
+  gradeRule?: Prisma.CourseGradeRuleUncheckedCreateNestedOneWithoutCourseInput
+  announcements?: Prisma.CourseAnnouncementUncheckedCreateNestedManyWithoutCourseInput
+  videoWatchEvents?: Prisma.VideoWatchEventUncheckedCreateNestedManyWithoutCourseInput
+}
+
+export type CourseCreateOrConnectWithoutLearningEventsInput = {
+  where: Prisma.CourseWhereUniqueInput
+  create: Prisma.XOR<Prisma.CourseCreateWithoutLearningEventsInput, Prisma.CourseUncheckedCreateWithoutLearningEventsInput>
+}
+
+export type CourseUpsertWithoutLearningEventsInput = {
+  update: Prisma.XOR<Prisma.CourseUpdateWithoutLearningEventsInput, Prisma.CourseUncheckedUpdateWithoutLearningEventsInput>
+  create: Prisma.XOR<Prisma.CourseCreateWithoutLearningEventsInput, Prisma.CourseUncheckedCreateWithoutLearningEventsInput>
+  where?: Prisma.CourseWhereInput
+}
+
+export type CourseUpdateToOneWithWhereWithoutLearningEventsInput = {
+  where?: Prisma.CourseWhereInput
+  data: Prisma.XOR<Prisma.CourseUpdateWithoutLearningEventsInput, Prisma.CourseUncheckedUpdateWithoutLearningEventsInput>
+}
+
+export type CourseUpdateWithoutLearningEventsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  thumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.EnumCourseLevelFieldUpdateOperationsInput | $Enums.CourseLevel
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  isFree?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  language?: Prisma.StringFieldUpdateOperationsInput | string
+  requirements?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningOutcomes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumCourseStatusFieldUpdateOperationsInput | $Enums.CourseStatus
+  publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  instructor?: Prisma.UserUpdateOneRequiredWithoutCoursesNestedInput
+  category?: Prisma.CategoryUpdateOneRequiredWithoutCoursesNestedInput
+  sections?: Prisma.SectionUpdateManyWithoutCourseNestedInput
+  enrollments?: Prisma.EnrollmentUpdateManyWithoutCourseNestedInput
+  reviews?: Prisma.ReviewUpdateManyWithoutCourseNestedInput
+  orderItems?: Prisma.OrderItemUpdateManyWithoutCourseNestedInput
+  certificates?: Prisma.CertificateUpdateManyWithoutCourseNestedInput
+  assignments?: Prisma.AssignmentUpdateManyWithoutCourseNestedInput
+  gradeRule?: Prisma.CourseGradeRuleUpdateOneWithoutCourseNestedInput
+  announcements?: Prisma.CourseAnnouncementUpdateManyWithoutCourseNestedInput
+  videoWatchEvents?: Prisma.VideoWatchEventUpdateManyWithoutCourseNestedInput
+}
+
+export type CourseUncheckedUpdateWithoutLearningEventsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  instructorId?: Prisma.StringFieldUpdateOperationsInput | string
+  categoryId?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  thumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.EnumCourseLevelFieldUpdateOperationsInput | $Enums.CourseLevel
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  isFree?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  language?: Prisma.StringFieldUpdateOperationsInput | string
+  requirements?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningOutcomes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumCourseStatusFieldUpdateOperationsInput | $Enums.CourseStatus
+  publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sections?: Prisma.SectionUncheckedUpdateManyWithoutCourseNestedInput
+  enrollments?: Prisma.EnrollmentUncheckedUpdateManyWithoutCourseNestedInput
+  reviews?: Prisma.ReviewUncheckedUpdateManyWithoutCourseNestedInput
+  orderItems?: Prisma.OrderItemUncheckedUpdateManyWithoutCourseNestedInput
+  certificates?: Prisma.CertificateUncheckedUpdateManyWithoutCourseNestedInput
+  assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutCourseNestedInput
+  gradeRule?: Prisma.CourseGradeRuleUncheckedUpdateOneWithoutCourseNestedInput
+  announcements?: Prisma.CourseAnnouncementUncheckedUpdateManyWithoutCourseNestedInput
+  videoWatchEvents?: Prisma.VideoWatchEventUncheckedUpdateManyWithoutCourseNestedInput
+}
+
+export type CourseCreateWithoutVideoWatchEventsInput = {
+  id?: string
+  title: string
+  slug: string
+  description: string
+  thumbnailUrl?: string | null
+  level: $Enums.CourseLevel
+  price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  isFree?: boolean
+  language?: string
+  requirements?: string | null
+  learningOutcomes?: string | null
+  status?: $Enums.CourseStatus
+  publishedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  instructor: Prisma.UserCreateNestedOneWithoutCoursesInput
+  category: Prisma.CategoryCreateNestedOneWithoutCoursesInput
+  sections?: Prisma.SectionCreateNestedManyWithoutCourseInput
+  enrollments?: Prisma.EnrollmentCreateNestedManyWithoutCourseInput
+  reviews?: Prisma.ReviewCreateNestedManyWithoutCourseInput
+  orderItems?: Prisma.OrderItemCreateNestedManyWithoutCourseInput
+  certificates?: Prisma.CertificateCreateNestedManyWithoutCourseInput
+  assignments?: Prisma.AssignmentCreateNestedManyWithoutCourseInput
+  gradeRule?: Prisma.CourseGradeRuleCreateNestedOneWithoutCourseInput
+  announcements?: Prisma.CourseAnnouncementCreateNestedManyWithoutCourseInput
+  learningEvents?: Prisma.LearningEventCreateNestedManyWithoutCourseInput
+}
+
+export type CourseUncheckedCreateWithoutVideoWatchEventsInput = {
+  id?: string
+  instructorId: string
+  categoryId: string
+  title: string
+  slug: string
+  description: string
+  thumbnailUrl?: string | null
+  level: $Enums.CourseLevel
+  price?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  isFree?: boolean
+  language?: string
+  requirements?: string | null
+  learningOutcomes?: string | null
+  status?: $Enums.CourseStatus
+  publishedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  sections?: Prisma.SectionUncheckedCreateNestedManyWithoutCourseInput
+  enrollments?: Prisma.EnrollmentUncheckedCreateNestedManyWithoutCourseInput
+  reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutCourseInput
+  orderItems?: Prisma.OrderItemUncheckedCreateNestedManyWithoutCourseInput
+  certificates?: Prisma.CertificateUncheckedCreateNestedManyWithoutCourseInput
+  assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutCourseInput
+  gradeRule?: Prisma.CourseGradeRuleUncheckedCreateNestedOneWithoutCourseInput
+  announcements?: Prisma.CourseAnnouncementUncheckedCreateNestedManyWithoutCourseInput
+  learningEvents?: Prisma.LearningEventUncheckedCreateNestedManyWithoutCourseInput
+}
+
+export type CourseCreateOrConnectWithoutVideoWatchEventsInput = {
+  where: Prisma.CourseWhereUniqueInput
+  create: Prisma.XOR<Prisma.CourseCreateWithoutVideoWatchEventsInput, Prisma.CourseUncheckedCreateWithoutVideoWatchEventsInput>
+}
+
+export type CourseUpsertWithoutVideoWatchEventsInput = {
+  update: Prisma.XOR<Prisma.CourseUpdateWithoutVideoWatchEventsInput, Prisma.CourseUncheckedUpdateWithoutVideoWatchEventsInput>
+  create: Prisma.XOR<Prisma.CourseCreateWithoutVideoWatchEventsInput, Prisma.CourseUncheckedCreateWithoutVideoWatchEventsInput>
+  where?: Prisma.CourseWhereInput
+}
+
+export type CourseUpdateToOneWithWhereWithoutVideoWatchEventsInput = {
+  where?: Prisma.CourseWhereInput
+  data: Prisma.XOR<Prisma.CourseUpdateWithoutVideoWatchEventsInput, Prisma.CourseUncheckedUpdateWithoutVideoWatchEventsInput>
+}
+
+export type CourseUpdateWithoutVideoWatchEventsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  thumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.EnumCourseLevelFieldUpdateOperationsInput | $Enums.CourseLevel
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  isFree?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  language?: Prisma.StringFieldUpdateOperationsInput | string
+  requirements?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningOutcomes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumCourseStatusFieldUpdateOperationsInput | $Enums.CourseStatus
+  publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  instructor?: Prisma.UserUpdateOneRequiredWithoutCoursesNestedInput
+  category?: Prisma.CategoryUpdateOneRequiredWithoutCoursesNestedInput
+  sections?: Prisma.SectionUpdateManyWithoutCourseNestedInput
+  enrollments?: Prisma.EnrollmentUpdateManyWithoutCourseNestedInput
+  reviews?: Prisma.ReviewUpdateManyWithoutCourseNestedInput
+  orderItems?: Prisma.OrderItemUpdateManyWithoutCourseNestedInput
+  certificates?: Prisma.CertificateUpdateManyWithoutCourseNestedInput
+  assignments?: Prisma.AssignmentUpdateManyWithoutCourseNestedInput
+  gradeRule?: Prisma.CourseGradeRuleUpdateOneWithoutCourseNestedInput
+  announcements?: Prisma.CourseAnnouncementUpdateManyWithoutCourseNestedInput
+  learningEvents?: Prisma.LearningEventUpdateManyWithoutCourseNestedInput
+}
+
+export type CourseUncheckedUpdateWithoutVideoWatchEventsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  instructorId?: Prisma.StringFieldUpdateOperationsInput | string
+  categoryId?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  thumbnailUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.EnumCourseLevelFieldUpdateOperationsInput | $Enums.CourseLevel
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  isFree?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  language?: Prisma.StringFieldUpdateOperationsInput | string
+  requirements?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningOutcomes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumCourseStatusFieldUpdateOperationsInput | $Enums.CourseStatus
+  publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sections?: Prisma.SectionUncheckedUpdateManyWithoutCourseNestedInput
+  enrollments?: Prisma.EnrollmentUncheckedUpdateManyWithoutCourseNestedInput
+  reviews?: Prisma.ReviewUncheckedUpdateManyWithoutCourseNestedInput
+  orderItems?: Prisma.OrderItemUncheckedUpdateManyWithoutCourseNestedInput
+  certificates?: Prisma.CertificateUncheckedUpdateManyWithoutCourseNestedInput
+  assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutCourseNestedInput
+  gradeRule?: Prisma.CourseGradeRuleUncheckedUpdateOneWithoutCourseNestedInput
+  announcements?: Prisma.CourseAnnouncementUncheckedUpdateManyWithoutCourseNestedInput
+  learningEvents?: Prisma.LearningEventUncheckedUpdateManyWithoutCourseNestedInput
 }
 
 export type CourseCreateWithoutReviewsInput = {
@@ -1732,6 +2086,8 @@ export type CourseCreateWithoutReviewsInput = {
   assignments?: Prisma.AssignmentCreateNestedManyWithoutCourseInput
   gradeRule?: Prisma.CourseGradeRuleCreateNestedOneWithoutCourseInput
   announcements?: Prisma.CourseAnnouncementCreateNestedManyWithoutCourseInput
+  learningEvents?: Prisma.LearningEventCreateNestedManyWithoutCourseInput
+  videoWatchEvents?: Prisma.VideoWatchEventCreateNestedManyWithoutCourseInput
 }
 
 export type CourseUncheckedCreateWithoutReviewsInput = {
@@ -1759,6 +2115,8 @@ export type CourseUncheckedCreateWithoutReviewsInput = {
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutCourseInput
   gradeRule?: Prisma.CourseGradeRuleUncheckedCreateNestedOneWithoutCourseInput
   announcements?: Prisma.CourseAnnouncementUncheckedCreateNestedManyWithoutCourseInput
+  learningEvents?: Prisma.LearningEventUncheckedCreateNestedManyWithoutCourseInput
+  videoWatchEvents?: Prisma.VideoWatchEventUncheckedCreateNestedManyWithoutCourseInput
 }
 
 export type CourseCreateOrConnectWithoutReviewsInput = {
@@ -1802,6 +2160,8 @@ export type CourseUpdateWithoutReviewsInput = {
   assignments?: Prisma.AssignmentUpdateManyWithoutCourseNestedInput
   gradeRule?: Prisma.CourseGradeRuleUpdateOneWithoutCourseNestedInput
   announcements?: Prisma.CourseAnnouncementUpdateManyWithoutCourseNestedInput
+  learningEvents?: Prisma.LearningEventUpdateManyWithoutCourseNestedInput
+  videoWatchEvents?: Prisma.VideoWatchEventUpdateManyWithoutCourseNestedInput
 }
 
 export type CourseUncheckedUpdateWithoutReviewsInput = {
@@ -1829,6 +2189,8 @@ export type CourseUncheckedUpdateWithoutReviewsInput = {
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutCourseNestedInput
   gradeRule?: Prisma.CourseGradeRuleUncheckedUpdateOneWithoutCourseNestedInput
   announcements?: Prisma.CourseAnnouncementUncheckedUpdateManyWithoutCourseNestedInput
+  learningEvents?: Prisma.LearningEventUncheckedUpdateManyWithoutCourseNestedInput
+  videoWatchEvents?: Prisma.VideoWatchEventUncheckedUpdateManyWithoutCourseNestedInput
 }
 
 export type CourseCreateWithoutOrderItemsInput = {
@@ -1856,6 +2218,8 @@ export type CourseCreateWithoutOrderItemsInput = {
   assignments?: Prisma.AssignmentCreateNestedManyWithoutCourseInput
   gradeRule?: Prisma.CourseGradeRuleCreateNestedOneWithoutCourseInput
   announcements?: Prisma.CourseAnnouncementCreateNestedManyWithoutCourseInput
+  learningEvents?: Prisma.LearningEventCreateNestedManyWithoutCourseInput
+  videoWatchEvents?: Prisma.VideoWatchEventCreateNestedManyWithoutCourseInput
 }
 
 export type CourseUncheckedCreateWithoutOrderItemsInput = {
@@ -1883,6 +2247,8 @@ export type CourseUncheckedCreateWithoutOrderItemsInput = {
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutCourseInput
   gradeRule?: Prisma.CourseGradeRuleUncheckedCreateNestedOneWithoutCourseInput
   announcements?: Prisma.CourseAnnouncementUncheckedCreateNestedManyWithoutCourseInput
+  learningEvents?: Prisma.LearningEventUncheckedCreateNestedManyWithoutCourseInput
+  videoWatchEvents?: Prisma.VideoWatchEventUncheckedCreateNestedManyWithoutCourseInput
 }
 
 export type CourseCreateOrConnectWithoutOrderItemsInput = {
@@ -1926,6 +2292,8 @@ export type CourseUpdateWithoutOrderItemsInput = {
   assignments?: Prisma.AssignmentUpdateManyWithoutCourseNestedInput
   gradeRule?: Prisma.CourseGradeRuleUpdateOneWithoutCourseNestedInput
   announcements?: Prisma.CourseAnnouncementUpdateManyWithoutCourseNestedInput
+  learningEvents?: Prisma.LearningEventUpdateManyWithoutCourseNestedInput
+  videoWatchEvents?: Prisma.VideoWatchEventUpdateManyWithoutCourseNestedInput
 }
 
 export type CourseUncheckedUpdateWithoutOrderItemsInput = {
@@ -1953,6 +2321,8 @@ export type CourseUncheckedUpdateWithoutOrderItemsInput = {
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutCourseNestedInput
   gradeRule?: Prisma.CourseGradeRuleUncheckedUpdateOneWithoutCourseNestedInput
   announcements?: Prisma.CourseAnnouncementUncheckedUpdateManyWithoutCourseNestedInput
+  learningEvents?: Prisma.LearningEventUncheckedUpdateManyWithoutCourseNestedInput
+  videoWatchEvents?: Prisma.VideoWatchEventUncheckedUpdateManyWithoutCourseNestedInput
 }
 
 export type CourseCreateWithoutCertificatesInput = {
@@ -1980,6 +2350,8 @@ export type CourseCreateWithoutCertificatesInput = {
   assignments?: Prisma.AssignmentCreateNestedManyWithoutCourseInput
   gradeRule?: Prisma.CourseGradeRuleCreateNestedOneWithoutCourseInput
   announcements?: Prisma.CourseAnnouncementCreateNestedManyWithoutCourseInput
+  learningEvents?: Prisma.LearningEventCreateNestedManyWithoutCourseInput
+  videoWatchEvents?: Prisma.VideoWatchEventCreateNestedManyWithoutCourseInput
 }
 
 export type CourseUncheckedCreateWithoutCertificatesInput = {
@@ -2007,6 +2379,8 @@ export type CourseUncheckedCreateWithoutCertificatesInput = {
   assignments?: Prisma.AssignmentUncheckedCreateNestedManyWithoutCourseInput
   gradeRule?: Prisma.CourseGradeRuleUncheckedCreateNestedOneWithoutCourseInput
   announcements?: Prisma.CourseAnnouncementUncheckedCreateNestedManyWithoutCourseInput
+  learningEvents?: Prisma.LearningEventUncheckedCreateNestedManyWithoutCourseInput
+  videoWatchEvents?: Prisma.VideoWatchEventUncheckedCreateNestedManyWithoutCourseInput
 }
 
 export type CourseCreateOrConnectWithoutCertificatesInput = {
@@ -2050,6 +2424,8 @@ export type CourseUpdateWithoutCertificatesInput = {
   assignments?: Prisma.AssignmentUpdateManyWithoutCourseNestedInput
   gradeRule?: Prisma.CourseGradeRuleUpdateOneWithoutCourseNestedInput
   announcements?: Prisma.CourseAnnouncementUpdateManyWithoutCourseNestedInput
+  learningEvents?: Prisma.LearningEventUpdateManyWithoutCourseNestedInput
+  videoWatchEvents?: Prisma.VideoWatchEventUpdateManyWithoutCourseNestedInput
 }
 
 export type CourseUncheckedUpdateWithoutCertificatesInput = {
@@ -2077,6 +2453,8 @@ export type CourseUncheckedUpdateWithoutCertificatesInput = {
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutCourseNestedInput
   gradeRule?: Prisma.CourseGradeRuleUncheckedUpdateOneWithoutCourseNestedInput
   announcements?: Prisma.CourseAnnouncementUncheckedUpdateManyWithoutCourseNestedInput
+  learningEvents?: Prisma.LearningEventUncheckedUpdateManyWithoutCourseNestedInput
+  videoWatchEvents?: Prisma.VideoWatchEventUncheckedUpdateManyWithoutCourseNestedInput
 }
 
 export type CourseCreateManyInstructorInput = {
@@ -2123,6 +2501,8 @@ export type CourseUpdateWithoutInstructorInput = {
   assignments?: Prisma.AssignmentUpdateManyWithoutCourseNestedInput
   gradeRule?: Prisma.CourseGradeRuleUpdateOneWithoutCourseNestedInput
   announcements?: Prisma.CourseAnnouncementUpdateManyWithoutCourseNestedInput
+  learningEvents?: Prisma.LearningEventUpdateManyWithoutCourseNestedInput
+  videoWatchEvents?: Prisma.VideoWatchEventUpdateManyWithoutCourseNestedInput
 }
 
 export type CourseUncheckedUpdateWithoutInstructorInput = {
@@ -2150,6 +2530,8 @@ export type CourseUncheckedUpdateWithoutInstructorInput = {
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutCourseNestedInput
   gradeRule?: Prisma.CourseGradeRuleUncheckedUpdateOneWithoutCourseNestedInput
   announcements?: Prisma.CourseAnnouncementUncheckedUpdateManyWithoutCourseNestedInput
+  learningEvents?: Prisma.LearningEventUncheckedUpdateManyWithoutCourseNestedInput
+  videoWatchEvents?: Prisma.VideoWatchEventUncheckedUpdateManyWithoutCourseNestedInput
 }
 
 export type CourseUncheckedUpdateManyWithoutInstructorInput = {
@@ -2215,6 +2597,8 @@ export type CourseUpdateWithoutCategoryInput = {
   assignments?: Prisma.AssignmentUpdateManyWithoutCourseNestedInput
   gradeRule?: Prisma.CourseGradeRuleUpdateOneWithoutCourseNestedInput
   announcements?: Prisma.CourseAnnouncementUpdateManyWithoutCourseNestedInput
+  learningEvents?: Prisma.LearningEventUpdateManyWithoutCourseNestedInput
+  videoWatchEvents?: Prisma.VideoWatchEventUpdateManyWithoutCourseNestedInput
 }
 
 export type CourseUncheckedUpdateWithoutCategoryInput = {
@@ -2242,6 +2626,8 @@ export type CourseUncheckedUpdateWithoutCategoryInput = {
   assignments?: Prisma.AssignmentUncheckedUpdateManyWithoutCourseNestedInput
   gradeRule?: Prisma.CourseGradeRuleUncheckedUpdateOneWithoutCourseNestedInput
   announcements?: Prisma.CourseAnnouncementUncheckedUpdateManyWithoutCourseNestedInput
+  learningEvents?: Prisma.LearningEventUncheckedUpdateManyWithoutCourseNestedInput
+  videoWatchEvents?: Prisma.VideoWatchEventUncheckedUpdateManyWithoutCourseNestedInput
 }
 
 export type CourseUncheckedUpdateManyWithoutCategoryInput = {
@@ -2276,6 +2662,8 @@ export type CourseCountOutputType = {
   certificates: number
   assignments: number
   announcements: number
+  learningEvents: number
+  videoWatchEvents: number
 }
 
 export type CourseCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2286,6 +2674,8 @@ export type CourseCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions
   certificates?: boolean | CourseCountOutputTypeCountCertificatesArgs
   assignments?: boolean | CourseCountOutputTypeCountAssignmentsArgs
   announcements?: boolean | CourseCountOutputTypeCountAnnouncementsArgs
+  learningEvents?: boolean | CourseCountOutputTypeCountLearningEventsArgs
+  videoWatchEvents?: boolean | CourseCountOutputTypeCountVideoWatchEventsArgs
 }
 
 /**
@@ -2347,6 +2737,20 @@ export type CourseCountOutputTypeCountAnnouncementsArgs<ExtArgs extends runtime.
   where?: Prisma.CourseAnnouncementWhereInput
 }
 
+/**
+ * CourseCountOutputType without action
+ */
+export type CourseCountOutputTypeCountLearningEventsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.LearningEventWhereInput
+}
+
+/**
+ * CourseCountOutputType without action
+ */
+export type CourseCountOutputTypeCountVideoWatchEventsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.VideoWatchEventWhereInput
+}
+
 
 export type CourseSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -2376,6 +2780,8 @@ export type CourseSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   assignments?: boolean | Prisma.Course$assignmentsArgs<ExtArgs>
   gradeRule?: boolean | Prisma.Course$gradeRuleArgs<ExtArgs>
   announcements?: boolean | Prisma.Course$announcementsArgs<ExtArgs>
+  learningEvents?: boolean | Prisma.Course$learningEventsArgs<ExtArgs>
+  videoWatchEvents?: boolean | Prisma.Course$videoWatchEventsArgs<ExtArgs>
   _count?: boolean | Prisma.CourseCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["course"]>
 
@@ -2455,6 +2861,8 @@ export type CourseInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   assignments?: boolean | Prisma.Course$assignmentsArgs<ExtArgs>
   gradeRule?: boolean | Prisma.Course$gradeRuleArgs<ExtArgs>
   announcements?: boolean | Prisma.Course$announcementsArgs<ExtArgs>
+  learningEvents?: boolean | Prisma.Course$learningEventsArgs<ExtArgs>
+  videoWatchEvents?: boolean | Prisma.Course$videoWatchEventsArgs<ExtArgs>
   _count?: boolean | Prisma.CourseCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type CourseIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2479,6 +2887,8 @@ export type $CoursePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     assignments: Prisma.$AssignmentPayload<ExtArgs>[]
     gradeRule: Prisma.$CourseGradeRulePayload<ExtArgs> | null
     announcements: Prisma.$CourseAnnouncementPayload<ExtArgs>[]
+    learningEvents: Prisma.$LearningEventPayload<ExtArgs>[]
+    videoWatchEvents: Prisma.$VideoWatchEventPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2902,6 +3312,8 @@ export interface Prisma__CourseClient<T, Null = never, ExtArgs extends runtime.T
   assignments<T extends Prisma.Course$assignmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Course$assignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   gradeRule<T extends Prisma.Course$gradeRuleArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Course$gradeRuleArgs<ExtArgs>>): Prisma.Prisma__CourseGradeRuleClient<runtime.Types.Result.GetResult<Prisma.$CourseGradeRulePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   announcements<T extends Prisma.Course$announcementsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Course$announcementsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CourseAnnouncementPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  learningEvents<T extends Prisma.Course$learningEventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Course$learningEventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LearningEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  videoWatchEvents<T extends Prisma.Course$videoWatchEventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Course$videoWatchEventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VideoWatchEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3533,6 +3945,54 @@ export type Course$announcementsArgs<ExtArgs extends runtime.Types.Extensions.In
   take?: number
   skip?: number
   distinct?: Prisma.CourseAnnouncementScalarFieldEnum | Prisma.CourseAnnouncementScalarFieldEnum[]
+}
+
+/**
+ * Course.learningEvents
+ */
+export type Course$learningEventsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the LearningEvent
+   */
+  select?: Prisma.LearningEventSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the LearningEvent
+   */
+  omit?: Prisma.LearningEventOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.LearningEventInclude<ExtArgs> | null
+  where?: Prisma.LearningEventWhereInput
+  orderBy?: Prisma.LearningEventOrderByWithRelationInput | Prisma.LearningEventOrderByWithRelationInput[]
+  cursor?: Prisma.LearningEventWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.LearningEventScalarFieldEnum | Prisma.LearningEventScalarFieldEnum[]
+}
+
+/**
+ * Course.videoWatchEvents
+ */
+export type Course$videoWatchEventsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the VideoWatchEvent
+   */
+  select?: Prisma.VideoWatchEventSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the VideoWatchEvent
+   */
+  omit?: Prisma.VideoWatchEventOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.VideoWatchEventInclude<ExtArgs> | null
+  where?: Prisma.VideoWatchEventWhereInput
+  orderBy?: Prisma.VideoWatchEventOrderByWithRelationInput | Prisma.VideoWatchEventOrderByWithRelationInput[]
+  cursor?: Prisma.VideoWatchEventWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.VideoWatchEventScalarFieldEnum | Prisma.VideoWatchEventScalarFieldEnum[]
 }
 
 /**

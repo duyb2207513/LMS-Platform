@@ -421,6 +421,8 @@ export const ModelName = {
   NotificationPreference: 'NotificationPreference',
   EmailLog: 'EmailLog',
   CourseAnnouncement: 'CourseAnnouncement',
+  LearningEvent: 'LearningEvent',
+  VideoWatchEvent: 'VideoWatchEvent',
   Review: 'Review',
   Comment: 'Comment',
   Order: 'Order',
@@ -443,7 +445,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "authSession" | "authToken" | "auditLog" | "category" | "course" | "section" | "lesson" | "enrollment" | "lessonProgress" | "quiz" | "question" | "quizOption" | "quizAttempt" | "attemptAnswer" | "assignment" | "assignmentSubmission" | "submissionFile" | "submissionFeedback" | "courseGradeRule" | "notification" | "notificationPreference" | "emailLog" | "courseAnnouncement" | "review" | "comment" | "order" | "orderItem" | "payment" | "paymentWebhookEvent" | "certificate"
+    modelProps: "user" | "authSession" | "authToken" | "auditLog" | "category" | "course" | "section" | "lesson" | "enrollment" | "lessonProgress" | "quiz" | "question" | "quizOption" | "quizAttempt" | "attemptAnswer" | "assignment" | "assignmentSubmission" | "submissionFile" | "submissionFeedback" | "courseGradeRule" | "notification" | "notificationPreference" | "emailLog" | "courseAnnouncement" | "learningEvent" | "videoWatchEvent" | "review" | "comment" | "order" | "orderItem" | "payment" | "paymentWebhookEvent" | "certificate"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2223,6 +2225,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    LearningEvent: {
+      payload: Prisma.$LearningEventPayload<ExtArgs>
+      fields: Prisma.LearningEventFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.LearningEventFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LearningEventPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.LearningEventFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LearningEventPayload>
+        }
+        findFirst: {
+          args: Prisma.LearningEventFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LearningEventPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.LearningEventFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LearningEventPayload>
+        }
+        findMany: {
+          args: Prisma.LearningEventFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LearningEventPayload>[]
+        }
+        create: {
+          args: Prisma.LearningEventCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LearningEventPayload>
+        }
+        createMany: {
+          args: Prisma.LearningEventCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.LearningEventCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LearningEventPayload>[]
+        }
+        delete: {
+          args: Prisma.LearningEventDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LearningEventPayload>
+        }
+        update: {
+          args: Prisma.LearningEventUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LearningEventPayload>
+        }
+        deleteMany: {
+          args: Prisma.LearningEventDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.LearningEventUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.LearningEventUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LearningEventPayload>[]
+        }
+        upsert: {
+          args: Prisma.LearningEventUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LearningEventPayload>
+        }
+        aggregate: {
+          args: Prisma.LearningEventAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateLearningEvent>
+        }
+        groupBy: {
+          args: Prisma.LearningEventGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.LearningEventGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.LearningEventCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.LearningEventCountAggregateOutputType> | number
+        }
+      }
+    }
+    VideoWatchEvent: {
+      payload: Prisma.$VideoWatchEventPayload<ExtArgs>
+      fields: Prisma.VideoWatchEventFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.VideoWatchEventFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VideoWatchEventPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.VideoWatchEventFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VideoWatchEventPayload>
+        }
+        findFirst: {
+          args: Prisma.VideoWatchEventFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VideoWatchEventPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.VideoWatchEventFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VideoWatchEventPayload>
+        }
+        findMany: {
+          args: Prisma.VideoWatchEventFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VideoWatchEventPayload>[]
+        }
+        create: {
+          args: Prisma.VideoWatchEventCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VideoWatchEventPayload>
+        }
+        createMany: {
+          args: Prisma.VideoWatchEventCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.VideoWatchEventCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VideoWatchEventPayload>[]
+        }
+        delete: {
+          args: Prisma.VideoWatchEventDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VideoWatchEventPayload>
+        }
+        update: {
+          args: Prisma.VideoWatchEventUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VideoWatchEventPayload>
+        }
+        deleteMany: {
+          args: Prisma.VideoWatchEventDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.VideoWatchEventUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.VideoWatchEventUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VideoWatchEventPayload>[]
+        }
+        upsert: {
+          args: Prisma.VideoWatchEventUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VideoWatchEventPayload>
+        }
+        aggregate: {
+          args: Prisma.VideoWatchEventAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateVideoWatchEvent>
+        }
+        groupBy: {
+          args: Prisma.VideoWatchEventGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.VideoWatchEventGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.VideoWatchEventCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.VideoWatchEventCountAggregateOutputType> | number
+        }
+      }
+    }
     Review: {
       payload: Prisma.$ReviewPayload<ExtArgs>
       fields: Prisma.ReviewFieldRefs
@@ -3145,6 +3295,40 @@ export const CourseAnnouncementScalarFieldEnum = {
 export type CourseAnnouncementScalarFieldEnum = (typeof CourseAnnouncementScalarFieldEnum)[keyof typeof CourseAnnouncementScalarFieldEnum]
 
 
+export const LearningEventScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  courseId: 'courseId',
+  lessonId: 'lessonId',
+  eventType: 'eventType',
+  sessionId: 'sessionId',
+  durationSeconds: 'durationSeconds',
+  metadata: 'metadata',
+  occurredAt: 'occurredAt',
+  createdAt: 'createdAt'
+} as const
+
+export type LearningEventScalarFieldEnum = (typeof LearningEventScalarFieldEnum)[keyof typeof LearningEventScalarFieldEnum]
+
+
+export const VideoWatchEventScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  courseId: 'courseId',
+  lessonId: 'lessonId',
+  sessionId: 'sessionId',
+  startedAt: 'startedAt',
+  endedAt: 'endedAt',
+  startPositionSeconds: 'startPositionSeconds',
+  endPositionSeconds: 'endPositionSeconds',
+  watchedSeconds: 'watchedSeconds',
+  completed: 'completed',
+  createdAt: 'createdAt'
+} as const
+
+export type VideoWatchEventScalarFieldEnum = (typeof VideoWatchEventScalarFieldEnum)[keyof typeof VideoWatchEventScalarFieldEnum]
+
+
 export const ReviewScalarFieldEnum = {
   id: 'id',
   courseId: 'courseId',
@@ -3548,6 +3732,20 @@ export type ListEnumAnnouncementStatusFieldRefInput<$PrismaModel> = FieldRefInpu
 
 
 /**
+ * Reference to a field of type 'LearningEventType'
+ */
+export type EnumLearningEventTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'LearningEventType'>
+    
+
+
+/**
+ * Reference to a field of type 'LearningEventType[]'
+ */
+export type ListEnumLearningEventTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'LearningEventType[]'>
+    
+
+
+/**
  * Reference to a field of type 'OrderStatus'
  */
 export type EnumOrderStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'OrderStatus'>
@@ -3777,6 +3975,8 @@ export type GlobalOmitConfig = {
   notificationPreference?: Prisma.NotificationPreferenceOmit
   emailLog?: Prisma.EmailLogOmit
   courseAnnouncement?: Prisma.CourseAnnouncementOmit
+  learningEvent?: Prisma.LearningEventOmit
+  videoWatchEvent?: Prisma.VideoWatchEventOmit
   review?: Prisma.ReviewOmit
   comment?: Prisma.CommentOmit
   order?: Prisma.OrderOmit

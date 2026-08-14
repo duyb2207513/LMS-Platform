@@ -22,10 +22,12 @@ import { assignmentsRouter, courseAssignmentsRouter, courseGradesRouter, submiss
 import notificationsRouter from "../modules/notifications/notification.routes.js";
 import preferencesRouter from "../modules/notification-preferences/preference.routes.js";
 import { announcementsRouter, courseAnnouncementsRouter } from "../modules/announcements/announcement.routes.js";
+import analyticsRouter from "../modules/analytics/analytics.routes.js";
 
 const router = Router();
 
 router.use("/auth", authRouter);
+router.use("/analytics", analyticsRouter);
 router.use("/admin", adminRouter);
 router.use("/categories", categoriesRouter);
 router.use("/courses/:courseId/sections", courseSectionsRouter);

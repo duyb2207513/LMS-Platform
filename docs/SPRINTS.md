@@ -14,6 +14,7 @@ Trang này là mục lục tổng cho LMS Platform. Nội dung được đối c
 | 6 | Hoàn thiện hệ thống thực tế | [Sprint 6](SPRINT-6-PRODUCTION.md) |
 | 7 | Bài tập và chấm điểm | [Sprint 7](SPRINT-7-ASSIGNMENTS.md) |
 | 8 | Notifications và communication | [Yêu cầu Sprint 8](SPRINT_8_NOTIFICATIONS_COMMUNICATION.md) · [Backend đã triển khai](SPRINT_8_BACKEND_IMPLEMENTATION.md) |
+| 9 | Analytics cho Student và Instructor | [Yêu cầu Sprint 9](SPRINT_9_ANALYTICS_DASHBOARDS.md) · [Backend đã triển khai](SPRINT_9_BACKEND_IMPLEMENTATION.md) |
 
 ## 2. Ma trận trạng thái
 
@@ -27,6 +28,7 @@ Trang này là mục lục tổng cho LMS Platform. Nội dung được đối c
 | 6 | Đã có | Đã có | Một phần | Mobile chưa có đầy đủ email/OAuth/session management |
 | 7 | Đã có | Đã có | Chưa có | Assignment và chấm điểm chưa triển khai trên mobile |
 | 8 | Đã có | Chưa có | Chưa có | Theo yêu cầu hiện tại, Sprint 8 mới triển khai backend |
+| 9 | Đã có | Chưa có | Chưa có | Analytics Student/Instructor hiện mới triển khai backend |
 
 ## 3. Kiến trúc chung
 

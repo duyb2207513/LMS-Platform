@@ -578,6 +578,23 @@ export type EnumAnnouncementStatusWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumAnnouncementStatusFilter<$PrismaModel>
 }
 
+export type EnumLearningEventTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.LearningEventType | Prisma.EnumLearningEventTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.LearningEventType[] | Prisma.ListEnumLearningEventTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.LearningEventType[] | Prisma.ListEnumLearningEventTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumLearningEventTypeFilter<$PrismaModel> | $Enums.LearningEventType
+}
+
+export type EnumLearningEventTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.LearningEventType | Prisma.EnumLearningEventTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.LearningEventType[] | Prisma.ListEnumLearningEventTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.LearningEventType[] | Prisma.ListEnumLearningEventTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumLearningEventTypeWithAggregatesFilter<$PrismaModel> | $Enums.LearningEventType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumLearningEventTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumLearningEventTypeFilter<$PrismaModel>
+}
+
 export type EnumOrderStatusFilter<$PrismaModel = never> = {
   equals?: $Enums.OrderStatus | Prisma.EnumOrderStatusFieldRefInput<$PrismaModel>
   in?: $Enums.OrderStatus[] | Prisma.ListEnumOrderStatusFieldRefInput<$PrismaModel>
@@ -1224,6 +1241,23 @@ export type NestedEnumAnnouncementStatusWithAggregatesFilter<$PrismaModel = neve
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumAnnouncementStatusFilter<$PrismaModel>
   _max?: Prisma.NestedEnumAnnouncementStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumLearningEventTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.LearningEventType | Prisma.EnumLearningEventTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.LearningEventType[] | Prisma.ListEnumLearningEventTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.LearningEventType[] | Prisma.ListEnumLearningEventTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumLearningEventTypeFilter<$PrismaModel> | $Enums.LearningEventType
+}
+
+export type NestedEnumLearningEventTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.LearningEventType | Prisma.EnumLearningEventTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.LearningEventType[] | Prisma.ListEnumLearningEventTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.LearningEventType[] | Prisma.ListEnumLearningEventTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumLearningEventTypeWithAggregatesFilter<$PrismaModel> | $Enums.LearningEventType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumLearningEventTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumLearningEventTypeFilter<$PrismaModel>
 }
 
 export type NestedEnumOrderStatusFilter<$PrismaModel = never> = {
