@@ -771,10 +771,6 @@ export type EnumCourseStatusFieldUpdateOperationsInput = {
   set?: $Enums.CourseStatus
 }
 
-export type NullableDateTimeFieldUpdateOperationsInput = {
-  set?: Date | string | null
-}
-
 export type CourseCreateNestedOneWithoutSectionsInput = {
   create?: Prisma.XOR<Prisma.CourseCreateWithoutSectionsInput, Prisma.CourseUncheckedCreateWithoutSectionsInput>
   connectOrCreate?: Prisma.CourseCreateOrConnectWithoutSectionsInput

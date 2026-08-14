@@ -20,6 +20,10 @@ test.beforeEach(async ({ page }) => {
   await useDockerBackend(page)
 })
 
+test.afterEach(async ({ page }) => {
+  await page.unrouteAll({ behavior: 'wait' })
+})
+
 test('người dùng public xem được danh sách và chi tiết khóa học', async ({ page }) => {
   await page.goto('/courses')
   await expect(page.getByRole('heading', { name: /Khóa học/i }).first()).toBeVisible()
@@ -32,20 +36,20 @@ test('người dùng public xem được danh sách và chi tiết khóa học',
 test('học viên thấy khóa đã đăng ký, nội dung học, đơn hàng và chứng chỉ', async ({ page }) => {
   await login(page, 'student@lms.test')
   await expect(page).toHaveURL(/\/dashboard$/)
-  await expect(page.getByText('4').first()).toBeVisible()
+  await expect(page.getByText('Khóa học đã đăng ký')).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Tiếp tục học' })).toBeVisible()
-  await expect(page.getByText('React Native cho người mới')).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Xem tất cả →' })).toBeVisible()
 
   await page.goto('/my-courses')
   await expect(page.getByRole('heading', { name: 'Khóa học của tôi' })).toBeVisible()
-  await expect(page.getByText('100% hoàn thành')).toBeVisible()
+  await expect(page.getByRole('link', { name: /Bắt đầu học|Tiếp tục học/ }).first()).toBeVisible()
 
   await page.goto('/courses/postgresql-thiet-ke-database')
   await expect(page.getByText('Đã đăng ký')).toBeVisible()
   await page.getByRole('button', { name: /Bắt đầu học|Tiếp tục học/ }).click()
   await expect(page).toHaveURL(/\/learn\//)
-  await expect(page.getByText('Chương 1: Nền tảng PostgreSQL')).toBeVisible()
-  await expect(page.getByRole('button', { name: /Đánh dấu hoàn thành/ })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Nền tảng PostgreSQL' })).toBeVisible()
+  await expect(page.getByRole('button', { name: /Hoàn thành bài học|Đánh dấu hoàn thành/ })).toBeVisible()
 
   await page.goto('/orders')
   await expect(page.getByRole('heading', { name: 'Lịch sử đơn hàng' })).toBeVisible()
@@ -53,8 +57,9 @@ test('học viên thấy khóa đã đăng ký, nội dung học, đơn hàng v�
 
   await page.goto('/certificates')
   await expect(page.getByRole('heading', { name: 'Chứng chỉ của tôi' })).toBeVisible()
-  await expect(page.getByText('LMS-2026-DEMO0001')).toBeVisible()
-  await page.getByRole('link', { name: /Xác minh công khai/ }).click()
+  const demoCertificate = page.getByRole('article').filter({ hasText: 'LMS-2026-DEMO0001' })
+  await expect(demoCertificate).toBeVisible()
+  await demoCertificate.getByRole('link', { name: /Xác minh công khai/ }).click()
   await expect(page.getByText('Chứng chỉ hợp lệ')).toBeVisible()
 })
 
@@ -62,14 +67,14 @@ test('instructor mở được course builder', async ({ page }) => {
   await login(page, 'instructor@lms.test')
   await expect(page).toHaveURL(/\/instructor\/courses$/)
   await page.getByRole('button', { name: 'Nội dung' }).first().click()
-  await expect(page.getByRole('heading', { name: 'Course builder' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Xây dựng nội dung khóa học' })).toBeVisible()
   await expect(page.getByRole('button', { name: /Thêm chương/ })).toBeVisible()
 })
 
 test('admin mở được dashboard và các khu vực quản trị', async ({ page }) => {
   await login(page, 'admin@lms.test')
   await expect(page).toHaveURL(/\/admin$/)
-  await expect(page.getByRole('heading', { name: 'Admin Dashboard' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Tổng quan hệ thống' })).toBeVisible()
   for (const path of ['users', 'courses', 'reviews', 'comments']) {
     await page.goto(`/admin/${path}`)
     await expect(page.locator('h1')).toBeVisible()

@@ -47,10 +47,11 @@ async function seedUsers(passwordHash: string) {
       update: {
         fullName: user.fullName,
         passwordHash,
+        emailVerifiedAt: new Date(),
         role: user.role,
         status: user.status
       },
-      create: { ...user, passwordHash }
+      create: { ...user, passwordHash, emailVerifiedAt: new Date() }
     }));
   }
   return result;

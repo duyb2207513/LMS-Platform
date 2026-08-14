@@ -90,6 +90,8 @@ cp .env.production.example .env.production
 docker compose --env-file .env.production -f docker-compose.prod.yml up -d --build
 ```
 
+Sprint 6 bổ sung xác minh email, quên/đặt lại mật khẩu, Google/GitHub login, đổi email, quản lý phiên đăng nhập, refresh-token rotation, khóa tạm khi đăng nhập sai, audit log, structured logging và Sentry tùy chọn. Hướng dẫn cấu hình chi tiết nằm tại `docs/SPRINT-6-PRODUCTION.md`.
+
 Production Compose tự chạy Prisma migration, phục vụ Vue qua Nginx, proxy `/api` và lưu PostgreSQL/uploads trong named volumes. Nên đặt reverse proxy HTTPS hoặc load balancer phía trước cổng 80, backup volume PostgreSQL định kỳ và không chạy seed demo trên dữ liệu thật.
 
 Xem log và cập nhật phiên bản:

@@ -15,6 +15,7 @@ export async function getProfile(userId: string) {
       avatarUrl: true,
       role: true,
       status: true,
+      emailVerifiedAt: true,
       createdAt: true,
       updatedAt: true
     }
@@ -39,6 +40,7 @@ export async function updateProfile(userId: string, input: UpdateProfileInput) {
         avatarUrl: true,
         role: true,
         status: true
+        ,emailVerifiedAt: true
       }
     });
   } catch (error) {
@@ -67,6 +69,7 @@ export async function setAvatar(userId: string, avatarUrl: string | null) {
         avatarUrl: true,
         role: true,
         status: true,
+        emailVerifiedAt: true,
         createdAt: true,
         updatedAt: true
       }
@@ -94,6 +97,10 @@ export async function changePassword(userId: string, input: ChangePasswordInput)
     throw new AppError(404, "User not found");
   }
 
+  if (!user.passwordHash) {
+    throw new AppError(400, "This account uses Google sign-in and does not have a password yet");
+  }
+
   const currentPasswordMatches = await bcrypt.compare(
     input.currentPassword,
     user.passwordHash
@@ -114,8 +121,8 @@ export async function changePassword(userId: string, input: ChangePasswordInput)
 
   const passwordHash = await bcrypt.hash(input.newPassword, PASSWORD_SALT_ROUNDS);
 
-  await prisma.user.update({
-    where: { id: userId },
-    data: { passwordHash }
-  });
+  await prisma.$transaction([
+    prisma.user.update({ where: { id: userId }, data: { passwordHash } }),
+    prisma.authSession.updateMany({ where: { userId, revokedAt: null }, data: { revokedAt: new Date() } })
+  ]);
 }
