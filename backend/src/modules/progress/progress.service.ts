@@ -1,12 +1,13 @@
 import { AppError } from "../../common/errors/AppError.js";
 import { prisma } from "../../config/database.js";
 import type { UpdateLessonProgressInput } from "./progress.types.js";
+import { recordSystemLearningEvent } from "../analytics/learning-event.service.js";
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 async function requireEnrollment(studentId: string, courseId: string) {
   const enrollment = await prisma.enrollment.findUnique({ where: { studentId_courseId: { studentId, courseId } } });
-  if (!enrollment || enrollment.status === "CANCELLED") throw new AppError(403, "Enroll in this course to track progress");
+  if (!enrollment || !["ACTIVE", "COMPLETED"].includes(enrollment.status)) throw new AppError(403, "Enroll in this course to track progress");
   return enrollment;
 }
 
@@ -37,14 +38,24 @@ export async function updateLessonProgress(lessonId: string, studentId: string, 
 
   const previous = await prisma.lessonProgress.findUnique({ where: { studentId_lessonId: { studentId, lessonId } } });
   const isCompleted = input.isCompleted ?? previous?.isCompleted ?? false;
+  const completedAt = isCompleted ? previous?.completedAt ?? new Date() : null;
   const progress = await prisma.lessonProgress.upsert({
     where: { studentId_lessonId: { studentId, lessonId } },
-    create: { studentId, lessonId, isCompleted, lastWatchedSecond: input.lastWatchedSecond ?? 0, completedAt: isCompleted ? new Date() : null },
-    update: { ...(input.lastWatchedSecond === undefined ? {} : { lastWatchedSecond: input.lastWatchedSecond }), ...(input.isCompleted === undefined ? {} : { isCompleted, completedAt: isCompleted ? new Date() : null }) },
-    select: { lessonId: true, isCompleted: true, lastWatchedSecond: true, completedAt: true, updatedAt: true }
+    create: { studentId, lessonId, isCompleted, lastWatchedSecond: input.lastWatchedSecond ?? 0, completedAt },
+    update: { ...(input.lastWatchedSecond === undefined ? {} : { lastWatchedSecond: input.lastWatchedSecond }), ...(input.isCompleted === undefined ? {} : { isCompleted, completedAt }) },
+    select: { id: true, lessonId: true, isCompleted: true, lastWatchedSecond: true, completedAt: true, updatedAt: true }
+  });
+  if (progress.isCompleted && progress.completedAt) await recordSystemLearningEvent({
+    userId: studentId,
+    courseId: lesson.section.courseId,
+    lessonId,
+    eventType: "LESSON_COMPLETED",
+    sessionId: progress.id,
+    occurredAt: progress.completedAt
   });
   const courseProgress = await calculateAndStoreProgress(studentId, lesson.section.courseId);
-  return { lessonProgress: progress, courseProgress };
+  const { id: _id, ...publicProgress } = progress;
+  return { lessonProgress: publicProgress, courseProgress };
 }
 
 export async function getCourseProgress(courseId: string, studentId: string) {

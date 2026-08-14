@@ -25,7 +25,14 @@
     },
     "plugins": [
       "expo-secure-store",
-      "expo-video"
+      "expo-video",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Cho phép LMS Platform truy cập thư viện ảnh để tải ảnh đại diện và thumbnail khóa học."
+        }
+      ],
+      "expo-font"
     ]
   }
 }

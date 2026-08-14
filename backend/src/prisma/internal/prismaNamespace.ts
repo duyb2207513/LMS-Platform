@@ -421,13 +421,22 @@ export const ModelName = {
   NotificationPreference: 'NotificationPreference',
   EmailLog: 'EmailLog',
   CourseAnnouncement: 'CourseAnnouncement',
+  LearningEvent: 'LearningEvent',
+  VideoWatchEvent: 'VideoWatchEvent',
   Review: 'Review',
   Comment: 'Comment',
   Order: 'Order',
   OrderItem: 'OrderItem',
   Payment: 'Payment',
   PaymentWebhookEvent: 'PaymentWebhookEvent',
-  Certificate: 'Certificate'
+  Certificate: 'Certificate',
+  Coupon: 'Coupon',
+  CouponCourse: 'CouponCourse',
+  CouponUsage: 'CouponUsage',
+  RefundRequest: 'RefundRequest',
+  PaymentRefund: 'PaymentRefund',
+  InstructorEarning: 'InstructorEarning',
+  Payout: 'Payout'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -443,7 +452,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "authSession" | "authToken" | "auditLog" | "category" | "course" | "section" | "lesson" | "enrollment" | "lessonProgress" | "quiz" | "question" | "quizOption" | "quizAttempt" | "attemptAnswer" | "assignment" | "assignmentSubmission" | "submissionFile" | "submissionFeedback" | "courseGradeRule" | "notification" | "notificationPreference" | "emailLog" | "courseAnnouncement" | "review" | "comment" | "order" | "orderItem" | "payment" | "paymentWebhookEvent" | "certificate"
+    modelProps: "user" | "authSession" | "authToken" | "auditLog" | "category" | "course" | "section" | "lesson" | "enrollment" | "lessonProgress" | "quiz" | "question" | "quizOption" | "quizAttempt" | "attemptAnswer" | "assignment" | "assignmentSubmission" | "submissionFile" | "submissionFeedback" | "courseGradeRule" | "notification" | "notificationPreference" | "emailLog" | "courseAnnouncement" | "learningEvent" | "videoWatchEvent" | "review" | "comment" | "order" | "orderItem" | "payment" | "paymentWebhookEvent" | "certificate" | "coupon" | "couponCourse" | "couponUsage" | "refundRequest" | "paymentRefund" | "instructorEarning" | "payout"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2223,6 +2232,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    LearningEvent: {
+      payload: Prisma.$LearningEventPayload<ExtArgs>
+      fields: Prisma.LearningEventFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.LearningEventFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LearningEventPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.LearningEventFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LearningEventPayload>
+        }
+        findFirst: {
+          args: Prisma.LearningEventFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LearningEventPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.LearningEventFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LearningEventPayload>
+        }
+        findMany: {
+          args: Prisma.LearningEventFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LearningEventPayload>[]
+        }
+        create: {
+          args: Prisma.LearningEventCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LearningEventPayload>
+        }
+        createMany: {
+          args: Prisma.LearningEventCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.LearningEventCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LearningEventPayload>[]
+        }
+        delete: {
+          args: Prisma.LearningEventDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LearningEventPayload>
+        }
+        update: {
+          args: Prisma.LearningEventUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LearningEventPayload>
+        }
+        deleteMany: {
+          args: Prisma.LearningEventDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.LearningEventUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.LearningEventUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LearningEventPayload>[]
+        }
+        upsert: {
+          args: Prisma.LearningEventUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LearningEventPayload>
+        }
+        aggregate: {
+          args: Prisma.LearningEventAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateLearningEvent>
+        }
+        groupBy: {
+          args: Prisma.LearningEventGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.LearningEventGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.LearningEventCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.LearningEventCountAggregateOutputType> | number
+        }
+      }
+    }
+    VideoWatchEvent: {
+      payload: Prisma.$VideoWatchEventPayload<ExtArgs>
+      fields: Prisma.VideoWatchEventFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.VideoWatchEventFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VideoWatchEventPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.VideoWatchEventFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VideoWatchEventPayload>
+        }
+        findFirst: {
+          args: Prisma.VideoWatchEventFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VideoWatchEventPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.VideoWatchEventFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VideoWatchEventPayload>
+        }
+        findMany: {
+          args: Prisma.VideoWatchEventFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VideoWatchEventPayload>[]
+        }
+        create: {
+          args: Prisma.VideoWatchEventCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VideoWatchEventPayload>
+        }
+        createMany: {
+          args: Prisma.VideoWatchEventCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.VideoWatchEventCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VideoWatchEventPayload>[]
+        }
+        delete: {
+          args: Prisma.VideoWatchEventDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VideoWatchEventPayload>
+        }
+        update: {
+          args: Prisma.VideoWatchEventUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VideoWatchEventPayload>
+        }
+        deleteMany: {
+          args: Prisma.VideoWatchEventDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.VideoWatchEventUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.VideoWatchEventUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VideoWatchEventPayload>[]
+        }
+        upsert: {
+          args: Prisma.VideoWatchEventUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$VideoWatchEventPayload>
+        }
+        aggregate: {
+          args: Prisma.VideoWatchEventAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateVideoWatchEvent>
+        }
+        groupBy: {
+          args: Prisma.VideoWatchEventGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.VideoWatchEventGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.VideoWatchEventCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.VideoWatchEventCountAggregateOutputType> | number
+        }
+      }
+    }
     Review: {
       payload: Prisma.$ReviewPayload<ExtArgs>
       fields: Prisma.ReviewFieldRefs
@@ -2741,6 +2898,524 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    Coupon: {
+      payload: Prisma.$CouponPayload<ExtArgs>
+      fields: Prisma.CouponFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CouponFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CouponPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CouponFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CouponPayload>
+        }
+        findFirst: {
+          args: Prisma.CouponFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CouponPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CouponFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CouponPayload>
+        }
+        findMany: {
+          args: Prisma.CouponFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CouponPayload>[]
+        }
+        create: {
+          args: Prisma.CouponCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CouponPayload>
+        }
+        createMany: {
+          args: Prisma.CouponCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.CouponCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CouponPayload>[]
+        }
+        delete: {
+          args: Prisma.CouponDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CouponPayload>
+        }
+        update: {
+          args: Prisma.CouponUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CouponPayload>
+        }
+        deleteMany: {
+          args: Prisma.CouponDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CouponUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.CouponUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CouponPayload>[]
+        }
+        upsert: {
+          args: Prisma.CouponUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CouponPayload>
+        }
+        aggregate: {
+          args: Prisma.CouponAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCoupon>
+        }
+        groupBy: {
+          args: Prisma.CouponGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CouponGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CouponCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CouponCountAggregateOutputType> | number
+        }
+      }
+    }
+    CouponCourse: {
+      payload: Prisma.$CouponCoursePayload<ExtArgs>
+      fields: Prisma.CouponCourseFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CouponCourseFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CouponCoursePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CouponCourseFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CouponCoursePayload>
+        }
+        findFirst: {
+          args: Prisma.CouponCourseFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CouponCoursePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CouponCourseFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CouponCoursePayload>
+        }
+        findMany: {
+          args: Prisma.CouponCourseFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CouponCoursePayload>[]
+        }
+        create: {
+          args: Prisma.CouponCourseCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CouponCoursePayload>
+        }
+        createMany: {
+          args: Prisma.CouponCourseCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.CouponCourseCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CouponCoursePayload>[]
+        }
+        delete: {
+          args: Prisma.CouponCourseDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CouponCoursePayload>
+        }
+        update: {
+          args: Prisma.CouponCourseUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CouponCoursePayload>
+        }
+        deleteMany: {
+          args: Prisma.CouponCourseDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CouponCourseUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.CouponCourseUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CouponCoursePayload>[]
+        }
+        upsert: {
+          args: Prisma.CouponCourseUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CouponCoursePayload>
+        }
+        aggregate: {
+          args: Prisma.CouponCourseAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCouponCourse>
+        }
+        groupBy: {
+          args: Prisma.CouponCourseGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CouponCourseGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CouponCourseCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CouponCourseCountAggregateOutputType> | number
+        }
+      }
+    }
+    CouponUsage: {
+      payload: Prisma.$CouponUsagePayload<ExtArgs>
+      fields: Prisma.CouponUsageFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CouponUsageFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CouponUsagePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CouponUsageFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CouponUsagePayload>
+        }
+        findFirst: {
+          args: Prisma.CouponUsageFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CouponUsagePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CouponUsageFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CouponUsagePayload>
+        }
+        findMany: {
+          args: Prisma.CouponUsageFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CouponUsagePayload>[]
+        }
+        create: {
+          args: Prisma.CouponUsageCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CouponUsagePayload>
+        }
+        createMany: {
+          args: Prisma.CouponUsageCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.CouponUsageCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CouponUsagePayload>[]
+        }
+        delete: {
+          args: Prisma.CouponUsageDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CouponUsagePayload>
+        }
+        update: {
+          args: Prisma.CouponUsageUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CouponUsagePayload>
+        }
+        deleteMany: {
+          args: Prisma.CouponUsageDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CouponUsageUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.CouponUsageUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CouponUsagePayload>[]
+        }
+        upsert: {
+          args: Prisma.CouponUsageUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CouponUsagePayload>
+        }
+        aggregate: {
+          args: Prisma.CouponUsageAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCouponUsage>
+        }
+        groupBy: {
+          args: Prisma.CouponUsageGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CouponUsageGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CouponUsageCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CouponUsageCountAggregateOutputType> | number
+        }
+      }
+    }
+    RefundRequest: {
+      payload: Prisma.$RefundRequestPayload<ExtArgs>
+      fields: Prisma.RefundRequestFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.RefundRequestFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RefundRequestPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.RefundRequestFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RefundRequestPayload>
+        }
+        findFirst: {
+          args: Prisma.RefundRequestFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RefundRequestPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.RefundRequestFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RefundRequestPayload>
+        }
+        findMany: {
+          args: Prisma.RefundRequestFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RefundRequestPayload>[]
+        }
+        create: {
+          args: Prisma.RefundRequestCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RefundRequestPayload>
+        }
+        createMany: {
+          args: Prisma.RefundRequestCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.RefundRequestCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RefundRequestPayload>[]
+        }
+        delete: {
+          args: Prisma.RefundRequestDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RefundRequestPayload>
+        }
+        update: {
+          args: Prisma.RefundRequestUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RefundRequestPayload>
+        }
+        deleteMany: {
+          args: Prisma.RefundRequestDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.RefundRequestUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.RefundRequestUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RefundRequestPayload>[]
+        }
+        upsert: {
+          args: Prisma.RefundRequestUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RefundRequestPayload>
+        }
+        aggregate: {
+          args: Prisma.RefundRequestAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateRefundRequest>
+        }
+        groupBy: {
+          args: Prisma.RefundRequestGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RefundRequestGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.RefundRequestCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RefundRequestCountAggregateOutputType> | number
+        }
+      }
+    }
+    PaymentRefund: {
+      payload: Prisma.$PaymentRefundPayload<ExtArgs>
+      fields: Prisma.PaymentRefundFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PaymentRefundFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentRefundPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PaymentRefundFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentRefundPayload>
+        }
+        findFirst: {
+          args: Prisma.PaymentRefundFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentRefundPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PaymentRefundFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentRefundPayload>
+        }
+        findMany: {
+          args: Prisma.PaymentRefundFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentRefundPayload>[]
+        }
+        create: {
+          args: Prisma.PaymentRefundCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentRefundPayload>
+        }
+        createMany: {
+          args: Prisma.PaymentRefundCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PaymentRefundCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentRefundPayload>[]
+        }
+        delete: {
+          args: Prisma.PaymentRefundDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentRefundPayload>
+        }
+        update: {
+          args: Prisma.PaymentRefundUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentRefundPayload>
+        }
+        deleteMany: {
+          args: Prisma.PaymentRefundDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PaymentRefundUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PaymentRefundUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentRefundPayload>[]
+        }
+        upsert: {
+          args: Prisma.PaymentRefundUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentRefundPayload>
+        }
+        aggregate: {
+          args: Prisma.PaymentRefundAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePaymentRefund>
+        }
+        groupBy: {
+          args: Prisma.PaymentRefundGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PaymentRefundGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PaymentRefundCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PaymentRefundCountAggregateOutputType> | number
+        }
+      }
+    }
+    InstructorEarning: {
+      payload: Prisma.$InstructorEarningPayload<ExtArgs>
+      fields: Prisma.InstructorEarningFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.InstructorEarningFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InstructorEarningPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.InstructorEarningFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InstructorEarningPayload>
+        }
+        findFirst: {
+          args: Prisma.InstructorEarningFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InstructorEarningPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.InstructorEarningFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InstructorEarningPayload>
+        }
+        findMany: {
+          args: Prisma.InstructorEarningFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InstructorEarningPayload>[]
+        }
+        create: {
+          args: Prisma.InstructorEarningCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InstructorEarningPayload>
+        }
+        createMany: {
+          args: Prisma.InstructorEarningCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.InstructorEarningCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InstructorEarningPayload>[]
+        }
+        delete: {
+          args: Prisma.InstructorEarningDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InstructorEarningPayload>
+        }
+        update: {
+          args: Prisma.InstructorEarningUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InstructorEarningPayload>
+        }
+        deleteMany: {
+          args: Prisma.InstructorEarningDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.InstructorEarningUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.InstructorEarningUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InstructorEarningPayload>[]
+        }
+        upsert: {
+          args: Prisma.InstructorEarningUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$InstructorEarningPayload>
+        }
+        aggregate: {
+          args: Prisma.InstructorEarningAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateInstructorEarning>
+        }
+        groupBy: {
+          args: Prisma.InstructorEarningGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.InstructorEarningGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.InstructorEarningCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.InstructorEarningCountAggregateOutputType> | number
+        }
+      }
+    }
+    Payout: {
+      payload: Prisma.$PayoutPayload<ExtArgs>
+      fields: Prisma.PayoutFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PayoutFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PayoutPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PayoutFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PayoutPayload>
+        }
+        findFirst: {
+          args: Prisma.PayoutFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PayoutPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PayoutFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PayoutPayload>
+        }
+        findMany: {
+          args: Prisma.PayoutFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PayoutPayload>[]
+        }
+        create: {
+          args: Prisma.PayoutCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PayoutPayload>
+        }
+        createMany: {
+          args: Prisma.PayoutCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PayoutCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PayoutPayload>[]
+        }
+        delete: {
+          args: Prisma.PayoutDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PayoutPayload>
+        }
+        update: {
+          args: Prisma.PayoutUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PayoutPayload>
+        }
+        deleteMany: {
+          args: Prisma.PayoutDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PayoutUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PayoutUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PayoutPayload>[]
+        }
+        upsert: {
+          args: Prisma.PayoutUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PayoutPayload>
+        }
+        aggregate: {
+          args: Prisma.PayoutAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePayout>
+        }
+        groupBy: {
+          args: Prisma.PayoutGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PayoutGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PayoutCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PayoutCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -3145,6 +3820,40 @@ export const CourseAnnouncementScalarFieldEnum = {
 export type CourseAnnouncementScalarFieldEnum = (typeof CourseAnnouncementScalarFieldEnum)[keyof typeof CourseAnnouncementScalarFieldEnum]
 
 
+export const LearningEventScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  courseId: 'courseId',
+  lessonId: 'lessonId',
+  eventType: 'eventType',
+  sessionId: 'sessionId',
+  durationSeconds: 'durationSeconds',
+  metadata: 'metadata',
+  occurredAt: 'occurredAt',
+  createdAt: 'createdAt'
+} as const
+
+export type LearningEventScalarFieldEnum = (typeof LearningEventScalarFieldEnum)[keyof typeof LearningEventScalarFieldEnum]
+
+
+export const VideoWatchEventScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  courseId: 'courseId',
+  lessonId: 'lessonId',
+  sessionId: 'sessionId',
+  startedAt: 'startedAt',
+  endedAt: 'endedAt',
+  startPositionSeconds: 'startPositionSeconds',
+  endPositionSeconds: 'endPositionSeconds',
+  watchedSeconds: 'watchedSeconds',
+  completed: 'completed',
+  createdAt: 'createdAt'
+} as const
+
+export type VideoWatchEventScalarFieldEnum = (typeof VideoWatchEventScalarFieldEnum)[keyof typeof VideoWatchEventScalarFieldEnum]
+
+
 export const ReviewScalarFieldEnum = {
   id: 'id',
   courseId: 'courseId',
@@ -3182,7 +3891,9 @@ export const OrderScalarFieldEnum = {
   currency: 'currency',
   paidAt: 'paidAt',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  couponId: 'couponId',
+  discount: 'discount'
 } as const
 
 export type OrderScalarFieldEnum = (typeof OrderScalarFieldEnum)[keyof typeof OrderScalarFieldEnum]
@@ -3246,6 +3957,130 @@ export const CertificateScalarFieldEnum = {
 } as const
 
 export type CertificateScalarFieldEnum = (typeof CertificateScalarFieldEnum)[keyof typeof CertificateScalarFieldEnum]
+
+
+export const CouponScalarFieldEnum = {
+  id: 'id',
+  code: 'code',
+  name: 'name',
+  description: 'description',
+  discountType: 'discountType',
+  discountValue: 'discountValue',
+  maxDiscountAmount: 'maxDiscountAmount',
+  minOrderAmount: 'minOrderAmount',
+  startsAt: 'startsAt',
+  expiresAt: 'expiresAt',
+  maxRedemptions: 'maxRedemptions',
+  redeemedCount: 'redeemedCount',
+  appliesToAllCourses: 'appliesToAllCourses',
+  isActive: 'isActive',
+  createdById: 'createdById',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CouponScalarFieldEnum = (typeof CouponScalarFieldEnum)[keyof typeof CouponScalarFieldEnum]
+
+
+export const CouponCourseScalarFieldEnum = {
+  couponId: 'couponId',
+  courseId: 'courseId',
+  createdAt: 'createdAt'
+} as const
+
+export type CouponCourseScalarFieldEnum = (typeof CouponCourseScalarFieldEnum)[keyof typeof CouponCourseScalarFieldEnum]
+
+
+export const CouponUsageScalarFieldEnum = {
+  id: 'id',
+  couponId: 'couponId',
+  userId: 'userId',
+  orderId: 'orderId',
+  discountAmount: 'discountAmount',
+  status: 'status',
+  usedAt: 'usedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type CouponUsageScalarFieldEnum = (typeof CouponUsageScalarFieldEnum)[keyof typeof CouponUsageScalarFieldEnum]
+
+
+export const RefundRequestScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  orderId: 'orderId',
+  paymentId: 'paymentId',
+  reason: 'reason',
+  status: 'status',
+  requestedAmount: 'requestedAmount',
+  approvedAmount: 'approvedAmount',
+  adminNote: 'adminNote',
+  reviewedById: 'reviewedById',
+  reviewedAt: 'reviewedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type RefundRequestScalarFieldEnum = (typeof RefundRequestScalarFieldEnum)[keyof typeof RefundRequestScalarFieldEnum]
+
+
+export const PaymentRefundScalarFieldEnum = {
+  id: 'id',
+  refundRequestId: 'refundRequestId',
+  paymentId: 'paymentId',
+  providerRefundId: 'providerRefundId',
+  idempotencyKey: 'idempotencyKey',
+  amount: 'amount',
+  status: 'status',
+  failureReason: 'failureReason',
+  processedAt: 'processedAt',
+  providerPayload: 'providerPayload',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PaymentRefundScalarFieldEnum = (typeof PaymentRefundScalarFieldEnum)[keyof typeof PaymentRefundScalarFieldEnum]
+
+
+export const InstructorEarningScalarFieldEnum = {
+  id: 'id',
+  instructorId: 'instructorId',
+  courseId: 'courseId',
+  orderId: 'orderId',
+  orderItemId: 'orderItemId',
+  paymentId: 'paymentId',
+  grossAmount: 'grossAmount',
+  platformFeeRate: 'platformFeeRate',
+  platformFeeAmount: 'platformFeeAmount',
+  netAmount: 'netAmount',
+  currency: 'currency',
+  status: 'status',
+  availableAt: 'availableAt',
+  payoutId: 'payoutId',
+  reversedAt: 'reversedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type InstructorEarningScalarFieldEnum = (typeof InstructorEarningScalarFieldEnum)[keyof typeof InstructorEarningScalarFieldEnum]
+
+
+export const PayoutScalarFieldEnum = {
+  id: 'id',
+  instructorId: 'instructorId',
+  amount: 'amount',
+  currency: 'currency',
+  status: 'status',
+  providerReference: 'providerReference',
+  failureReason: 'failureReason',
+  createdById: 'createdById',
+  idempotencyKey: 'idempotencyKey',
+  processedAt: 'processedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PayoutScalarFieldEnum = (typeof PayoutScalarFieldEnum)[keyof typeof PayoutScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -3548,6 +4383,20 @@ export type ListEnumAnnouncementStatusFieldRefInput<$PrismaModel> = FieldRefInpu
 
 
 /**
+ * Reference to a field of type 'LearningEventType'
+ */
+export type EnumLearningEventTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'LearningEventType'>
+    
+
+
+/**
+ * Reference to a field of type 'LearningEventType[]'
+ */
+export type ListEnumLearningEventTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'LearningEventType[]'>
+    
+
+
+/**
  * Reference to a field of type 'OrderStatus'
  */
 export type EnumOrderStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'OrderStatus'>
@@ -3586,6 +4435,90 @@ export type EnumPaymentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$Pr
  * Reference to a field of type 'PaymentStatus[]'
  */
 export type ListEnumPaymentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PaymentStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'CouponDiscountType'
+ */
+export type EnumCouponDiscountTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CouponDiscountType'>
+    
+
+
+/**
+ * Reference to a field of type 'CouponDiscountType[]'
+ */
+export type ListEnumCouponDiscountTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CouponDiscountType[]'>
+    
+
+
+/**
+ * Reference to a field of type 'CouponUsageStatus'
+ */
+export type EnumCouponUsageStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CouponUsageStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'CouponUsageStatus[]'
+ */
+export type ListEnumCouponUsageStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CouponUsageStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'RefundRequestStatus'
+ */
+export type EnumRefundRequestStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RefundRequestStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'RefundRequestStatus[]'
+ */
+export type ListEnumRefundRequestStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RefundRequestStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'PaymentRefundStatus'
+ */
+export type EnumPaymentRefundStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PaymentRefundStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'PaymentRefundStatus[]'
+ */
+export type ListEnumPaymentRefundStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PaymentRefundStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'EarningStatus'
+ */
+export type EnumEarningStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EarningStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'EarningStatus[]'
+ */
+export type ListEnumEarningStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EarningStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'PayoutStatus'
+ */
+export type EnumPayoutStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PayoutStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'PayoutStatus[]'
+ */
+export type ListEnumPayoutStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PayoutStatus[]'>
     
 
 
@@ -3777,6 +4710,8 @@ export type GlobalOmitConfig = {
   notificationPreference?: Prisma.NotificationPreferenceOmit
   emailLog?: Prisma.EmailLogOmit
   courseAnnouncement?: Prisma.CourseAnnouncementOmit
+  learningEvent?: Prisma.LearningEventOmit
+  videoWatchEvent?: Prisma.VideoWatchEventOmit
   review?: Prisma.ReviewOmit
   comment?: Prisma.CommentOmit
   order?: Prisma.OrderOmit
@@ -3784,6 +4719,13 @@ export type GlobalOmitConfig = {
   payment?: Prisma.PaymentOmit
   paymentWebhookEvent?: Prisma.PaymentWebhookEventOmit
   certificate?: Prisma.CertificateOmit
+  coupon?: Prisma.CouponOmit
+  couponCourse?: Prisma.CouponCourseOmit
+  couponUsage?: Prisma.CouponUsageOmit
+  refundRequest?: Prisma.RefundRequestOmit
+  paymentRefund?: Prisma.PaymentRefundOmit
+  instructorEarning?: Prisma.InstructorEarningOmit
+  payout?: Prisma.PayoutOmit
 }
 
 /* Types for Logging */

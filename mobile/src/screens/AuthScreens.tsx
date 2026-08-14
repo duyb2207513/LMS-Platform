@@ -14,7 +14,7 @@ export function LoginScreen({ navigation }: NativeStackScreenProps<RootStackPara
   async function submit() {
     if (!email.trim() || !password) return setError('Vui lòng nhập email và mật khẩu');
     setLoading(true); setError('');
-    try { await login(email.trim().toLowerCase(), password); navigation.replace('Dashboard'); }
+    try { await login(email.trim().toLowerCase(), password); navigation.replace('Main', { screen: 'AccountTab' }); }
     catch (e) { setError(getApiMessage(e, 'Email hoặc mật khẩu không đúng')); }
     finally { setLoading(false); }
   }

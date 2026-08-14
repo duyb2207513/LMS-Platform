@@ -138,6 +138,16 @@ export type EmailLog = Prisma.EmailLogModel
  */
 export type CourseAnnouncement = Prisma.CourseAnnouncementModel
 /**
+ * Model LearningEvent
+ * 
+ */
+export type LearningEvent = Prisma.LearningEventModel
+/**
+ * Model VideoWatchEvent
+ * 
+ */
+export type VideoWatchEvent = Prisma.VideoWatchEventModel
+/**
  * Model Review
  * 
  */
@@ -172,3 +182,38 @@ export type PaymentWebhookEvent = Prisma.PaymentWebhookEventModel
  * 
  */
 export type Certificate = Prisma.CertificateModel
+/**
+ * Model Coupon
+ * 
+ */
+export type Coupon = Prisma.CouponModel
+/**
+ * Model CouponCourse
+ * 
+ */
+export type CouponCourse = Prisma.CouponCourseModel
+/**
+ * Model CouponUsage
+ * 
+ */
+export type CouponUsage = Prisma.CouponUsageModel
+/**
+ * Model RefundRequest
+ * 
+ */
+export type RefundRequest = Prisma.RefundRequestModel
+/**
+ * Model PaymentRefund
+ * 
+ */
+export type PaymentRefund = Prisma.PaymentRefundModel
+/**
+ * Model InstructorEarning
+ * 
+ */
+export type InstructorEarning = Prisma.InstructorEarningModel
+/**
+ * Model Payout
+ * 
+ */
+export type Payout = Prisma.PayoutModel

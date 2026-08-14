@@ -98,7 +98,7 @@ export async function listMyAttempts(quizId: string, studentId: string) {
 }
 export async function submitAttempt(attemptId: string, studentId: string, input: SubmitAttemptInput) {
   if (!UUID.test(attemptId)) throw new AppError(404, "Quiz attempt not found");
-  const attempt = await prisma.quizAttempt.findUnique({ where: { id: attemptId }, include: { quiz: { include: quizTree } } });
+  const attempt = await prisma.quizAttempt.findUnique({ where: { id: attemptId }, include: { quiz: { include: { ...quizTree, lesson: { select: { id: true, section: { select: { courseId: true } } } } } } } });
   if (!attempt || attempt.studentId !== studentId) throw new AppError(404, "Quiz attempt not found");
   if (attempt.status !== "IN_PROGRESS") throw new AppError(409, "Quiz attempt has already been submitted");
   const questionMap = new Map(attempt.quiz.questions.map(question => [question.id, question]));
@@ -111,11 +111,13 @@ export async function submitAttempt(attemptId: string, studentId: string, input:
   const earnedPoints = answers.reduce((sum, answer) => sum + answer.pointsEarned, 0);
   const score = totalPoints ? Math.round((earnedPoints / totalPoints) * 10000) / 100 : 0;
   const passed = score >= attempt.quiz.passingScore;
+  const submittedAt = new Date();
   await prisma.$transaction(async transaction => {
-    const claimed = await transaction.quizAttempt.updateMany({ where: { id: attemptId, status: "IN_PROGRESS" }, data: { status: "SUBMITTED", score, earnedPoints, totalPoints, passed, submittedAt: new Date() } });
+    const claimed = await transaction.quizAttempt.updateMany({ where: { id: attemptId, status: "IN_PROGRESS" }, data: { status: "SUBMITTED", score, earnedPoints, totalPoints, passed, submittedAt } });
     if (!claimed.count) throw new AppError(409, "Quiz attempt has already been submitted");
     if (answers.length) await transaction.attemptAnswer.createMany({ data: answers.map(answer => ({ ...answer, attemptId })) });
+    await transaction.learningEvent.create({ data: { userId: studentId, courseId: attempt.quiz.lesson.section.courseId, lessonId: attempt.quiz.lesson.id, eventType: "QUIZ_SUBMITTED", sessionId: attempt.id, occurredAt: submittedAt, metadata: { quizId: attempt.quizId, attemptId: attempt.id, score } } });
   });
   await safelyRunCommunication(() => createNotification({ userId: studentId, type: "QUIZ_RESULT", title: `Kết quả quiz: ${attempt.quiz.title}`, message: `Bạn đạt ${score}%${passed ? " và đã vượt qua" : ""}.`, data: { url: `/quizzes/${attempt.quizId}/result/${attempt.id}`, quizId: attempt.quizId, attemptId: attempt.id } }));
-  return { id: attempt.id, quizId: attempt.quizId, attemptNumber: attempt.attemptNumber, status: "SUBMITTED" as const, score, earnedPoints, totalPoints, passed, submittedAt: new Date(), answers: attempt.quiz.questions.map(question => { const selected = answers.find(answer => answer.questionId === question.id); return { questionId: question.id, question: question.text, selectedOptionId: selected?.optionId ?? null, correctOptionId: question.options.find(option => option.isCorrect)?.id, isCorrect: selected?.isCorrect ?? false, pointsEarned: selected?.pointsEarned ?? 0, explanation: question.explanation }; }) };
+  return { id: attempt.id, quizId: attempt.quizId, attemptNumber: attempt.attemptNumber, status: "SUBMITTED" as const, score, earnedPoints, totalPoints, passed, submittedAt, answers: attempt.quiz.questions.map(question => { const selected = answers.find(answer => answer.questionId === question.id); return { questionId: question.id, question: question.text, selectedOptionId: selected?.optionId ?? null, correctOptionId: question.options.find(option => option.isCorrect)?.id, isCorrect: selected?.isCorrect ?? false, pointsEarned: selected?.pointsEarned ?? 0, explanation: question.explanation }; }) };
 }

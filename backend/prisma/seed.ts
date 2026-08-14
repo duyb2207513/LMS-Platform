@@ -510,11 +510,70 @@ async function seedSprint8(studentId: string, instructorId: string) {
   });
 }
 
+async function seedSprint9(studentId: string) {
+  const course = await prisma.course.findUniqueOrThrow({ where: { slug: "react-native-cho-nguoi-moi" } });
+  const textLessonId = "20000000-0000-4000-8000-000000000001";
+  const videoLessonId = "20000000-0000-4000-8000-000000000002";
+  const events = [
+    { sessionId: "90000000-0000-4000-8000-000000000001", lessonId: textLessonId, eventType: "LESSON_STARTED" as const, durationSeconds: null, occurredAt: new Date("2026-08-10T02:00:00.000Z") },
+    { sessionId: "90000000-0000-4000-8000-000000000002", lessonId: textLessonId, eventType: "STUDY_SESSION" as const, durationSeconds: 300, occurredAt: new Date("2026-08-10T02:01:00.000Z") },
+    { sessionId: "90000000-0000-4000-8000-000000000003", lessonId: textLessonId, eventType: "LESSON_COMPLETED" as const, durationSeconds: null, occurredAt: new Date("2026-08-10T02:21:00.000Z") },
+    { sessionId: "90000000-0000-4000-8000-000000000004", lessonId: videoLessonId, eventType: "LESSON_STARTED" as const, durationSeconds: null, occurredAt: new Date("2026-08-11T03:00:00.000Z") },
+    { sessionId: "90000000-0000-4000-8000-000000000005", lessonId: videoLessonId, eventType: "STUDY_SESSION" as const, durationSeconds: 300, occurredAt: new Date("2026-08-12T03:00:00.000Z") },
+    { sessionId: "90000000-0000-4000-8000-000000000006", lessonId: videoLessonId, eventType: "STUDY_SESSION" as const, durationSeconds: 300, occurredAt: new Date("2026-08-13T03:00:00.000Z") },
+    { sessionId: "90000000-0000-4000-8000-000000000007", lessonId: videoLessonId, eventType: "STUDY_SESSION" as const, durationSeconds: 300, occurredAt: new Date("2026-08-14T03:00:00.000Z") }
+  ];
+  for (const event of events) {
+    await prisma.learningEvent.upsert({
+      where: { userId_sessionId_eventType_occurredAt: { userId: studentId, sessionId: event.sessionId, eventType: event.eventType, occurredAt: event.occurredAt } },
+      update: { courseId: course.id, lessonId: event.lessonId, durationSeconds: event.durationSeconds },
+      create: { ...event, userId: studentId, courseId: course.id }
+    });
+  }
+  await prisma.videoWatchEvent.upsert({
+    where: { userId_sessionId_startedAt: { userId: studentId, sessionId: "91000000-0000-4000-8000-000000000001", startedAt: new Date("2026-08-14T03:10:00.000Z") } },
+    update: { watchedSeconds: 180, endPositionSeconds: 180 },
+    create: {
+      userId: studentId,
+      courseId: course.id,
+      lessonId: videoLessonId,
+      sessionId: "91000000-0000-4000-8000-000000000001",
+      startedAt: new Date("2026-08-14T03:10:00.000Z"),
+      endedAt: new Date("2026-08-14T03:13:00.000Z"),
+      startPositionSeconds: 0,
+      endPositionSeconds: 180,
+      watchedSeconds: 180,
+      completed: false
+    }
+  });
+}
+
+async function seedSprint10(studentId: string, instructorId: string, adminId: string) {
+  const course = await prisma.course.findUniqueOrThrow({ where: { slug: "expressjs-rest-api-tu-co-ban" } });
+  const couponDefinitions = [
+    { code: "WELCOME20", name: "Welcome 20%", discountType: "PERCENTAGE" as const, discountValue: 20, maxDiscountAmount: 300000, minOrderAmount: 100000, startsAt: new Date("2026-01-01T00:00:00.000Z"), expiresAt: new Date("2030-12-31T23:59:59.000Z"), maxRedemptions: 100, appliesToAllCourses: true, isActive: true },
+    { code: "SAVE100K", name: "Save 100,000 VND", discountType: "FIXED_AMOUNT" as const, discountValue: 100000, maxDiscountAmount: null, minOrderAmount: 200000, startsAt: new Date("2026-01-01T00:00:00.000Z"), expiresAt: new Date("2030-12-31T23:59:59.000Z"), maxRedemptions: 50, appliesToAllCourses: true, isActive: true },
+    { code: "EXP2025", name: "Expired coupon", discountType: "PERCENTAGE" as const, discountValue: 10, maxDiscountAmount: null, minOrderAmount: null, startsAt: new Date("2025-01-01T00:00:00.000Z"), expiresAt: new Date("2025-12-31T23:59:59.000Z"), maxRedemptions: null, appliesToAllCourses: true, isActive: true },
+    { code: "INACTIVE15", name: "Inactive coupon", discountType: "PERCENTAGE" as const, discountValue: 15, maxDiscountAmount: null, minOrderAmount: null, startsAt: new Date("2026-01-01T00:00:00.000Z"), expiresAt: new Date("2030-12-31T23:59:59.000Z"), maxRedemptions: null, appliesToAllCourses: true, isActive: false }
+  ];
+  for (const coupon of couponDefinitions) await prisma.coupon.upsert({ where: { code: coupon.code }, update: { ...coupon, createdById: adminId }, create: { ...coupon, createdById: adminId } });
+  const scoped = await prisma.coupon.upsert({ where: { code: "EXPRESS25" }, update: { name: "ExpressJS course 25%", discountType: "PERCENTAGE", discountValue: 25, startsAt: new Date("2026-01-01T00:00:00.000Z"), expiresAt: new Date("2030-12-31T23:59:59.000Z"), appliesToAllCourses: false, isActive: true, createdById: adminId }, create: { code: "EXPRESS25", name: "ExpressJS course 25%", discountType: "PERCENTAGE", discountValue: 25, startsAt: new Date("2026-01-01T00:00:00.000Z"), expiresAt: new Date("2030-12-31T23:59:59.000Z"), appliesToAllCourses: false, isActive: true, createdById: adminId } });
+  await prisma.couponCourse.upsert({ where: { couponId_courseId: { couponId: scoped.id, courseId: course.id } }, update: {}, create: { couponId: scoped.id, courseId: course.id } });
+
+  const order = await prisma.order.findUniqueOrThrow({ where: { id: "60000000-0000-4000-8000-000000000001" } });
+  const item = await prisma.orderItem.findUniqueOrThrow({ where: { orderId_courseId: { orderId: order.id, courseId: course.id } } });
+  const payment = await prisma.payment.findUniqueOrThrow({ where: { idempotencyKey: "seed-demo-payment-001" } });
+  await prisma.instructorEarning.upsert({ where: { orderItemId: item.id }, update: { instructorId, courseId: course.id, orderId: order.id, paymentId: payment.id, grossAmount: 299000, platformFeeRate: 20, platformFeeAmount: 59800, netAmount: 239200, status: "AVAILABLE", availableAt: new Date("2026-08-12T08:00:00.000Z"), payoutId: null, reversedAt: null }, create: { instructorId, courseId: course.id, orderId: order.id, orderItemId: item.id, paymentId: payment.id, grossAmount: 299000, platformFeeRate: 20, platformFeeAmount: 59800, netAmount: 239200, status: "AVAILABLE", availableAt: new Date("2026-08-12T08:00:00.000Z") } });
+  await prisma.refundRequest.upsert({ where: { id: "a0000000-0000-4000-8000-000000000001" }, update: { userId: studentId, orderId: order.id, paymentId: payment.id, reason: "Demo refund request outside the policy.", status: "REJECTED", requestedAmount: 299000, adminNote: "Demo rejected request", reviewedById: adminId, reviewedAt: new Date("2026-08-13T08:00:00.000Z") }, create: { id: "a0000000-0000-4000-8000-000000000001", userId: studentId, orderId: order.id, paymentId: payment.id, reason: "Demo refund request outside the policy.", status: "REJECTED", requestedAmount: 299000, adminNote: "Demo rejected request", reviewedById: adminId, reviewedAt: new Date("2026-08-13T08:00:00.000Z") } });
+  await prisma.payout.upsert({ where: { idempotencyKey: "seed-demo-payout-failed" }, update: { instructorId, amount: 239200, status: "FAILED", failureReason: "Sandbox payout failure", createdById: adminId, processedAt: new Date("2026-08-14T08:00:00.000Z") }, create: { instructorId, amount: 239200, status: "FAILED", failureReason: "Sandbox payout failure", createdById: adminId, idempotencyKey: "seed-demo-payout-failed", processedAt: new Date("2026-08-14T08:00:00.000Z") } });
+}
+
 async function main() {
   const passwordHash = await bcrypt.hash(TEST_PASSWORD, 12);
   const users = await seedUsers(passwordHash);
   const instructor = users.find(user => user.role === "INSTRUCTOR")!;
   const student = users.find(user => user.role === "STUDENT" && user.status === "ACTIVE")!;
+  const admin = users.find(user => user.role === "ADMIN")!;
   const categories = await seedCategories();
   await seedCourses(instructor.id, categories);
   await seedLearningContent(student.id);
@@ -523,6 +582,8 @@ async function main() {
   await seedAdditionalLearningContent(student.id);
   await seedSprint7(student.id, instructor.id);
   await seedSprint8(student.id, instructor.id);
+  await seedSprint9(student.id);
+  await seedSprint10(student.id, instructor.id, admin.id);
 
   console.log("Seed completed successfully");
   console.log("Test password for every seeded account: Password123");
