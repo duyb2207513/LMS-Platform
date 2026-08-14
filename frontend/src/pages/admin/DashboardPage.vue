@@ -1,71 +1,18 @@
 <script setup lang="ts">
+import { computed, onMounted, ref } from 'vue'
 import AdminLayout from '@/layouts/AdminLayout.vue'
-import { useAuthStore } from '@/stores/auth'
-import { useCategoryStore } from '@/stores/categories'
-import { onMounted } from 'vue'
+import LoadingSpinner from '@/components/ui/LoadingSpinner.vue'
+import StatusBadge from '@/components/ui/StatusBadge.vue'
+import { useApi } from '@/composables/useApi'
+import type { AdminDashboardStats, ApiResponse } from '@/types'
 
-const auth = useAuthStore()
-const categoryStore = useCategoryStore()
-
-onMounted(() => {
-  categoryStore.fetchCategories()
-})
+const api = useApi(), stats = ref<AdminDashboardStats | null>(null), error = ref('')
+const money = (value: number) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(value)
+const coursePublishPercent = computed(() => !stats.value?.courses.total ? 0 : Math.round(((stats.value.courses.byStatus.PUBLISHED || 0) / stats.value.courses.total) * 100))
+async function load() { try { const response = await api.get<ApiResponse<AdminDashboardStats>>('/admin/dashboard'); stats.value = response.data || null } catch (cause) { error.value = cause instanceof Error ? cause.message : 'Không thể tải dashboard' } }
+onMounted(load)
 </script>
 
-<template>
-  <AdminLayout>
-    <div class="max-w-6xl">
-      <div class="mb-8">
-        <h1 class="text-3xl font-extrabold text-slate-900 dark:text-white">Admin Dashboard 🛡️</h1>
-        <p class="mt-2 text-lg text-slate-500 dark:text-slate-400">Xin chào, {{ auth.user?.fullName }}!</p>
-      </div>
+<template><AdminLayout><main class="app-page"><header class="flex flex-wrap items-end justify-between gap-5"><div><p class="text-sm font-bold uppercase tracking-[.14em] text-purple-600 dark:text-purple-400">Trung tâm điều hành</p><h1 class="app-page-title mt-2">Tổng quan hệ thống</h1><p class="app-page-description">Theo dõi người dùng, nội dung học tập và hoạt động kinh doanh.</p></div><button class="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold shadow-sm hover:border-purple-300 dark:border-slate-700 dark:bg-slate-900" @click="load">↻ Làm mới dữ liệu</button></header><LoadingSpinner v-if="api.loading.value && !stats" class="py-24"/><p v-else-if="error" class="mt-6 rounded-2xl bg-red-50 p-5 text-red-700 dark:bg-red-950/30 dark:text-red-300">{{ error }}</p><template v-else-if="stats"><section class="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4"><article class="stat-card stat-card--purple"><span class="stat-icon">♙</span><div><p class="stat-label">Người dùng</p><p class="stat-value">{{ stats.users.total }}</p><p class="stat-note">{{ stats.users.byRole.STUDENT || 0 }} học viên</p></div></article><article class="stat-card stat-card--blue"><span class="stat-icon">▤</span><div><p class="stat-label">Khóa học</p><p class="stat-value">{{ stats.courses.total }}</p><p class="stat-note">{{ stats.courses.byStatus.PUBLISHED || 0 }} đang xuất bản</p></div></article><article class="stat-card stat-card--green"><span class="stat-icon">↗</span><div><p class="stat-label">Lượt ghi danh</p><p class="stat-value">{{ stats.learning.enrollments }}</p><p class="stat-note">Tổng toàn hệ thống</p></div></article><article class="stat-card stat-card--amber"><span class="stat-icon">₫</span><div><p class="stat-label">Doanh thu</p><p class="stat-value stat-value--money">{{ money(stats.commerce.revenue) }}</p><p class="stat-note">{{ stats.commerce.paidOrders }} đơn thành công</p></div></article></section><section class="mt-6 grid gap-6 xl:grid-cols-[1.15fr_.85fr]"><article class="surface-card p-6"><div class="flex items-center justify-between"><div><p class="text-xs font-bold uppercase tracking-wider text-slate-400">Sức khỏe nội dung</p><h2 class="mt-2 text-xl font-black">Tình trạng khóa học</h2></div><span class="text-3xl font-black text-purple-700 dark:text-purple-300">{{ coursePublishPercent }}%</span></div><div class="mt-6 h-3 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800"><div class="h-full rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-500" :style="{ width: `${coursePublishPercent}%` }"/></div><div class="mt-6 grid grid-cols-3 gap-3 text-center"><div class="summary-cell"><b>{{ stats.courses.byStatus.PUBLISHED || 0 }}</b><span>Xuất bản</span></div><div class="summary-cell"><b>{{ stats.courses.byStatus.DRAFT || 0 }}</b><span>Bản nháp</span></div><div class="summary-cell"><b>{{ stats.courses.byStatus.ARCHIVED || 0 }}</b><span>Lưu trữ</span></div></div></article><article class="surface-card p-6"><p class="text-xs font-bold uppercase tracking-wider text-slate-400">Tương tác</p><h2 class="mt-2 text-xl font-black">Hoạt động học tập</h2><div class="mt-5 grid grid-cols-3 gap-3"><div class="activity-cell"><b>{{ stats.learning.reviews }}</b><span>Đánh giá</span></div><div class="activity-cell"><b>{{ stats.learning.comments }}</b><span>Bình luận</span></div><div class="activity-cell"><b>{{ stats.certificates }}</b><span>Chứng chỉ</span></div></div></article></section><section class="mt-6 grid gap-6 xl:grid-cols-2"><article class="surface-card overflow-hidden"><header class="flex items-center justify-between border-b border-slate-100 p-5 dark:border-slate-800"><div><h2 class="text-lg font-black">Người dùng mới</h2><p class="mt-1 text-xs text-slate-500">Các tài khoản vừa tham gia</p></div><RouterLink to="/admin/users" class="text-sm font-bold text-purple-600">Xem tất cả →</RouterLink></header><div class="divide-y divide-slate-100 px-5 dark:divide-slate-800"><div v-for="user in stats.recent.users" :key="user.id" class="flex items-center gap-3 py-4"><span class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-purple-100 font-bold text-purple-700 dark:bg-purple-950/50 dark:text-purple-300">{{ user.fullName.charAt(0) }}</span><div class="min-w-0 flex-1"><b class="line-clamp-1 text-sm">{{ user.fullName }}</b><p class="line-clamp-1 text-xs text-slate-500">{{ user.email }}</p></div><StatusBadge :status="user.role"/></div><p v-if="!stats.recent.users.length" class="py-8 text-center text-sm text-slate-500">Chưa có dữ liệu.</p></div></article><article class="surface-card overflow-hidden"><header class="flex items-center justify-between border-b border-slate-100 p-5 dark:border-slate-800"><div><h2 class="text-lg font-black">Đơn hàng gần đây</h2><p class="mt-1 text-xs text-slate-500">Giao dịch mới nhất</p></div></header><div class="divide-y divide-slate-100 px-5 dark:divide-slate-800"><div v-for="order in stats.recent.orders" :key="order.id" class="flex items-center gap-3 py-4"><div class="min-w-0 flex-1"><b class="font-mono text-sm">{{ order.orderNumber }}</b><p class="line-clamp-1 text-xs text-slate-500">{{ order.user.fullName }} · {{ new Date(order.createdAt).toLocaleDateString('vi-VN') }}</p></div><div class="text-right"><b class="text-sm">{{ money(order.total) }}</b><div class="mt-1"><StatusBadge :status="order.status"/></div></div></div><p v-if="!stats.recent.orders.length" class="py-8 text-center text-sm text-slate-500">Chưa có dữ liệu.</p></div></article></section></template></main></AdminLayout></template>
 
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10">
-        <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-800 transition-colors duration-300">
-          <div class="flex items-center gap-4">
-            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-indigo-500/25">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a4 4 0 014-4z"/></svg>
-            </div>
-            <div>
-              <p class="text-2xl font-bold text-slate-900 dark:text-white">{{ categoryStore.categories.length }}</p>
-              <p class="text-sm text-slate-500 dark:text-slate-400">Danh mục</p>
-            </div>
-          </div>
-        </div>
-        <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-800 transition-colors duration-300">
-          <div class="flex items-center gap-4">
-            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center text-white shadow-lg shadow-emerald-500/25">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
-            </div>
-            <div>
-              <p class="text-2xl font-bold text-slate-900 dark:text-white">—</p>
-              <p class="text-sm text-slate-500 dark:text-slate-400">Người dùng</p>
-            </div>
-          </div>
-        </div>
-        <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-800 transition-colors duration-300">
-          <div class="flex items-center gap-4">
-            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center text-white shadow-lg shadow-amber-500/25">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-            </div>
-            <div>
-              <p class="text-2xl font-bold text-slate-900 dark:text-white">—</p>
-              <p class="text-sm text-slate-500 dark:text-slate-400">Khóa học</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <router-link to="/admin/categories" class="block bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-800 hover:shadow-md hover:border-indigo-200 dark:hover:border-indigo-800 transition-all duration-300 group">
-          <h3 class="text-lg font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">Quản lý danh mục</h3>
-          <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Tạo, sửa, xóa danh mục khóa học</p>
-        </router-link>
-        <router-link to="/admin/users" class="block bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-800 hover:shadow-md hover:border-indigo-200 dark:hover:border-indigo-800 transition-all duration-300 group">
-          <h3 class="text-lg font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">Quản lý người dùng</h3>
-          <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Xem và quản lý tài khoản người dùng</p>
-        </router-link>
-      </div>
-    </div>
-  </AdminLayout>
-</template>
+<style scoped>.stat-card{display:flex;align-items:center;gap:1rem;overflow:hidden;border:1px solid var(--border);border-radius:1.25rem;background:var(--surface);padding:1.25rem;box-shadow:var(--shadow-sm)}.stat-icon{display:grid;width:3.1rem;height:3.1rem;flex-shrink:0;place-items:center;border-radius:1rem;font-size:1.3rem;font-weight:900}.stat-card--purple .stat-icon{background:#ede9fe;color:#6d28d9}.stat-card--blue .stat-icon{background:#dbeafe;color:#1d4ed8}.stat-card--green .stat-icon{background:#d1fae5;color:#047857}.stat-card--amber .stat-icon{background:#fef3c7;color:#b45309}.stat-label{font-size:.75rem;font-weight:700;color:var(--text-muted)}.stat-value{margin-top:.2rem;font-size:1.65rem;font-weight:900;letter-spacing:-.04em}.stat-value--money{font-size:1.25rem}.stat-note{margin-top:.2rem;font-size:.68rem;color:var(--text-muted)}.summary-cell,.activity-cell{border-radius:1rem;background:var(--surface-muted);padding:1rem .5rem}.summary-cell b,.activity-cell b{display:block;font-size:1.25rem}.summary-cell span,.activity-cell span{margin-top:.3rem;display:block;font-size:.68rem;color:var(--text-muted)}.activity-cell{padding:1.3rem .5rem}.activity-cell b{font-size:1.5rem}</style>

@@ -5,6 +5,7 @@ import InstructorLayout from '@/layouts/InstructorLayout.vue'
 import BaseInput from '@/components/ui/BaseInput.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import LoadingSpinner from '@/components/ui/LoadingSpinner.vue'
+import ImageFilePicker from '@/components/ui/ImageFilePicker.vue'
 import { useCourseStore } from '@/stores/courses'
 import { useCategoryStore } from '@/stores/categories'
 import { CourseLevel, CourseStatus } from '@/types'
@@ -19,12 +20,14 @@ const loading = ref(false)
 const pageLoading = ref(true)
 const error = ref('')
 const success = ref('')
+const thumbnailFile = ref<File | null>(null)
+const currentThumbnailUrl = ref<string | null>(null)
+const pickerKey = ref(0)
 
 const form = ref<CourseFormData>({
   categoryId: '',
   title: '',
   description: '',
-  thumbnailUrl: '',
   level: CourseLevel.BEGINNER,
   price: 0,
   isFree: true,
@@ -50,7 +53,14 @@ async function handleSubmit() {
 
   loading.value = true
   try {
-    await courseStore.updateCourse(route.params.id as string, form.value)
+    const courseId = route.params.id as string
+    await courseStore.updateCourse(courseId, form.value)
+    if (thumbnailFile.value) {
+      const uploadResponse = await courseStore.uploadCourseThumbnail(courseId, thumbnailFile.value)
+      currentThumbnailUrl.value = uploadResponse.data?.thumbnailUrl || currentThumbnailUrl.value
+      thumbnailFile.value = null
+      pickerKey.value += 1
+    }
     success.value = 'Cập nhật khóa học thành công!'
   } catch (e) {
     error.value = e instanceof Error ? e.message : 'Cập nhật thất bại'
@@ -88,7 +98,6 @@ onMounted(async () => {
       categoryId: course.categoryId,
       title: course.title,
       description: course.description,
-      thumbnailUrl: course.thumbnailUrl || '',
       level: course.level,
       price: course.price,
       isFree: course.isFree,
@@ -96,6 +105,7 @@ onMounted(async () => {
       requirements: course.requirements || '',
       learningOutcomes: course.learningOutcomes || '',
     }
+    currentThumbnailUrl.value = course.thumbnailUrl || null
     currentStatus.value = course.status
   } catch (e) {
     error.value = 'Tải dữ liệu thất bại'
@@ -110,7 +120,7 @@ onMounted(async () => {
     <div v-if="pageLoading" class="py-12"><LoadingSpinner /></div>
     <div v-else class="max-w-3xl">
       <div class="mb-8">
-        <router-link to="/instructor/courses" class="inline-flex items-center gap-1 text-sm text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 mb-4 transition-colors">
+        <router-link to="/instructor/courses" class="inline-flex items-center gap-1 text-sm text-slate-500 dark:text-slate-400 hover:text-purple-600 dark:hover:text-purple-400 mb-4 transition-colors">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
           Quay lại danh sách
         </router-link>
@@ -159,12 +169,12 @@ onMounted(async () => {
           
           <div class="space-y-1.5">
             <label for="edit-desc" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Mô tả <span class="text-red-500">*</span></label>
-            <textarea id="edit-desc" v-model="form.description" placeholder="Mô tả chi tiết..." rows="4" required class="w-full rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:border-indigo-500 dark:focus:border-indigo-400 focus:outline-none resize-none transition-colors duration-200" />
+            <textarea id="edit-desc" v-model="form.description" placeholder="Mô tả chi tiết..." rows="4" required class="w-full rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:border-purple-500 dark:focus:border-purple-400 focus:outline-none resize-none transition-colors duration-200" />
           </div>
 
           <div class="space-y-1.5">
             <label for="edit-cat" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Danh mục <span class="text-red-500">*</span></label>
-            <select id="edit-cat" v-model="form.categoryId" required class="w-full rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:border-indigo-500 dark:focus:border-indigo-400 focus:outline-none cursor-pointer transition-colors duration-200">
+            <select id="edit-cat" v-model="form.categoryId" required class="w-full rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:border-purple-500 dark:focus:border-purple-400 focus:outline-none cursor-pointer transition-colors duration-200">
               <option value="" disabled>Chọn danh mục</option>
               <option v-for="cat in categoryStore.categories" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
             </select>
@@ -173,7 +183,7 @@ onMounted(async () => {
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <div class="space-y-1.5">
               <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Cấp độ</label>
-              <select v-model="form.level" class="w-full rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:border-indigo-500 dark:focus:border-indigo-400 focus:outline-none cursor-pointer transition-colors duration-200">
+              <select v-model="form.level" class="w-full rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:border-purple-500 dark:focus:border-purple-400 focus:outline-none cursor-pointer transition-colors duration-200">
                 <option v-for="l in levels" :key="l.value" :value="l.value">{{ l.label }}</option>
               </select>
             </div>
@@ -186,7 +196,7 @@ onMounted(async () => {
           <div class="flex items-center gap-3">
             <label class="relative inline-flex items-center cursor-pointer">
               <input type="checkbox" v-model="form.isFree" class="sr-only peer" />
-              <div class="w-11 h-6 bg-slate-200 dark:bg-slate-800 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600" />
+              <div class="w-11 h-6 bg-slate-200 dark:bg-slate-800 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600" />
             </label>
             <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Miễn phí</span>
           </div>
@@ -197,13 +207,21 @@ onMounted(async () => {
           <h2 class="text-lg font-bold text-slate-900 dark:text-white pb-2 border-b border-slate-100 dark:border-slate-800">Chi tiết</h2>
           <div class="space-y-1.5">
             <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Bạn sẽ học được gì</label>
-            <textarea v-model="form.learningOutcomes" rows="4" placeholder="Liệt kê những gì học viên đạt được..." class="w-full rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:border-indigo-500 dark:focus:border-indigo-400 focus:outline-none resize-none transition-colors duration-200" />
+            <textarea v-model="form.learningOutcomes" rows="4" placeholder="Liệt kê những gì học viên đạt được..." class="w-full rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:border-purple-500 dark:focus:border-purple-400 focus:outline-none resize-none transition-colors duration-200" />
           </div>
           <div class="space-y-1.5">
             <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Yêu cầu</label>
-            <textarea v-model="form.requirements" rows="3" placeholder="Yêu cầu trước khi học..." class="w-full rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:border-indigo-500 dark:focus:border-indigo-400 focus:outline-none resize-none transition-colors duration-200" />
+            <textarea v-model="form.requirements" rows="3" placeholder="Yêu cầu trước khi học..." class="w-full rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:border-purple-500 dark:focus:border-purple-400 focus:outline-none resize-none transition-colors duration-200" />
           </div>
-          <BaseInput id="edit-thumb" v-model="form.thumbnailUrl" label="URL hình ảnh đại diện" placeholder="https://example.com/image.jpg" />
+          <ImageFilePicker
+            :key="pickerKey"
+            id="edit-thumb"
+            label="Ảnh đại diện khóa học"
+            :current-url="currentThumbnailUrl"
+            :disabled="loading"
+            @change="thumbnailFile = $event"
+            @error="error = $event"
+          />
         </div>
 
         <div class="flex justify-end gap-4">

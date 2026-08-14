@@ -1,10 +1,13 @@
 import { Router } from "express";
 import { authenticate } from "../../common/middlewares/authenticate.js";
+import { uploadAvatar } from "../../config/upload.js";
 import { validateRequest } from "../../common/middlewares/validateRequest.js";
 import { asyncHandler } from "../../common/utils/asyncHandler.js";
 import {
   changeMyPasswordController,
+  deleteMyAvatarController,
   getMyProfileController,
+  uploadMyAvatarController,
   updateMyProfileController
 } from "./users.controller.js";
 import {
@@ -117,6 +120,59 @@ usersRouter.patch(
   validateRequest(validateUpdateProfileInput),
   asyncHandler(updateMyProfileController)
 );
+
+/**
+ * @openapi
+ * /users/me/avatar:
+ *   post:
+ *     operationId: uploadMyAvatar
+ *     summary: Upload the authenticated user's avatar
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             required: [avatar]
+ *             properties:
+ *               avatar:
+ *                 type: string
+ *                 format: binary
+ *           encoding:
+ *             avatar:
+ *               contentType: image/jpeg, image/png, image/webp
+ *     responses:
+ *       200:
+ *         description: Avatar uploaded successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ProfileResponse'
+ *       400:
+ *         description: File is missing, invalid, or larger than 5 MB
+ *       401:
+ *         description: Authentication required
+ *   delete:
+ *     operationId: deleteMyAvatar
+ *     summary: Remove the authenticated user's avatar
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Avatar removed successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ProfileResponse'
+ *       401:
+ *         description: Authentication required
+ */
+usersRouter.post("/me/avatar", authenticate, uploadAvatar, asyncHandler(uploadMyAvatarController));
+usersRouter.delete("/me/avatar", authenticate, asyncHandler(deleteMyAvatarController));
 
 /**
  * @openapi

@@ -1,107 +1,16 @@
 import { ref } from 'vue'
 
-const BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/api/v1`
+const configured = String(import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000').replace(/\/$/, '')
+export const API_BASE_URL = configured.endsWith('/api/v1') ? configured : `${configured}/api/v1`
 
-function getAuthHeaders(): Record<string, string> {
-  const token = localStorage.getItem('accessToken')
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-  }
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`
-  }
-  return headers
-}
+function headers(body?: unknown) { const token=localStorage.getItem('accessToken'); return { Accept:'application/json', ...(body instanceof FormData?{}:{'Content-Type':'application/json'}), ...(token?{Authorization:`Bearer ${token}`}:{}) } }
+async function parse<T>(response:Response):Promise<T>{if(response.status===204)return undefined as T;const data=await response.json().catch(()=>({}));if(!response.ok){const error=new Error(data.message||`HTTP ${response.status}`) as Error&{status?:number;errors?:Record<string,string>};error.status=response.status;error.errors=data.errors;throw error}return data}
+let refresh:Promise<boolean>|null=null
+async function refreshAccess(){try{const response=await fetch(`${API_BASE_URL}/auth/refresh-token`,{method:'POST',credentials:'include',headers:{Accept:'application/json'}});const data=await parse<{data:{accessToken:string}}>(response);localStorage.setItem('accessToken',data.data.accessToken);return true}catch{localStorage.removeItem('accessToken');localStorage.removeItem('user');return false}}
+async function request<T>(endpoint:string,options:RequestInit={}){let response=await fetch(`${API_BASE_URL}${endpoint}`,{...options,credentials:'include',headers:{...headers(options.body),...options.headers}});if(response.status===401&&!endpoint.startsWith('/auth/')){refresh??=refreshAccess().finally(()=>{refresh=null});if(await refresh)response=await fetch(`${API_BASE_URL}${endpoint}`,{...options,credentials:'include',headers:{...headers(options.body),...options.headers}})}return parse<T>(response)}
 
-async function handleResponse<T>(response: Response): Promise<T> {
-  const data = await response.json()
-  if (!response.ok) {
-    throw new Error(data.message || `HTTP error ${response.status}`)
-  }
-  return data
-}
-
-export function useApi() {
-  const loading = ref(false)
-  const error = ref<string | null>(null)
-
-  async function get<T>(endpoint: string, params?: Record<string, string | number | boolean | undefined>): Promise<T> {
-    loading.value = true
-    error.value = null
-    try {
-      let url = `${BASE_URL}${endpoint}`
-      if (params) {
-        const searchParams = new URLSearchParams()
-        Object.entries(params).forEach(([key, value]) => {
-          if (value !== undefined && value !== '') {
-            searchParams.append(key, String(value))
-          }
-        })
-        const queryString = searchParams.toString()
-        if (queryString) url += `?${queryString}`
-      }
-      const response = await fetch(url, { headers: getAuthHeaders() })
-      return await handleResponse<T>(response)
-    } catch (e) {
-      error.value = e instanceof Error ? e.message : 'An unknown error occurred'
-      throw e
-    } finally {
-      loading.value = false
-    }
-  }
-
-  async function post<T>(endpoint: string, body?: unknown): Promise<T> {
-    loading.value = true
-    error.value = null
-    try {
-      const response = await fetch(`${BASE_URL}${endpoint}`, {
-        method: 'POST',
-        headers: getAuthHeaders(),
-        body: body ? JSON.stringify(body) : undefined,
-      })
-      return await handleResponse<T>(response)
-    } catch (e) {
-      error.value = e instanceof Error ? e.message : 'An unknown error occurred'
-      throw e
-    } finally {
-      loading.value = false
-    }
-  }
-
-  async function put<T>(endpoint: string, body?: unknown): Promise<T> {
-    loading.value = true
-    error.value = null
-    try {
-      const response = await fetch(`${BASE_URL}${endpoint}`, {
-        method: 'PUT',
-        headers: getAuthHeaders(),
-        body: body ? JSON.stringify(body) : undefined,
-      })
-      return await handleResponse<T>(response)
-    } catch (e) {
-      error.value = e instanceof Error ? e.message : 'An unknown error occurred'
-      throw e
-    } finally {
-      loading.value = false
-    }
-  }
-
-  async function del<T>(endpoint: string): Promise<T> {
-    loading.value = true
-    error.value = null
-    try {
-      const response = await fetch(`${BASE_URL}${endpoint}`, {
-        method: 'DELETE',
-        headers: getAuthHeaders(),
-      })
-      return await handleResponse<T>(response)
-    } catch (e) {
-      error.value = e instanceof Error ? e.message : 'An unknown error occurred'
-      throw e
-    } finally {
-      loading.value = false
-    }
-  }
-
-  return { loading, error, get, post, put, del }
+export function useApi(){const loading=ref(false),error=ref<string|null>(null);async function run<T>(job:()=>Promise<T>){loading.value=true;error.value=null;try{return await job()}catch(e){error.value=e instanceof Error?e.message:'Đã có lỗi xảy ra';throw e}finally{loading.value=false}}
+  const get=<T>(endpoint:string,params?:Record<string,string|number|boolean|undefined>)=>run(()=>{const q=new URLSearchParams();Object.entries(params||{}).forEach(([k,v])=>{if(v!==undefined&&v!=='')q.set(k,String(v))});return request<T>(endpoint+(q.size?`?${q}`:''))})
+  const send=<T>(method:string,endpoint:string,body?:unknown)=>run(()=>request<T>(endpoint,{method,body:body instanceof FormData?body:body===undefined?undefined:JSON.stringify(body)}))
+  return {loading,error,get,post:<T>(e:string,b?:unknown)=>send<T>('POST',e,b),put:<T>(e:string,b?:unknown)=>send<T>('PUT',e,b),patch:<T>(e:string,b?:unknown)=>send<T>('PATCH',e,b),del:<T>(e:string)=>send<T>('DELETE',e)}
 }

@@ -15,6 +15,7 @@ export async function getProfile(userId: string) {
       avatarUrl: true,
       role: true,
       status: true,
+      emailVerifiedAt: true,
       createdAt: true,
       updatedAt: true
     }
@@ -39,6 +40,7 @@ export async function updateProfile(userId: string, input: UpdateProfileInput) {
         avatarUrl: true,
         role: true,
         status: true
+        ,emailVerifiedAt: true
       }
     });
   } catch (error) {
@@ -55,6 +57,36 @@ export async function updateProfile(userId: string, input: UpdateProfileInput) {
   }
 }
 
+export async function setAvatar(userId: string, avatarUrl: string | null) {
+  try {
+    return await prisma.user.update({
+      where: { id: userId },
+      data: { avatarUrl },
+      select: {
+        id: true,
+        fullName: true,
+        email: true,
+        avatarUrl: true,
+        role: true,
+        status: true,
+        emailVerifiedAt: true,
+        createdAt: true,
+        updatedAt: true
+      }
+    });
+  } catch (error) {
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "code" in error &&
+      error.code === "P2025"
+    ) {
+      throw new AppError(404, "User not found");
+    }
+    throw error;
+  }
+}
+
 export async function changePassword(userId: string, input: ChangePasswordInput): Promise<void> {
   const user = await prisma.user.findUnique({
     where: { id: userId },
@@ -63,6 +95,10 @@ export async function changePassword(userId: string, input: ChangePasswordInput)
 
   if (!user) {
     throw new AppError(404, "User not found");
+  }
+
+  if (!user.passwordHash) {
+    throw new AppError(400, "This account uses Google sign-in and does not have a password yet");
   }
 
   const currentPasswordMatches = await bcrypt.compare(
@@ -85,8 +121,8 @@ export async function changePassword(userId: string, input: ChangePasswordInput)
 
   const passwordHash = await bcrypt.hash(input.newPassword, PASSWORD_SALT_ROUNDS);
 
-  await prisma.user.update({
-    where: { id: userId },
-    data: { passwordHash }
-  });
+  await prisma.$transaction([
+    prisma.user.update({ where: { id: userId }, data: { passwordHash } }),
+    prisma.authSession.updateMany({ where: { userId, revokedAt: null }, data: { revokedAt: new Date() } })
+  ]);
 }

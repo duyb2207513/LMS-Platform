@@ -21,13 +21,13 @@ export async function assertLessonAccess(lessonId: string, actor: AuthTokenPaylo
   if (canManageCourse(course.instructorId, actor)) return lesson;
   if (actor.role !== "STUDENT" || course.status !== "PUBLISHED" || !lesson.isPublished) throw new AppError(403, "You do not have permission to access this lesson");
   const enrollment = await prisma.enrollment.findUnique({ where: { studentId_courseId: { studentId: actor.userId, courseId: course.id } }, select: { status: true } });
-  if (!enrollment || enrollment.status === "CANCELLED") throw new AppError(403, "Enroll in this course to access this lesson");
+  if (!enrollment || !["ACTIVE", "COMPLETED"].includes(enrollment.status)) throw new AppError(403, "Enroll in this course to access this lesson");
   return lesson;
 }
 
 export async function assertCourseEnrollment(courseId: string, studentId: string) {
   if (!UUID.test(courseId)) throw new AppError(404, "Course not found");
   const enrollment = await prisma.enrollment.findUnique({ where: { studentId_courseId: { studentId, courseId } }, select: { status: true, course: { select: { status: true } } } });
-  if (!enrollment || enrollment.status === "CANCELLED" || enrollment.course.status !== "PUBLISHED") throw new AppError(403, "Enroll in this course to perform this action");
+  if (!enrollment || !["ACTIVE", "COMPLETED"].includes(enrollment.status) || enrollment.course.status !== "PUBLISHED") throw new AppError(403, "Enroll in this course to perform this action");
   return enrollment;
 }

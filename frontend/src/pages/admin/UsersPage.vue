@@ -1,98 +1,20 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import AdminLayout from '@/layouts/AdminLayout.vue'
+import BaseButton from '@/components/ui/BaseButton.vue'
+import StatusBadge from '@/components/ui/StatusBadge.vue'
 import LoadingSpinner from '@/components/ui/LoadingSpinner.vue'
 import { useApi } from '@/composables/useApi'
-import type { User, ApiResponse } from '@/types'
+import type { AdminListResponse, ApiResponse, User, UserRole, UserStatus } from '@/types'
 
-const api = useApi()
-const users = ref<User[]>([])
-const loading = ref(true)
-
-function getRoleBadge(role: string) {
-  switch (role) {
-    case 'ADMIN': return { text: 'Admin', class: 'bg-rose-100 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400' }
-    case 'INSTRUCTOR': return { text: 'Giảng viên', class: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-400' }
-    default: return { text: 'Học viên', class: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400' }
-  }
-}
-
-function getStatusBadge(status: string) {
-  return status === 'ACTIVE'
-    ? { text: 'Hoạt động', class: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400' }
-    : { text: 'Bị khóa', class: 'bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-400' }
-}
-
-function formatDate(d: string) {
-  return new Date(d).toLocaleDateString('vi-VN')
-}
-
-onMounted(async () => {
-  try {
-    const res = await api.get<ApiResponse<User[]>>('/users')
-    if (res.data) users.value = res.data
-  } catch {
-    // Users API may not be ready yet
-  } finally {
-    loading.value = false
-  }
-})
+const api = useApi(), users = ref<User[]>([]), search = ref(''), role = ref(''), status = ref(''), error = ref(''), message = ref(''), updatingId = ref('')
+const activeCount = computed(() => users.value.filter((user) => user.status === 'ACTIVE').length)
+async function load() { error.value = ''; try { const response = await api.get<AdminListResponse<User>>('/admin/users', { search: search.value.trim(), role: role.value, status: status.value, limit: 100 }); users.value = response.data?.items || [] } catch (cause) { error.value = cause instanceof Error ? cause.message : 'Không thể tải người dùng' } }
+async function update(user: User, data: { role?: UserRole; status?: UserStatus }) { updatingId.value = user.id; error.value = ''; message.value = ''; try { const response = await api.patch<ApiResponse<User>>(`/admin/users/${user.id}`, data); if (response.data) Object.assign(user, response.data); message.value = `Đã cập nhật tài khoản ${user.fullName}.` } catch (cause) { error.value = cause instanceof Error ? cause.message : 'Không thể cập nhật' } finally { updatingId.value = '' } }
+function clearFilters() { search.value = ''; role.value = ''; status.value = ''; void load() }
+onMounted(load)
 </script>
 
-<template>
-  <AdminLayout>
-    <div class="max-w-6xl">
-      <div class="mb-8">
-        <h1 class="text-3xl font-extrabold text-slate-900 dark:text-white">Quản lý người dùng</h1>
-        <p class="mt-2 text-slate-500 dark:text-slate-400">Xem và quản lý tất cả người dùng trong hệ thống</p>
-      </div>
+<template><AdminLayout><main class="app-page"><header><p class="text-sm font-bold uppercase tracking-[.14em] text-purple-600">Quản trị tài khoản</p><h1 class="app-page-title mt-2">Quản lý người dùng</h1><p class="app-page-description">Tìm kiếm, phân quyền và kiểm soát trạng thái truy cập.</p></header><section class="mt-7 grid gap-4 sm:grid-cols-3"><article class="admin-metric"><span>Đang hiển thị</span><b>{{ users.length }}</b></article><article class="admin-metric"><span>Đang hoạt động</span><b>{{ activeCount }}</b></article><article class="admin-metric"><span>Đã khóa</span><b>{{ users.length - activeCount }}</b></article></section><section class="surface-card mt-6 p-4"><form class="grid gap-3 md:grid-cols-[minmax(0,1fr)_180px_180px_auto]" @submit.prevent="load"><label class="relative"><span class="sr-only">Tìm kiếm</span><span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">⌕</span><input v-model="search" class="admin-control pl-10" placeholder="Tìm theo tên hoặc email..."/></label><select v-model="role" class="admin-control"><option value="">Tất cả vai trò</option><option value="STUDENT">Học viên</option><option value="INSTRUCTOR">Giảng viên</option><option value="ADMIN">Quản trị viên</option></select><select v-model="status" class="admin-control"><option value="">Tất cả trạng thái</option><option value="ACTIVE">Hoạt động</option><option value="BLOCKED">Đã khóa</option></select><BaseButton type="submit">Tìm kiếm</BaseButton></form><button v-if="search || role || status" class="mt-3 text-xs font-bold text-purple-600" @click="clearFilters">Đặt lại bộ lọc</button></section><p v-if="error" class="mt-5 rounded-2xl bg-red-50 p-4 text-sm text-red-700 dark:bg-red-950/30 dark:text-red-300">{{ error }}</p><p v-if="message" class="mt-5 rounded-2xl bg-emerald-50 p-4 text-sm text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-300">{{ message }}</p><LoadingSpinner v-if="api.loading.value && !users.length" class="py-20"/><section v-else class="surface-card mt-6 overflow-hidden"><div class="overflow-x-auto"><table class="admin-table"><thead><tr><th>Người dùng</th><th>Vai trò</th><th>Trạng thái</th><th>Ngày tham gia</th><th class="text-right">Thao tác</th></tr></thead><tbody><tr v-for="user in users" :key="user.id"><td><div class="flex items-center gap-3"><img v-if="user.avatarUrl" :src="user.avatarUrl" :alt="user.fullName" class="h-10 w-10 rounded-xl object-cover"/><span v-else class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-violet-500 to-purple-700 font-bold text-white">{{ user.fullName.charAt(0) }}</span><div><b class="line-clamp-1">{{ user.fullName }}</b><p class="mt-1 text-xs text-slate-500">{{ user.email }}</p></div></div></td><td><select :value="user.role" class="admin-control min-w-32" :disabled="updatingId === user.id" @change="update(user, { role: ($event.target as HTMLSelectElement).value as UserRole })"><option value="STUDENT">Học viên</option><option value="INSTRUCTOR">Giảng viên</option><option value="ADMIN">Quản trị viên</option></select></td><td><StatusBadge :status="user.status"/></td><td class="text-sm text-slate-500">{{ new Date(user.createdAt).toLocaleDateString('vi-VN') }}</td><td class="text-right"><BaseButton size="sm" :variant="user.status === 'ACTIVE' ? 'ghost' : 'secondary'" :loading="updatingId === user.id" @click="update(user, { status: (user.status === 'ACTIVE' ? 'BLOCKED' : 'ACTIVE') as UserStatus })">{{ user.status === 'ACTIVE' ? 'Khóa tài khoản' : 'Mở khóa' }}</BaseButton></td></tr></tbody></table></div><p v-if="!users.length" class="py-12 text-center text-sm text-slate-500">Không tìm thấy người dùng phù hợp.</p></section></main></AdminLayout></template>
 
-      <LoadingSpinner v-if="loading" />
-
-      <div v-else-if="users.length === 0" class="text-center py-20 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 transition-colors duration-300">
-        <svg class="w-16 h-16 mx-auto text-slate-300 dark:text-slate-700 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
-        <h3 class="text-xl font-semibold text-slate-700 dark:text-slate-300">Chưa có người dùng nào</h3>
-        <p class="text-slate-500 dark:text-slate-400 mt-2">API quản lý người dùng sẽ được phát triển sớm</p>
-      </div>
-
-      <div v-else class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden transition-colors duration-300">
-        <table class="w-full">
-          <thead>
-            <tr class="border-b border-slate-100 dark:border-slate-800">
-              <th class="text-left px-6 py-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Người dùng</th>
-              <th class="text-left px-6 py-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider hidden sm:table-cell">Vai trò</th>
-              <th class="text-left px-6 py-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider hidden md:table-cell">Trạng thái</th>
-              <th class="text-left px-6 py-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider hidden lg:table-cell">Ngày tạo</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="u in users" :key="u.id" class="border-b border-slate-50 dark:border-slate-800/50 hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
-              <td class="px-6 py-4">
-                <div class="flex items-center gap-3">
-                  <div class="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
-                    {{ u.fullName.charAt(0).toUpperCase() }}
-                  </div>
-                  <div>
-                    <p class="font-semibold text-slate-900 dark:text-white">{{ u.fullName }}</p>
-                    <p class="text-xs text-slate-400 dark:text-slate-500">{{ u.email }}</p>
-                  </div>
-                </div>
-              </td>
-              <td class="px-6 py-4 hidden sm:table-cell">
-                <span :class="['px-2.5 py-1 rounded-lg text-xs font-semibold', getRoleBadge(u.role).class]">
-                  {{ getRoleBadge(u.role).text }}
-                </span>
-              </td>
-              <td class="px-6 py-4 hidden md:table-cell">
-                <span :class="['px-2.5 py-1 rounded-lg text-xs font-semibold', getStatusBadge(u.status).class]">
-                  {{ getStatusBadge(u.status).text }}
-                </span>
-              </td>
-              <td class="px-6 py-4 text-sm text-slate-500 dark:text-slate-400 hidden lg:table-cell">{{ formatDate(u.createdAt) }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </AdminLayout>
-</template>
+<style scoped>.admin-metric{display:flex;align-items:center;justify-content:space-between;border:1px solid var(--border);border-radius:1.1rem;background:var(--surface);padding:1rem 1.2rem}.admin-metric span{font-size:.8rem;color:var(--text-muted)}.admin-metric b{font-size:1.3rem}.admin-control{min-height:2.75rem;width:100%;border:1px solid var(--border);border-radius:.8rem;background:var(--surface-muted);padding:.65rem .85rem;color:var(--text);font-size:.82rem;outline:none}.admin-control:focus{border-color:#a855f7;box-shadow:0 0 0 3px rgba(168,85,247,.1)}.admin-table{width:100%;min-width:760px}.admin-table th{background:var(--surface-muted);padding:.85rem 1.1rem;text-align:left;font-size:.67rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted)}.admin-table td{border-top:1px solid var(--border);padding:1rem 1.1rem;vertical-align:middle}.admin-table tbody tr:hover{background:color-mix(in srgb,var(--surface-muted) 60%,transparent)}</style>

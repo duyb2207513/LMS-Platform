@@ -1,44 +1,51 @@
-import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { useCallback, useEffect, useState } from 'react';
+import { RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
+import { coursesApi } from '../api/services';
+import { CourseCard } from '../components/CourseCard';
+import { Button, IconButton, StateView } from '../components/ui';
 import { useAuth } from '../auth/AuthContext';
-import type { RootStackParamList } from '../types';
+import type { Course } from '../types';
+import { colors } from '../theme';
+import { useAppTheme } from '../providers/ThemeProvider';
 
-type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
-export function HomeScreen({ navigation }: Props) {
+export function HomeScreen({ navigation }: { navigation: any }) {
   const { user } = useAuth();
-  return <LinearGradient colors={['#5535ff', '#b10cff', '#472ec4']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.fill}>
-    <SafeAreaView style={styles.safe}>
-      <View style={styles.brand}><View style={styles.logo}><Text style={styles.logoText}>▤</Text></View><Text style={styles.brandText}>LMS Platform</Text></View>
-      <View style={styles.hero}>
-        <View style={styles.pill}><View style={styles.dot} /><Text style={styles.pillText}>Nền tảng học trực tuyến hàng đầu</Text></View>
-        <Text style={styles.heading}>Nâng tầm kiến thức</Text>
-        <Text style={styles.highlight}>với LMS Platform</Text>
-        <Text style={styles.copy}>Khám phá những khóa học chất lượng cao. Học mọi lúc, mọi nơi với trải nghiệm học tập hiện đại.</Text>
-        <Pressable style={styles.primary} onPress={() => navigation.navigate('Courses')}><Text style={styles.primaryText}>Khám phá khóa học  →</Text></Pressable>
-        <Pressable style={styles.secondary} onPress={() => navigation.navigate(user ? 'Dashboard' : 'Register')}><Text style={styles.secondaryText}>{user ? 'Vào trang của tôi' : 'Bắt đầu miễn phí'}</Text></Pressable>
-      </View>
+  const { palette, isDark } = useAppTheme();
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const load = useCallback(async () => {
+    setLoading(true);
+    try { setCourses((await coursesApi.list({ limit: 8 })).data.data); setError(''); }
+    catch { setError('Không thể tải khóa học nổi bật'); }
+    finally { setLoading(false); }
+  }, []);
+  useEffect(() => { void load(); }, [load]);
+
+  return <SafeAreaView style={[styles.safe, { backgroundColor: palette.background }]} edges={['top']}>
+    <View style={[styles.header, { backgroundColor: palette.surface, borderBottomColor: palette.border }]}><View style={styles.brand}><View style={[styles.logo, { backgroundColor: palette.primary }]}><Ionicons name="book-outline" size={23} color="#fff" /></View><Text style={[styles.brandText, { color: palette.ink }]}>LMS Platform</Text></View><IconButton icon="search-outline" label="Tìm kiếm" onPress={() => navigation.navigate('SearchTab')} /></View>
+    <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content} refreshControl={<RefreshControl refreshing={loading} onRefresh={load} tintColor={palette.primary} />}>
+      <LinearGradient colors={['#5535ff', '#aa13ff', '#4a2cc7']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.hero}>
+        <View style={styles.pill}><View style={styles.dot} /><Text style={styles.pillText}>Học mọi lúc, mọi nơi</Text></View>
+        <Text style={styles.heading}>Nâng tầm kiến thức</Text><Text style={styles.highlight}>cùng LMS Platform</Text>
+        <Text style={styles.copy}>Khóa học thực tế, tiến độ rõ ràng và trải nghiệm học tập được tối ưu cho điện thoại.</Text>
+        <View style={styles.heroActions}><View style={{ flex: 1 }}><Button title="Khám phá" variant="outline" onPress={() => navigation.navigate('CoursesTab')} /></View><View style={{ flex: 1 }}><Button title={user ? 'Học tiếp' : 'Đăng nhập'} onPress={() => user ? navigation.navigate('AccountTab') : navigation.navigate('Login')} /></View></View>
+      </LinearGradient>
       <View style={styles.stats}><Stat value="100+" label="Khóa học" /><Stat value="50+" label="Giảng viên" /><Stat value="1K+" label="Học viên" /></View>
-    </SafeAreaView>
-  </LinearGradient>;
+      <View style={styles.sectionHeader}><View><Text style={[styles.sectionTitle, { color: palette.ink }]}>Khóa học nổi bật</Text><Text style={[styles.sectionNote, { color: palette.muted }]}>Kéo ngang để khám phá</Text></View><Text onPress={() => navigation.navigate('CoursesTab')} style={[styles.seeAll, { color: palette.primary }]}>Xem tất cả</Text></View>
+      {loading || error ? <StateView loading={loading} error={error} onRetry={load} /> : <ScrollView horizontal showsHorizontalScrollIndicator={false} snapToInterval={292} decelerationRate="fast" contentContainerStyle={styles.horizontal}>{courses.map(course => <View key={course.id} style={styles.course}><CourseCard course={course} onPress={() => navigation.navigate('CourseDetail', { slug: course.slug })} /></View>)}</ScrollView>}
+      <View style={[styles.verify, { backgroundColor: isDark ? '#2d2845' : '#eee9ff' }]}><Ionicons name="shield-checkmark-outline" size={30} color={palette.primary} /><View style={{ flex: 1 }}><Text style={[styles.verifyTitle, { color: palette.ink }]}>Xác minh chứng chỉ</Text><Text style={[styles.verifyText, { color: palette.muted }]}>Kiểm tra tính hợp lệ bằng mã công khai.</Text></View><Ionicons name="chevron-forward" size={22} color={palette.primary} onPress={() => navigation.navigate('VerifyCertificate')} /></View>
+    </ScrollView>
+  </SafeAreaView>;
 }
 
-function Stat({ value, label }: { value: string; label: string }) {
-  return <View><Text style={styles.statValue}>{value}</Text><Text style={styles.statLabel}>{label}</Text></View>;
-}
+function Stat({ value, label }: { value: string; label: string }) { const { palette } = useAppTheme(); return <View style={[styles.stat, { backgroundColor: palette.surface }]}><Text style={[styles.statValue, { color: palette.ink }]}>{value}</Text><Text style={[styles.statLabel, { color: palette.muted }]}>{label}</Text></View>; }
+
 const styles = StyleSheet.create({
-  fill: { flex: 1 }, safe: { flex: 1, paddingHorizontal: 24 },
-  brand: { flexDirection: 'row', alignItems: 'center', marginTop: 12 },
-  logo: { width: 42, height: 42, borderRadius: 13, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' },
-  logoText: { color: '#6335f5', fontSize: 24, fontWeight: '800' }, brandText: { color: '#fff', fontSize: 21, fontWeight: '800', marginLeft: 11 },
-  hero: { flex: 1, justifyContent: 'center' },
-  pill: { alignSelf: 'flex-start', borderWidth: 1, borderColor: '#ffffff55', backgroundColor: '#ffffff18', borderRadius: 24, paddingHorizontal: 13, paddingVertical: 8, flexDirection: 'row', alignItems: 'center' },
-  dot: { width: 8, height: 8, borderRadius: 8, backgroundColor: '#16e0a6', marginRight: 8 }, pillText: { color: '#fff', fontWeight: '600' },
-  heading: { color: '#fff', fontSize: 40, lineHeight: 47, fontWeight: '900', marginTop: 26 },
-  highlight: { color: '#ffbf20', fontSize: 40, lineHeight: 47, fontWeight: '900', marginTop: 3 },
-  copy: { color: '#eeeaff', fontSize: 17, lineHeight: 27, marginTop: 23 },
-  primary: { backgroundColor: '#fff', borderRadius: 15, padding: 17, alignItems: 'center', marginTop: 28 }, primaryText: { color: '#4f35de', fontWeight: '800', fontSize: 16 },
-  secondary: { borderRadius: 15, borderWidth: 1, borderColor: '#ffffff55', padding: 15, alignItems: 'center', marginTop: 12 }, secondaryText: { color: '#fff', fontWeight: '700', fontSize: 16 },
-  stats: { flexDirection: 'row', justifyContent: 'space-between', paddingBottom: 26 }, statValue: { color: '#fff', fontSize: 25, fontWeight: '900' }, statLabel: { color: '#ddd5ff', marginTop: 3 },
+  safe: { flex: 1, backgroundColor: colors.background }, header: { height: 66, paddingHorizontal: 18, backgroundColor: '#fff', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderBottomWidth: 1, borderBottomColor: colors.border }, brand: { flexDirection: 'row', alignItems: 'center', gap: 10 }, logo: { width: 42, height: 42, borderRadius: 14, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center' }, brandText: { color: colors.ink, fontSize: 20, fontWeight: '900' }, content: { padding: 18, paddingBottom: 36 },
+  hero: { borderRadius: 28, padding: 22, overflow: 'hidden' }, pill: { alignSelf: 'flex-start', backgroundColor: '#ffffff20', borderColor: '#ffffff44', borderWidth: 1, borderRadius: 20, paddingHorizontal: 11, paddingVertical: 7, flexDirection: 'row', alignItems: 'center' }, dot: { width: 7, height: 7, borderRadius: 4, backgroundColor: '#1de2a7', marginRight: 7 }, pillText: { color: '#fff', fontSize: 12, fontWeight: '700' }, heading: { color: '#fff', fontSize: 30, fontWeight: '900', lineHeight: 38, marginTop: 20 }, highlight: { color: colors.amber, fontSize: 30, fontWeight: '900', lineHeight: 38 }, copy: { color: '#eeeaff', lineHeight: 22, marginTop: 13 }, heroActions: { flexDirection: 'row', gap: 9, marginTop: 18 },
+  stats: { flexDirection: 'row', gap: 10, marginTop: 14 }, stat: { flex: 1, backgroundColor: '#fff', borderRadius: 17, paddingVertical: 15, alignItems: 'center' }, statValue: { color: colors.ink, fontSize: 19, fontWeight: '900' }, statLabel: { color: colors.muted, fontSize: 11, marginTop: 3 }, sectionHeader: { flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between', marginTop: 28, marginBottom: 13 }, sectionTitle: { color: colors.ink, fontSize: 22, fontWeight: '900' }, sectionNote: { color: colors.muted, fontSize: 12, marginTop: 3 }, seeAll: { color: colors.primary, fontWeight: '800' }, horizontal: { paddingRight: 10 }, course: { width: 280, marginRight: 12 }, verify: { marginTop: 14, flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: '#eee9ff', borderRadius: 20, padding: 17 }, verifyTitle: { color: colors.ink, fontWeight: '900' }, verifyText: { color: colors.muted, fontSize: 12, marginTop: 3 },
 });

@@ -606,6 +606,95 @@ const swaggerDefinition = {
         type: "object", additionalProperties: false, required: ["content"],
         properties: { content: { type: "string", maxLength: 5000 } }
       },
+      CreateOrderRequest: {
+        type: "object", additionalProperties: false, required: ["courseIds"],
+        properties: { courseIds: { type: "array", minItems: 1, maxItems: 20, uniqueItems: true, items: { type: "string", format: "uuid" } } }
+      },
+      OrderItem: {
+        type: "object", required: ["courseId", "courseTitleSnapshot", "priceSnapshot"],
+        properties: { id: { type: "string", format: "uuid" }, courseId: { type: "string", format: "uuid" }, courseTitleSnapshot: { type: "string" }, priceSnapshot: { type: "number", example: 299000 } }
+      },
+      Order: {
+        type: "object", required: ["id", "orderNumber", "status", "subtotal", "total", "currency", "items"],
+        properties: { id: { type: "string", format: "uuid" }, orderNumber: { type: "string", example: "ORD-20260810-ABC123" }, status: { type: "string", enum: ["PENDING", "PAID", "CANCELLED"] }, subtotal: { type: "number" }, total: { type: "number" }, currency: { type: "string", enum: ["VND"] }, paidAt: { type: "string", format: "date-time", nullable: true }, items: { type: "array", items: { $ref: "#/components/schemas/OrderItem" } } }
+      },
+      MockPaymentCallbackRequest: {
+        type: "object", required: ["token", "status"],
+        properties: { token: { type: "string", description: "Opaque token embedded in mockPaymentUrl" }, status: { type: "string", enum: ["SUCCEEDED", "FAILED"] } }
+      },
+      MockPaymentWebhookRequest: {
+        type: "object", additionalProperties: false, required: ["eventId", "paymentId", "status", "providerTransactionId", "amount", "currency"],
+        properties: { eventId: { type: "string" }, paymentId: { type: "string", format: "uuid" }, status: { type: "string", enum: ["SUCCEEDED", "FAILED"] }, providerTransactionId: { type: "string" }, amount: { type: "number" }, currency: { type: "string", enum: ["VND"] } }
+      },
+      Certificate: {
+        type: "object", required: ["id", "certificateNumber", "verificationCode", "studentNameSnapshot", "courseTitleSnapshot", "instructorNameSnapshot", "issuedAt"],
+        properties: { id: { type: "string", format: "uuid" }, certificateNumber: { type: "string", example: "LMS-2026-A1B2C3D4" }, verificationCode: { type: "string" }, studentNameSnapshot: { type: "string" }, courseTitleSnapshot: { type: "string" }, instructorNameSnapshot: { type: "string" }, issuedAt: { type: "string", format: "date-time" }, revokedAt: { type: "string", format: "date-time", nullable: true } }
+      },
+      AssignmentRequest: {
+        type: "object", additionalProperties: false, required: ["title", "dueAt"],
+        properties: {
+          title: { type: "string", maxLength: 255, example: "Thiết kế REST API cho LMS" },
+          description: { type: "string", nullable: true, maxLength: 10000 },
+          instructions: { type: "string", nullable: true, maxLength: 30000 },
+          dueAt: { type: "string", format: "date-time", example: "2026-09-01T16:59:59.000Z" },
+          maxScore: { type: "number", minimum: 0.01, maximum: 100000, default: 100 },
+          allowResubmission: { type: "boolean", default: false },
+          maxSubmissions: { type: "integer", minimum: 1, maximum: 20, default: 1 },
+          allowLateSubmissions: { type: "boolean", default: false },
+          isPublished: { type: "boolean", default: false }
+        }
+      },
+      GradeSubmissionRequest: {
+        type: "object", additionalProperties: false, required: ["score"],
+        properties: { score: { type: "number", minimum: 0, example: 85 }, comment: { type: "string", nullable: true, maxLength: 10000, example: "Bài làm tốt, cần bổ sung kiểm thử." } }
+      },
+      CourseGradeRuleRequest: {
+        type: "object", additionalProperties: false, required: ["assignmentWeight", "quizWeight", "passingScore"],
+        properties: {
+          assignmentWeight: { type: "number", minimum: 0, maximum: 100, example: 60 },
+          quizWeight: { type: "number", minimum: 0, maximum: 100, example: 40 },
+          passingScore: { type: "number", minimum: 0, maximum: 100, example: 70 }
+        },
+        description: "assignmentWeight and quizWeight must total 100"
+      },
+      NotificationPreferenceRequest: {
+        type: "object", additionalProperties: false, minProperties: 1,
+        properties: {
+          inAppEnabled: { type: "boolean" }, emailEnabled: { type: "boolean" }, courseUpdates: { type: "boolean" },
+          assignmentReminders: { type: "boolean" }, quizResults: { type: "boolean" }, certificateUpdates: { type: "boolean" }
+        }
+      },
+      AnnouncementRequest: {
+        type: "object", additionalProperties: false, required: ["title", "content"],
+        properties: { title: { type: "string", maxLength: 255, example: "Thay đổi lịch học" }, content: { type: "string", maxLength: 50000, example: "Buổi học ngày mai bắt đầu lúc 08:00." } }
+      },
+      UpdateAnnouncementRequest: {
+        type: "object", additionalProperties: false, minProperties: 1,
+        properties: { title: { type: "string", maxLength: 255 }, content: { type: "string", maxLength: 50000 } }
+      },
+      Notification: {
+        type: "object", required: ["id", "type", "title", "message", "isRead", "createdAt"],
+        properties: {
+          id: { type: "string", format: "uuid" },
+          type: { type: "string", enum: ["WELCOME", "COURSE_ENROLLED", "NEW_LESSON", "ASSIGNMENT_DUE", "QUIZ_RESULT", "CERTIFICATE_ISSUED", "COURSE_ANNOUNCEMENT"] },
+          title: { type: "string" }, message: { type: "string" }, data: { type: "object", nullable: true, additionalProperties: true },
+          isRead: { type: "boolean" }, readAt: { type: "string", format: "date-time", nullable: true }, createdAt: { type: "string", format: "date-time" }
+        }
+      },
+      NotificationPreference: {
+        allOf: [
+          { $ref: "#/components/schemas/NotificationPreferenceRequest" },
+          { type: "object", required: ["id", "userId", "inAppEnabled", "emailEnabled", "courseUpdates", "assignmentReminders", "quizResults", "certificateUpdates", "createdAt", "updatedAt"], properties: { id: { type: "string", format: "uuid" }, userId: { type: "string", format: "uuid" }, createdAt: { type: "string", format: "date-time" }, updatedAt: { type: "string", format: "date-time" } } }
+        ]
+      },
+      CourseAnnouncement: {
+        type: "object", required: ["id", "courseId", "authorId", "title", "content", "status", "createdAt", "updatedAt"],
+        properties: { id: { type: "string", format: "uuid" }, courseId: { type: "string", format: "uuid" }, authorId: { type: "string", format: "uuid" }, title: { type: "string" }, content: { type: "string" }, status: { type: "string", enum: ["DRAFT", "PUBLISHED"] }, publishedAt: { type: "string", format: "date-time", nullable: true }, createdAt: { type: "string", format: "date-time" }, updatedAt: { type: "string", format: "date-time" } }
+      },
+      AdminUserUpdateRequest: {
+        type: "object", additionalProperties: false,
+        properties: { role: { type: "string", enum: ["STUDENT", "INSTRUCTOR", "ADMIN"] }, status: { type: "string", enum: ["ACTIVE", "BLOCKED"] } }
+      },
       ErrorResponse: {
         type: "object",
         required: ["success", "message"],

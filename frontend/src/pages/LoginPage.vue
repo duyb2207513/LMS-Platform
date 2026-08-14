@@ -1,88 +1,51 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import AuthLayout from '@/layouts/AuthLayout.vue'
 import BaseInput from '@/components/ui/BaseInput.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
+import GoogleSignInButton from '@/components/auth/GoogleSignInButton.vue'
+import GitHubSignInButton from '@/components/auth/GitHubSignInButton.vue'
 import { useAuthStore } from '@/stores/auth'
 
-const auth = useAuthStore()
-const router = useRouter()
-
-const email = ref('')
-const password = ref('')
-const loading = ref(false)
-const error = ref('')
-
-async function handleLogin() {
+const auth = useAuthStore(), route = useRoute(), router = useRouter()
+const email = ref(''), password = ref(''), loading = ref(false), error = ref('')
+async function finishLogin() {
+  const redirect = typeof route.query.redirect === 'string' ? route.query.redirect : ''
+  await router.push(redirect || (auth.isAdmin ? '/admin' : auth.isInstructor ? '/instructor/courses' : '/dashboard'))
+}
+async function submit() {
   error.value = ''
+  if (!email.value.trim() || !password.value) { error.value = 'Email và mật khẩu là bắt buộc'; return }
   loading.value = true
-  try {
-    await auth.login({ email: email.value, password: password.value })
-    // Redirect based on role
-    if (auth.isAdmin) router.push('/admin')
-    else if (auth.isInstructor) router.push('/instructor')
-    else router.push('/dashboard')
-  } catch (e) {
-    error.value = e instanceof Error ? e.message : 'Đăng nhập thất bại'
-  } finally {
-    loading.value = false
-  }
+  try { await auth.login({ email: email.value.trim(), password: password.value }); await finishLogin() }
+  catch (cause) { error.value = cause instanceof Error ? cause.message : 'Đăng nhập thất bại' }
+  finally { loading.value = false }
+}
+async function loginWithGoogle(idToken: string) {
+  loading.value = true; error.value = ''
+  try { await auth.googleLogin(idToken); await finishLogin() }
+  catch (cause) { error.value = cause instanceof Error ? cause.message : 'Đăng nhập Google thất bại' }
+  finally { loading.value = false }
 }
 </script>
 
 <template>
   <AuthLayout>
     <div class="space-y-6">
-      <div class="text-center">
-        <h1 class="text-2xl font-bold text-slate-900 dark:text-white">Chào mừng trở lại!</h1>
-        <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Đăng nhập để tiếp tục học tập</p>
-      </div>
-
-      <!-- Error Alert -->
-      <div v-if="error" class="p-4 rounded-xl bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900/50">
-        <p class="text-sm text-red-600 dark:text-red-400 flex items-center gap-2">
-          <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          {{ error }}
-        </p>
-      </div>
-
-      <form @submit.prevent="handleLogin" class="space-y-5">
-        <BaseInput
-          id="login-email"
-          v-model="email"
-          label="Email"
-          type="email"
-          placeholder="your@email.com"
-          :required="true"
-        />
-        <BaseInput
-          id="login-password"
-          v-model="password"
-          label="Mật khẩu"
-          type="password"
-          placeholder="••••••••"
-          :required="true"
-        />
-
-        <BaseButton
-          type="submit"
-          :loading="loading"
-          :full-width="true"
-          size="lg"
-        >
-          Đăng nhập
-        </BaseButton>
+      <div class="text-center"><h1 class="text-2xl font-extrabold">Chào mừng trở lại</h1><p class="mt-2 text-sm text-slate-500">Đăng nhập để tiếp tục hành trình học tập</p></div>
+      <p v-if="$route.query.registered" class="rounded-xl bg-emerald-50 p-3 text-sm text-emerald-700">Đăng ký thành công. Hãy kiểm tra email để xác minh tài khoản.</p>
+      <p v-if="$route.query.reset" class="rounded-xl bg-emerald-50 p-3 text-sm text-emerald-700">Mật khẩu đã được đặt lại. Bạn có thể đăng nhập.</p>
+      <GitHubSignInButton />
+      <GoogleSignInButton @credential="loginWithGoogle" @error="error = $event" />
+      <div class="flex items-center gap-3"><span class="h-px flex-1 bg-slate-200 dark:bg-slate-700"/><span class="text-xs text-slate-400">hoặc dùng email</span><span class="h-px flex-1 bg-slate-200 dark:bg-slate-700"/></div>
+      <form class="space-y-5" @submit.prevent="submit">
+        <BaseInput id="email" v-model="email" type="email" label="Email" placeholder="ban@example.com" required />
+        <div><BaseInput id="password" v-model="password" type="password" label="Mật khẩu" required /><div class="mt-2 text-right"><RouterLink to="/forgot-password" class="text-xs font-bold text-purple-600">Quên mật khẩu?</RouterLink></div></div>
+        <p v-if="error" class="rounded-xl bg-red-50 p-3 text-sm text-red-700 dark:bg-red-950/30 dark:text-red-300">{{ error }}</p>
+        <BaseButton type="submit" :loading="loading" :full-width="true">Đăng nhập</BaseButton>
       </form>
-
-      <p class="text-center text-sm text-slate-500 dark:text-slate-400">
-        Chưa có tài khoản?
-        <router-link to="/register" class="font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors">
-          Đăng ký ngay
-        </router-link>
-      </p>
+      <p class="text-center text-sm">Chưa có tài khoản? <RouterLink to="/register" class="font-bold text-purple-600">Đăng ký</RouterLink></p>
     </div>
   </AuthLayout>
 </template>

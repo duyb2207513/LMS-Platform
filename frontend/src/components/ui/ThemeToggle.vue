@@ -1,45 +1,21 @@
 <script setup lang="ts">
 import { useThemeStore } from '@/stores/theme'
-
 const themeStore = useThemeStore()
 </script>
 
 <template>
   <button
-    @click="themeStore.toggleTheme"
-    class="p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-300 transition-all duration-300 cursor-pointer flex items-center justify-center border border-transparent dark:border-slate-700"
+    type="button"
+    class="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-slate-200 bg-white text-purple-600 shadow-sm transition-[background-color,border-color,color,transform] duration-200 hover:-translate-y-px hover:border-purple-200 hover:bg-purple-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-purple-500/15 dark:border-slate-700 dark:bg-slate-900 dark:text-amber-400 dark:hover:border-slate-600 dark:hover:bg-slate-800"
     :title="themeStore.isDark ? 'Chuyển sang giao diện sáng' : 'Chuyển sang giao diện tối'"
+    :aria-label="themeStore.isDark ? 'Chuyển sang giao diện sáng' : 'Chuyển sang giao diện tối'"
+    @click="themeStore.toggleTheme"
   >
-    <!-- Sun Icon (shows when dark mode is active) -->
-    <svg
-      v-if="themeStore.isDark"
-      class="w-5 h-5 animate-pulse text-amber-400"
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-    >
-      <path
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        stroke-width="2"
-        d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m12.728 12.728l.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"
-      />
+    <svg v-if="themeStore.isDark" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.36-6.36-.7.7M6.34 17.66l-.7.7m0-12.72.7.7m12.72 12.72.7-.7M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z" />
     </svg>
-
-    <!-- Moon Icon (shows when light mode is active) -->
-    <svg
-      v-else
-      class="w-5 h-5 text-indigo-600"
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-    >
-      <path
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        stroke-width="2"
-        d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
-      />
+    <svg v-else class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M20.35 15.35A9 9 0 0 1 8.65 3.65 9 9 0 1 0 20.35 15.35Z" />
     </svg>
   </button>
 </template>

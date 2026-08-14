@@ -1,9 +1,14 @@
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
-import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
+import { NavigationContainer, DarkTheme, DefaultTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../auth/AuthContext';
-import type { RootStackParamList } from '../types';
-import { colors } from '../theme';
+import type { MainTabParamList, RootStackParamList } from '../types';
+import { colors, shadows, typography } from '../theme';
+import { useAppTheme } from '../providers/ThemeProvider';
 import { HomeScreen } from '../screens/HomeScreen';
 import { LoginScreen, RegisterScreen } from '../screens/AuthScreens';
 import { CoursesScreen, CourseDetailScreen } from '../screens/CourseScreens';
@@ -13,40 +18,80 @@ import { CourseFormScreen, InstructorCoursesScreen } from '../screens/Instructor
 import { CourseBuilderScreen } from '../screens/CourseBuilderScreen';
 import { LearningScreen, MyCoursesScreen } from '../screens/LearningScreens';
 import { QuizBuilderScreen, QuizResultScreen, QuizScreen } from '../screens/QuizScreens';
+import { CertificatesScreen, CheckoutScreen, MockPaymentScreen, OrdersScreen, PaymentResultScreen, VerifyCertificateScreen } from '../screens/PaymentScreens';
+import { NotificationsScreen, SearchScreen } from '../screens/MainTabScreens';
+import { AssignmentDetailScreen, AssignmentManagerScreen, AssignmentsScreen, AssignmentSubmissionsScreen, SubmissionDetailScreen } from '../screens/AssignmentScreens';
+import { AnnouncementsScreen } from '../screens/CommunicationScreens';
+import { AnalyticsScreen } from '../screens/AnalyticsScreens';
+import { AdminCouponsScreen, AdminPayoutsScreen, AdminRefundsScreen, RefundsScreen, RevenueScreen } from '../screens/CommerceScreens';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
-const navigationTheme = { ...DefaultTheme, colors: { ...DefaultTheme.colors, primary: colors.primary, background: colors.background, card: '#fff', text: colors.ink, border: colors.border } };
+const Tabs = createBottomTabNavigator<MainTabParamList>();
+const tabConfig: Record<keyof MainTabParamList, { label: string; active: keyof typeof Ionicons.glyphMap; inactive: keyof typeof Ionicons.glyphMap }> = {
+  HomeTab: { label: 'Trang chủ', active: 'home', inactive: 'home-outline' }, CoursesTab: { label: 'Khóa học', active: 'library', inactive: 'library-outline' },
+  SearchTab: { label: 'Tìm kiếm', active: 'search', inactive: 'search-outline' }, NotificationsTab: { label: 'Thông báo', active: 'notifications', inactive: 'notifications-outline' }, AccountTab: { label: 'Cá nhân', active: 'person', inactive: 'person-outline' },
+};
+
+function MainTabs() {
+  const insets = useSafeAreaInsets();
+  const { palette } = useAppTheme();
+  return <Tabs.Navigator backBehavior="history" screenListeners={{ tabPress: () => { void Haptics.selectionAsync().catch(() => undefined); } }} screenOptions={({ route }) => ({
+    headerShown: false, tabBarHideOnKeyboard: true, tabBarActiveTintColor: palette.primary, tabBarInactiveTintColor: palette.muted,
+    tabBarLabel: tabConfig[route.name].label, tabBarLabelStyle: { fontSize: 10, fontWeight: '800', marginTop: 2 },
+    tabBarIcon: ({ focused, color, size }) => <Ionicons name={focused ? tabConfig[route.name].active : tabConfig[route.name].inactive} size={Math.max(22, size)} color={color} />,
+    tabBarStyle: { height: 62 + insets.bottom, paddingTop: 8, paddingBottom: Math.max(7, insets.bottom), borderTopWidth: 0, backgroundColor: palette.surface, ...shadows.elevated },
+  })}>
+    <Tabs.Screen name="HomeTab" component={HomeScreen} />
+    <Tabs.Screen name="CoursesTab" component={CoursesScreen} />
+    <Tabs.Screen name="SearchTab" component={SearchScreen} />
+    <Tabs.Screen name="NotificationsTab" component={NotificationsScreen} />
+    <Tabs.Screen name="AccountTab" component={DashboardScreen} />
+  </Tabs.Navigator>;
+}
 
 export function AppNavigator() {
-  const { user, isBooting } = useAuth();
-  if (isBooting) return <View style={styles.boot}><View style={styles.logo}><Text style={styles.logoText}>▤</Text></View><ActivityIndicator size="large" color={colors.primary} /></View>;
+  const { isBooting } = useAuth();
+  const { palette, isDark } = useAppTheme();
+  const baseTheme = isDark ? DarkTheme : DefaultTheme;
+  const navigationTheme = { ...baseTheme, colors: { ...baseTheme.colors, primary: palette.primary, background: palette.background, card: palette.surface, text: palette.ink, border: palette.border } };
+  if (isBooting) return <View style={[styles.boot, { backgroundColor: palette.background }]}><View style={[styles.logo, { backgroundColor: palette.primary }]}><Ionicons name="book-outline" size={34} color="#fff" /></View><ActivityIndicator size="large" color={palette.primary} /><Text style={[styles.loading, { color: palette.muted }]}>Đang chuẩn bị LMS...</Text></View>;
   return <NavigationContainer theme={navigationTheme}>
-    <Stack.Navigator screenOptions={{ headerTintColor: colors.primary, headerTitleStyle: { fontWeight: '800' }, headerShadowVisible: false, contentStyle: { backgroundColor: colors.background } }}>
-      <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
-      <Stack.Screen name="Courses" component={CoursesScreen} options={{ title: 'Khóa học' }} />
+    <Stack.Navigator screenOptions={{ headerTintColor: palette.primary, headerStyle: { backgroundColor: palette.surface }, headerTitleAlign: 'center', headerTitleStyle: { ...typography.title, color: palette.ink }, headerBackButtonDisplayMode: 'minimal', headerShadowVisible: false, contentStyle: { backgroundColor: palette.background }, animation: 'slide_from_right', gestureEnabled: true }}>
+      <Stack.Screen name="Main" component={MainTabs} options={{ headerShown: false }} />
+      <Stack.Screen name="Login" component={LoginScreen} options={{ title: 'Đăng nhập', presentation: 'modal' }} />
+      <Stack.Screen name="Register" component={RegisterScreen} options={{ title: 'Đăng ký', presentation: 'modal' }} />
       <Stack.Screen name="CourseDetail" component={CourseDetailScreen} options={{ title: 'Chi tiết khóa học' }} />
-      <Stack.Screen name="Dashboard" component={DashboardScreen} options={{ title: 'Tài khoản' }} />
-      {!user ? <>
-        <Stack.Screen name="Login" component={LoginScreen} options={{ title: 'Đăng nhập' }} />
-        <Stack.Screen name="Register" component={RegisterScreen} options={{ title: 'Đăng ký' }} />
-      </> : <>
-        <Stack.Screen name="Profile" component={ProfileScreen} options={{ title: 'Hồ sơ' }} />
-        <Stack.Screen name="ChangePassword" component={ChangePasswordScreen} options={{ title: 'Đổi mật khẩu' }} />
-        {user.role === 'STUDENT' && <>
-          <Stack.Screen name="MyCourses" component={MyCoursesScreen} options={{ title: 'Khóa học của tôi' }} />
-          <Stack.Screen name="Learning" component={LearningScreen} options={{ title: 'Học tập' }} />
-          <Stack.Screen name="Quiz" component={QuizScreen} options={{ title: 'Làm bài quiz' }} />
-          <Stack.Screen name="QuizResult" component={QuizResultScreen} options={{ title: 'Kết quả quiz' }} />
-        </>}
-        {(user.role === 'INSTRUCTOR' || user.role === 'ADMIN') && <>
-          <Stack.Screen name="InstructorCourses" component={InstructorCoursesScreen} options={{ title: 'Quản lý khóa học' }} />
-          <Stack.Screen name="CourseForm" component={CourseFormScreen} options={{ title: 'Thông tin khóa học' }} />
-          <Stack.Screen name="CourseBuilder" component={CourseBuilderScreen} options={{ title: 'Xây dựng nội dung' }} />
-          <Stack.Screen name="QuizBuilder" component={QuizBuilderScreen} options={{ title: 'Quiz builder' }} />
-        </>}
-        {user.role === 'ADMIN' && <Stack.Screen name="AdminCategories" component={AdminCategoriesScreen} options={{ title: 'Quản lý danh mục' }} />}
-      </>}
+      <Stack.Screen name="VerifyCertificate" component={VerifyCertificateScreen} options={{ title: 'Xác minh chứng chỉ' }} />
+      <Stack.Screen name="Profile" component={ProfileScreen} options={{ title: 'Hồ sơ' }} />
+      <Stack.Screen name="ChangePassword" component={ChangePasswordScreen} options={{ title: 'Đổi mật khẩu' }} />
+      <Stack.Screen name="MyCourses" component={MyCoursesScreen} options={{ title: 'Khóa học của tôi' }} />
+      <Stack.Screen name="Learning" component={LearningScreen} options={{ title: 'Học tập' }} />
+      <Stack.Screen name="Quiz" component={QuizScreen} options={{ title: 'Làm bài quiz' }} />
+      <Stack.Screen name="QuizResult" component={QuizResultScreen} options={{ title: 'Kết quả quiz' }} />
+      <Stack.Screen name="Orders" component={OrdersScreen} options={{ title: 'Đơn hàng' }} />
+      <Stack.Screen name="Checkout" component={CheckoutScreen} options={{ title: 'Thanh toán' }} />
+      <Stack.Screen name="MockPayment" component={MockPaymentScreen} options={{ title: 'Cổng thanh toán' }} />
+      <Stack.Screen name="PaymentResult" component={PaymentResultScreen} options={{ title: 'Kết quả thanh toán', headerBackVisible: false }} />
+      <Stack.Screen name="Certificates" component={CertificatesScreen} options={{ title: 'Chứng chỉ' }} />
+      <Stack.Screen name="InstructorCourses" component={InstructorCoursesScreen} options={{ title: 'Quản lý khóa học' }} />
+      <Stack.Screen name="CourseForm" component={CourseFormScreen} options={{ title: 'Thông tin khóa học' }} />
+      <Stack.Screen name="CourseBuilder" component={CourseBuilderScreen} options={{ title: 'Xây dựng nội dung' }} />
+      <Stack.Screen name="QuizBuilder" component={QuizBuilderScreen} options={{ title: 'Quiz builder' }} />
+      <Stack.Screen name="AdminCategories" component={AdminCategoriesScreen} options={{ title: 'Quản lý danh mục' }} />
+      <Stack.Screen name="Assignments" component={AssignmentsScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="AssignmentDetail" component={AssignmentDetailScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="AssignmentManager" component={AssignmentManagerScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="AssignmentSubmissions" component={AssignmentSubmissionsScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="SubmissionDetail" component={SubmissionDetailScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="Announcements" component={AnnouncementsScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="Analytics" component={AnalyticsScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="Refunds" component={RefundsScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="AdminRefunds" component={AdminRefundsScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="AdminCoupons" component={AdminCouponsScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="Revenue" component={RevenueScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="AdminPayouts" component={AdminPayoutsScreen} options={{ headerShown: false }} />
     </Stack.Navigator>
   </NavigationContainer>;
 }
-const styles = StyleSheet.create({ boot: { flex: 1, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center', gap: 22 }, logo: { width: 70, height: 70, borderRadius: 22, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center' }, logoText: { color: '#fff', fontSize: 37 } });
+
+const styles = StyleSheet.create({ boot: { flex: 1, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center', gap: 18 }, logo: { width: 70, height: 70, borderRadius: 22, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center' }, loading: { color: colors.muted, fontWeight: '700' } });

@@ -1,181 +1,138 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
+import { ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import AppBrand from '@/components/layout/AppBrand.vue'
 import ThemeToggle from '@/components/ui/ThemeToggle.vue'
+import { useAuthStore } from '@/stores/auth'
 
+const props = withDefaults(defineProps<{ workspace?: boolean }>(), { workspace: false })
+const emit = defineEmits<{ toggleWorkspace: [] }>()
 const auth = useAuthStore()
+const route = useRoute()
 const router = useRouter()
 const mobileMenuOpen = ref(false)
-const profileMenuOpen = ref(false)
+const profileOpen = ref(false)
 
-function handleLogout() {
-  auth.logout()
-  profileMenuOpen.value = false
-  router.push('/login')
+const dashboardPath = () => auth.isAdmin ? '/admin' : auth.isInstructor ? '/instructor' : '/dashboard'
+const mainLinkClass = (path: string) => {
+  const active = path === '/' ? route.path === '/' : route.path === path || route.path.startsWith(`${path}/`)
+  return [
+    'rounded-xl px-4 py-2 text-sm font-semibold transition-colors',
+    active
+      ? 'bg-purple-50 text-purple-700 dark:bg-purple-950/40 dark:text-purple-300'
+      : 'text-slate-600 hover:bg-slate-100 hover:text-slate-950 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white',
+  ]
 }
 
-function getDashboardRoute() {
-  if (auth.isAdmin) return '/admin'
-  if (auth.isInstructor) return '/instructor'
-  return '/dashboard'
+async function logout() {
+  await auth.logout()
+  profileOpen.value = false
+  mobileMenuOpen.value = false
+  await router.push('/login')
 }
+
+function toggleMobileNavigation() {
+  profileOpen.value = false
+  if (props.workspace) emit('toggleWorkspace')
+  else mobileMenuOpen.value = !mobileMenuOpen.value
+}
+
+watch(() => route.fullPath, () => {
+  mobileMenuOpen.value = false
+  profileOpen.value = false
+})
 </script>
 
 <template>
-  <header class="sticky top-0 z-40 w-full border-b border-slate-200/80 dark:border-slate-800/80 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl transition-colors duration-300">
-    <div class="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-      <!-- Logo -->
-      <router-link to="/" class="flex items-center gap-2.5 group">
-        <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-600 to-purple-600 shadow-lg shadow-indigo-500/25 transition-transform group-hover:scale-110">
-          <svg class="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-          </svg>
-        </div>
-        <span class="text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-          LMS Platform
-        </span>
-      </router-link>
+  <header class="sticky top-0 z-40 border-b border-slate-200/80 bg-white/88 backdrop-blur-xl dark:border-slate-800 dark:bg-slate-950/88">
+    <div class="mx-auto flex h-16 max-w-[90rem] items-center justify-between gap-3 px-3 sm:px-5 lg:px-8">
+      <AppBrand />
 
-      <!-- Desktop Nav -->
-      <nav class="hidden md:flex items-center gap-1">
-        <router-link
-          to="/"
-          class="px-4 py-2 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-slate-800 transition-all"
-          active-class="!text-indigo-600 !bg-indigo-50 dark:!text-indigo-400 dark:!bg-slate-800"
-        >
-          Trang chủ
-        </router-link>
-        <router-link
-          to="/courses"
-          class="px-4 py-2 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-slate-800 transition-all"
-          active-class="!text-indigo-600 !bg-indigo-50 dark:!text-indigo-400 dark:!bg-slate-800"
-        >
-          Khóa học
-        </router-link>
+      <nav class="hidden items-center gap-1 md:flex" aria-label="Điều hướng chính">
+        <RouterLink to="/" :class="mainLinkClass('/')">Trang chủ</RouterLink>
+        <RouterLink to="/courses" :class="mainLinkClass('/courses')">Khóa học</RouterLink>
+        <RouterLink v-if="auth.isStudent" to="/my-courses" :class="mainLinkClass('/my-courses')">Khóa học của tôi</RouterLink>
       </nav>
 
-      <!-- Right Section -->
-      <div class="flex items-center gap-3">
-        <!-- Theme Toggle -->
+      <div class="flex shrink-0 items-center gap-1.5 sm:gap-2">
         <ThemeToggle />
 
-        <!-- Auth Buttons (Guest) -->
         <template v-if="!auth.isLoggedIn">
-          <router-link
-            to="/login"
-            class="hidden sm:inline-flex px-4 py-2 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-slate-800 transition-all"
-          >
+          <RouterLink to="/login" class="hidden min-h-10 items-center rounded-xl px-3.5 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-100 sm:inline-flex dark:text-slate-200 dark:hover:bg-slate-800">
             Đăng nhập
-          </router-link>
-          <router-link
-            to="/register"
-            class="inline-flex px-5 py-2 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 shadow-lg shadow-indigo-500/25 transition-all hover:shadow-xl"
-          >
+          </RouterLink>
+          <RouterLink to="/register" class="inline-flex min-h-10 items-center rounded-xl bg-gradient-to-r from-violet-600 to-purple-600 px-3.5 text-sm font-bold text-white shadow-md shadow-purple-500/20 transition hover:from-violet-700 hover:to-purple-700 sm:px-4">
             Đăng ký
-          </router-link>
+          </RouterLink>
         </template>
 
-        <!-- Logged In User -->
-        <template v-else>
-          <router-link
-            :to="getDashboardRoute()"
-            class="hidden sm:inline-flex px-4 py-2 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-slate-800 transition-all"
+        <div v-else class="relative">
+          <button
+            type="button"
+            class="flex min-h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white p-1.5 pr-1.5 text-left shadow-sm transition hover:border-purple-200 hover:bg-purple-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-purple-500/15 dark:border-slate-700 dark:bg-slate-900 dark:hover:border-purple-800 dark:hover:bg-purple-950/30 sm:pr-3"
+            :aria-expanded="profileOpen"
+            aria-haspopup="menu"
+            @click="profileOpen = !profileOpen; mobileMenuOpen = false"
           >
-            Dashboard
-          </router-link>
+            <img v-if="auth.user?.avatarUrl" :src="auth.user.avatarUrl" alt="" class="h-7 w-7 rounded-lg object-cover">
+            <span v-else class="grid h-7 w-7 place-items-center rounded-lg bg-gradient-to-br from-violet-600 to-purple-600 text-xs font-bold text-white">{{ auth.userInitials }}</span>
+            <span class="hidden max-w-36 truncate text-sm font-semibold text-slate-800 sm:block dark:text-slate-100">{{ auth.user?.fullName }}</span>
+            <svg class="hidden h-4 w-4 text-slate-400 sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m6 9 6 6 6-6" /></svg>
+          </button>
 
-          <!-- Profile Dropdown -->
-          <div class="relative">
-            <button
-              @click="profileMenuOpen = !profileMenuOpen"
-              class="flex items-center gap-2 p-1 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
-            >
-              <div class="h-8 w-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-sm font-bold shadow-md">
-                {{ auth.userInitials }}
+          <Transition name="dropdown">
+            <div v-if="profileOpen" class="absolute right-0 mt-2 w-64 overflow-hidden rounded-2xl border border-slate-200 bg-white p-2 shadow-xl shadow-slate-900/10 dark:border-slate-700 dark:bg-slate-900" role="menu">
+              <div class="mb-1 rounded-xl bg-slate-50 px-3 py-3 dark:bg-slate-800/70">
+                <p class="truncate text-sm font-bold text-slate-900 dark:text-white">{{ auth.user?.fullName }}</p>
+                <p class="mt-0.5 truncate text-xs text-slate-500 dark:text-slate-400">{{ auth.user?.email }}</p>
+                <span class="mt-2 inline-flex rounded-full bg-purple-100 px-2 py-1 text-[10px] font-bold tracking-wide text-purple-700 dark:bg-purple-950/50 dark:text-purple-300">{{ auth.user?.role }}</span>
               </div>
-              <svg class="w-4 h-4 text-slate-400 hidden sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
+              <RouterLink :to="dashboardPath()" class="profile-link" role="menuitem">Dashboard</RouterLink>
+              <RouterLink to="/profile" class="profile-link" role="menuitem">Hồ sơ cá nhân</RouterLink>
+              <RouterLink to="/change-password" class="profile-link" role="menuitem">Đổi mật khẩu</RouterLink>
+              <RouterLink to="/security" class="profile-link" role="menuitem">Bảo mật và thiết bị</RouterLink>
+              <template v-if="auth.isStudent">
+                <RouterLink to="/my-courses" class="profile-link" role="menuitem">Khóa học của tôi</RouterLink>
+                <RouterLink to="/orders" class="profile-link" role="menuitem">Đơn hàng</RouterLink>
+                <RouterLink to="/certificates" class="profile-link" role="menuitem">Chứng chỉ</RouterLink>
+              </template>
+              <div class="my-1 border-t border-slate-100 dark:border-slate-800" />
+              <button type="button" class="w-full rounded-xl px-3 py-2.5 text-left text-sm font-semibold text-red-600 transition hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/30" role="menuitem" @click="logout">Đăng xuất</button>
+            </div>
+          </Transition>
+        </div>
 
-            <!-- Dropdown -->
-            <Transition name="dropdown">
-              <div
-                v-if="profileMenuOpen"
-                class="absolute right-0 mt-2 w-56 rounded-xl bg-white dark:bg-slate-900 shadow-xl border border-slate-100 dark:border-slate-800 py-1 z-50"
-              >
-                <div class="px-4 py-3 border-b border-slate-100 dark:border-slate-800">
-                  <p class="text-sm font-semibold text-slate-900 dark:text-white">{{ auth.user?.fullName }}</p>
-                  <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{{ auth.user?.email }}</p>
-                  <span class="inline-block mt-1.5 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-indigo-100 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-400">
-                    {{ auth.user?.role }}
-                  </span>
-                </div>
-                <router-link
-                  :to="getDashboardRoute()"
-                  @click="profileMenuOpen = false"
-                  class="block px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-indigo-50 dark:hover:bg-slate-800 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
-                >
-                  Dashboard
-                </router-link>
-                <button
-                  @click="handleLogout"
-                  class="w-full text-left px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors cursor-pointer"
-                >
-                  Đăng xuất
-                </button>
-              </div>
-            </Transition>
-          </div>
-        </template>
-
-        <!-- Mobile Menu Toggle -->
         <button
-          @click="mobileMenuOpen = !mobileMenuOpen"
-          class="md:hidden p-2 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+          type="button"
+          :class="['grid h-10 w-10 place-items-center rounded-xl border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:border-purple-200 hover:bg-purple-50 hover:text-purple-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-purple-800 dark:hover:bg-purple-950/30', workspace ? 'lg:hidden' : 'md:hidden']"
+          :aria-label="workspace ? 'Mở menu quản lý' : 'Mở menu điều hướng'"
+          :aria-expanded="mobileMenuOpen"
+          @click="toggleMobileNavigation"
         >
-          <svg v-if="!mobileMenuOpen" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-          </svg>
-          <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-          </svg>
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7h16M4 12h16M4 17h16" /></svg>
         </button>
       </div>
     </div>
 
-    <!-- Mobile Menu -->
-    <Transition name="slide-down">
-      <div v-if="mobileMenuOpen" class="md:hidden border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 pb-4 pt-2">
-        <router-link to="/" @click="mobileMenuOpen = false" class="block py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400">Trang chủ</router-link>
-        <router-link to="/courses" @click="mobileMenuOpen = false" class="block py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400">Khóa học</router-link>
-        <template v-if="!auth.isLoggedIn">
-          <router-link to="/login" @click="mobileMenuOpen = false" class="block py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400">Đăng nhập</router-link>
-          <router-link to="/register" @click="mobileMenuOpen = false" class="block py-2.5 text-sm font-semibold text-indigo-600 dark:text-indigo-400">Đăng ký</router-link>
-        </template>
-      </div>
+    <Transition name="mobile-nav">
+      <nav v-if="mobileMenuOpen && !workspace" class="border-t border-slate-100 bg-white px-3 py-3 shadow-lg md:hidden dark:border-slate-800 dark:bg-slate-950" aria-label="Điều hướng mobile">
+        <div class="mx-auto grid max-w-7xl gap-1">
+          <RouterLink to="/" :class="mainLinkClass('/')">Trang chủ</RouterLink>
+          <RouterLink to="/courses" :class="mainLinkClass('/courses')">Khóa học</RouterLink>
+          <RouterLink v-if="auth.isStudent" to="/my-courses" :class="mainLinkClass('/my-courses')">Khóa học của tôi</RouterLink>
+          <RouterLink v-if="!auth.isLoggedIn" to="/login" class="rounded-xl px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800">Đăng nhập</RouterLink>
+        </div>
+      </nav>
     </Transition>
   </header>
 </template>
 
 <style scoped>
-.dropdown-enter-active,
-.dropdown-leave-active {
-  transition: all 0.15s ease;
-}
-.dropdown-enter-from,
-.dropdown-leave-to {
-  opacity: 0;
-  transform: translateY(-4px) scale(0.97);
-}
-.slide-down-enter-active,
-.slide-down-leave-active {
-  transition: all 0.2s ease;
-}
-.slide-down-enter-from,
-.slide-down-leave-to {
-  opacity: 0;
-  transform: translateY(-8px);
-}
+.profile-link { display: block; border-radius: .75rem; padding: .625rem .75rem; font-size: .875rem; font-weight: 600; color: #475569; transition: background-color 150ms ease, color 150ms ease; }
+.profile-link:hover { background: #f3e8ff; color: #6d28d9; }
+:global(.dark) .profile-link { color: #cbd5e1; }
+:global(.dark) .profile-link:hover { background: rgba(88, 28, 135, .28); color: #d8b4fe; }
+.dropdown-enter-active, .dropdown-leave-active, .mobile-nav-enter-active, .mobile-nav-leave-active { transition: opacity 150ms ease, transform 150ms ease; }
+.dropdown-enter-from, .dropdown-leave-to { opacity: 0; transform: translateY(-6px) scale(.98); }
+.mobile-nav-enter-from, .mobile-nav-leave-to { opacity: 0; transform: translateY(-6px); }
 </style>

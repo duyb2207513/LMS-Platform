@@ -128,6 +128,260 @@ export interface CourseProgress {
   progressPercent: number;
 }
 
+export type OrderStatus = 'PENDING' | 'PAID' | 'CANCELLED' | 'REFUNDED';
+export type PaymentStatus = 'PENDING' | 'SUCCEEDED' | 'FAILED' | 'REFUNDED';
+
+export interface OrderItem {
+  id: string;
+  courseId: string;
+  courseTitleSnapshot: string;
+  priceSnapshot: number;
+  course?: Pick<Course, 'slug' | 'thumbnailUrl'>;
+}
+
+export interface Payment {
+  id: string;
+  provider: 'MOCK' | 'VNPAY';
+  status: PaymentStatus;
+  amount: number;
+  currency: string;
+  providerTransactionId: string | null;
+  paidAt: string | null;
+  createdAt: string;
+}
+
+export interface Order {
+  id: string;
+  orderNumber: string;
+  status: OrderStatus;
+  subtotal: number;
+  discount?: number;
+  total: number;
+  couponId?: string | null;
+  coupon?: { id: string; code: string; discountType: 'PERCENTAGE' | 'FIXED_AMOUNT'; discountValue: number } | null;
+  currency: string;
+  paidAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+  items: OrderItem[];
+  payments: Payment[];
+}
+
+export interface AssignmentFile {
+  id: string;
+  originalName: string;
+  fileUrl: string;
+  mimeType: string;
+  sizeBytes: number;
+}
+
+export interface SubmissionFeedback {
+  id: string;
+  score: number;
+  comment: string | null;
+  gradedAt: string;
+  grader?: Pick<User, 'id' | 'fullName'>;
+}
+
+export interface AssignmentSubmission {
+  id: string;
+  assignmentId: string;
+  studentId: string;
+  attemptNumber: number;
+  textContent: string | null;
+  status: 'SUBMITTED' | 'GRADED';
+  submittedAt: string;
+  isLate: boolean;
+  student?: Pick<User, 'id' | 'fullName' | 'email' | 'avatarUrl'>;
+  files: AssignmentFile[];
+  feedback: SubmissionFeedback | null;
+}
+
+export interface Assignment {
+  id: string;
+  courseId: string;
+  title: string;
+  description: string | null;
+  instructions: string | null;
+  dueAt: string;
+  maxScore: number;
+  allowResubmission: boolean;
+  maxSubmissions: number;
+  allowLateSubmissions: boolean;
+  isPublished: boolean;
+  createdAt: string;
+  submissions?: AssignmentSubmission[];
+  _count?: { submissions: number };
+}
+
+export interface CourseGrade {
+  student?: Pick<User, 'id' | 'fullName' | 'email' | 'avatarUrl'>;
+  courseId: string;
+  studentId: string;
+  finalScore: number;
+  passed: boolean;
+  rule: CourseGradeRule;
+  assignment: { percent: number; earned: number; maximum: number; total: number; graded: number };
+  quiz: { percent: number; total: number; attempted: number };
+}
+
+export interface CourseGradeRule {
+  courseId: string;
+  assignmentWeight: number;
+  quizWeight: number;
+  passingScore: number;
+}
+
+export type NotificationType = 'WELCOME' | 'COURSE_ENROLLED' | 'NEW_LESSON' | 'COURSE_ANNOUNCEMENT' | 'ASSIGNMENT_DUE' | 'QUIZ_RESULT' | 'CERTIFICATE_ISSUED';
+export interface AppNotification {
+  id: string;
+  type: NotificationType;
+  title: string;
+  message: string;
+  data: Record<string, unknown> | null;
+  isRead: boolean;
+  readAt: string | null;
+  createdAt: string;
+}
+
+export interface NotificationPreference {
+  inAppEnabled: boolean;
+  emailEnabled: boolean;
+  courseUpdates: boolean;
+  assignmentReminders: boolean;
+  quizResults: boolean;
+  certificateUpdates: boolean;
+}
+
+export interface Announcement {
+  id: string;
+  courseId: string;
+  authorId: string;
+  title: string;
+  content: string;
+  status: 'DRAFT' | 'PUBLISHED';
+  publishedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+  author?: Pick<User, 'id' | 'fullName' | 'role'>;
+}
+
+export interface StudentAnalyticsOverview {
+  enrolledCourses: number;
+  inProgressCourses: number;
+  completedCourses: number;
+  notStartedCourses: number;
+  totalLearningSeconds: number;
+  averageQuizScore: number | null;
+  currentStreak: number;
+  longestStreak: number;
+}
+
+export interface InstructorAnalyticsOverview {
+  uniqueStudents: number;
+  newEnrollments: number;
+  completionRate: number;
+  averageQuizScore: number | null;
+  averageRating: number | null;
+  ratingCount: number;
+  revenue: { amount: number; currency: string; available: boolean };
+}
+
+export interface CouponValidation {
+  valid: boolean;
+  coupon: { code: string; discountType: 'PERCENTAGE' | 'FIXED_AMOUNT'; discountValue: number };
+  pricing: { originalAmount: number; discountAmount: number; finalAmount: number; currency: string };
+}
+
+export interface Coupon {
+  id: string;
+  code: string;
+  name: string;
+  description: string | null;
+  discountType: 'PERCENTAGE' | 'FIXED_AMOUNT';
+  discountValue: number;
+  maxDiscountAmount: number | null;
+  minOrderAmount: number | null;
+  startsAt: string;
+  expiresAt: string;
+  maxRedemptions: number | null;
+  redeemedCount: number;
+  appliesToAllCourses: boolean;
+  isActive: boolean;
+  courses?: Array<{ course: Pick<Course, 'id' | 'title' | 'slug'> }>;
+}
+
+export type RefundStatus = 'PENDING' | 'PROCESSING' | 'APPROVED' | 'REFUNDED' | 'REJECTED' | 'CANCELLED' | 'FAILED';
+export interface RefundRequest {
+  id: string;
+  orderId: string;
+  userId: string;
+  paymentId: string;
+  reason: string;
+  status: RefundStatus;
+  requestedAmount: number;
+  approvedAmount: number | null;
+  adminNote: string | null;
+  createdAt: string;
+  reviewedAt: string | null;
+  order?: Pick<Order, 'id' | 'orderNumber' | 'total' | 'currency'>;
+  user?: Pick<User, 'id' | 'fullName' | 'email'>;
+}
+
+export interface RevenueOverview {
+  grossRevenue: number;
+  platformFees: number;
+  netRevenue: number;
+  pendingBalance: number;
+  availableBalance: number;
+  paidAmount: number;
+  reversedAmount: number;
+  currency: string;
+}
+
+export interface InstructorEarning {
+  id: string;
+  courseId: string;
+  grossAmount: number;
+  platformFeeAmount: number;
+  netAmount: number;
+  status: 'PENDING' | 'AVAILABLE' | 'PAID' | 'REVERSED';
+  availableAt: string;
+  createdAt: string;
+  course?: Pick<Course, 'id' | 'title' | 'slug'>;
+}
+
+export interface Payout {
+  id: string;
+  instructorId: string;
+  amount: number;
+  currency: string;
+  status: 'PENDING' | 'PROCESSING' | 'PAID' | 'FAILED' | 'CANCELLED';
+  failureReason: string | null;
+  createdAt: string;
+  processedAt?: string | null;
+  instructor?: Pick<User, 'id' | 'fullName' | 'email'>;
+}
+
+export interface Certificate {
+  id: string;
+  certificateNumber: string;
+  verificationCode: string;
+  enrollmentId: string;
+  studentId: string;
+  courseId: string;
+  studentNameSnapshot: string;
+  courseTitleSnapshot: string;
+  instructorNameSnapshot: string;
+  issuedAt: string;
+  revokedAt: string | null;
+}
+
+export interface CertificateVerification {
+  valid: boolean;
+  certificate: Pick<Certificate, 'certificateNumber' | 'studentNameSnapshot' | 'courseTitleSnapshot' | 'instructorNameSnapshot' | 'issuedAt' | 'revokedAt'>;
+}
+
 export interface ApiResponse<T> {
   success: boolean;
   message: string;
@@ -145,12 +399,10 @@ export interface PaginatedResponse<T> extends ApiResponse<T[]> {
 }
 
 export type RootStackParamList = {
-  Home: undefined;
-  Courses: undefined;
+  Main: { screen?: keyof MainTabParamList } | undefined;
   CourseDetail: { slug: string };
   Login: undefined;
   Register: undefined;
-  Dashboard: undefined;
   Profile: undefined;
   ChangePassword: undefined;
   InstructorCourses: undefined;
@@ -162,4 +414,30 @@ export type RootStackParamList = {
   Quiz: { quizId: string; title: string };
   QuizResult: { result: QuizResult; quizTitle: string };
   AdminCategories: undefined;
+  Orders: undefined;
+  Checkout: { orderId?: string; courseId?: string; courseTitle?: string; price?: number };
+  MockPayment: { orderId: string; checkoutUrl: string };
+  PaymentResult: { orderId: string };
+  Certificates: undefined;
+  VerifyCertificate: { initialCode?: string } | undefined;
+  Assignments: { courseId: string; courseTitle: string };
+  AssignmentDetail: { assignmentId: string; courseId: string };
+  AssignmentManager: { courseId: string; courseTitle: string };
+  AssignmentSubmissions: { assignmentId: string; assignmentTitle: string; maxScore: number };
+  SubmissionDetail: { submissionId: string; maxScore: number };
+  Announcements: { courseId: string; courseTitle: string };
+  Analytics: undefined;
+  Refunds: undefined;
+  AdminRefunds: undefined;
+  AdminCoupons: undefined;
+  Revenue: undefined;
+  AdminPayouts: undefined;
+};
+
+export type MainTabParamList = {
+  HomeTab: undefined;
+  CoursesTab: undefined;
+  SearchTab: undefined;
+  NotificationsTab: undefined;
+  AccountTab: undefined;
 };

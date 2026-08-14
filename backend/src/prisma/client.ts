@@ -47,6 +47,21 @@ export { Prisma }
  */
 export type User = Prisma.UserModel
 /**
+ * Model AuthSession
+ * 
+ */
+export type AuthSession = Prisma.AuthSessionModel
+/**
+ * Model AuthToken
+ * 
+ */
+export type AuthToken = Prisma.AuthTokenModel
+/**
+ * Model AuditLog
+ * 
+ */
+export type AuditLog = Prisma.AuditLogModel
+/**
  * Model Category
  * 
  */
@@ -102,6 +117,61 @@ export type QuizAttempt = Prisma.QuizAttemptModel
  */
 export type AttemptAnswer = Prisma.AttemptAnswerModel
 /**
+ * Model Assignment
+ * 
+ */
+export type Assignment = Prisma.AssignmentModel
+/**
+ * Model AssignmentSubmission
+ * 
+ */
+export type AssignmentSubmission = Prisma.AssignmentSubmissionModel
+/**
+ * Model SubmissionFile
+ * 
+ */
+export type SubmissionFile = Prisma.SubmissionFileModel
+/**
+ * Model SubmissionFeedback
+ * 
+ */
+export type SubmissionFeedback = Prisma.SubmissionFeedbackModel
+/**
+ * Model CourseGradeRule
+ * 
+ */
+export type CourseGradeRule = Prisma.CourseGradeRuleModel
+/**
+ * Model Notification
+ * 
+ */
+export type Notification = Prisma.NotificationModel
+/**
+ * Model NotificationPreference
+ * 
+ */
+export type NotificationPreference = Prisma.NotificationPreferenceModel
+/**
+ * Model EmailLog
+ * 
+ */
+export type EmailLog = Prisma.EmailLogModel
+/**
+ * Model CourseAnnouncement
+ * 
+ */
+export type CourseAnnouncement = Prisma.CourseAnnouncementModel
+/**
+ * Model LearningEvent
+ * 
+ */
+export type LearningEvent = Prisma.LearningEventModel
+/**
+ * Model VideoWatchEvent
+ * 
+ */
+export type VideoWatchEvent = Prisma.VideoWatchEventModel
+/**
  * Model Review
  * 
  */
@@ -111,3 +181,63 @@ export type Review = Prisma.ReviewModel
  * 
  */
 export type Comment = Prisma.CommentModel
+/**
+ * Model Order
+ * 
+ */
+export type Order = Prisma.OrderModel
+/**
+ * Model OrderItem
+ * 
+ */
+export type OrderItem = Prisma.OrderItemModel
+/**
+ * Model Payment
+ * 
+ */
+export type Payment = Prisma.PaymentModel
+/**
+ * Model PaymentWebhookEvent
+ * 
+ */
+export type PaymentWebhookEvent = Prisma.PaymentWebhookEventModel
+/**
+ * Model Certificate
+ * 
+ */
+export type Certificate = Prisma.CertificateModel
+/**
+ * Model Coupon
+ * 
+ */
+export type Coupon = Prisma.CouponModel
+/**
+ * Model CouponCourse
+ * 
+ */
+export type CouponCourse = Prisma.CouponCourseModel
+/**
+ * Model CouponUsage
+ * 
+ */
+export type CouponUsage = Prisma.CouponUsageModel
+/**
+ * Model RefundRequest
+ * 
+ */
+export type RefundRequest = Prisma.RefundRequestModel
+/**
+ * Model PaymentRefund
+ * 
+ */
+export type PaymentRefund = Prisma.PaymentRefundModel
+/**
+ * Model InstructorEarning
+ * 
+ */
+export type InstructorEarning = Prisma.InstructorEarningModel
+/**
+ * Model Payout
+ * 
+ */
+export type Payout = Prisma.PayoutModel

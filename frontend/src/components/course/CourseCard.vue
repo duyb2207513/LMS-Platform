@@ -1,92 +1,71 @@
 <script setup lang="ts">
+import CourseThumbnail from '@/components/course/CourseThumbnail.vue'
 import type { Course } from '@/types'
 import { CourseLevel } from '@/types'
 
-defineProps<{
-  course: Course
-}>()
+defineProps<{ course: Course }>()
 
-function getLevelBadge(level: CourseLevel) {
-  switch (level) {
-    case CourseLevel.BEGINNER:
-      return { text: 'Cơ bản', class: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400' }
-    case CourseLevel.INTERMEDIATE:
-      return { text: 'Trung cấp', class: 'bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400' }
-    case CourseLevel.ADVANCED:
-      return { text: 'Nâng cao', class: 'bg-rose-100 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400' }
-    default:
-      return { text: level, class: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300' }
-  }
+const levelLabels: Record<CourseLevel, string> = {
+  [CourseLevel.BEGINNER]: 'Cơ bản',
+  [CourseLevel.INTERMEDIATE]: 'Trung cấp',
+  [CourseLevel.ADVANCED]: 'Nâng cao',
 }
 
 function formatPrice(price: number, isFree: boolean) {
-  if (isFree) return 'Miễn phí'
-  return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price)
+  return isFree ? 'Miễn phí' : new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price)
 }
 </script>
 
 <template>
-  <router-link
-    :to="`/courses/${course.slug}`"
-    class="group block bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-indigo-500/10 dark:hover:shadow-indigo-500/5 hover:-translate-y-1"
-  >
-    <!-- Thumbnail -->
-    <div class="relative aspect-video bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-indigo-950 dark:to-purple-950 overflow-hidden">
-      <img
-        v-if="course.thumbnailUrl"
-        :src="course.thumbnailUrl"
-        :alt="course.title"
-        class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-      />
-      <div v-else class="w-full h-full flex items-center justify-center">
-        <svg class="w-12 h-12 text-indigo-300 dark:text-indigo-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-        </svg>
+  <RouterLink :to="`/courses/${course.slug}`" class="course-card group">
+    <div class="relative overflow-hidden">
+      <CourseThumbnail :src="course.thumbnailUrl" :alt="course.title" class="transition-transform duration-500 group-hover:scale-[1.025]" />
+      <div class="absolute inset-x-0 top-0 flex items-start justify-between gap-2 p-3">
+        <span class="rounded-full border border-white/70 bg-white/90 px-3 py-1 text-xs font-bold text-slate-700 shadow-sm backdrop-blur dark:border-white/10 dark:bg-slate-950/80 dark:text-slate-100">
+          {{ levelLabels[course.level] }}
+        </span>
+        <span :class="['rounded-full px-3 py-1 text-xs font-extrabold shadow-sm backdrop-blur', course.isFree ? 'bg-emerald-500 text-white' : 'bg-slate-950/80 text-white']">
+          {{ formatPrice(course.price, course.isFree) }}
+        </span>
       </div>
-      <!-- Level Badge -->
-      <span
-        :class="[
-          'absolute top-3 left-3 px-2.5 py-1 rounded-lg text-xs font-semibold',
-          getLevelBadge(course.level).class,
-        ]"
-      >
-        {{ getLevelBadge(course.level).text }}
-      </span>
-      <!-- Price Badge -->
-      <span
-        :class="[
-          'absolute top-3 right-3 px-2.5 py-1 rounded-lg text-xs font-bold',
-          course.isFree ? 'bg-emerald-500 text-white' : 'bg-white/90 dark:bg-slate-900/90 text-slate-900 dark:text-white backdrop-blur-sm',
-        ]"
-      >
-        {{ formatPrice(course.price, course.isFree) }}
-      </span>
     </div>
 
-    <!-- Content -->
-    <div class="p-5">
-      <!-- Category -->
-      <p v-if="course.category" class="text-xs font-medium text-indigo-600 dark:text-indigo-400 mb-2 uppercase tracking-wide">
-        {{ course.category.name }}
+    <div class="flex flex-1 flex-col p-5">
+      <p class="text-xs font-bold uppercase tracking-[0.12em] text-purple-600 dark:text-purple-400">
+        {{ course.category?.name || 'Khóa học' }}
       </p>
-
-      <!-- Title -->
-      <h3 class="text-base font-bold text-slate-900 dark:text-slate-100 line-clamp-2 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+      <h3 class="mt-2 line-clamp-2 text-lg font-extrabold leading-snug tracking-tight text-slate-950 transition-colors group-hover:text-purple-700 dark:text-white dark:group-hover:text-purple-300">
         {{ course.title }}
       </h3>
-
-      <!-- Description -->
-      <p class="mt-2 text-sm text-slate-500 dark:text-slate-400 line-clamp-2">
+      <p class="mt-2 line-clamp-2 text-sm leading-6 text-slate-500 dark:text-slate-400">
         {{ course.description }}
       </p>
 
-      <!-- Instructor -->
-      <div v-if="course.instructor" class="mt-4 flex items-center gap-2">
-        <div class="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-white text-xs font-bold">
-          {{ course.instructor.fullName?.charAt(0)?.toUpperCase() }}
+      <div class="mt-auto flex items-center justify-between gap-3 border-t border-slate-100 pt-4 dark:border-slate-800">
+        <div class="flex min-w-0 items-center gap-2.5">
+          <img v-if="course.instructor?.avatarUrl" :src="course.instructor.avatarUrl" :alt="course.instructor.fullName" class="h-8 w-8 rounded-full object-cover" />
+          <span v-else class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-gradient-to-br from-violet-500 to-purple-700 text-xs font-bold text-white">
+            {{ course.instructor?.fullName?.charAt(0)?.toUpperCase() || 'L' }}
+          </span>
+          <span class="line-clamp-1 text-sm font-medium text-slate-600 dark:text-slate-300">{{ course.instructor?.fullName || 'LMS Instructor' }}</span>
         </div>
-        <span class="text-sm text-slate-600 dark:text-slate-400">{{ course.instructor.fullName }}</span>
+        <span class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-purple-50 text-purple-700 transition-transform group-hover:translate-x-0.5 dark:bg-purple-950/40 dark:text-purple-300" aria-hidden="true">→</span>
       </div>
     </div>
-  </router-link>
+  </RouterLink>
 </template>
+
+<style scoped>
+.course-card {
+  display: flex;
+  min-height: 100%;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 1.35rem;
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
+}
+.course-card:hover { transform: translateY(-4px); border-color: rgba(168,85,247,.3); box-shadow: var(--shadow-md); }
+</style>
