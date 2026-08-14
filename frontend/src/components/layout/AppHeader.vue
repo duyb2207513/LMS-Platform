@@ -90,6 +90,7 @@ watch(() => route.fullPath, () => {
               <RouterLink :to="dashboardPath()" class="profile-link" role="menuitem">Dashboard</RouterLink>
               <RouterLink to="/profile" class="profile-link" role="menuitem">Hồ sơ cá nhân</RouterLink>
               <RouterLink to="/change-password" class="profile-link" role="menuitem">Đổi mật khẩu</RouterLink>
+              <RouterLink to="/security" class="profile-link" role="menuitem">Bảo mật và thiết bị</RouterLink>
               <template v-if="auth.isStudent">
                 <RouterLink to="/my-courses" class="profile-link" role="menuitem">Khóa học của tôi</RouterLink>
                 <RouterLink to="/orders" class="profile-link" role="menuitem">Đơn hàng</RouterLink>

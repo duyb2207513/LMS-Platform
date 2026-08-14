@@ -16,6 +16,8 @@ import certificatesRouter, { courseCertificatesRouter } from "../modules/certifi
 import ordersRouter from "../modules/orders/orders.routes.js";
 import { orderPaymentsRouter, paymentsRouter } from "../modules/payments/payments.routes.js";
 import adminRouter from "../modules/admin/admin.routes.js";
+import { prisma } from "../config/database.js";
+import { asyncHandler } from "../common/utils/asyncHandler.js";
 
 const router = Router();
 
@@ -83,5 +85,27 @@ router.get("/health", (_request, response) => {
     }
   });
 });
+
+/**
+ * @openapi
+ * /health/ready:
+ *   get:
+ *     summary: Check API and database readiness
+ *     tags: [System]
+ *     responses:
+ *       200:
+ *         description: API and database are ready
+ *       503:
+ *         description: A required dependency is unavailable
+ */
+router.get("/health/ready", asyncHandler(async (_request, response) => {
+  const startedAt = Date.now();
+  await prisma.$queryRaw`SELECT 1`;
+  response.status(200).json({
+    success: true,
+    message: "LMS API is ready",
+    data: { database: "connected", responseTimeMs: Date.now() - startedAt, timestamp: new Date().toISOString() }
+  });
+}));
 
 export default router;

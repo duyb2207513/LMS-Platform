@@ -94,3 +94,12 @@ export const PaymentStatus = {
 } as const
 
 export type PaymentStatus = (typeof PaymentStatus)[keyof typeof PaymentStatus]
+
+
+export const AuthTokenType = {
+  VERIFY_EMAIL: 'VERIFY_EMAIL',
+  RESET_PASSWORD: 'RESET_PASSWORD',
+  CHANGE_EMAIL: 'CHANGE_EMAIL'
+} as const
+
+export type AuthTokenType = (typeof AuthTokenType)[keyof typeof AuthTokenType]

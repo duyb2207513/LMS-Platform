@@ -3,17 +3,26 @@ import cookieParser from "cookie-parser";
 import express from "express";
 import path from "node:path";
 import swaggerUi from "swagger-ui-express";
+import pinoHttp from "pino-http";
 import { errorHandler } from "./common/middlewares/errorHandler.js";
 import { notFound } from "./common/middlewares/notFound.js";
 import { env } from "./config/env.js";
 import { swaggerSpec } from "./config/swagger.js";
 import apiRouter from "./routes/index.js";
 import { apiRateLimiter, authRateLimiter, securityHeaders } from "./common/middlewares/security.js";
+import { auditTrail } from "./common/middlewares/auditTrail.js";
+import { logger } from "./config/logger.js";
+import "./config/monitoring.js";
 
 const app = express();
 app.set("trust proxy", env.nodeEnv === "production" ? 1 : false);
 app.disable("x-powered-by");
 app.use(securityHeaders);
+app.use(pinoHttp({
+  logger,
+  autoLogging: { ignore: request => request.url?.endsWith("/health") === true },
+  customLogLevel: (_request, response, error) => error || response.statusCode >= 500 ? "error" : response.statusCode >= 400 ? "warn" : "info"
+}));
 
 app.use(
   cors({
@@ -35,6 +44,7 @@ app.use(
 
 app.use("/api/v1", apiRateLimiter);
 app.use("/api/v1/auth", authRateLimiter);
+app.use("/api/v1", auditTrail);
 app.use("/api/v1", apiRouter);
 
 app.use(notFound);

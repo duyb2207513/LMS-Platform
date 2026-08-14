@@ -30,6 +30,7 @@ export interface User {
   avatarUrl?: string | null
   role: UserRole
   status: UserStatus
+  emailVerifiedAt?: string | null
   createdAt: string
   updatedAt: string
 }
@@ -102,6 +103,16 @@ export interface AuthResponse {
   user: User
   accessToken: string
   refreshToken: string
+}
+
+export interface AuthSession {
+  id: string
+  ipAddress: string | null
+  userAgent: string | null
+  lastUsedAt: string
+  expiresAt: string
+  createdAt: string
+  isCurrent: boolean
 }
 
 export interface Enrollment { id:string;courseId:string;progressPercent:number;status:'ACTIVE'|'COMPLETED'|'CANCELLED';enrolledAt:string;completedAt:string|null;course:Course }
