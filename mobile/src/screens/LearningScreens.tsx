@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Alert, Image, Linking, PanResponder, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, FlatList, Linking, PanResponder, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { VideoView, useVideoPlayer } from 'expo-video';
@@ -8,7 +8,7 @@ import { WebView } from 'react-native-webview';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { certificatesApi, commentsApi, enrollmentsApi, learningApi } from '../api/services';
 import { getApiMessage } from '../api/client';
-import { BottomSheet, Button, Field, Screen, SectionTitle, StateView } from '../components/ui';
+import { BottomSheet, Button, Field, ImageWithFallback, Screen, SectionTitle, StateView } from '../components/ui';
 import type { Comment, CourseContent, CourseProgress, Enrollment, Lesson, RootStackParamList } from '../types';
 import { colors, shadow } from '../theme';
 import { useAuth } from '../auth/AuthContext';
@@ -24,15 +24,19 @@ export function MyCoursesScreen({ navigation }: NativeStackScreenProps<RootStack
   const visibleItems = items.filter(item => filter === 'all' || (filter === 'completed' ? item.status === 'COMPLETED' : item.status !== 'COMPLETED'));
   const activeCount = items.filter(item => item.status !== 'COMPLETED').length;
   const completedCount = items.filter(item => item.status === 'COMPLETED').length;
-  return <Screen refreshing={loading} onRefresh={load}><SectionTitle title="Khóa học của tôi" subtitle="Học tiếp từ đúng nơi bạn đã dừng lại" />
-    {!!items.length && <><View style={styles.librarySummary}><View style={styles.libraryMetric}><Text style={styles.libraryValue}>{items.length}</Text><Text style={styles.libraryLabel}>Đã đăng ký</Text></View><View style={styles.libraryDivider} /><View style={styles.libraryMetric}><Text style={styles.libraryValue}>{activeCount}</Text><Text style={styles.libraryLabel}>Đang học</Text></View><View style={styles.libraryDivider} /><View style={styles.libraryMetric}><Text style={styles.libraryValue}>{completedCount}</Text><Text style={styles.libraryLabel}>Hoàn thành</Text></View></View>
-    <View style={styles.libraryFilters}><LibraryFilter label="Tất cả" active={filter === 'all'} onPress={() => setFilter('all')} /><LibraryFilter label="Đang học" active={filter === 'active'} onPress={() => setFilter('active')} /><LibraryFilter label="Hoàn thành" active={filter === 'completed'} onPress={() => setFilter('completed')} /></View></>}
-    {loading || error || !items.length ? <View style={{ flex: 1 }}><StateView loading={loading} error={error} empty="Bạn chưa đăng ký khóa học nào" onRetry={load} />{!loading && !error && !items.length && <Button title="Khám phá khóa học" onPress={() => navigation.navigate('Main', { screen: 'CoursesTab' })} />}</View> : visibleItems.length ? visibleItems.map(item => <View key={item.id} style={styles.libraryCard}>
-      <View>{item.course.thumbnailUrl ? <Image source={{ uri: item.course.thumbnailUrl }} style={styles.libraryImage} /> : <View style={[styles.libraryImage, styles.placeholder]}><Ionicons name="book-outline" size={42} color={colors.primary} /></View>}<View style={[styles.libraryStatus, item.status === 'COMPLETED' && styles.libraryStatusDone]}><Ionicons name={item.status === 'COMPLETED' ? 'checkmark-circle' : item.progressPercent ? 'play-circle' : 'sparkles'} size={13} color={item.status === 'COMPLETED' ? colors.success : colors.primary} /><Text style={[styles.libraryStatusText, item.status === 'COMPLETED' && { color: colors.success }]}>{item.status === 'COMPLETED' ? 'Đã hoàn thành' : item.progressPercent ? 'Đang học' : 'Mới đăng ký'}</Text></View></View>
-      <Text style={styles.libraryTitle}>{item.course.title}</Text><Text style={styles.libraryInstructor}>{item.course.instructor?.fullName || 'LMS Platform'} · {item.course.category?.name || 'Khóa học'}</Text>
-      <View style={styles.progressHeading}><Text style={styles.percent}>{Math.round(item.progressPercent)}% hoàn thành</Text><Text style={styles.libraryHint}>{item.progressPercent ? 'Tiếp tục hành trình' : 'Sẵn sàng bắt đầu'}</Text></View><ProgressBar value={item.progressPercent} />
-      <Button title={item.progressPercent ? 'Tiếp tục học' : 'Bắt đầu học'} onPress={() => navigation.navigate('Learning', { courseId: item.course.id, courseTitle: item.course.title })} />{item.status === 'COMPLETED' && <Button title="Nhận chứng chỉ" variant="outline" onPress={() => issueCertificate(item.course.id)} />}
-    </View>) : <StateView empty="Không có khóa học trong nhóm này" />}
+  return <Screen scroll={false}>
+    <FlatList data={visibleItems} keyExtractor={item => item.id} showsVerticalScrollIndicator={false} refreshing={loading && items.length > 0} onRefresh={load}
+      contentContainerStyle={visibleItems.length ? { paddingBottom: 24 } : { flexGrow: 1 }}
+      ListHeaderComponent={<View><SectionTitle title="Khóa học của tôi" subtitle="Học tiếp từ đúng nơi bạn đã dừng lại" />
+        {!!items.length && <><View style={styles.librarySummary}><View style={styles.libraryMetric}><Text style={styles.libraryValue}>{items.length}</Text><Text style={styles.libraryLabel}>Đã đăng ký</Text></View><View style={styles.libraryDivider} /><View style={styles.libraryMetric}><Text style={styles.libraryValue}>{activeCount}</Text><Text style={styles.libraryLabel}>Đang học</Text></View><View style={styles.libraryDivider} /><View style={styles.libraryMetric}><Text style={styles.libraryValue}>{completedCount}</Text><Text style={styles.libraryLabel}>Hoàn thành</Text></View></View>
+        <View style={styles.libraryFilters}><LibraryFilter label="Tất cả" active={filter === 'all'} onPress={() => setFilter('all')} /><LibraryFilter label="Đang học" active={filter === 'active'} onPress={() => setFilter('active')} /><LibraryFilter label="Hoàn thành" active={filter === 'completed'} onPress={() => setFilter('completed')} /></View></>}</View>}
+      ListEmptyComponent={<View style={{ flex: 1 }}><StateView loading={loading} error={error} empty={items.length ? 'Không có khóa học trong nhóm này' : 'Bạn chưa đăng ký khóa học nào'} onRetry={load} variant="list" />{!loading && !error && !items.length && <Button title="Khám phá khóa học" onPress={() => navigation.navigate('Main', { screen: 'CoursesTab' })} />}</View>}
+      renderItem={({ item }) => <View style={styles.libraryCard}>
+        <View><ImageWithFallback uri={item.course.thumbnailUrl} style={styles.libraryImage} accessibilityLabel={`Ảnh khóa học ${item.course.title}`} /><View style={[styles.libraryStatus, item.status === 'COMPLETED' && styles.libraryStatusDone]}><Ionicons name={item.status === 'COMPLETED' ? 'checkmark-circle' : item.progressPercent ? 'play-circle' : 'sparkles'} size={13} color={item.status === 'COMPLETED' ? colors.success : colors.primary} /><Text style={[styles.libraryStatusText, item.status === 'COMPLETED' && { color: colors.success }]}>{item.status === 'COMPLETED' ? 'Đã hoàn thành' : item.progressPercent ? 'Đang học' : 'Mới đăng ký'}</Text></View></View>
+        <Text style={styles.libraryTitle}>{item.course.title}</Text><Text style={styles.libraryInstructor}>{item.course.instructor?.fullName || 'LMS Platform'} · {item.course.category?.name || 'Khóa học'}</Text>
+        <View style={styles.progressHeading}><Text style={styles.percent}>{Math.round(item.progressPercent)}% hoàn thành</Text><Text style={styles.libraryHint}>{item.progressPercent ? 'Tiếp tục hành trình' : 'Sẵn sàng bắt đầu'}</Text></View><ProgressBar value={item.progressPercent} />
+        <Button title={item.progressPercent ? 'Tiếp tục học' : 'Bắt đầu học'} onPress={() => navigation.navigate('Learning', { courseId: item.course.id, courseTitle: item.course.title })} />{item.status === 'COMPLETED' && <Button title="Nhận chứng chỉ" variant="outline" onPress={() => issueCertificate(item.course.id)} />}
+      </View>} />
   </Screen>;
 }
 

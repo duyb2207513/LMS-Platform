@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Alert, Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Alert, FlatList, Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Picker } from '@react-native-picker/picker';
 import * as ImagePicker from 'expo-image-picker';
 import { categoriesApi, coursesApi } from '../api/services';
 import { getApiMessage } from '../api/client';
 import { imageUploadFile, type MobileUploadFile } from '../api/media';
-import { Button, Field, Screen, SectionTitle, StateView } from '../components/ui';
+import { Button, Field, ImageWithFallback, Screen, SectionTitle, StateView, StatusBadge } from '../components/ui';
 import type { Category, Course, CourseInput, CourseLevel, RootStackParamList } from '../types';
 import { colors, shadow } from '../theme';
 
@@ -16,12 +16,16 @@ export function InstructorCoursesScreen({ navigation }: NativeStackScreenProps<R
   useEffect(() => { const unsubscribe = navigation.addListener('focus', () => { void load(); }); return unsubscribe; }, [navigation, load]);
   async function toggle(course: Course) { try { course.status === 'PUBLISHED' ? await coursesApi.unpublish(course.id) : await coursesApi.publish(course.id); await load(); } catch (e) { Alert.alert('Không thể đổi trạng thái', getApiMessage(e)); } }
   function remove(course: Course) { Alert.alert('Xóa khóa học?', 'Khóa học đã xuất bản sẽ được lưu trữ.', [{ text: 'Hủy' }, { text: 'Xác nhận', style: 'destructive', onPress: async () => { try { await coursesApi.remove(course.id); await load(); } catch (e) { Alert.alert('Không thể xóa', getApiMessage(e)); } } }]); }
-  return <Screen><SectionTitle title="Khóa học của tôi" subtitle="Tạo, chỉnh sửa và xuất bản nội dung" /><Button title="+ Tạo khóa học" onPress={() => navigation.navigate('CourseForm')} />
-    {loading || error || !items.length ? <StateView loading={loading} error={error} empty="Bạn chưa có khóa học nào" onRetry={load} /> : items.map(course => <View key={course.id} style={styles.card}>
-      {course.thumbnailUrl ? <Image source={{ uri: course.thumbnailUrl }} style={styles.thumb} /> : <View style={[styles.thumb, styles.fallback]}><Text style={{ color: colors.primary, fontSize: 28 }}>▤</Text></View>}
-      <View style={{ flex: 1 }}><View style={styles.row}><Text style={styles.status}>{course.status}</Text><Text style={styles.level}>{course.level}</Text></View><Text style={styles.title}>{course.title}</Text><Text style={styles.category}>{course.category?.name}</Text>
-        <View style={styles.actions}><Pressable onPress={() => navigation.navigate('CourseBuilder', { course })}><Text style={styles.action}>Nội dung</Text></Pressable><Pressable onPress={() => navigation.navigate('CourseForm', { course })}><Text style={styles.action}>Sửa</Text></Pressable>{course.status !== 'ARCHIVED' && <Pressable onPress={() => toggle(course)}><Text style={styles.action}>{course.status === 'PUBLISHED' ? 'Gỡ' : 'Xuất bản'}</Text></Pressable>}<Pressable onPress={() => remove(course)}><Text style={styles.danger}>Xóa</Text></Pressable></View>
-      </View></View>)}
+  return <Screen scroll={false}>
+    <FlatList data={items} keyExtractor={course => course.id} showsVerticalScrollIndicator={false} refreshing={loading && items.length > 0} onRefresh={load}
+      contentContainerStyle={items.length ? styles.listContent : styles.emptyList}
+      ListHeaderComponent={<View><SectionTitle title="Khóa học của tôi" subtitle="Tạo, chỉnh sửa và xuất bản nội dung" /><Button title="+ Tạo khóa học" onPress={() => navigation.navigate('CourseForm')} /></View>}
+      ListEmptyComponent={<StateView loading={loading} error={error} empty="Bạn chưa có khóa học nào" onRetry={load} variant="list" />}
+      renderItem={({ item: course }) => <View style={styles.card}>
+        <ImageWithFallback uri={course.thumbnailUrl} style={styles.thumb} accessibilityLabel={`Ảnh khóa học ${course.title}`} />
+        <View style={{ flex: 1 }}><View style={styles.row}><StatusBadge label={course.status} tone={course.status === 'PUBLISHED' ? 'success' : course.status === 'ARCHIVED' ? 'neutral' : 'warning'} /><Text style={styles.level}>{course.level}</Text></View><Text style={styles.title}>{course.title}</Text><Text style={styles.category}>{course.category?.name}</Text>
+          <View style={styles.actions}><Pressable onPress={() => navigation.navigate('CourseBuilder', { course })}><Text style={styles.action}>Nội dung</Text></Pressable><Pressable onPress={() => navigation.navigate('CourseForm', { course })}><Text style={styles.action}>Sửa</Text></Pressable>{course.status !== 'ARCHIVED' && <Pressable onPress={() => toggle(course)}><Text style={styles.action}>{course.status === 'PUBLISHED' ? 'Gỡ' : 'Xuất bản'}</Text></Pressable>}<Pressable onPress={() => remove(course)}><Text style={styles.danger}>Xóa</Text></Pressable></View>
+        </View></View>} />
   </Screen>;
 }
 
@@ -52,4 +56,4 @@ export function CourseFormScreen({ route, navigation }: NativeStackScreenProps<R
     <Button title={course ? 'Lưu thay đổi' : 'Tạo khóa học'} onPress={save} loading={saving} disabled={!form.title.trim() || !form.description.trim() || !form.categoryId} />
   </Screen>;
 }
-const styles = StyleSheet.create({ card: { flexDirection: 'row', gap: 13, backgroundColor: '#fff', padding: 13, marginTop: 13, borderRadius: 17, ...shadow }, thumb: { width: 88, height: 88, borderRadius: 13 }, fallback: { backgroundColor: '#eeeaff', alignItems: 'center', justifyContent: 'center' }, row: { flexDirection: 'row', justifyContent: 'space-between' }, status: { color: colors.primary, fontSize: 10, fontWeight: '800' }, level: { color: colors.muted, fontSize: 10 }, title: { color: colors.ink, fontSize: 16, fontWeight: '800', marginTop: 7 }, category: { color: colors.muted, fontSize: 12, marginTop: 3 }, actions: { flexDirection: 'row', gap: 17, marginTop: 10 }, action: { color: colors.primary, fontWeight: '700' }, danger: { color: colors.danger, fontWeight: '700' }, label: { color: colors.ink, fontSize: 14, fontWeight: '600', marginBottom: 7 }, picker: { borderWidth: 1, borderColor: '#e8e9f2', backgroundColor: '#fff', borderRadius: 14, overflow: 'hidden', marginBottom: 14 }, checkRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 16 }, check: { width: 24, height: 24, borderWidth: 2, borderColor: colors.primary, borderRadius: 7, alignItems: 'center', justifyContent: 'center' }, checked: { backgroundColor: colors.primary }, checkText: { marginLeft: 10, color: colors.ink, fontWeight: '600' }, preview: { width: '100%', height: 180, borderRadius: 15, marginVertical: 10 }, error: { color: colors.danger, marginVertical: 8 } });
+const styles = StyleSheet.create({ listContent: { paddingBottom: 24 }, emptyList: { flexGrow: 1 }, card: { flexDirection: 'row', gap: 13, backgroundColor: '#fff', padding: 13, marginTop: 13, borderRadius: 17, ...shadow }, thumb: { width: 88, height: 88, borderRadius: 13 }, row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }, level: { color: colors.muted, fontSize: 10 }, title: { color: colors.ink, fontSize: 16, fontWeight: '800', marginTop: 7 }, category: { color: colors.muted, fontSize: 12, marginTop: 3 }, actions: { flexDirection: 'row', gap: 17, marginTop: 10 }, action: { color: colors.primary, fontWeight: '700' }, danger: { color: colors.danger, fontWeight: '700' }, label: { color: colors.ink, fontSize: 14, fontWeight: '600', marginBottom: 7 }, picker: { borderWidth: 1, borderColor: '#e8e9f2', backgroundColor: '#fff', borderRadius: 14, overflow: 'hidden', marginBottom: 14 }, checkRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 16 }, check: { width: 24, height: 24, borderWidth: 2, borderColor: colors.primary, borderRadius: 7, alignItems: 'center', justifyContent: 'center' }, checked: { backgroundColor: colors.primary }, checkText: { marginLeft: 10, color: colors.ink, fontWeight: '600' }, preview: { width: '100%', height: 180, borderRadius: 15, marginVertical: 10 }, error: { color: colors.danger, marginVertical: 8 } });
