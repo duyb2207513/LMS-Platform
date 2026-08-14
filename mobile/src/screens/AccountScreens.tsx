@@ -6,6 +6,7 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useAuth } from '../auth/AuthContext';
 import { usersApi } from '../api/services';
 import { getApiMessage } from '../api/client';
+import { imageUploadFile } from '../api/media';
 import { AppBar, Button, Field, Screen, SectionTitle } from '../components/ui';
 import type { RootStackParamList } from '../types';
 import { colors, shadow } from '../theme';
@@ -38,7 +39,7 @@ export function ProfileScreen() {
     const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], allowsEditing: true, aspect: [1, 1], quality: .85 });
     if (result.canceled) return;
     setLoading(true); setError('');
-    try { const profile = (await usersApi.uploadAvatar(result.assets[0].uri)).data.data; await setUser(profile); setAvatarUrl(profile.avatarUrl || ''); }
+    try { const file = await imageUploadFile(result.assets[0], 'avatar'); const profile = (await usersApi.uploadAvatar(file)).data.data; await setUser(profile); setAvatarUrl(profile.avatarUrl || ''); }
     catch (e) { setError(getApiMessage(e, 'Không thể tải ảnh đại diện')); } finally { setLoading(false); }
   }
   return <Screen><SectionTitle title="Hồ sơ của tôi" subtitle="Bạn chỉ có thể cập nhật họ tên và ảnh đại diện" />
