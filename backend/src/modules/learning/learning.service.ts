@@ -12,7 +12,7 @@ export async function getCourseContent(courseId: string, actor: AuthTokenPayload
   let enrolled = false;
   if (!manager && actor.role === "STUDENT") {
     const enrollment = await prisma.enrollment.findUnique({ where: { studentId_courseId: { studentId: actor.userId, courseId } }, select: { status: true } });
-    enrolled = Boolean(enrollment && enrollment.status !== "CANCELLED" && course.status === "PUBLISHED");
+    enrolled = Boolean(enrollment && ["ACTIVE", "COMPLETED"].includes(enrollment.status) && course.status === "PUBLISHED");
   }
   if (!manager && !enrolled) throw new AppError(403, "Enroll in this course to view its content");
 

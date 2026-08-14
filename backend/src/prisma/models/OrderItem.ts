@@ -226,6 +226,7 @@ export type OrderItemWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"OrderItem"> | Date | string
   order?: Prisma.XOR<Prisma.OrderScalarRelationFilter, Prisma.OrderWhereInput>
   course?: Prisma.XOR<Prisma.CourseScalarRelationFilter, Prisma.CourseWhereInput>
+  earning?: Prisma.XOR<Prisma.InstructorEarningNullableScalarRelationFilter, Prisma.InstructorEarningWhereInput> | null
 }
 
 export type OrderItemOrderByWithRelationInput = {
@@ -237,6 +238,7 @@ export type OrderItemOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   order?: Prisma.OrderOrderByWithRelationInput
   course?: Prisma.CourseOrderByWithRelationInput
+  earning?: Prisma.InstructorEarningOrderByWithRelationInput
 }
 
 export type OrderItemWhereUniqueInput = Prisma.AtLeast<{
@@ -252,6 +254,7 @@ export type OrderItemWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"OrderItem"> | Date | string
   order?: Prisma.XOR<Prisma.OrderScalarRelationFilter, Prisma.OrderWhereInput>
   course?: Prisma.XOR<Prisma.CourseScalarRelationFilter, Prisma.CourseWhereInput>
+  earning?: Prisma.XOR<Prisma.InstructorEarningNullableScalarRelationFilter, Prisma.InstructorEarningWhereInput> | null
 }, "id" | "orderId_courseId">
 
 export type OrderItemOrderByWithAggregationInput = {
@@ -287,6 +290,7 @@ export type OrderItemCreateInput = {
   createdAt?: Date | string
   order: Prisma.OrderCreateNestedOneWithoutItemsInput
   course: Prisma.CourseCreateNestedOneWithoutOrderItemsInput
+  earning?: Prisma.InstructorEarningCreateNestedOneWithoutOrderItemInput
 }
 
 export type OrderItemUncheckedCreateInput = {
@@ -296,6 +300,7 @@ export type OrderItemUncheckedCreateInput = {
   courseTitleSnapshot: string
   priceSnapshot: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
+  earning?: Prisma.InstructorEarningUncheckedCreateNestedOneWithoutOrderItemInput
 }
 
 export type OrderItemUpdateInput = {
@@ -305,6 +310,7 @@ export type OrderItemUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   order?: Prisma.OrderUpdateOneRequiredWithoutItemsNestedInput
   course?: Prisma.CourseUpdateOneRequiredWithoutOrderItemsNestedInput
+  earning?: Prisma.InstructorEarningUpdateOneWithoutOrderItemNestedInput
 }
 
 export type OrderItemUncheckedUpdateInput = {
@@ -314,6 +320,7 @@ export type OrderItemUncheckedUpdateInput = {
   courseTitleSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
   priceSnapshot?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  earning?: Prisma.InstructorEarningUncheckedUpdateOneWithoutOrderItemNestedInput
 }
 
 export type OrderItemCreateManyInput = {
@@ -389,6 +396,11 @@ export type OrderItemMinOrderByAggregateInput = {
 
 export type OrderItemSumOrderByAggregateInput = {
   priceSnapshot?: Prisma.SortOrder
+}
+
+export type OrderItemScalarRelationFilter = {
+  is?: Prisma.OrderItemWhereInput
+  isNot?: Prisma.OrderItemWhereInput
 }
 
 export type OrderItemCreateNestedManyWithoutCourseInput = {
@@ -475,12 +487,27 @@ export type OrderItemUncheckedUpdateManyWithoutOrderNestedInput = {
   deleteMany?: Prisma.OrderItemScalarWhereInput | Prisma.OrderItemScalarWhereInput[]
 }
 
+export type OrderItemCreateNestedOneWithoutEarningInput = {
+  create?: Prisma.XOR<Prisma.OrderItemCreateWithoutEarningInput, Prisma.OrderItemUncheckedCreateWithoutEarningInput>
+  connectOrCreate?: Prisma.OrderItemCreateOrConnectWithoutEarningInput
+  connect?: Prisma.OrderItemWhereUniqueInput
+}
+
+export type OrderItemUpdateOneRequiredWithoutEarningNestedInput = {
+  create?: Prisma.XOR<Prisma.OrderItemCreateWithoutEarningInput, Prisma.OrderItemUncheckedCreateWithoutEarningInput>
+  connectOrCreate?: Prisma.OrderItemCreateOrConnectWithoutEarningInput
+  upsert?: Prisma.OrderItemUpsertWithoutEarningInput
+  connect?: Prisma.OrderItemWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.OrderItemUpdateToOneWithWhereWithoutEarningInput, Prisma.OrderItemUpdateWithoutEarningInput>, Prisma.OrderItemUncheckedUpdateWithoutEarningInput>
+}
+
 export type OrderItemCreateWithoutCourseInput = {
   id?: string
   courseTitleSnapshot: string
   priceSnapshot: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
   order: Prisma.OrderCreateNestedOneWithoutItemsInput
+  earning?: Prisma.InstructorEarningCreateNestedOneWithoutOrderItemInput
 }
 
 export type OrderItemUncheckedCreateWithoutCourseInput = {
@@ -489,6 +516,7 @@ export type OrderItemUncheckedCreateWithoutCourseInput = {
   courseTitleSnapshot: string
   priceSnapshot: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
+  earning?: Prisma.InstructorEarningUncheckedCreateNestedOneWithoutOrderItemInput
 }
 
 export type OrderItemCreateOrConnectWithoutCourseInput = {
@@ -535,6 +563,7 @@ export type OrderItemCreateWithoutOrderInput = {
   priceSnapshot: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
   course: Prisma.CourseCreateNestedOneWithoutOrderItemsInput
+  earning?: Prisma.InstructorEarningCreateNestedOneWithoutOrderItemInput
 }
 
 export type OrderItemUncheckedCreateWithoutOrderInput = {
@@ -543,6 +572,7 @@ export type OrderItemUncheckedCreateWithoutOrderInput = {
   courseTitleSnapshot: string
   priceSnapshot: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
+  earning?: Prisma.InstructorEarningUncheckedCreateNestedOneWithoutOrderItemInput
 }
 
 export type OrderItemCreateOrConnectWithoutOrderInput = {
@@ -571,6 +601,58 @@ export type OrderItemUpdateManyWithWhereWithoutOrderInput = {
   data: Prisma.XOR<Prisma.OrderItemUpdateManyMutationInput, Prisma.OrderItemUncheckedUpdateManyWithoutOrderInput>
 }
 
+export type OrderItemCreateWithoutEarningInput = {
+  id?: string
+  courseTitleSnapshot: string
+  priceSnapshot: runtime.Decimal | runtime.DecimalJsLike | number | string
+  createdAt?: Date | string
+  order: Prisma.OrderCreateNestedOneWithoutItemsInput
+  course: Prisma.CourseCreateNestedOneWithoutOrderItemsInput
+}
+
+export type OrderItemUncheckedCreateWithoutEarningInput = {
+  id?: string
+  orderId: string
+  courseId: string
+  courseTitleSnapshot: string
+  priceSnapshot: runtime.Decimal | runtime.DecimalJsLike | number | string
+  createdAt?: Date | string
+}
+
+export type OrderItemCreateOrConnectWithoutEarningInput = {
+  where: Prisma.OrderItemWhereUniqueInput
+  create: Prisma.XOR<Prisma.OrderItemCreateWithoutEarningInput, Prisma.OrderItemUncheckedCreateWithoutEarningInput>
+}
+
+export type OrderItemUpsertWithoutEarningInput = {
+  update: Prisma.XOR<Prisma.OrderItemUpdateWithoutEarningInput, Prisma.OrderItemUncheckedUpdateWithoutEarningInput>
+  create: Prisma.XOR<Prisma.OrderItemCreateWithoutEarningInput, Prisma.OrderItemUncheckedCreateWithoutEarningInput>
+  where?: Prisma.OrderItemWhereInput
+}
+
+export type OrderItemUpdateToOneWithWhereWithoutEarningInput = {
+  where?: Prisma.OrderItemWhereInput
+  data: Prisma.XOR<Prisma.OrderItemUpdateWithoutEarningInput, Prisma.OrderItemUncheckedUpdateWithoutEarningInput>
+}
+
+export type OrderItemUpdateWithoutEarningInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  courseTitleSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
+  priceSnapshot?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  order?: Prisma.OrderUpdateOneRequiredWithoutItemsNestedInput
+  course?: Prisma.CourseUpdateOneRequiredWithoutOrderItemsNestedInput
+}
+
+export type OrderItemUncheckedUpdateWithoutEarningInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  orderId?: Prisma.StringFieldUpdateOperationsInput | string
+  courseId?: Prisma.StringFieldUpdateOperationsInput | string
+  courseTitleSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
+  priceSnapshot?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
 export type OrderItemCreateManyCourseInput = {
   id?: string
   orderId: string
@@ -585,6 +667,7 @@ export type OrderItemUpdateWithoutCourseInput = {
   priceSnapshot?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   order?: Prisma.OrderUpdateOneRequiredWithoutItemsNestedInput
+  earning?: Prisma.InstructorEarningUpdateOneWithoutOrderItemNestedInput
 }
 
 export type OrderItemUncheckedUpdateWithoutCourseInput = {
@@ -593,6 +676,7 @@ export type OrderItemUncheckedUpdateWithoutCourseInput = {
   courseTitleSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
   priceSnapshot?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  earning?: Prisma.InstructorEarningUncheckedUpdateOneWithoutOrderItemNestedInput
 }
 
 export type OrderItemUncheckedUpdateManyWithoutCourseInput = {
@@ -617,6 +701,7 @@ export type OrderItemUpdateWithoutOrderInput = {
   priceSnapshot?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   course?: Prisma.CourseUpdateOneRequiredWithoutOrderItemsNestedInput
+  earning?: Prisma.InstructorEarningUpdateOneWithoutOrderItemNestedInput
 }
 
 export type OrderItemUncheckedUpdateWithoutOrderInput = {
@@ -625,6 +710,7 @@ export type OrderItemUncheckedUpdateWithoutOrderInput = {
   courseTitleSnapshot?: Prisma.StringFieldUpdateOperationsInput | string
   priceSnapshot?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  earning?: Prisma.InstructorEarningUncheckedUpdateOneWithoutOrderItemNestedInput
 }
 
 export type OrderItemUncheckedUpdateManyWithoutOrderInput = {
@@ -646,6 +732,7 @@ export type OrderItemSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   createdAt?: boolean
   order?: boolean | Prisma.OrderDefaultArgs<ExtArgs>
   course?: boolean | Prisma.CourseDefaultArgs<ExtArgs>
+  earning?: boolean | Prisma.OrderItem$earningArgs<ExtArgs>
 }, ExtArgs["result"]["orderItem"]>
 
 export type OrderItemSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -683,6 +770,7 @@ export type OrderItemOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs 
 export type OrderItemInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   order?: boolean | Prisma.OrderDefaultArgs<ExtArgs>
   course?: boolean | Prisma.CourseDefaultArgs<ExtArgs>
+  earning?: boolean | Prisma.OrderItem$earningArgs<ExtArgs>
 }
 export type OrderItemIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   order?: boolean | Prisma.OrderDefaultArgs<ExtArgs>
@@ -698,6 +786,7 @@ export type $OrderItemPayload<ExtArgs extends runtime.Types.Extensions.InternalA
   objects: {
     order: Prisma.$OrderPayload<ExtArgs>
     course: Prisma.$CoursePayload<ExtArgs>
+    earning: Prisma.$InstructorEarningPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1102,6 +1191,7 @@ export interface Prisma__OrderItemClient<T, Null = never, ExtArgs extends runtim
   readonly [Symbol.toStringTag]: "PrismaPromise"
   order<T extends Prisma.OrderDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.OrderDefaultArgs<ExtArgs>>): Prisma.Prisma__OrderClient<runtime.Types.Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   course<T extends Prisma.CourseDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CourseDefaultArgs<ExtArgs>>): Prisma.Prisma__CourseClient<runtime.Types.Result.GetResult<Prisma.$CoursePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  earning<T extends Prisma.OrderItem$earningArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.OrderItem$earningArgs<ExtArgs>>): Prisma.Prisma__InstructorEarningClient<runtime.Types.Result.GetResult<Prisma.$InstructorEarningPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1535,6 +1625,25 @@ export type OrderItemDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Limit how many OrderItems to delete.
    */
   limit?: number
+}
+
+/**
+ * OrderItem.earning
+ */
+export type OrderItem$earningArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the InstructorEarning
+   */
+  select?: Prisma.InstructorEarningSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the InstructorEarning
+   */
+  omit?: Prisma.InstructorEarningOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.InstructorEarningInclude<ExtArgs> | null
+  where?: Prisma.InstructorEarningWhereInput
 }
 
 /**

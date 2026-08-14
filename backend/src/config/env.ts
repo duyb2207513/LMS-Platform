@@ -36,6 +36,10 @@ export const env = {
   smtpPassword: process.env.SMTP_PASSWORD ?? "",
   mailFrom: process.env.MAIL_FROM ?? "LMS Platform <no-reply@lms.local>",
   assignmentReminderIntervalMinutes: Number(process.env.ASSIGNMENT_REMINDER_INTERVAL_MINUTES ?? 15),
+  commercePlatformFeePercent: Number(process.env.COMMERCE_PLATFORM_FEE_PERCENT ?? 20),
+  commerceRefundWindowDays: Number(process.env.COMMERCE_REFUND_WINDOW_DAYS ?? 7),
+  commerceRefundMaxProgressPercent: Number(process.env.COMMERCE_REFUND_MAX_PROGRESS_PERCENT ?? 20),
+  commerceEarningReleaseIntervalMinutes: Number(process.env.COMMERCE_EARNING_RELEASE_INTERVAL_MINUTES ?? 60),
   sentryDsn: process.env.SENTRY_DSN ?? "",
   logLevel: process.env.LOG_LEVEL ?? (process.env.NODE_ENV === "production" ? "info" : "debug")
 } as const;

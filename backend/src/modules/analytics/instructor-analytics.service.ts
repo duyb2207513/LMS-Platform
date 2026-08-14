@@ -15,7 +15,7 @@ export async function getInstructorOverview(instructorId: string, query: Instruc
     meta: { from: query.from, to: query.to, timezone: "Asia/Ho_Chi_Minh" }
   };
   const time = timeWhere(query);
-  const enrollmentWhere = { courseId: { in: courseIds }, status: { not: "CANCELLED" as const }, enrolledAt: time };
+  const enrollmentWhere = { courseId: { in: courseIds }, status: { in: ["ACTIVE" as const, "COMPLETED" as const] }, enrolledAt: time };
   const [students, newEnrollments, completedEnrollments, quiz, ratings, revenue] = await Promise.all([
     prisma.enrollment.findMany({ where: enrollmentWhere, distinct: ["studentId"], select: { studentId: true } }),
     prisma.enrollment.count({ where: enrollmentWhere }),
@@ -41,7 +41,7 @@ export async function getInstructorOverview(instructorId: string, query: Instruc
 export async function getInstructorEnrollments(instructorId: string, query: InstructorAnalyticsQuery) {
   const courseIds = (await instructorCourses(instructorId, query.courseId)).map(course => course.id);
   const rows = courseIds.length ? await prisma.enrollment.findMany({
-    where: { courseId: { in: courseIds }, status: { not: "CANCELLED" }, enrolledAt: timeWhere(query) },
+    where: { courseId: { in: courseIds }, status: { in: ["ACTIVE", "COMPLETED"] }, enrolledAt: timeWhere(query) },
     select: { enrolledAt: true }
   }) : [];
   const values = new Map(buildBucketKeys(query.from, query.to, query.groupBy).map(key => [key, { date: key, count: 0 }]));
@@ -55,7 +55,7 @@ export async function getInstructorCoursePerformance(instructorId: string, query
   if (!courseIds.length) return [];
   const time = timeWhere(query);
   const [enrollments, learning, video, attempts, reviews, orderItems] = await Promise.all([
-    prisma.enrollment.findMany({ where: { courseId: { in: courseIds }, status: { not: "CANCELLED" }, enrolledAt: time }, select: { courseId: true, studentId: true, status: true, completedAt: true, progressPercent: true } }),
+    prisma.enrollment.findMany({ where: { courseId: { in: courseIds }, status: { in: ["ACTIVE", "COMPLETED"] }, enrolledAt: time }, select: { courseId: true, studentId: true, status: true, completedAt: true, progressPercent: true } }),
     prisma.learningEvent.findMany({ where: { courseId: { in: courseIds }, occurredAt: time }, select: { courseId: true, userId: true } }),
     prisma.videoWatchEvent.findMany({ where: { courseId: { in: courseIds }, startedAt: time }, select: { courseId: true, userId: true } }),
     prisma.quizAttempt.findMany({ where: { status: "SUBMITTED", score: { not: null }, submittedAt: time, quiz: { lesson: { section: { courseId: { in: courseIds } } } } }, select: { score: true, quiz: { select: { lesson: { select: { section: { select: { courseId: true } } } } } } } }),

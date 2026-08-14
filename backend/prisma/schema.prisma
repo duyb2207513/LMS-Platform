@@ -42,6 +42,7 @@ enum EnrollmentStatus {
   ACTIVE
   COMPLETED
   CANCELLED
+  REFUNDED
 }
 
 enum QuizAttemptStatus {
@@ -53,6 +54,7 @@ enum OrderStatus {
   PENDING
   PAID
   CANCELLED
+  REFUNDED
 }
 
 enum PaymentProvider {
@@ -64,6 +66,49 @@ enum PaymentStatus {
   PENDING
   SUCCEEDED
   FAILED
+  REFUNDED
+}
+
+enum CouponDiscountType {
+  PERCENTAGE
+  FIXED_AMOUNT
+}
+
+enum CouponUsageStatus {
+  REDEEMED
+  RELEASED
+}
+
+enum RefundRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  PROCESSING
+  REFUNDED
+  FAILED
+  CANCELLED
+}
+
+enum PaymentRefundStatus {
+  PENDING
+  PROCESSING
+  SUCCEEDED
+  FAILED
+}
+
+enum EarningStatus {
+  PENDING
+  AVAILABLE
+  PAID
+  REVERSED
+}
+
+enum PayoutStatus {
+  PENDING
+  PROCESSING
+  PAID
+  FAILED
+  CANCELLED
 }
 
 enum AuthTokenType {
@@ -143,6 +188,13 @@ model User {
   courseAnnouncements    CourseAnnouncement[]    @relation("AnnouncementAuthor")
   learningEvents         LearningEvent[]
   videoWatchEvents       VideoWatchEvent[]
+  couponsCreated         Coupon[]               @relation("CouponCreator")
+  couponUsages           CouponUsage[]
+  refundRequests         RefundRequest[]         @relation("RefundRequester")
+  refundReviews          RefundRequest[]         @relation("RefundReviewer")
+  instructorEarnings     InstructorEarning[]     @relation("InstructorEarnings")
+  instructorPayouts      Payout[]                @relation("InstructorPayouts")
+  payoutsCreated         Payout[]                @relation("PayoutCreator")
 
   @@index([role])
   @@index([status])
@@ -246,6 +298,8 @@ model Course {
   announcements    CourseAnnouncement[]
   learningEvents   LearningEvent[]
   videoWatchEvents VideoWatchEvent[]
+  couponCourses    CouponCourse[]
+  earnings         InstructorEarning[]
 
   @@index([instructorId])
   @@index([categoryId])
@@ -691,6 +745,12 @@ model Order {
   user     User        @relation(fields: [userId], references: [id], onDelete: Restrict)
   items    OrderItem[]
   payments Payment[]
+  couponId  String?       @map("coupon_id") @db.Uuid
+  discount  Decimal       @default(0) @map("discount_amount") @db.Decimal(12, 2)
+  coupon    Coupon?       @relation(fields: [couponId], references: [id], onDelete: SetNull)
+  couponUsage CouponUsage?
+  refundRequests RefundRequest[]
+  earnings  InstructorEarning[]
 
   @@index([userId, createdAt])
   @@index([status])
@@ -707,6 +767,7 @@ model OrderItem {
 
   order  Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
   course Course @relation(fields: [courseId], references: [id], onDelete: Restrict)
+  earning InstructorEarning?
 
   @@unique([orderId, courseId])
   @@index([courseId])
@@ -729,6 +790,9 @@ model Payment {
 
   order  Order                 @relation(fields: [orderId], references: [id], onDelete: Cascade)
   events PaymentWebhookEvent[]
+  refundRequests RefundRequest[]
+  refunds PaymentRefund[]
+  earnings InstructorEarning[]
 
   @@index([orderId, createdAt])
   @@index([status])
@@ -771,4 +835,167 @@ model Certificate {
   @@unique([studentId, courseId])
   @@index([courseId])
   @@map("certificates")
+}
+
+model Coupon {
+  id                    String             @id @default(uuid()) @db.Uuid
+  code                  String             @unique @db.VarChar(50)
+  name                  String             @db.VarChar(255)
+  description           String?
+  discountType          CouponDiscountType @map("discount_type")
+  discountValue         Decimal            @map("discount_value") @db.Decimal(12, 2)
+  maxDiscountAmount     Decimal?           @map("max_discount_amount") @db.Decimal(12, 2)
+  minOrderAmount        Decimal?           @map("min_order_amount") @db.Decimal(12, 2)
+  startsAt              DateTime           @map("starts_at") @db.Timestamptz(3)
+  expiresAt             DateTime           @map("expires_at") @db.Timestamptz(3)
+  maxRedemptions        Int?               @map("max_redemptions")
+  redeemedCount         Int                @default(0) @map("redeemed_count")
+  appliesToAllCourses   Boolean            @default(false) @map("applies_to_all_courses")
+  isActive              Boolean            @default(true) @map("is_active")
+  createdById           String             @map("created_by") @db.Uuid
+  createdAt             DateTime           @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt             DateTime           @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  createdBy User          @relation("CouponCreator", fields: [createdById], references: [id], onDelete: Restrict)
+  courses   CouponCourse[]
+  usages    CouponUsage[]
+  orders    Order[]
+
+  @@index([isActive, startsAt, expiresAt])
+  @@map("coupons")
+}
+
+model CouponCourse {
+  couponId String   @map("coupon_id") @db.Uuid
+  courseId String   @map("course_id") @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  coupon Coupon @relation(fields: [couponId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@id([couponId, courseId])
+  @@index([courseId])
+  @@map("coupon_courses")
+}
+
+model CouponUsage {
+  id             String            @id @default(uuid()) @db.Uuid
+  couponId       String            @map("coupon_id") @db.Uuid
+  userId         String            @map("user_id") @db.Uuid
+  orderId        String            @unique @map("order_id") @db.Uuid
+  discountAmount Decimal           @map("discount_amount") @db.Decimal(12, 2)
+  status         CouponUsageStatus @default(REDEEMED)
+  usedAt         DateTime?         @map("used_at") @db.Timestamptz(3)
+  createdAt      DateTime          @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  coupon Coupon @relation(fields: [couponId], references: [id], onDelete: Restrict)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Restrict)
+  order  Order  @relation(fields: [orderId], references: [id], onDelete: Restrict)
+
+  @@unique([couponId, userId])
+  @@index([couponId, status])
+  @@map("coupon_usages")
+}
+
+model RefundRequest {
+  id              String              @id @default(uuid()) @db.Uuid
+  userId          String              @map("user_id") @db.Uuid
+  orderId         String              @map("order_id") @db.Uuid
+  paymentId       String              @map("payment_id") @db.Uuid
+  reason          String
+  status          RefundRequestStatus @default(PENDING)
+  requestedAmount Decimal             @map("requested_amount") @db.Decimal(12, 2)
+  approvedAmount  Decimal?            @map("approved_amount") @db.Decimal(12, 2)
+  adminNote       String?             @map("admin_note")
+  reviewedById    String?             @map("reviewed_by") @db.Uuid
+  reviewedAt      DateTime?           @map("reviewed_at") @db.Timestamptz(3)
+  createdAt       DateTime            @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt       DateTime            @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  user      User    @relation("RefundRequester", fields: [userId], references: [id], onDelete: Restrict)
+  reviewer  User?   @relation("RefundReviewer", fields: [reviewedById], references: [id], onDelete: SetNull)
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  payment   Payment @relation(fields: [paymentId], references: [id], onDelete: Restrict)
+  refunds   PaymentRefund[]
+
+  @@index([userId, createdAt])
+  @@index([paymentId, status])
+  @@index([status, createdAt])
+  @@map("refund_requests")
+}
+
+model PaymentRefund {
+  id                String              @id @default(uuid()) @db.Uuid
+  refundRequestId   String              @map("refund_request_id") @db.Uuid
+  paymentId         String              @map("payment_id") @db.Uuid
+  providerRefundId  String?             @unique @map("provider_refund_id") @db.VarChar(255)
+  idempotencyKey    String              @unique @map("idempotency_key") @db.VarChar(255)
+  amount            Decimal             @db.Decimal(12, 2)
+  status            PaymentRefundStatus @default(PENDING)
+  failureReason     String?             @map("failure_reason")
+  processedAt       DateTime?           @map("processed_at") @db.Timestamptz(3)
+  providerPayload   Json?               @map("provider_payload")
+  createdAt         DateTime            @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt         DateTime            @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  refundRequest RefundRequest @relation(fields: [refundRequestId], references: [id], onDelete: Restrict)
+  payment       Payment       @relation(fields: [paymentId], references: [id], onDelete: Restrict)
+
+  @@index([refundRequestId])
+  @@index([paymentId, status])
+  @@map("payment_refunds")
+}
+
+model InstructorEarning {
+  id                String        @id @default(uuid()) @db.Uuid
+  instructorId      String        @map("instructor_id") @db.Uuid
+  courseId          String        @map("course_id") @db.Uuid
+  orderId           String        @map("order_id") @db.Uuid
+  orderItemId       String        @unique @map("order_item_id") @db.Uuid
+  paymentId         String        @map("payment_id") @db.Uuid
+  grossAmount       Decimal       @map("gross_amount") @db.Decimal(12, 2)
+  platformFeeRate   Decimal       @map("platform_fee_rate") @db.Decimal(5, 2)
+  platformFeeAmount Decimal       @map("platform_fee_amount") @db.Decimal(12, 2)
+  netAmount         Decimal       @map("net_amount") @db.Decimal(12, 2)
+  currency          String        @default("VND") @db.VarChar(3)
+  status            EarningStatus @default(PENDING)
+  availableAt       DateTime      @map("available_at") @db.Timestamptz(3)
+  payoutId          String?       @map("payout_id") @db.Uuid
+  reversedAt        DateTime?     @map("reversed_at") @db.Timestamptz(3)
+  createdAt         DateTime      @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt         DateTime      @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  instructor User      @relation("InstructorEarnings", fields: [instructorId], references: [id], onDelete: Restrict)
+  course     Course    @relation(fields: [courseId], references: [id], onDelete: Restrict)
+  order      Order     @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  orderItem  OrderItem @relation(fields: [orderItemId], references: [id], onDelete: Restrict)
+  payment    Payment   @relation(fields: [paymentId], references: [id], onDelete: Restrict)
+  payout     Payout?   @relation(fields: [payoutId], references: [id], onDelete: SetNull)
+
+  @@index([instructorId, status, availableAt])
+  @@index([courseId, createdAt])
+  @@index([orderId])
+  @@map("instructor_earnings")
+}
+
+model Payout {
+  id                String       @id @default(uuid()) @db.Uuid
+  instructorId      String       @map("instructor_id") @db.Uuid
+  amount            Decimal      @db.Decimal(12, 2)
+  currency          String       @default("VND") @db.VarChar(3)
+  status            PayoutStatus @default(PENDING)
+  providerReference String?      @unique @map("provider_reference") @db.VarChar(255)
+  failureReason     String?      @map("failure_reason")
+  createdById       String       @map("created_by") @db.Uuid
+  idempotencyKey    String       @unique @map("idempotency_key") @db.VarChar(255)
+  processedAt       DateTime?    @map("processed_at") @db.Timestamptz(3)
+  createdAt         DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt         DateTime     @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  instructor User                @relation("InstructorPayouts", fields: [instructorId], references: [id], onDelete: Restrict)
+  createdBy  User                @relation("PayoutCreator", fields: [createdById], references: [id], onDelete: Restrict)
+  earnings   InstructorEarning[]
+
+  @@index([instructorId, status, createdAt])
+  @@map("payouts")
 }

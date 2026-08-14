@@ -126,6 +126,7 @@ try {
   console.log("Sprint 4 payment and certificate lifecycle integration tests passed");
 } finally {
   await prisma.certificate.deleteMany({ where: { courseId: courseId ?? undefined } });
+  await prisma.instructorEarning.deleteMany({ where: { order: { user: { email: { in: emails } } } } });
   await prisma.order.deleteMany({ where: { user: { email: { in: emails } } } });
   if (courseId) await prisma.course.deleteMany({ where: { id: courseId } });
   if (categoryId) await prisma.category.deleteMany({ where: { id: categoryId } });

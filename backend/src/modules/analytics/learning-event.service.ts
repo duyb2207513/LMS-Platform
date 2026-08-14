@@ -8,7 +8,7 @@ async function enrollmentFor(studentId: string, courseId: string) {
     where: { studentId_courseId: { studentId, courseId } },
     select: { enrolledAt: true, status: true, course: { select: { status: true } } }
   });
-  if (!enrollment || enrollment.status === "CANCELLED" || enrollment.course.status !== "PUBLISHED") throw new AppError(403, "Enroll in this course to record learning activity");
+  if (!enrollment || !["ACTIVE", "COMPLETED"].includes(enrollment.status) || enrollment.course.status !== "PUBLISHED") throw new AppError(403, "Enroll in this course to record learning activity");
   return enrollment;
 }
 
