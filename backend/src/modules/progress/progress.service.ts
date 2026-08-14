@@ -7,7 +7,7 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-
 
 async function requireEnrollment(studentId: string, courseId: string) {
   const enrollment = await prisma.enrollment.findUnique({ where: { studentId_courseId: { studentId, courseId } } });
-  if (!enrollment || enrollment.status === "CANCELLED") throw new AppError(403, "Enroll in this course to track progress");
+  if (!enrollment || !["ACTIVE", "COMPLETED"].includes(enrollment.status)) throw new AppError(403, "Enroll in this course to track progress");
   return enrollment;
 }
 

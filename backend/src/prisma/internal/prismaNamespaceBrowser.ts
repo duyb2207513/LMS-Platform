@@ -83,7 +83,14 @@ export const ModelName = {
   OrderItem: 'OrderItem',
   Payment: 'Payment',
   PaymentWebhookEvent: 'PaymentWebhookEvent',
-  Certificate: 'Certificate'
+  Certificate: 'Certificate',
+  Coupon: 'Coupon',
+  CouponCourse: 'CouponCourse',
+  CouponUsage: 'CouponUsage',
+  RefundRequest: 'RefundRequest',
+  PaymentRefund: 'PaymentRefund',
+  InstructorEarning: 'InstructorEarning',
+  Payout: 'Payout'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -538,7 +545,9 @@ export const OrderScalarFieldEnum = {
   currency: 'currency',
   paidAt: 'paidAt',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  couponId: 'couponId',
+  discount: 'discount'
 } as const
 
 export type OrderScalarFieldEnum = (typeof OrderScalarFieldEnum)[keyof typeof OrderScalarFieldEnum]
@@ -602,6 +611,130 @@ export const CertificateScalarFieldEnum = {
 } as const
 
 export type CertificateScalarFieldEnum = (typeof CertificateScalarFieldEnum)[keyof typeof CertificateScalarFieldEnum]
+
+
+export const CouponScalarFieldEnum = {
+  id: 'id',
+  code: 'code',
+  name: 'name',
+  description: 'description',
+  discountType: 'discountType',
+  discountValue: 'discountValue',
+  maxDiscountAmount: 'maxDiscountAmount',
+  minOrderAmount: 'minOrderAmount',
+  startsAt: 'startsAt',
+  expiresAt: 'expiresAt',
+  maxRedemptions: 'maxRedemptions',
+  redeemedCount: 'redeemedCount',
+  appliesToAllCourses: 'appliesToAllCourses',
+  isActive: 'isActive',
+  createdById: 'createdById',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CouponScalarFieldEnum = (typeof CouponScalarFieldEnum)[keyof typeof CouponScalarFieldEnum]
+
+
+export const CouponCourseScalarFieldEnum = {
+  couponId: 'couponId',
+  courseId: 'courseId',
+  createdAt: 'createdAt'
+} as const
+
+export type CouponCourseScalarFieldEnum = (typeof CouponCourseScalarFieldEnum)[keyof typeof CouponCourseScalarFieldEnum]
+
+
+export const CouponUsageScalarFieldEnum = {
+  id: 'id',
+  couponId: 'couponId',
+  userId: 'userId',
+  orderId: 'orderId',
+  discountAmount: 'discountAmount',
+  status: 'status',
+  usedAt: 'usedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type CouponUsageScalarFieldEnum = (typeof CouponUsageScalarFieldEnum)[keyof typeof CouponUsageScalarFieldEnum]
+
+
+export const RefundRequestScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  orderId: 'orderId',
+  paymentId: 'paymentId',
+  reason: 'reason',
+  status: 'status',
+  requestedAmount: 'requestedAmount',
+  approvedAmount: 'approvedAmount',
+  adminNote: 'adminNote',
+  reviewedById: 'reviewedById',
+  reviewedAt: 'reviewedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type RefundRequestScalarFieldEnum = (typeof RefundRequestScalarFieldEnum)[keyof typeof RefundRequestScalarFieldEnum]
+
+
+export const PaymentRefundScalarFieldEnum = {
+  id: 'id',
+  refundRequestId: 'refundRequestId',
+  paymentId: 'paymentId',
+  providerRefundId: 'providerRefundId',
+  idempotencyKey: 'idempotencyKey',
+  amount: 'amount',
+  status: 'status',
+  failureReason: 'failureReason',
+  processedAt: 'processedAt',
+  providerPayload: 'providerPayload',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PaymentRefundScalarFieldEnum = (typeof PaymentRefundScalarFieldEnum)[keyof typeof PaymentRefundScalarFieldEnum]
+
+
+export const InstructorEarningScalarFieldEnum = {
+  id: 'id',
+  instructorId: 'instructorId',
+  courseId: 'courseId',
+  orderId: 'orderId',
+  orderItemId: 'orderItemId',
+  paymentId: 'paymentId',
+  grossAmount: 'grossAmount',
+  platformFeeRate: 'platformFeeRate',
+  platformFeeAmount: 'platformFeeAmount',
+  netAmount: 'netAmount',
+  currency: 'currency',
+  status: 'status',
+  availableAt: 'availableAt',
+  payoutId: 'payoutId',
+  reversedAt: 'reversedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type InstructorEarningScalarFieldEnum = (typeof InstructorEarningScalarFieldEnum)[keyof typeof InstructorEarningScalarFieldEnum]
+
+
+export const PayoutScalarFieldEnum = {
+  id: 'id',
+  instructorId: 'instructorId',
+  amount: 'amount',
+  currency: 'currency',
+  status: 'status',
+  providerReference: 'providerReference',
+  failureReason: 'failureReason',
+  createdById: 'createdById',
+  idempotencyKey: 'idempotencyKey',
+  processedAt: 'processedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PayoutScalarFieldEnum = (typeof PayoutScalarFieldEnum)[keyof typeof PayoutScalarFieldEnum]
 
 
 export const SortOrder = {

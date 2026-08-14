@@ -26,7 +26,7 @@ async function averageBestQuizScore(studentId: string): Promise<number | null> {
 export async function getStudentOverview(studentId: string) {
   const [enrollments, learningTime, videoTime, averageQuizScore, streak] = await Promise.all([
     prisma.enrollment.findMany({
-      where: { studentId, status: { not: "CANCELLED" } },
+      where: { studentId, status: { in: ["ACTIVE", "COMPLETED"] } },
       select: {
         status: true,
         progressPercent: true,
@@ -53,7 +53,7 @@ export async function getStudentOverview(studentId: string) {
 
 export async function getStudentCourseProgress(studentId: string) {
   const enrollments = await prisma.enrollment.findMany({
-    where: { studentId, status: { not: "CANCELLED" } },
+    where: { studentId, status: { in: ["ACTIVE", "COMPLETED"] } },
     orderBy: { enrolledAt: "desc" },
     include: {
       course: {

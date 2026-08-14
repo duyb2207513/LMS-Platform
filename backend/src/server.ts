@@ -5,12 +5,14 @@ import { logger } from "./config/logger.js";
 import { prisma } from "./config/database.js";
 import { closeSocket, initializeSocket } from "./services/realtime/socket.service.js";
 import { startAssignmentReminderJob } from "./jobs/assignment-reminders.job.js";
+import { startEarningReleaseJob } from "./jobs/release-pending-earnings.job.js";
 
 const HOST = "0.0.0.0";
 
 const server = createServer(app);
 initializeSocket(server);
 const stopReminderJob = startAssignmentReminderJob(env.assignmentReminderIntervalMinutes);
+const stopEarningReleaseJob = startEarningReleaseJob(env.commerceEarningReleaseIntervalMinutes);
 server.listen(env.port, HOST, () => {
   logger.info({ port: env.port, host: HOST }, "LMS API started");
 });
@@ -18,6 +20,7 @@ server.listen(env.port, HOST, () => {
 async function shutdown(signal: string) {
   logger.info({ signal }, "Graceful shutdown started");
   stopReminderJob();
+  stopEarningReleaseJob();
   await closeSocket();
   server.close(async () => {
     await prisma.$disconnect();

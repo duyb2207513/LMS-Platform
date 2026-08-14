@@ -222,6 +222,6 @@ export async function getMyCourseGrade(courseId: string, studentId: string) {
 
 export async function listCourseGrades(courseId: string, actor: AuthTokenPayload) {
   await managedCourse(courseId, actor);
-  const enrollments = await prisma.enrollment.findMany({ where: { courseId, status: { not: "CANCELLED" } }, orderBy: { enrolledAt: "asc" }, include: { student: { select: studentSelect } } });
+  const enrollments = await prisma.enrollment.findMany({ where: { courseId, status: { in: ["ACTIVE", "COMPLETED"] } }, orderBy: { enrolledAt: "asc" }, include: { student: { select: studentSelect } } });
   return Promise.all(enrollments.map(async enrollment => ({ student: enrollment.student, ...(await calculateCourseGrade(courseId, enrollment.studentId)) })));
 }

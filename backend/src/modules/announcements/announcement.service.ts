@@ -28,7 +28,7 @@ export async function listCourseAnnouncements(courseId: string, actor: AuthToken
   if (!manager) {
     if (actor.role !== "STUDENT" || course.status !== "PUBLISHED") throw new AppError(403, "You do not have permission to view course announcements");
     const enrollment = await prisma.enrollment.findUnique({ where: { studentId_courseId: { studentId: actor.userId, courseId } }, select: { status: true } });
-    if (!enrollment || enrollment.status === "CANCELLED") throw new AppError(403, "Course enrollment is required");
+    if (!enrollment || !["ACTIVE", "COMPLETED"].includes(enrollment.status)) throw new AppError(403, "Course enrollment is required");
   }
   return prisma.courseAnnouncement.findMany({
     where: { courseId, ...(manager ? {} : { status: "PUBLISHED" as const }) },
@@ -55,7 +55,7 @@ export async function publishAnnouncement(id: string, actor: AuthTokenPayload) {
   const result = await prisma.$transaction(async transaction => {
     const claimed = await transaction.courseAnnouncement.updateMany({ where: { id, status: "DRAFT" }, data: { status: "PUBLISHED", publishedAt: new Date() } });
     if (!claimed.count) throw new AppError(409, "Announcement is already published");
-    const enrollments = await transaction.enrollment.findMany({ where: { courseId: item.courseId, status: { not: "CANCELLED" } }, select: { studentId: true } });
+    const enrollments = await transaction.enrollment.findMany({ where: { courseId: item.courseId, status: { in: ["ACTIVE", "COMPLETED"] } }, select: { studentId: true } });
     const userIds = enrollments.map(enrollment => enrollment.studentId);
     const preferences = await transaction.notificationPreference.findMany({ where: { userId: { in: userIds } } });
     const map = new Map(preferences.map(preference => [preference.userId, preference]));
