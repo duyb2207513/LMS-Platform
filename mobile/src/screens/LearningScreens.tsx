@@ -12,8 +12,10 @@ import { BottomSheet, Button, Field, ImageWithFallback, Screen, SectionTitle, St
 import type { Comment, CourseContent, CourseProgress, Enrollment, Lesson, RootStackParamList } from '../types';
 import { colors, shadow } from '../theme';
 import { useAuth } from '../auth/AuthContext';
+import { useAppTheme } from '../providers/ThemeProvider';
 
 export function MyCoursesScreen({ navigation }: NativeStackScreenProps<RootStackParamList, 'MyCourses'>) {
+  const { palette } = useAppTheme();
   const [items, setItems] = useState<Enrollment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -31,10 +33,10 @@ export function MyCoursesScreen({ navigation }: NativeStackScreenProps<RootStack
         {!!items.length && <><View style={styles.librarySummary}><View style={styles.libraryMetric}><Text style={styles.libraryValue}>{items.length}</Text><Text style={styles.libraryLabel}>Đã đăng ký</Text></View><View style={styles.libraryDivider} /><View style={styles.libraryMetric}><Text style={styles.libraryValue}>{activeCount}</Text><Text style={styles.libraryLabel}>Đang học</Text></View><View style={styles.libraryDivider} /><View style={styles.libraryMetric}><Text style={styles.libraryValue}>{completedCount}</Text><Text style={styles.libraryLabel}>Hoàn thành</Text></View></View>
         <View style={styles.libraryFilters}><LibraryFilter label="Tất cả" active={filter === 'all'} onPress={() => setFilter('all')} /><LibraryFilter label="Đang học" active={filter === 'active'} onPress={() => setFilter('active')} /><LibraryFilter label="Hoàn thành" active={filter === 'completed'} onPress={() => setFilter('completed')} /></View></>}</View>}
       ListEmptyComponent={<View style={{ flex: 1 }}><StateView loading={loading} error={error} empty={items.length ? 'Không có khóa học trong nhóm này' : 'Bạn chưa đăng ký khóa học nào'} onRetry={load} variant="list" />{!loading && !error && !items.length && <Button title="Khám phá khóa học" onPress={() => navigation.navigate('Main', { screen: 'CoursesTab' })} />}</View>}
-      renderItem={({ item }) => <View style={styles.libraryCard}>
+      renderItem={({ item }) => <View style={[styles.libraryCard, { backgroundColor: palette.surface }]}>
         <View><ImageWithFallback uri={item.course.thumbnailUrl} style={styles.libraryImage} accessibilityLabel={`Ảnh khóa học ${item.course.title}`} /><View style={[styles.libraryStatus, item.status === 'COMPLETED' && styles.libraryStatusDone]}><Ionicons name={item.status === 'COMPLETED' ? 'checkmark-circle' : item.progressPercent ? 'play-circle' : 'sparkles'} size={13} color={item.status === 'COMPLETED' ? colors.success : colors.primary} /><Text style={[styles.libraryStatusText, item.status === 'COMPLETED' && { color: colors.success }]}>{item.status === 'COMPLETED' ? 'Đã hoàn thành' : item.progressPercent ? 'Đang học' : 'Mới đăng ký'}</Text></View></View>
-        <Text style={styles.libraryTitle}>{item.course.title}</Text><Text style={styles.libraryInstructor}>{item.course.instructor?.fullName || 'LMS Platform'} · {item.course.category?.name || 'Khóa học'}</Text>
-        <View style={styles.progressHeading}><Text style={styles.percent}>{Math.round(item.progressPercent)}% hoàn thành</Text><Text style={styles.libraryHint}>{item.progressPercent ? 'Tiếp tục hành trình' : 'Sẵn sàng bắt đầu'}</Text></View><ProgressBar value={item.progressPercent} />
+        <Text style={[styles.libraryTitle, { color: palette.ink }]}>{item.course.title}</Text><Text style={[styles.libraryInstructor, { color: palette.muted }]}>{item.course.instructor?.fullName || 'LMS Platform'} · {item.course.category?.name || 'Khóa học'}</Text>
+        <View style={styles.progressHeading}><Text style={[styles.percent, { color: palette.primary }]}>{Math.round(item.progressPercent)}% hoàn thành</Text><Text style={[styles.libraryHint, { color: palette.muted }]}>{item.progressPercent ? 'Tiếp tục hành trình' : 'Sẵn sàng bắt đầu'}</Text></View><ProgressBar value={item.progressPercent} />
         <Button title={item.progressPercent ? 'Tiếp tục học' : 'Bắt đầu học'} onPress={() => navigation.navigate('Learning', { courseId: item.course.id, courseTitle: item.course.title })} />{item.status === 'COMPLETED' && <Button title="Nhận chứng chỉ" variant="outline" onPress={() => issueCertificate(item.course.id)} />}
       </View>} />
   </Screen>;

@@ -9,9 +9,11 @@ import { Button, IconButton, StateView } from '../components/ui';
 import { useAuth } from '../auth/AuthContext';
 import type { Course } from '../types';
 import { colors } from '../theme';
+import { useAppTheme } from '../providers/ThemeProvider';
 
 export function HomeScreen({ navigation }: { navigation: any }) {
   const { user } = useAuth();
+  const { palette, isDark } = useAppTheme();
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -23,9 +25,9 @@ export function HomeScreen({ navigation }: { navigation: any }) {
   }, []);
   useEffect(() => { void load(); }, [load]);
 
-  return <SafeAreaView style={styles.safe} edges={['top']}>
-    <View style={styles.header}><View style={styles.brand}><View style={styles.logo}><Ionicons name="book-outline" size={23} color="#fff" /></View><Text style={styles.brandText}>LMS Platform</Text></View><IconButton icon="search-outline" label="Tìm kiếm" onPress={() => navigation.navigate('SearchTab')} /></View>
-    <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content} refreshControl={<RefreshControl refreshing={loading} onRefresh={load} tintColor={colors.primary} />}>
+  return <SafeAreaView style={[styles.safe, { backgroundColor: palette.background }]} edges={['top']}>
+    <View style={[styles.header, { backgroundColor: palette.surface, borderBottomColor: palette.border }]}><View style={styles.brand}><View style={[styles.logo, { backgroundColor: palette.primary }]}><Ionicons name="book-outline" size={23} color="#fff" /></View><Text style={[styles.brandText, { color: palette.ink }]}>LMS Platform</Text></View><IconButton icon="search-outline" label="Tìm kiếm" onPress={() => navigation.navigate('SearchTab')} /></View>
+    <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content} refreshControl={<RefreshControl refreshing={loading} onRefresh={load} tintColor={palette.primary} />}>
       <LinearGradient colors={['#5535ff', '#aa13ff', '#4a2cc7']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.hero}>
         <View style={styles.pill}><View style={styles.dot} /><Text style={styles.pillText}>Học mọi lúc, mọi nơi</Text></View>
         <Text style={styles.heading}>Nâng tầm kiến thức</Text><Text style={styles.highlight}>cùng LMS Platform</Text>
@@ -33,14 +35,14 @@ export function HomeScreen({ navigation }: { navigation: any }) {
         <View style={styles.heroActions}><View style={{ flex: 1 }}><Button title="Khám phá" variant="outline" onPress={() => navigation.navigate('CoursesTab')} /></View><View style={{ flex: 1 }}><Button title={user ? 'Học tiếp' : 'Đăng nhập'} onPress={() => user ? navigation.navigate('AccountTab') : navigation.navigate('Login')} /></View></View>
       </LinearGradient>
       <View style={styles.stats}><Stat value="100+" label="Khóa học" /><Stat value="50+" label="Giảng viên" /><Stat value="1K+" label="Học viên" /></View>
-      <View style={styles.sectionHeader}><View><Text style={styles.sectionTitle}>Khóa học nổi bật</Text><Text style={styles.sectionNote}>Kéo ngang để khám phá</Text></View><Text onPress={() => navigation.navigate('CoursesTab')} style={styles.seeAll}>Xem tất cả</Text></View>
+      <View style={styles.sectionHeader}><View><Text style={[styles.sectionTitle, { color: palette.ink }]}>Khóa học nổi bật</Text><Text style={[styles.sectionNote, { color: palette.muted }]}>Kéo ngang để khám phá</Text></View><Text onPress={() => navigation.navigate('CoursesTab')} style={[styles.seeAll, { color: palette.primary }]}>Xem tất cả</Text></View>
       {loading || error ? <StateView loading={loading} error={error} onRetry={load} /> : <ScrollView horizontal showsHorizontalScrollIndicator={false} snapToInterval={292} decelerationRate="fast" contentContainerStyle={styles.horizontal}>{courses.map(course => <View key={course.id} style={styles.course}><CourseCard course={course} onPress={() => navigation.navigate('CourseDetail', { slug: course.slug })} /></View>)}</ScrollView>}
-      <View style={styles.verify}><Ionicons name="shield-checkmark-outline" size={30} color={colors.primary} /><View style={{ flex: 1 }}><Text style={styles.verifyTitle}>Xác minh chứng chỉ</Text><Text style={styles.verifyText}>Kiểm tra tính hợp lệ bằng mã công khai.</Text></View><Ionicons name="chevron-forward" size={22} color={colors.primary} onPress={() => navigation.navigate('VerifyCertificate')} /></View>
+      <View style={[styles.verify, { backgroundColor: isDark ? '#2d2845' : '#eee9ff' }]}><Ionicons name="shield-checkmark-outline" size={30} color={palette.primary} /><View style={{ flex: 1 }}><Text style={[styles.verifyTitle, { color: palette.ink }]}>Xác minh chứng chỉ</Text><Text style={[styles.verifyText, { color: palette.muted }]}>Kiểm tra tính hợp lệ bằng mã công khai.</Text></View><Ionicons name="chevron-forward" size={22} color={palette.primary} onPress={() => navigation.navigate('VerifyCertificate')} /></View>
     </ScrollView>
   </SafeAreaView>;
 }
 
-function Stat({ value, label }: { value: string; label: string }) { return <View style={styles.stat}><Text style={styles.statValue}>{value}</Text><Text style={styles.statLabel}>{label}</Text></View>; }
+function Stat({ value, label }: { value: string; label: string }) { const { palette } = useAppTheme(); return <View style={[styles.stat, { backgroundColor: palette.surface }]}><Text style={[styles.statValue, { color: palette.ink }]}>{value}</Text><Text style={[styles.statLabel, { color: palette.muted }]}>{label}</Text></View>; }
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.background }, header: { height: 66, paddingHorizontal: 18, backgroundColor: '#fff', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderBottomWidth: 1, borderBottomColor: colors.border }, brand: { flexDirection: 'row', alignItems: 'center', gap: 10 }, logo: { width: 42, height: 42, borderRadius: 14, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center' }, brandText: { color: colors.ink, fontSize: 20, fontWeight: '900' }, content: { padding: 18, paddingBottom: 36 },

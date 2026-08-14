@@ -8,14 +8,16 @@ import { AppBar, BottomSheet, Button, Field, Screen, StateView } from '../compon
 import { CourseCard } from '../components/CourseCard';
 import type { AppNotification, Category, Course, NotificationPreference } from '../types';
 import { colors, shadow } from '../theme';
+import { useAppTheme } from '../providers/ThemeProvider';
 
 export function SearchScreen({ navigation }: { navigation: any }) {
+  const { palette } = useAppTheme();
   const [query, setQuery] = useState(''); const [categoryId, setCategoryId] = useState('');
   const [categories, setCategories] = useState<Category[]>([]); const [items, setItems] = useState<Course[]>([]);
   const [filterOpen, setFilterOpen] = useState(false); const [loading, setLoading] = useState(false); const [error, setError] = useState('');
   const search = useCallback(async () => { setLoading(true); try { const [courses, categoryResult] = await Promise.all([coursesApi.list({ search: query.trim() || undefined, categoryId: categoryId || undefined, limit: 30 }), categoriesApi.list()]); setItems(courses.data.data); setCategories(categoryResult.data.data); setError(''); } catch (e) { setError(getApiMessage(e)); } finally { setLoading(false); } }, [query, categoryId]);
   useEffect(() => { void search(); }, [categoryId]);
-  return <View style={styles.page}><Screen topInset scroll={false} quickScroll={false}>
+  return <View style={[styles.page, { backgroundColor: palette.background }]}><Screen topInset scroll={false} quickScroll={false}>
     <AppBar title="Tìm kiếm" subtitle="Tìm nhanh khóa học phù hợp" onFilter={() => setFilterOpen(true)} />
     <View style={styles.searchBody}><Field label="Từ khóa" value={query} onChangeText={setQuery} placeholder="Tên khóa học, chủ đề..." returnKeyType="search" onSubmitEditing={search} />
       <FlatList data={items} keyExtractor={item => item.id} showsVerticalScrollIndicator={false}
@@ -28,6 +30,7 @@ export function SearchScreen({ navigation }: { navigation: any }) {
 
 export function NotificationsScreen({ navigation }: { navigation: any }) {
   const { user } = useAuth();
+  const { palette } = useAppTheme();
   const [items, setItems] = useState<AppNotification[]>([]); const [unreadOnly, setUnreadOnly] = useState(false);
   const [loading, setLoading] = useState(true); const [error, setError] = useState(''); const [prefsOpen, setPrefsOpen] = useState(false);
   const [prefs, setPrefs] = useState<NotificationPreference | null>(null);
@@ -42,7 +45,7 @@ export function NotificationsScreen({ navigation }: { navigation: any }) {
   const read = async (item: AppNotification) => { if (!item.isRead) await notificationsApi.markRead(item.id); await load(); };
   const remove = async (item: AppNotification) => { try { await notificationsApi.remove(item.id); setItems(current => current.filter(row => row.id !== item.id)); } catch (e) { Alert.alert('Không thể xóa', getApiMessage(e)); } };
   if (!user) return <Screen topInset><AppBar title="Thông báo" /><StateView empty="Đăng nhập để xem thông báo của bạn" /><Button title="Đăng nhập" onPress={() => navigation.navigate('Login')} /></Screen>;
-  return <View style={styles.page}><Screen topInset scroll={false} quickScroll={false}>
+  return <View style={[styles.page, { backgroundColor: palette.background }]}><Screen topInset scroll={false} quickScroll={false}>
     <FlatList data={items} keyExtractor={item => item.id} showsVerticalScrollIndicator={false} refreshing={loading && items.length > 0} onRefresh={load}
       contentContainerStyle={items.length ? styles.listContent : styles.emptyList}
       ListHeaderComponent={<View><AppBar title="Thông báo" subtitle={`${items.filter(item => !item.isRead).length} chưa đọc`} onMore={openPreferences} />
@@ -55,8 +58,9 @@ export function NotificationsScreen({ navigation }: { navigation: any }) {
 
 function SwipeNotification({ item, onPress, onDelete }: { item: AppNotification; onPress(): void; onDelete(): void }) {
   const x = useRef(new Animated.Value(0)).current;
+  const { palette, isDark } = useAppTheme();
   const pan = useMemo(() => PanResponder.create({ onMoveShouldSetPanResponder: (_, g) => g.dx < -8 && Math.abs(g.dx) > Math.abs(g.dy), onPanResponderMove: (_, g) => x.setValue(Math.max(-96, Math.min(0, g.dx))), onPanResponderRelease: (_, g) => { if (g.dx < -70) Animated.timing(x, { toValue: -96, duration: 160, useNativeDriver: true }).start(); else Animated.spring(x, { toValue: 0, useNativeDriver: true }).start(); } }), [x]);
-  return <View style={styles.swipeWrap}><Pressable style={styles.deleteAction} onPress={onDelete}><Ionicons name="trash-outline" size={22} color="#fff" /><Text style={styles.deleteText}>Xóa</Text></Pressable><Animated.View {...pan.panHandlers} style={{ transform: [{ translateX: x }] }}><Pressable onPress={onPress} style={[styles.notification, !item.isRead && styles.unread]}><View style={[styles.notificationIcon, { backgroundColor: `${notificationColor[item.type] || colors.primary}18` }]}><Ionicons name={notificationIcon[item.type] || 'notifications-outline'} size={23} color={notificationColor[item.type] || colors.primary} /></View><View style={{ flex: 1 }}><View style={styles.notificationTop}><Text numberOfLines={1} style={styles.notificationTitle}>{item.title}</Text>{!item.isRead && <View style={styles.unreadDot} />}</View><Text numberOfLines={2} style={styles.notificationMessage}>{item.message}</Text><Text style={styles.notificationTime}>{relativeTime(item.createdAt)}</Text></View></Pressable></Animated.View></View>;
+  return <View style={styles.swipeWrap}><Pressable style={styles.deleteAction} onPress={onDelete}><Ionicons name="trash-outline" size={22} color="#fff" /><Text style={styles.deleteText}>Xóa</Text></Pressable><Animated.View {...pan.panHandlers} style={{ transform: [{ translateX: x }] }}><Pressable onPress={onPress} style={[styles.notification, { backgroundColor: !item.isRead ? (isDark ? '#2b2740' : '#f6f2ff') : palette.surface }]}><View style={[styles.notificationIcon, { backgroundColor: `${notificationColor[item.type] || palette.primary}18` }]}><Ionicons name={notificationIcon[item.type] || 'notifications-outline'} size={23} color={notificationColor[item.type] || palette.primary} /></View><View style={{ flex: 1 }}><View style={styles.notificationTop}><Text numberOfLines={1} style={[styles.notificationTitle, { color: palette.ink }]}>{item.title}</Text>{!item.isRead && <View style={[styles.unreadDot, { backgroundColor: palette.primary }]} />}</View><Text numberOfLines={2} style={[styles.notificationMessage, { color: palette.muted }]}>{item.message}</Text><Text style={[styles.notificationTime, { color: palette.muted }]}>{relativeTime(item.createdAt)}</Text></View></Pressable></Animated.View></View>;
 }
 
 const preferenceRows: Array<{ key: keyof NotificationPreference; label: string; note: string }> = [
@@ -67,8 +71,8 @@ const preferenceRows: Array<{ key: keyof NotificationPreference; label: string; 
 const notificationIcon: Partial<Record<AppNotification['type'], keyof typeof Ionicons.glyphMap>> = { WELCOME: 'sparkles-outline', COURSE_ENROLLED: 'school-outline', NEW_LESSON: 'play-circle-outline', COURSE_ANNOUNCEMENT: 'megaphone-outline', ASSIGNMENT_DUE: 'document-text-outline', QUIZ_RESULT: 'ribbon-outline', CERTIFICATE_ISSUED: 'medal-outline' };
 const notificationColor: Partial<Record<AppNotification['type'], string>> = { ASSIGNMENT_DUE: colors.warning, CERTIFICATE_ISSUED: colors.success, WELCOME: colors.primary };
 function relativeTime(value: string) { const seconds = Math.max(0, Math.floor((Date.now() - new Date(value).getTime()) / 1000)); if (seconds < 60) return 'Vừa xong'; if (seconds < 3600) return `${Math.floor(seconds / 60)} phút trước`; if (seconds < 86400) return `${Math.floor(seconds / 3600)} giờ trước`; return new Intl.DateTimeFormat('vi-VN', { dateStyle: 'medium' }).format(new Date(value)); }
-function FilterRow({ label, selected, onPress }: { label: string; selected: boolean; onPress(): void }) { return <Pressable onPress={onPress} style={styles.filterRow}><Text style={[styles.filterLabel, selected && { color: colors.primary, fontWeight: '900' }]}>{label}</Text>{selected && <Ionicons name="checkmark-circle" size={23} color={colors.primary} />}</Pressable>; }
-function PreferenceRow({ label, note, value, onChange }: { label: string; note: string; value: boolean; onChange(value: boolean): void }) { return <View style={styles.preferenceRow}><View style={{ flex: 1 }}><Text style={styles.preferenceLabel}>{label}</Text><Text style={styles.preferenceNote}>{note}</Text></View><Switch value={value} onValueChange={onChange} trackColor={{ false: '#d7d8e0', true: '#a994ff' }} thumbColor={value ? colors.primary : '#fff'} /></View>; }
+function FilterRow({ label, selected, onPress }: { label: string; selected: boolean; onPress(): void }) { const { palette } = useAppTheme(); return <Pressable onPress={onPress} style={[styles.filterRow, { borderBottomColor: palette.border }]}><Text style={[styles.filterLabel, { color: palette.ink }, selected && { color: palette.primary, fontWeight: '900' }]}>{label}</Text>{selected && <Ionicons name="checkmark-circle" size={23} color={palette.primary} />}</Pressable>; }
+function PreferenceRow({ label, note, value, onChange }: { label: string; note: string; value: boolean; onChange(value: boolean): void }) { const { palette } = useAppTheme(); return <View style={[styles.preferenceRow, { borderBottomColor: palette.border }]}><View style={{ flex: 1 }}><Text style={[styles.preferenceLabel, { color: palette.ink }]}>{label}</Text><Text style={[styles.preferenceNote, { color: palette.muted }]}>{note}</Text></View><Switch value={value} onValueChange={onChange} trackColor={{ false: '#555b6c', true: '#a994ff' }} thumbColor={value ? palette.primary : '#fff'} /></View>; }
 
 const styles = StyleSheet.create({
   page: { flex: 1, backgroundColor: colors.background }, searchBody: { flex: 1, paddingTop: 14 }, listContent: { paddingBottom: 24 }, emptyList: { flexGrow: 1 }, filterRow: { minHeight: 58, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderBottomWidth: 1, borderBottomColor: colors.border }, filterLabel: { color: colors.ink, fontSize: 16 }, segment: { flexDirection: 'row', backgroundColor: '#ececf4', borderRadius: 14, padding: 4, marginTop: 14 }, segmentItem: { flex: 1, paddingVertical: 10, borderRadius: 11, alignItems: 'center' }, segmentActive: { backgroundColor: '#fff', ...shadow }, segmentText: { color: colors.muted, fontWeight: '800' }, segmentTextActive: { color: colors.primary }, markRow: { flexDirection: 'row', justifyContent: 'space-between', gap: 8, marginVertical: 14 }, swipeHint: { color: colors.muted, fontSize: 10, flex: 1 }, markAll: { color: colors.primary, fontSize: 12, fontWeight: '900' },

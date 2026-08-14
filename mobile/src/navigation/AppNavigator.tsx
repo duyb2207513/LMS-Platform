@@ -1,12 +1,14 @@
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
+import * as Haptics from 'expo-haptics';
+import { NavigationContainer, DarkTheme, DefaultTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../auth/AuthContext';
 import type { MainTabParamList, RootStackParamList } from '../types';
 import { colors, shadows, typography } from '../theme';
+import { useAppTheme } from '../providers/ThemeProvider';
 import { HomeScreen } from '../screens/HomeScreen';
 import { LoginScreen, RegisterScreen } from '../screens/AuthScreens';
 import { CoursesScreen, CourseDetailScreen } from '../screens/CourseScreens';
@@ -25,8 +27,6 @@ import { AdminCouponsScreen, AdminPayoutsScreen, AdminRefundsScreen, RefundsScre
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Tabs = createBottomTabNavigator<MainTabParamList>();
-const navigationTheme = { ...DefaultTheme, colors: { ...DefaultTheme.colors, primary: colors.primary, background: colors.background, card: '#fff', text: colors.ink, border: colors.border } };
-
 const tabConfig: Record<keyof MainTabParamList, { label: string; active: keyof typeof Ionicons.glyphMap; inactive: keyof typeof Ionicons.glyphMap }> = {
   HomeTab: { label: 'Trang chủ', active: 'home', inactive: 'home-outline' }, CoursesTab: { label: 'Khóa học', active: 'library', inactive: 'library-outline' },
   SearchTab: { label: 'Tìm kiếm', active: 'search', inactive: 'search-outline' }, NotificationsTab: { label: 'Thông báo', active: 'notifications', inactive: 'notifications-outline' }, AccountTab: { label: 'Cá nhân', active: 'person', inactive: 'person-outline' },
@@ -34,11 +34,12 @@ const tabConfig: Record<keyof MainTabParamList, { label: string; active: keyof t
 
 function MainTabs() {
   const insets = useSafeAreaInsets();
-  return <Tabs.Navigator backBehavior="history" screenOptions={({ route }) => ({
-    headerShown: false, tabBarHideOnKeyboard: true, tabBarActiveTintColor: colors.primary, tabBarInactiveTintColor: '#8b91a0',
+  const { palette } = useAppTheme();
+  return <Tabs.Navigator backBehavior="history" screenListeners={{ tabPress: () => { void Haptics.selectionAsync().catch(() => undefined); } }} screenOptions={({ route }) => ({
+    headerShown: false, tabBarHideOnKeyboard: true, tabBarActiveTintColor: palette.primary, tabBarInactiveTintColor: palette.muted,
     tabBarLabel: tabConfig[route.name].label, tabBarLabelStyle: { fontSize: 10, fontWeight: '800', marginTop: 2 },
     tabBarIcon: ({ focused, color, size }) => <Ionicons name={focused ? tabConfig[route.name].active : tabConfig[route.name].inactive} size={Math.max(22, size)} color={color} />,
-    tabBarStyle: { height: 62 + insets.bottom, paddingTop: 8, paddingBottom: Math.max(7, insets.bottom), borderTopWidth: 0, backgroundColor: colors.surface, ...shadows.elevated },
+    tabBarStyle: { height: 62 + insets.bottom, paddingTop: 8, paddingBottom: Math.max(7, insets.bottom), borderTopWidth: 0, backgroundColor: palette.surface, ...shadows.elevated },
   })}>
     <Tabs.Screen name="HomeTab" component={HomeScreen} />
     <Tabs.Screen name="CoursesTab" component={CoursesScreen} />
@@ -50,9 +51,12 @@ function MainTabs() {
 
 export function AppNavigator() {
   const { isBooting } = useAuth();
-  if (isBooting) return <View style={styles.boot}><View style={styles.logo}><Ionicons name="book-outline" size={34} color="#fff" /></View><ActivityIndicator size="large" color={colors.primary} /><Text style={styles.loading}>Đang chuẩn bị LMS...</Text></View>;
+  const { palette, isDark } = useAppTheme();
+  const baseTheme = isDark ? DarkTheme : DefaultTheme;
+  const navigationTheme = { ...baseTheme, colors: { ...baseTheme.colors, primary: palette.primary, background: palette.background, card: palette.surface, text: palette.ink, border: palette.border } };
+  if (isBooting) return <View style={[styles.boot, { backgroundColor: palette.background }]}><View style={[styles.logo, { backgroundColor: palette.primary }]}><Ionicons name="book-outline" size={34} color="#fff" /></View><ActivityIndicator size="large" color={palette.primary} /><Text style={[styles.loading, { color: palette.muted }]}>Đang chuẩn bị LMS...</Text></View>;
   return <NavigationContainer theme={navigationTheme}>
-    <Stack.Navigator screenOptions={{ headerTintColor: colors.primary, headerStyle: { backgroundColor: colors.surface }, headerTitleAlign: 'center', headerTitleStyle: typography.title, headerBackButtonDisplayMode: 'minimal', headerShadowVisible: false, contentStyle: { backgroundColor: colors.background }, animation: 'slide_from_right', gestureEnabled: true }}>
+    <Stack.Navigator screenOptions={{ headerTintColor: palette.primary, headerStyle: { backgroundColor: palette.surface }, headerTitleAlign: 'center', headerTitleStyle: { ...typography.title, color: palette.ink }, headerBackButtonDisplayMode: 'minimal', headerShadowVisible: false, contentStyle: { backgroundColor: palette.background }, animation: 'slide_from_right', gestureEnabled: true }}>
       <Stack.Screen name="Main" component={MainTabs} options={{ headerShown: false }} />
       <Stack.Screen name="Login" component={LoginScreen} options={{ title: 'Đăng nhập', presentation: 'modal' }} />
       <Stack.Screen name="Register" component={RegisterScreen} options={{ title: 'Đăng ký', presentation: 'modal' }} />
