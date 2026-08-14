@@ -40,6 +40,10 @@ mobile/    React Native + Expo, kết nối cùng REST API
 docs/      Tài liệu dự án
 ```
 
+## Tài liệu theo Sprint
+
+Xem [docs/SPRINTS.md](docs/SPRINTS.md) để đọc phạm vi, database, API, phân quyền, giao diện, Docker và kiểm thử của Sprint 1–8. Trang này cũng ghi rõ chức năng nào đã có ở backend, web hoặc mobile.
+
 ## Sprint 5 Admin API
 
 Tất cả endpoint dưới đây yêu cầu Bearer token role `ADMIN`:
