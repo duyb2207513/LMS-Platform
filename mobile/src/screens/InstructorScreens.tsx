@@ -9,8 +9,10 @@ import { imageUploadFile, type MobileUploadFile } from '../api/media';
 import { Button, Field, ImageWithFallback, Screen, SectionTitle, StateView, StatusBadge } from '../components/ui';
 import type { Category, Course, CourseInput, CourseLevel, RootStackParamList } from '../types';
 import { colors, shadow } from '../theme';
+import { useAppTheme } from '../providers/ThemeProvider';
 
 export function InstructorCoursesScreen({ navigation }: NativeStackScreenProps<RootStackParamList, 'InstructorCourses'>) {
+  const { palette } = useAppTheme();
   const [items, setItems] = useState<Course[]>([]); const [loading, setLoading] = useState(true); const [error, setError] = useState('');
   const load = useCallback(async () => { setLoading(true); try { setItems((await coursesApi.managed({ limit: 50 })).data.data); setError(''); } catch (e) { setError(getApiMessage(e)); } finally { setLoading(false); } }, []);
   useEffect(() => { const unsubscribe = navigation.addListener('focus', () => { void load(); }); return unsubscribe; }, [navigation, load]);
@@ -21,9 +23,9 @@ export function InstructorCoursesScreen({ navigation }: NativeStackScreenProps<R
       contentContainerStyle={items.length ? styles.listContent : styles.emptyList}
       ListHeaderComponent={<View><SectionTitle title="Khóa học của tôi" subtitle="Tạo, chỉnh sửa và xuất bản nội dung" /><Button title="+ Tạo khóa học" onPress={() => navigation.navigate('CourseForm')} /></View>}
       ListEmptyComponent={<StateView loading={loading} error={error} empty="Bạn chưa có khóa học nào" onRetry={load} variant="list" />}
-      renderItem={({ item: course }) => <View style={styles.card}>
+      renderItem={({ item: course }) => <View style={[styles.card, { backgroundColor: palette.surface }]}>
         <ImageWithFallback uri={course.thumbnailUrl} style={styles.thumb} accessibilityLabel={`Ảnh khóa học ${course.title}`} />
-        <View style={{ flex: 1 }}><View style={styles.row}><StatusBadge label={course.status} tone={course.status === 'PUBLISHED' ? 'success' : course.status === 'ARCHIVED' ? 'neutral' : 'warning'} /><Text style={styles.level}>{course.level}</Text></View><Text style={styles.title}>{course.title}</Text><Text style={styles.category}>{course.category?.name}</Text>
+        <View style={{ flex: 1 }}><View style={styles.row}><StatusBadge label={course.status} tone={course.status === 'PUBLISHED' ? 'success' : course.status === 'ARCHIVED' ? 'neutral' : 'warning'} /><Text style={[styles.level, { color: palette.muted }]}>{course.level}</Text></View><Text style={[styles.title, { color: palette.ink }]}>{course.title}</Text><Text style={[styles.category, { color: palette.muted }]}>{course.category?.name}</Text>
           <View style={styles.actions}><Pressable onPress={() => navigation.navigate('CourseBuilder', { course })}><Text style={styles.action}>Nội dung</Text></Pressable><Pressable onPress={() => navigation.navigate('CourseForm', { course })}><Text style={styles.action}>Sửa</Text></Pressable>{course.status !== 'ARCHIVED' && <Pressable onPress={() => toggle(course)}><Text style={styles.action}>{course.status === 'PUBLISHED' ? 'Gỡ' : 'Xuất bản'}</Text></Pressable>}<Pressable onPress={() => remove(course)}><Text style={styles.danger}>Xóa</Text></Pressable></View>
         </View></View>} />
   </Screen>;

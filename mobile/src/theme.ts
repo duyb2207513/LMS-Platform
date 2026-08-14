@@ -14,6 +14,24 @@ export const colors = {
   success: '#16a34a',
 } as const;
 
+export type AppPalette = { [Key in keyof typeof colors]: string };
+
+export const darkColors: AppPalette = {
+  primary: '#9b7cff',
+  primaryDark: '#c3b2ff',
+  magenta: '#d568ff',
+  amber: '#ffd166',
+  green: '#42e2b8',
+  ink: '#f4f5fb',
+  muted: '#aeb4c3',
+  border: '#303548',
+  surface: '#202431',
+  background: '#141720',
+  danger: '#ff6b78',
+  warning: '#ffbd4a',
+  success: '#45d690',
+};
+
 export const spacing = {
   xxs: 4,
   xs: 8,

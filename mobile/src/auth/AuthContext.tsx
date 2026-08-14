@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import * as SecureStore from 'expo-secure-store';
-import { ACCESS_TOKEN_KEY, setSessionExpiredHandler } from '../api/client';
+import { ACCESS_TOKEN_KEY, clearApiCache, setApiCacheScope, setSessionExpiredHandler } from '../api/client';
 import { normalizeMediaUrls } from '../api/media';
 import { authApi, usersApi } from '../api/services';
 import type { User } from '../types';
@@ -27,12 +27,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await Promise.all([
       SecureStore.deleteItemAsync(ACCESS_TOKEN_KEY),
       SecureStore.deleteItemAsync(USER_KEY),
+      clearApiCache().catch(() => undefined),
     ]);
+    setApiCacheScope(null);
     setUserState(null);
   }, []);
 
   const setUser = useCallback(async (nextUser: User) => {
     const normalizedUser = normalizeMediaUrls(nextUser);
+    setApiCacheScope(normalizedUser.id);
     await SecureStore.setItemAsync(USER_KEY, JSON.stringify(normalizedUser));
     setUserState(normalizedUser);
   }, []);
@@ -44,7 +47,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       SecureStore.getItemAsync(USER_KEY),
     ]).then(([token, savedUser]) => {
       if (token && savedUser) {
-        try { setUserState(normalizeMediaUrls(JSON.parse(savedUser) as User)); } catch { void clearSession(); }
+        try { const restoredUser = normalizeMediaUrls(JSON.parse(savedUser) as User); setApiCacheScope(restoredUser.id); setUserState(restoredUser); } catch { void clearSession(); }
       }
     }).finally(() => setBooting(false));
   }, [clearSession]);

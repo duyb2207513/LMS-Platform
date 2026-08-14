@@ -4,12 +4,15 @@ import {
   ScrollView, StyleSheet, Text, TextInput, type ImageStyle, type StyleProp, type TextInputProps, type ViewStyle, View,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, radius, shadow, shadows, spacing, typography } from '../theme';
+import { useAppTheme } from '../providers/ThemeProvider';
 
 export function Screen({ children, scroll = true, topInset = false, refreshing = false, onRefresh, quickScroll = true, contentStyle }: {
   children: ReactNode; scroll?: boolean; topInset?: boolean; refreshing?: boolean; onRefresh?(): void; quickScroll?: boolean; contentStyle?: StyleProp<ViewStyle>;
 }) {
+  const { palette } = useAppTheme();
   const ref = useRef<ScrollView>(null);
   const [awayFromTop, setAwayFromTop] = useState(false);
   const body = scroll
@@ -18,7 +21,7 @@ export function Screen({ children, scroll = true, topInset = false, refreshing =
       refreshControl={onRefresh ? <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} /> : undefined}
       onScroll={event => setAwayFromTop(event.nativeEvent.contentOffset.y > 360)}>{children}</ScrollView>
     : <View style={[styles.screenContent, { flex: 1 }, contentStyle]}>{children}</View>;
-  return <SafeAreaView style={styles.safe} edges={topInset ? ['top', 'bottom'] : ['bottom']}><KeyboardAvoidingView
+  return <SafeAreaView style={[styles.safe, { backgroundColor: palette.background }]} edges={topInset ? ['top', 'bottom'] : ['bottom']}><KeyboardAvoidingView
     style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>{body}
     {scroll && quickScroll && awayFromTop && <Pressable accessibilityLabel="Cuộn lên đầu trang" onPress={() => ref.current?.scrollTo({ y: 0, animated: true })} style={styles.floatingScroll}><Ionicons name="arrow-up" size={22} color="#fff" /></Pressable>}
   </KeyboardAvoidingView></SafeAreaView>;
@@ -27,9 +30,10 @@ export function Screen({ children, scroll = true, topInset = false, refreshing =
 export function AppBar({ title, subtitle, onBack, onSearch, onFilter, onMore }: {
   title: string; subtitle?: string; onBack?(): void; onSearch?(): void; onFilter?(): void; onMore?(): void;
 }) {
-  return <View style={styles.appBar}>
+  const { palette } = useAppTheme();
+  return <View style={[styles.appBar, { backgroundColor: palette.surface, borderBottomColor: palette.border }]}>
     {onBack && <IconButton icon="chevron-back" label="Quay lại" onPress={onBack} />}
-    <View style={{ flex: 1 }}><Text numberOfLines={1} style={styles.appBarTitle}>{title}</Text>{subtitle && <Text numberOfLines={1} style={styles.appBarSubtitle}>{subtitle}</Text>}</View>
+    <View style={{ flex: 1 }}><Text numberOfLines={1} style={[styles.appBarTitle, { color: palette.ink }]}>{title}</Text>{subtitle && <Text numberOfLines={1} style={[styles.appBarSubtitle, { color: palette.muted }]}>{subtitle}</Text>}</View>
     {onSearch && <IconButton icon="search-outline" label="Tìm kiếm" onPress={onSearch} />}
     {onFilter && <IconButton icon="options-outline" label="Bộ lọc" onPress={onFilter} />}
     {onMore && <IconButton icon="ellipsis-horizontal" label="Thêm" onPress={onMore} />}
@@ -37,13 +41,15 @@ export function AppBar({ title, subtitle, onBack, onSearch, onFilter, onMore }: 
 }
 
 export function IconButton({ icon, label, onPress, badge }: { icon: keyof typeof Ionicons.glyphMap; label: string; onPress(): void; badge?: number }) {
-  return <Pressable accessibilityRole="button" accessibilityLabel={label} hitSlop={8} onPress={onPress} style={({ pressed }) => [styles.iconButton, pressed && { opacity: .55 }]}>
-    <Ionicons name={icon} size={23} color={colors.ink} />
+  const { palette, isDark } = useAppTheme();
+  const handlePress = () => { void Haptics.selectionAsync().catch(() => undefined); onPress(); };
+  return <Pressable accessibilityRole="button" accessibilityLabel={label} hitSlop={8} onPress={handlePress} style={({ pressed }) => [styles.iconButton, { backgroundColor: isDark ? '#2b3040' : '#f6f5fb' }, pressed && { opacity: .55 }]}>
+    <Ionicons name={icon} size={23} color={palette.ink} />
     {!!badge && <View style={styles.iconBadge}><Text style={styles.iconBadgeText}>{badge > 99 ? '99+' : badge}</Text></View>}
   </Pressable>;
 }
 
-export function Card({ children, style }: { children: ReactNode; style?: StyleProp<ViewStyle> }) { return <View style={[styles.card, style]}>{children}</View>; }
+export function Card({ children, style }: { children: ReactNode; style?: StyleProp<ViewStyle> }) { const { palette } = useAppTheme(); return <View style={[styles.card, { backgroundColor: palette.surface }, style]}>{children}</View>; }
 
 type StatusTone = 'neutral' | 'primary' | 'success' | 'warning' | 'danger';
 const statusTones: Record<StatusTone, { background: string; foreground: string }> = {
@@ -65,10 +71,11 @@ export function StatusBadge({ label, tone = 'neutral', icon }: { label: string; 
 export function ImageWithFallback({ uri, style, accessibilityLabel, fallbackIcon = 'book-outline' }: {
   uri?: string | null; style: StyleProp<ImageStyle>; accessibilityLabel?: string; fallbackIcon?: keyof typeof Ionicons.glyphMap;
 }) {
+  const { palette, isDark } = useAppTheme();
   const [failed, setFailed] = useState(false);
   useEffect(() => setFailed(false), [uri]);
-  if (!uri || failed) return <View style={[style, styles.imageFallback]} accessibilityRole="image" accessibilityLabel={accessibilityLabel}>
-    <Ionicons name={fallbackIcon} size={38} color={colors.primary} />
+  if (!uri || failed) return <View style={[style, styles.imageFallback, { backgroundColor: isDark ? '#2d2845' : '#eee9ff' }]} accessibilityRole="image" accessibilityLabel={accessibilityLabel}>
+    <Ionicons name={fallbackIcon} size={38} color={palette.primary} />
   </View>;
   return <Image source={{ uri }} style={style} resizeMode="cover" accessibilityLabel={accessibilityLabel} onError={() => setFailed(true)} />;
 }
@@ -76,6 +83,7 @@ export function ImageWithFallback({ uri, style, accessibilityLabel, fallbackIcon
 export function Skeleton({ width = '100%', height = 16, radius: skeletonRadius = radius.sm, style }: {
   width?: number | `${number}%`; height?: number; radius?: number; style?: StyleProp<ViewStyle>;
 }) {
+  const { isDark } = useAppTheme();
   const opacity = useRef(new Animated.Value(.45)).current;
   useEffect(() => {
     const animation = Animated.loop(Animated.sequence([
@@ -85,21 +93,25 @@ export function Skeleton({ width = '100%', height = 16, radius: skeletonRadius =
     animation.start();
     return () => animation.stop();
   }, [opacity]);
-  return <Animated.View accessibilityLabel="Đang tải" style={[styles.skeleton, { width, height, borderRadius: skeletonRadius, opacity }, style]} />;
+  return <Animated.View accessibilityLabel="Đang tải" style={[styles.skeleton, { width, height, borderRadius: skeletonRadius, opacity, backgroundColor: isDark ? '#34394a' : '#e6e7ee' }, style]} />;
 }
 
 export function SkeletonCard() {
-  return <View style={styles.skeletonCard}><Skeleton height={148} radius={radius.lg} /><Skeleton width="42%" style={{ marginTop: spacing.md }} /><Skeleton height={22} style={{ marginTop: spacing.sm }} /><Skeleton width="72%" style={{ marginTop: spacing.xs }} /></View>;
+  const { palette } = useAppTheme();
+  return <View style={[styles.skeletonCard, { backgroundColor: palette.surface }]}><Skeleton height={148} radius={radius.lg} /><Skeleton width="42%" style={{ marginTop: spacing.md }} /><Skeleton height={22} style={{ marginTop: spacing.sm }} /><Skeleton width="72%" style={{ marginTop: spacing.xs }} /></View>;
 }
 
 export function Snackbar({ visible, message, tone = 'success', onDismiss, actionLabel, onAction }: {
   visible: boolean; message: string; tone?: 'success' | 'danger' | 'neutral'; onDismiss(): void; actionLabel?: string; onAction?(): void;
 }) {
+  const dismissRef = useRef(onDismiss);
+  useEffect(() => { dismissRef.current = onDismiss; }, [onDismiss]);
   useEffect(() => {
     if (!visible) return;
-    const timeout = setTimeout(onDismiss, 3200);
+    void Haptics.notificationAsync(tone === 'danger' ? Haptics.NotificationFeedbackType.Error : Haptics.NotificationFeedbackType.Success).catch(() => undefined);
+    const timeout = setTimeout(() => dismissRef.current(), 3200);
     return () => clearTimeout(timeout);
-  }, [visible, onDismiss]);
+  }, [message, tone, visible]);
   if (!visible) return null;
   const icon = tone === 'success' ? 'checkmark-circle' : tone === 'danger' ? 'alert-circle' : 'information-circle';
   const foreground = tone === 'danger' ? '#ffd9de' : tone === 'success' ? '#c8f7df' : '#fff';
@@ -111,11 +123,13 @@ export function Snackbar({ visible, message, tone = 'success', onDismiss, action
 }
 
 export function MetricCard({ icon, label, value, tone = colors.primary }: { icon: keyof typeof Ionicons.glyphMap; label: string; value: string; tone?: string }) {
-  return <View style={styles.metric}><View style={[styles.metricIcon, { backgroundColor: `${tone}18` }]}><Ionicons name={icon} size={22} color={tone} /></View><Text style={styles.metricValue}>{value}</Text><Text style={styles.metricLabel}>{label}</Text></View>;
+  const { palette } = useAppTheme();
+  return <View style={[styles.metric, { backgroundColor: palette.surface }]}><View style={[styles.metricIcon, { backgroundColor: `${tone}18` }]}><Ionicons name={icon} size={22} color={tone} /></View><Text style={[styles.metricValue, { color: palette.ink }]}>{value}</Text><Text style={[styles.metricLabel, { color: palette.muted }]}>{label}</Text></View>;
 }
 
 export function BottomSheet({ visible, title, onClose, children }: { visible: boolean; title: string; onClose(): void; children: ReactNode }) {
   const insets = useSafeAreaInsets();
+  const { palette } = useAppTheme();
   const translateY = useRef(new Animated.Value(0)).current;
   const pan = useMemo(() => PanResponder.create({
     onMoveShouldSetPanResponder: (_, gesture) => gesture.dy > 8 && Math.abs(gesture.dy) > Math.abs(gesture.dx),
@@ -127,8 +141,8 @@ export function BottomSheet({ visible, title, onClose, children }: { visible: bo
   }), [onClose, translateY]);
   return <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
     <View style={styles.sheetOverlay}><Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
-      <Animated.View style={[styles.sheet, { paddingBottom: Math.max(20, insets.bottom), transform: [{ translateY }] }]} {...pan.panHandlers}>
-        <View style={styles.sheetHandle} /><View style={styles.sheetHeader}><Text style={styles.sheetTitle}>{title}</Text><IconButton icon="close" label="Đóng" onPress={onClose} /></View>
+      <Animated.View style={[styles.sheet, { backgroundColor: palette.surface, paddingBottom: Math.max(20, insets.bottom), transform: [{ translateY }] }]} {...pan.panHandlers}>
+        <View style={[styles.sheetHandle, { backgroundColor: palette.border }]} /><View style={styles.sheetHeader}><Text style={[styles.sheetTitle, { color: palette.ink }]}>{title}</Text><IconButton icon="close" label="Đóng" onPress={onClose} /></View>
         {children}
       </Animated.View>
     </View>
@@ -138,32 +152,37 @@ export function BottomSheet({ visible, title, onClose, children }: { visible: bo
 export function Button({ title, onPress, loading, variant = 'primary', disabled }: {
   title: string; onPress(): void; loading?: boolean; variant?: 'primary' | 'outline' | 'danger' | 'ghost'; disabled?: boolean;
 }) {
-  return <Pressable onPress={onPress} disabled={disabled || loading}
+  const { palette } = useAppTheme();
+  const handlePress = () => { void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => undefined); onPress(); };
+  return <Pressable onPress={handlePress} disabled={disabled || loading}
     accessibilityRole="button" accessibilityState={{ disabled: disabled || loading, busy: loading }}
-    style={({ pressed }) => [styles.button, styles[`button_${variant}`], (pressed || disabled) && { opacity: .65 }]}>
-    {loading ? <ActivityIndicator color={variant === 'outline' || variant === 'ghost' ? colors.primary : '#fff'} />
-      : <Text style={[styles.buttonText, (variant === 'outline' || variant === 'ghost') && { color: colors.primary }]}>{title}</Text>}
+    style={({ pressed }) => [styles.button, styles[`button_${variant}`], variant === 'primary' && { backgroundColor: palette.primary }, variant === 'outline' && { backgroundColor: palette.surface, borderColor: palette.primary }, (pressed || disabled) && { opacity: .65 }]}>
+    {loading ? <ActivityIndicator color={variant === 'outline' || variant === 'ghost' ? palette.primary : '#fff'} />
+      : <Text style={[styles.buttonText, (variant === 'outline' || variant === 'ghost') && { color: palette.primary }]}>{title}</Text>}
   </Pressable>;
 }
 
 export function Field({ label, error, multiline, ...props }: TextInputProps & { label: string; error?: string }) {
+  const { palette } = useAppTheme();
   return <View style={styles.fieldWrap}>
-    <Text style={styles.label}>{label}</Text>
-    <TextInput placeholderTextColor="#9aa1b2" multiline={multiline}
-      style={[styles.input, multiline && styles.textarea, error && { borderColor: colors.danger }]} {...props} />
+    <Text style={[styles.label, { color: palette.ink }]}>{label}</Text>
+    <TextInput placeholderTextColor={palette.muted} multiline={multiline}
+      style={[styles.input, { backgroundColor: palette.surface, borderColor: palette.border, color: palette.ink }, multiline && styles.textarea, error && { borderColor: palette.danger }]} {...props} />
     {!!error && <Text style={styles.error}>{error}</Text>}
   </View>;
 }
 
 export function SectionTitle({ title, subtitle }: { title: string; subtitle?: string }) {
-  return <View style={{ marginBottom: 18 }}><Text style={styles.title}>{title}</Text>{subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}</View>;
+  const { palette } = useAppTheme();
+  return <View style={{ marginBottom: 18 }}><Text style={[styles.title, { color: palette.ink }]}>{title}</Text>{subtitle && <Text style={[styles.subtitle, { color: palette.muted }]}>{subtitle}</Text>}</View>;
 }
 
 export function StateView({ loading, error, empty, onRetry, variant = 'default' }: { loading?: boolean; error?: string; empty?: string; onRetry?(): void; variant?: 'default' | 'list' }) {
+  const { palette } = useAppTheme();
   if (loading && variant === 'list') return <View style={styles.skeletonList}><SkeletonCard /><SkeletonCard /></View>;
-  if (loading) return <View style={styles.state}><ActivityIndicator size="large" color={colors.primary} /><Text>Đang tải...</Text></View>;
+  if (loading) return <View style={styles.state}><ActivityIndicator size="large" color={palette.primary} /><Text style={{ color: palette.ink }}>Đang tải...</Text></View>;
   if (error) return <View style={styles.state}><Text style={styles.error}>{error}</Text>{onRetry && <Button title="Thử lại" onPress={onRetry} variant="outline" />}</View>;
-  return <View style={styles.state}><Text style={styles.subtitle}>{empty || 'Chưa có dữ liệu'}</Text></View>;
+  return <View style={styles.state}><Text style={[styles.subtitle, { color: palette.muted }]}>{empty || 'Chưa có dữ liệu'}</Text></View>;
 }
 
 const styles = StyleSheet.create({
