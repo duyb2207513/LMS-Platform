@@ -26,6 +26,11 @@ const router = createRouter({
       component: () => import('@/pages/RegisterPage.vue'),
       meta: { guest: true },
     },
+    { path: '/forgot-password', name: 'forgot-password', component: () => import('@/pages/ForgotPasswordPage.vue'), meta: { guest: true } },
+    { path: '/reset-password', name: 'reset-password', component: () => import('@/pages/ResetPasswordPage.vue'), meta: { guest: true } },
+    { path: '/verify-email', name: 'verify-email', component: () => import('@/pages/VerifyEmailPage.vue') },
+    { path: '/confirm-email-change', name: 'confirm-email-change', component: () => import('@/pages/ConfirmEmailChangePage.vue') },
+    { path: '/auth/github/callback', name: 'github-callback', component: () => import('@/pages/GitHubCallbackPage.vue') },
     {
       path: '/courses',
       name: 'courses',
@@ -46,7 +51,10 @@ const router = createRouter({
     { path: '/403', name: 'forbidden', component: () => import('@/pages/ForbiddenPage.vue') },
     { path: '/profile', name: 'profile', component: () => import('@/pages/student/ProfilePage.vue'), meta: { requiresAuth: true } },
     { path: '/change-password', name: 'change-password', component: () => import('@/pages/student/ChangePasswordPage.vue'), meta: { requiresAuth: true } },
+    { path: '/security', name: 'security', component: () => import('@/pages/student/SecurityPage.vue'), meta: { requiresAuth: true } },
     { path: '/my-courses', name: 'my-courses', component: () => import('@/pages/student/MyCoursesPage.vue'), meta: { requiresAuth: true, roles: [UserRole.STUDENT] } },
+    { path: '/courses/:courseId/assignments', name: 'student-assignments', component: () => import('@/pages/student/CourseAssignmentsPage.vue'), meta: { requiresAuth: true, roles: [UserRole.STUDENT] } },
+    { path: '/assignments/:assignmentId', name: 'student-assignment-detail', component: () => import('@/pages/student/AssignmentDetailPage.vue'), meta: { requiresAuth: true, roles: [UserRole.STUDENT] } },
     { path: '/learn/:courseId', name: 'learning', component: () => import('@/pages/student/LearningPage.vue'), meta: { requiresAuth: true, roles: [UserRole.STUDENT] } },
     { path: '/quiz/:quizId', name: 'take-quiz', component: () => import('@/pages/student/QuizPage.vue'), meta: { requiresAuth: true, roles: [UserRole.STUDENT] } },
     { path: '/quiz-result', name: 'quiz-result', component: () => import('@/pages/student/QuizResultPage.vue'), meta: { requiresAuth: true, roles: [UserRole.STUDENT] } },
@@ -81,6 +89,8 @@ const router = createRouter({
       meta: { requiresAuth: true, roles: [UserRole.INSTRUCTOR] },
     },
     { path: '/instructor/courses/:courseId/builder', name: 'course-builder', component: () => import('@/pages/instructor/CourseBuilderPage.vue'), meta: { requiresAuth: true, roles: [UserRole.INSTRUCTOR, UserRole.ADMIN] } },
+    { path: '/instructor/courses/:courseId/assignments', name: 'assignment-builder', component: () => import('@/pages/instructor/AssignmentsPage.vue'), meta: { requiresAuth: true, roles: [UserRole.INSTRUCTOR, UserRole.ADMIN] } },
+    { path: '/instructor/assignments/:assignmentId/submissions', name: 'assignment-submissions', component: () => import('@/pages/instructor/AssignmentSubmissionsPage.vue'), meta: { requiresAuth: true, roles: [UserRole.INSTRUCTOR, UserRole.ADMIN] } },
     { path: '/instructor/lessons/:lessonId/quiz', name: 'quiz-builder', component: () => import('@/pages/instructor/QuizBuilderPage.vue'), meta: { requiresAuth: true, roles: [UserRole.INSTRUCTOR, UserRole.ADMIN] } },
     // Admin routes
     {

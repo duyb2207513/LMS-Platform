@@ -16,6 +16,12 @@ import certificatesRouter, { courseCertificatesRouter } from "../modules/certifi
 import ordersRouter from "../modules/orders/orders.routes.js";
 import { orderPaymentsRouter, paymentsRouter } from "../modules/payments/payments.routes.js";
 import adminRouter from "../modules/admin/admin.routes.js";
+import { prisma } from "../config/database.js";
+import { asyncHandler } from "../common/utils/asyncHandler.js";
+import { assignmentsRouter, courseAssignmentsRouter, courseGradesRouter, submissionFilesRouter, submissionsRouter } from "../modules/assignments/assignments.routes.js";
+import notificationsRouter from "../modules/notifications/notification.routes.js";
+import preferencesRouter from "../modules/notification-preferences/preference.routes.js";
+import { announcementsRouter, courseAnnouncementsRouter } from "../modules/announcements/announcement.routes.js";
 
 const router = Router();
 
@@ -28,6 +34,9 @@ router.use("/courses/:courseId/content", courseLearningRouter);
 router.use("/courses/:courseId/progress", courseProgressRouter);
 router.use("/courses/:courseId/reviews", courseReviewsRouter);
 router.use("/courses/:courseId/certificates", courseCertificatesRouter);
+router.use("/courses/:courseId/assignments", courseAssignmentsRouter);
+router.use("/courses/:courseId/grades", courseGradesRouter);
+router.use("/courses/:courseId/announcements", courseAnnouncementsRouter);
 router.use("/courses", coursesRouter);
 router.use("/sections/:sectionId/lessons", sectionLessonsRouter);
 router.use("/sections", sectionsRouter);
@@ -39,6 +48,12 @@ router.use("/quizzes", quizzesRouter);
 router.use("/questions", questionsRouter);
 router.use("/options", optionsRouter);
 router.use("/quiz-attempts", quizAttemptsRouter);
+router.use("/assignments", assignmentsRouter);
+router.use("/submissions", submissionsRouter);
+router.use("/submission-files", submissionFilesRouter);
+router.use("/announcements", announcementsRouter);
+router.use("/notifications", notificationsRouter);
+router.use("/notification-preferences", preferencesRouter);
 router.use("/reviews", reviewsRouter);
 router.use("/comments", commentsRouter);
 router.use("/orders/:orderId/payments/mock", orderPaymentsRouter);
@@ -83,5 +98,27 @@ router.get("/health", (_request, response) => {
     }
   });
 });
+
+/**
+ * @openapi
+ * /health/ready:
+ *   get:
+ *     summary: Check API and database readiness
+ *     tags: [System]
+ *     responses:
+ *       200:
+ *         description: API and database are ready
+ *       503:
+ *         description: A required dependency is unavailable
+ */
+router.get("/health/ready", asyncHandler(async (_request, response) => {
+  const startedAt = Date.now();
+  await prisma.$queryRaw`SELECT 1`;
+  response.status(200).json({
+    success: true,
+    message: "LMS API is ready",
+    data: { database: "connected", responseTimeMs: Date.now() - startedAt, timestamp: new Date().toISOString() }
+  });
+}));
 
 export default router;

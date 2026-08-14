@@ -30,6 +30,7 @@ export interface User {
   avatarUrl?: string | null
   role: UserRole
   status: UserStatus
+  emailVerifiedAt?: string | null
   createdAt: string
   updatedAt: string
 }
@@ -104,6 +105,16 @@ export interface AuthResponse {
   refreshToken: string
 }
 
+export interface AuthSession {
+  id: string
+  ipAddress: string | null
+  userAgent: string | null
+  lastUsedAt: string
+  expiresAt: string
+  createdAt: string
+  isCurrent: boolean
+}
+
 export interface Enrollment { id:string;courseId:string;progressPercent:number;status:'ACTIVE'|'COMPLETED'|'CANCELLED';enrolledAt:string;completedAt:string|null;course:Course }
 export interface LessonProgress { isCompleted:boolean;lastWatchedSecond:number;completedAt?:string|null }
 export interface Lesson { id:string;sectionId:string;title:string;lessonType:'VIDEO'|'TEXT'|'DOCUMENT';content:string|null;videoUrl:string|null;documentUrl:string|null;durationSeconds:number|null;position:number;isPreview:boolean;isRequired:boolean;isPublished:boolean;progress?:LessonProgress;quiz?:Quiz|null }
@@ -121,6 +132,12 @@ export interface Payment { id:string;status:'PENDING'|'SUCCEEDED'|'FAILED';amoun
 export interface OrderItem { id:string;courseId:string;courseTitleSnapshot:string;priceSnapshot:number;course?:Pick<Course,'slug'|'thumbnailUrl'> }
 export interface Order { id:string;orderNumber:string;status:'PENDING'|'PAID'|'CANCELLED';subtotal:number;total:number;currency:string;paidAt:string|null;createdAt:string;items:OrderItem[];payments:Payment[] }
 export interface Certificate { id:string;certificateNumber:string;verificationCode:string;studentNameSnapshot:string;courseTitleSnapshot:string;instructorNameSnapshot:string;issuedAt:string;revokedAt:string|null;courseId:string }
+export interface SubmissionFile { id:string;originalName:string;fileUrl:string;mimeType:string;sizeBytes:number;createdAt:string }
+export interface SubmissionFeedback { id:string;score:number;comment:string|null;gradedAt:string;updatedAt:string;grader?:Pick<User,'id'|'fullName'> }
+export interface AssignmentSubmission { id:string;assignmentId:string;studentId:string;attemptNumber:number;textContent:string|null;status:'SUBMITTED'|'GRADED';submittedAt:string;updatedAt:string;student?:Pick<User,'id'|'fullName'|'email'|'avatarUrl'>;files:SubmissionFile[];feedback:SubmissionFeedback|null }
+export interface Assignment { id:string;courseId:string;title:string;description:string|null;instructions:string|null;dueAt:string;maxScore:number;allowResubmission:boolean;maxSubmissions:number;allowLateSubmissions:boolean;isPublished:boolean;createdAt:string;updatedAt:string;isOverdue?:boolean;remainingSubmissions?:number;submissions?:AssignmentSubmission[];_count?:{submissions:number};course?:Pick<Course,'id'|'title'|'slug'> }
+export interface CourseGradeRule { courseId:string;assignmentWeight:number;quizWeight:number;passingScore:number }
+export interface CourseGrade { courseId:string;studentId:string;finalScore:number;passed:boolean;rule:CourseGradeRule;assignment:{percent:number;earned:number;maximum:number;total:number;graded:number};quiz:{percent:number;total:number;attempted:number};student?:Pick<User,'id'|'fullName'|'email'|'avatarUrl'> }
 
 export interface CategoryFormData {
   name: string

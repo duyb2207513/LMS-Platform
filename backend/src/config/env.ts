@@ -21,5 +21,21 @@ export const env = {
   rateLimitWindowMs: Number(process.env.RATE_LIMIT_WINDOW_MS ?? 15 * 60 * 1000),
   rateLimitMax: Number(process.env.RATE_LIMIT_MAX ?? 300),
   authRateLimitWindowMs: Number(process.env.AUTH_RATE_LIMIT_WINDOW_MS ?? 15 * 60 * 1000),
-  authRateLimitMax: Number(process.env.AUTH_RATE_LIMIT_MAX ?? 20)
+  authRateLimitMax: Number(process.env.AUTH_RATE_LIMIT_MAX ?? 20),
+  loginMaxAttempts: Number(process.env.LOGIN_MAX_ATTEMPTS ?? 5),
+  loginLockMinutes: Number(process.env.LOGIN_LOCK_MINUTES ?? 15),
+  requireEmailVerification: process.env.REQUIRE_EMAIL_VERIFICATION === "true",
+  googleClientId: process.env.GOOGLE_CLIENT_ID ?? "",
+  githubClientId: process.env.GITHUB_CLIENT_ID ?? "",
+  githubClientSecret: process.env.GITHUB_CLIENT_SECRET ?? "",
+  githubCallbackUrl: process.env.GITHUB_CALLBACK_URL ?? `http://localhost:${process.env.PORT ?? 3000}/api/v1/auth/github/callback`,
+  smtpHost: process.env.SMTP_HOST ?? "",
+  smtpPort: Number(process.env.SMTP_PORT ?? 587),
+  smtpSecure: process.env.SMTP_SECURE === "true",
+  smtpUser: process.env.SMTP_USER ?? "",
+  smtpPassword: process.env.SMTP_PASSWORD ?? "",
+  mailFrom: process.env.MAIL_FROM ?? "LMS Platform <no-reply@lms.local>",
+  assignmentReminderIntervalMinutes: Number(process.env.ASSIGNMENT_REMINDER_INTERVAL_MINUTES ?? 15),
+  sentryDsn: process.env.SENTRY_DSN ?? "",
+  logLevel: process.env.LOG_LEVEL ?? (process.env.NODE_ENV === "production" ? "info" : "debug")
 } as const;

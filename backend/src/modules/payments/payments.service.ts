@@ -1,4 +1,4 @@
-import { randomUUID } from "node:crypto"; import { AppError } from "../../common/errors/AppError.js"; import { prisma } from "../../config/database.js"; import { UUID } from "../interactions/access.js"; import type { MockCallbackInput, MockWebhookInput } from "./payments.types.js";
+import { randomUUID } from "node:crypto"; import { AppError } from "../../common/errors/AppError.js"; import { prisma } from "../../config/database.js"; import { safelyRunCommunication, sendEnrollmentCommunication } from "../../services/communication/communication.service.js"; import { UUID } from "../interactions/access.js"; import type { MockCallbackInput, MockWebhookInput } from "./payments.types.js";
 function paymentData<T extends { amount: unknown }>(payment: T) { return { ...payment, amount: Number(payment.amount) }; }
 export async function initiateMockPayment(orderId: string, userId: string, origin: string) {
   if (!UUID.test(orderId)) throw new AppError(404, "Order not found"); const order = await prisma.order.findUnique({ where: { id: orderId }, include: { payments: { where: { provider: "MOCK", status: "PENDING" }, orderBy: { createdAt: "desc" }, take: 1 } } });
@@ -12,7 +12,8 @@ export async function processMockWebhook(input: MockWebhookInput) {
   const payment = await prisma.payment.findUnique({ where: { id: input.paymentId }, include: { order: { include: { items: true } } } }); if (!payment || payment.provider !== "MOCK") throw new AppError(404, "Payment not found");
   if (Number(payment.amount) !== input.amount || payment.currency !== input.currency) throw new AppError(400, "Webhook amount or currency does not match the payment");
   const duplicateTransaction = await prisma.payment.findFirst({ where: { providerTransactionId: input.providerTransactionId, id: { not: payment.id } }, select: { id: true } }); if (duplicateTransaction) throw new AppError(409, "Provider transaction has already been used");
-  return prisma.$transaction(async transaction => {
+  let paymentCompletedNow = false;
+  const result = await prisma.$transaction(async transaction => {
     const existing = await transaction.paymentWebhookEvent.findUnique({ where: { provider_eventId: { provider: "MOCK", eventId: input.eventId } } });
     if (existing) { const current = await transaction.payment.findUniqueOrThrow({ where: { id: payment.id } }); return { duplicate: true, payment: paymentData(current) }; }
     await transaction.paymentWebhookEvent.create({ data: { paymentId: payment.id, provider: "MOCK", eventId: input.eventId, payload: { eventId: input.eventId, paymentId: input.paymentId, status: input.status, providerTransactionId: input.providerTransactionId, amount: input.amount, currency: input.currency } } });
@@ -25,7 +26,10 @@ export async function processMockWebhook(input: MockWebhookInput) {
     const succeeded = await transaction.payment.update({ where: { id: payment.id }, data: { status: "SUCCEEDED", providerTransactionId: input.providerTransactionId, paidAt, failureReason: null } });
     await transaction.order.update({ where: { id: payment.orderId }, data: { status: "PAID", paidAt } });
     await transaction.enrollment.createMany({ data: payment.order.items.map(item => ({ studentId: payment.order.userId, courseId: item.courseId })), skipDuplicates: true });
+    paymentCompletedNow = true;
     return { duplicate: false, payment: paymentData(succeeded) };
   });
+  if (paymentCompletedNow) await Promise.all(payment.order.items.map(item => safelyRunCommunication(() => sendEnrollmentCommunication(payment.order.userId, item.courseId))));
+  return result;
 }
 export async function completeMockPayment(paymentId: string, input: MockCallbackInput) { const payment = await getMockPayment(paymentId, input.token); return processMockWebhook({ eventId: `mock-callback:${paymentId}:${input.status}`, paymentId, status: input.status, providerTransactionId: `MOCK-${paymentId}`, amount: Number(payment.amount), currency: payment.currency }); }

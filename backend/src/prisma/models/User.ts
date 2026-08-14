@@ -20,8 +20,18 @@ export type UserModel = runtime.Types.Result.DefaultSelection<Prisma.$UserPayloa
 
 export type AggregateUser = {
   _count: UserCountAggregateOutputType | null
+  _avg: UserAvgAggregateOutputType | null
+  _sum: UserSumAggregateOutputType | null
   _min: UserMinAggregateOutputType | null
   _max: UserMaxAggregateOutputType | null
+}
+
+export type UserAvgAggregateOutputType = {
+  failedLoginAttempts: number | null
+}
+
+export type UserSumAggregateOutputType = {
+  failedLoginAttempts: number | null
 }
 
 export type UserMinAggregateOutputType = {
@@ -30,6 +40,12 @@ export type UserMinAggregateOutputType = {
   email: string | null
   passwordHash: string | null
   avatarUrl: string | null
+  googleId: string | null
+  githubId: string | null
+  emailVerifiedAt: Date | null
+  failedLoginAttempts: number | null
+  lockedUntil: Date | null
+  lastLoginAt: Date | null
   role: $Enums.UserRole | null
   status: $Enums.UserStatus | null
   createdAt: Date | null
@@ -42,6 +58,12 @@ export type UserMaxAggregateOutputType = {
   email: string | null
   passwordHash: string | null
   avatarUrl: string | null
+  googleId: string | null
+  githubId: string | null
+  emailVerifiedAt: Date | null
+  failedLoginAttempts: number | null
+  lockedUntil: Date | null
+  lastLoginAt: Date | null
   role: $Enums.UserRole | null
   status: $Enums.UserStatus | null
   createdAt: Date | null
@@ -54,6 +76,12 @@ export type UserCountAggregateOutputType = {
   email: number
   passwordHash: number
   avatarUrl: number
+  googleId: number
+  githubId: number
+  emailVerifiedAt: number
+  failedLoginAttempts: number
+  lockedUntil: number
+  lastLoginAt: number
   role: number
   status: number
   createdAt: number
@@ -62,12 +90,26 @@ export type UserCountAggregateOutputType = {
 }
 
 
+export type UserAvgAggregateInputType = {
+  failedLoginAttempts?: true
+}
+
+export type UserSumAggregateInputType = {
+  failedLoginAttempts?: true
+}
+
 export type UserMinAggregateInputType = {
   id?: true
   fullName?: true
   email?: true
   passwordHash?: true
   avatarUrl?: true
+  googleId?: true
+  githubId?: true
+  emailVerifiedAt?: true
+  failedLoginAttempts?: true
+  lockedUntil?: true
+  lastLoginAt?: true
   role?: true
   status?: true
   createdAt?: true
@@ -80,6 +122,12 @@ export type UserMaxAggregateInputType = {
   email?: true
   passwordHash?: true
   avatarUrl?: true
+  googleId?: true
+  githubId?: true
+  emailVerifiedAt?: true
+  failedLoginAttempts?: true
+  lockedUntil?: true
+  lastLoginAt?: true
   role?: true
   status?: true
   createdAt?: true
@@ -92,6 +140,12 @@ export type UserCountAggregateInputType = {
   email?: true
   passwordHash?: true
   avatarUrl?: true
+  googleId?: true
+  githubId?: true
+  emailVerifiedAt?: true
+  failedLoginAttempts?: true
+  lockedUntil?: true
+  lastLoginAt?: true
   role?: true
   status?: true
   createdAt?: true
@@ -137,6 +191,18 @@ export type UserAggregateArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: UserAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: UserSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: UserMinAggregateInputType
@@ -167,6 +233,8 @@ export type UserGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
   take?: number
   skip?: number
   _count?: UserCountAggregateInputType | true
+  _avg?: UserAvgAggregateInputType
+  _sum?: UserSumAggregateInputType
   _min?: UserMinAggregateInputType
   _max?: UserMaxAggregateInputType
 }
@@ -175,13 +243,21 @@ export type UserGroupByOutputType = {
   id: string
   fullName: string
   email: string
-  passwordHash: string
+  passwordHash: string | null
   avatarUrl: string | null
+  googleId: string | null
+  githubId: string | null
+  emailVerifiedAt: Date | null
+  failedLoginAttempts: number
+  lockedUntil: Date | null
+  lastLoginAt: Date | null
   role: $Enums.UserRole
   status: $Enums.UserStatus
   createdAt: Date
   updatedAt: Date
   _count: UserCountAggregateOutputType | null
+  _avg: UserAvgAggregateOutputType | null
+  _sum: UserSumAggregateOutputType | null
   _min: UserMinAggregateOutputType | null
   _max: UserMaxAggregateOutputType | null
 }
@@ -208,8 +284,14 @@ export type UserWhereInput = {
   id?: Prisma.UuidFilter<"User"> | string
   fullName?: Prisma.StringFilter<"User"> | string
   email?: Prisma.StringFilter<"User"> | string
-  passwordHash?: Prisma.StringFilter<"User"> | string
+  passwordHash?: Prisma.StringNullableFilter<"User"> | string | null
   avatarUrl?: Prisma.StringNullableFilter<"User"> | string | null
+  googleId?: Prisma.StringNullableFilter<"User"> | string | null
+  githubId?: Prisma.StringNullableFilter<"User"> | string | null
+  emailVerifiedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  failedLoginAttempts?: Prisma.IntFilter<"User"> | number
+  lockedUntil?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  lastLoginAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   role?: Prisma.EnumUserRoleFilter<"User"> | $Enums.UserRole
   status?: Prisma.EnumUserStatusFilter<"User"> | $Enums.UserStatus
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
@@ -218,18 +300,33 @@ export type UserWhereInput = {
   enrollments?: Prisma.EnrollmentListRelationFilter
   lessonProgress?: Prisma.LessonProgressListRelationFilter
   quizAttempts?: Prisma.QuizAttemptListRelationFilter
+  assignmentSubmissions?: Prisma.AssignmentSubmissionListRelationFilter
+  submissionFeedback?: Prisma.SubmissionFeedbackListRelationFilter
   reviews?: Prisma.ReviewListRelationFilter
   comments?: Prisma.CommentListRelationFilter
   orders?: Prisma.OrderListRelationFilter
   certificates?: Prisma.CertificateListRelationFilter
+  authSessions?: Prisma.AuthSessionListRelationFilter
+  authTokens?: Prisma.AuthTokenListRelationFilter
+  auditLogs?: Prisma.AuditLogListRelationFilter
+  notifications?: Prisma.NotificationListRelationFilter
+  notificationPreference?: Prisma.XOR<Prisma.NotificationPreferenceNullableScalarRelationFilter, Prisma.NotificationPreferenceWhereInput> | null
+  emailLogs?: Prisma.EmailLogListRelationFilter
+  courseAnnouncements?: Prisma.CourseAnnouncementListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   fullName?: Prisma.SortOrder
   email?: Prisma.SortOrder
-  passwordHash?: Prisma.SortOrder
+  passwordHash?: Prisma.SortOrderInput | Prisma.SortOrder
   avatarUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  googleId?: Prisma.SortOrderInput | Prisma.SortOrder
+  githubId?: Prisma.SortOrderInput | Prisma.SortOrder
+  emailVerifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  failedLoginAttempts?: Prisma.SortOrder
+  lockedUntil?: Prisma.SortOrderInput | Prisma.SortOrder
+  lastLoginAt?: Prisma.SortOrderInput | Prisma.SortOrder
   role?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -238,21 +335,36 @@ export type UserOrderByWithRelationInput = {
   enrollments?: Prisma.EnrollmentOrderByRelationAggregateInput
   lessonProgress?: Prisma.LessonProgressOrderByRelationAggregateInput
   quizAttempts?: Prisma.QuizAttemptOrderByRelationAggregateInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionOrderByRelationAggregateInput
+  submissionFeedback?: Prisma.SubmissionFeedbackOrderByRelationAggregateInput
   reviews?: Prisma.ReviewOrderByRelationAggregateInput
   comments?: Prisma.CommentOrderByRelationAggregateInput
   orders?: Prisma.OrderOrderByRelationAggregateInput
   certificates?: Prisma.CertificateOrderByRelationAggregateInput
+  authSessions?: Prisma.AuthSessionOrderByRelationAggregateInput
+  authTokens?: Prisma.AuthTokenOrderByRelationAggregateInput
+  auditLogs?: Prisma.AuditLogOrderByRelationAggregateInput
+  notifications?: Prisma.NotificationOrderByRelationAggregateInput
+  notificationPreference?: Prisma.NotificationPreferenceOrderByWithRelationInput
+  emailLogs?: Prisma.EmailLogOrderByRelationAggregateInput
+  courseAnnouncements?: Prisma.CourseAnnouncementOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
   id?: string
   email?: string
+  googleId?: string
+  githubId?: string
   AND?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
   OR?: Prisma.UserWhereInput[]
   NOT?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
   fullName?: Prisma.StringFilter<"User"> | string
-  passwordHash?: Prisma.StringFilter<"User"> | string
+  passwordHash?: Prisma.StringNullableFilter<"User"> | string | null
   avatarUrl?: Prisma.StringNullableFilter<"User"> | string | null
+  emailVerifiedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  failedLoginAttempts?: Prisma.IntFilter<"User"> | number
+  lockedUntil?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  lastLoginAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   role?: Prisma.EnumUserRoleFilter<"User"> | $Enums.UserRole
   status?: Prisma.EnumUserStatusFilter<"User"> | $Enums.UserStatus
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
@@ -261,25 +373,42 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   enrollments?: Prisma.EnrollmentListRelationFilter
   lessonProgress?: Prisma.LessonProgressListRelationFilter
   quizAttempts?: Prisma.QuizAttemptListRelationFilter
+  assignmentSubmissions?: Prisma.AssignmentSubmissionListRelationFilter
+  submissionFeedback?: Prisma.SubmissionFeedbackListRelationFilter
   reviews?: Prisma.ReviewListRelationFilter
   comments?: Prisma.CommentListRelationFilter
   orders?: Prisma.OrderListRelationFilter
   certificates?: Prisma.CertificateListRelationFilter
-}, "id" | "email">
+  authSessions?: Prisma.AuthSessionListRelationFilter
+  authTokens?: Prisma.AuthTokenListRelationFilter
+  auditLogs?: Prisma.AuditLogListRelationFilter
+  notifications?: Prisma.NotificationListRelationFilter
+  notificationPreference?: Prisma.XOR<Prisma.NotificationPreferenceNullableScalarRelationFilter, Prisma.NotificationPreferenceWhereInput> | null
+  emailLogs?: Prisma.EmailLogListRelationFilter
+  courseAnnouncements?: Prisma.CourseAnnouncementListRelationFilter
+}, "id" | "email" | "googleId" | "githubId">
 
 export type UserOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   fullName?: Prisma.SortOrder
   email?: Prisma.SortOrder
-  passwordHash?: Prisma.SortOrder
+  passwordHash?: Prisma.SortOrderInput | Prisma.SortOrder
   avatarUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  googleId?: Prisma.SortOrderInput | Prisma.SortOrder
+  githubId?: Prisma.SortOrderInput | Prisma.SortOrder
+  emailVerifiedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  failedLoginAttempts?: Prisma.SortOrder
+  lockedUntil?: Prisma.SortOrderInput | Prisma.SortOrder
+  lastLoginAt?: Prisma.SortOrderInput | Prisma.SortOrder
   role?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
+  _avg?: Prisma.UserAvgOrderByAggregateInput
   _max?: Prisma.UserMaxOrderByAggregateInput
   _min?: Prisma.UserMinOrderByAggregateInput
+  _sum?: Prisma.UserSumOrderByAggregateInput
 }
 
 export type UserScalarWhereWithAggregatesInput = {
@@ -289,8 +418,14 @@ export type UserScalarWhereWithAggregatesInput = {
   id?: Prisma.UuidWithAggregatesFilter<"User"> | string
   fullName?: Prisma.StringWithAggregatesFilter<"User"> | string
   email?: Prisma.StringWithAggregatesFilter<"User"> | string
-  passwordHash?: Prisma.StringWithAggregatesFilter<"User"> | string
+  passwordHash?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   avatarUrl?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  googleId?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  githubId?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  emailVerifiedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+  failedLoginAttempts?: Prisma.IntWithAggregatesFilter<"User"> | number
+  lockedUntil?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+  lastLoginAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
   role?: Prisma.EnumUserRoleWithAggregatesFilter<"User"> | $Enums.UserRole
   status?: Prisma.EnumUserStatusWithAggregatesFilter<"User"> | $Enums.UserStatus
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
@@ -301,8 +436,14 @@ export type UserCreateInput = {
   id?: string
   fullName: string
   email: string
-  passwordHash: string
+  passwordHash?: string | null
   avatarUrl?: string | null
+  googleId?: string | null
+  githubId?: string | null
+  emailVerifiedAt?: Date | string | null
+  failedLoginAttempts?: number
+  lockedUntil?: Date | string | null
+  lastLoginAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
   createdAt?: Date | string
@@ -311,18 +452,33 @@ export type UserCreateInput = {
   enrollments?: Prisma.EnrollmentCreateNestedManyWithoutStudentInput
   lessonProgress?: Prisma.LessonProgressCreateNestedManyWithoutStudentInput
   quizAttempts?: Prisma.QuizAttemptCreateNestedManyWithoutStudentInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionCreateNestedManyWithoutStudentInput
+  submissionFeedback?: Prisma.SubmissionFeedbackCreateNestedManyWithoutGraderInput
   reviews?: Prisma.ReviewCreateNestedManyWithoutUserInput
   comments?: Prisma.CommentCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
   certificates?: Prisma.CertificateCreateNestedManyWithoutStudentInput
+  authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
+  authTokens?: Prisma.AuthTokenCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
+  emailLogs?: Prisma.EmailLogCreateNestedManyWithoutUserInput
+  courseAnnouncements?: Prisma.CourseAnnouncementCreateNestedManyWithoutAuthorInput
 }
 
 export type UserUncheckedCreateInput = {
   id?: string
   fullName: string
   email: string
-  passwordHash: string
+  passwordHash?: string | null
   avatarUrl?: string | null
+  googleId?: string | null
+  githubId?: string | null
+  emailVerifiedAt?: Date | string | null
+  failedLoginAttempts?: number
+  lockedUntil?: Date | string | null
+  lastLoginAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
   createdAt?: Date | string
@@ -331,18 +487,33 @@ export type UserUncheckedCreateInput = {
   enrollments?: Prisma.EnrollmentUncheckedCreateNestedManyWithoutStudentInput
   lessonProgress?: Prisma.LessonProgressUncheckedCreateNestedManyWithoutStudentInput
   quizAttempts?: Prisma.QuizAttemptUncheckedCreateNestedManyWithoutStudentInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionUncheckedCreateNestedManyWithoutStudentInput
+  submissionFeedback?: Prisma.SubmissionFeedbackUncheckedCreateNestedManyWithoutGraderInput
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutUserInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
   certificates?: Prisma.CertificateUncheckedCreateNestedManyWithoutStudentInput
+  authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
+  authTokens?: Prisma.AuthTokenUncheckedCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
+  emailLogs?: Prisma.EmailLogUncheckedCreateNestedManyWithoutUserInput
+  courseAnnouncements?: Prisma.CourseAnnouncementUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  githubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failedLoginAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -351,18 +522,33 @@ export type UserUpdateInput = {
   enrollments?: Prisma.EnrollmentUpdateManyWithoutStudentNestedInput
   lessonProgress?: Prisma.LessonProgressUpdateManyWithoutStudentNestedInput
   quizAttempts?: Prisma.QuizAttemptUpdateManyWithoutStudentNestedInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionUpdateManyWithoutStudentNestedInput
+  submissionFeedback?: Prisma.SubmissionFeedbackUpdateManyWithoutGraderNestedInput
   reviews?: Prisma.ReviewUpdateManyWithoutUserNestedInput
   comments?: Prisma.CommentUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
   certificates?: Prisma.CertificateUpdateManyWithoutStudentNestedInput
+  authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
+  authTokens?: Prisma.AuthTokenUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
+  emailLogs?: Prisma.EmailLogUpdateManyWithoutUserNestedInput
+  courseAnnouncements?: Prisma.CourseAnnouncementUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  githubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failedLoginAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -371,18 +557,33 @@ export type UserUncheckedUpdateInput = {
   enrollments?: Prisma.EnrollmentUncheckedUpdateManyWithoutStudentNestedInput
   lessonProgress?: Prisma.LessonProgressUncheckedUpdateManyWithoutStudentNestedInput
   quizAttempts?: Prisma.QuizAttemptUncheckedUpdateManyWithoutStudentNestedInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionUncheckedUpdateManyWithoutStudentNestedInput
+  submissionFeedback?: Prisma.SubmissionFeedbackUncheckedUpdateManyWithoutGraderNestedInput
   reviews?: Prisma.ReviewUncheckedUpdateManyWithoutUserNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
   certificates?: Prisma.CertificateUncheckedUpdateManyWithoutStudentNestedInput
+  authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
+  authTokens?: Prisma.AuthTokenUncheckedUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
+  emailLogs?: Prisma.EmailLogUncheckedUpdateManyWithoutUserNestedInput
+  courseAnnouncements?: Prisma.CourseAnnouncementUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserCreateManyInput = {
   id?: string
   fullName: string
   email: string
-  passwordHash: string
+  passwordHash?: string | null
   avatarUrl?: string | null
+  googleId?: string | null
+  githubId?: string | null
+  emailVerifiedAt?: Date | string | null
+  failedLoginAttempts?: number
+  lockedUntil?: Date | string | null
+  lastLoginAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
   createdAt?: Date | string
@@ -393,8 +594,14 @@ export type UserUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  githubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failedLoginAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -405,8 +612,14 @@ export type UserUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  githubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failedLoginAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -419,10 +632,20 @@ export type UserCountOrderByAggregateInput = {
   email?: Prisma.SortOrder
   passwordHash?: Prisma.SortOrder
   avatarUrl?: Prisma.SortOrder
+  googleId?: Prisma.SortOrder
+  githubId?: Prisma.SortOrder
+  emailVerifiedAt?: Prisma.SortOrder
+  failedLoginAttempts?: Prisma.SortOrder
+  lockedUntil?: Prisma.SortOrder
+  lastLoginAt?: Prisma.SortOrder
   role?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type UserAvgOrderByAggregateInput = {
+  failedLoginAttempts?: Prisma.SortOrder
 }
 
 export type UserMaxOrderByAggregateInput = {
@@ -431,6 +654,12 @@ export type UserMaxOrderByAggregateInput = {
   email?: Prisma.SortOrder
   passwordHash?: Prisma.SortOrder
   avatarUrl?: Prisma.SortOrder
+  googleId?: Prisma.SortOrder
+  githubId?: Prisma.SortOrder
+  emailVerifiedAt?: Prisma.SortOrder
+  failedLoginAttempts?: Prisma.SortOrder
+  lockedUntil?: Prisma.SortOrder
+  lastLoginAt?: Prisma.SortOrder
   role?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -443,15 +672,30 @@ export type UserMinOrderByAggregateInput = {
   email?: Prisma.SortOrder
   passwordHash?: Prisma.SortOrder
   avatarUrl?: Prisma.SortOrder
+  googleId?: Prisma.SortOrder
+  githubId?: Prisma.SortOrder
+  emailVerifiedAt?: Prisma.SortOrder
+  failedLoginAttempts?: Prisma.SortOrder
+  lockedUntil?: Prisma.SortOrder
+  lastLoginAt?: Prisma.SortOrder
   role?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
+export type UserSumOrderByAggregateInput = {
+  failedLoginAttempts?: Prisma.SortOrder
+}
+
 export type UserScalarRelationFilter = {
   is?: Prisma.UserWhereInput
   isNot?: Prisma.UserWhereInput
+}
+
+export type UserNullableScalarRelationFilter = {
+  is?: Prisma.UserWhereInput | null
+  isNot?: Prisma.UserWhereInput | null
 }
 
 export type StringFieldUpdateOperationsInput = {
@@ -460,6 +704,18 @@ export type StringFieldUpdateOperationsInput = {
 
 export type NullableStringFieldUpdateOperationsInput = {
   set?: string | null
+}
+
+export type NullableDateTimeFieldUpdateOperationsInput = {
+  set?: Date | string | null
+}
+
+export type IntFieldUpdateOperationsInput = {
+  set?: number
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
 }
 
 export type EnumUserRoleFieldUpdateOperationsInput = {
@@ -472,6 +728,50 @@ export type EnumUserStatusFieldUpdateOperationsInput = {
 
 export type DateTimeFieldUpdateOperationsInput = {
   set?: Date | string
+}
+
+export type UserCreateNestedOneWithoutAuthSessionsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAuthSessionsInput, Prisma.UserUncheckedCreateWithoutAuthSessionsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAuthSessionsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutAuthSessionsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAuthSessionsInput, Prisma.UserUncheckedCreateWithoutAuthSessionsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAuthSessionsInput
+  upsert?: Prisma.UserUpsertWithoutAuthSessionsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAuthSessionsInput, Prisma.UserUpdateWithoutAuthSessionsInput>, Prisma.UserUncheckedUpdateWithoutAuthSessionsInput>
+}
+
+export type UserCreateNestedOneWithoutAuthTokensInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAuthTokensInput, Prisma.UserUncheckedCreateWithoutAuthTokensInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAuthTokensInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutAuthTokensNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAuthTokensInput, Prisma.UserUncheckedCreateWithoutAuthTokensInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAuthTokensInput
+  upsert?: Prisma.UserUpsertWithoutAuthTokensInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAuthTokensInput, Prisma.UserUpdateWithoutAuthTokensInput>, Prisma.UserUncheckedUpdateWithoutAuthTokensInput>
+}
+
+export type UserCreateNestedOneWithoutAuditLogsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAuditLogsInput, Prisma.UserUncheckedCreateWithoutAuditLogsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAuditLogsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneWithoutAuditLogsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAuditLogsInput, Prisma.UserUncheckedCreateWithoutAuditLogsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAuditLogsInput
+  upsert?: Prisma.UserUpsertWithoutAuditLogsInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAuditLogsInput, Prisma.UserUpdateWithoutAuditLogsInput>, Prisma.UserUncheckedUpdateWithoutAuditLogsInput>
 }
 
 export type UserCreateNestedOneWithoutCoursesInput = {
@@ -530,6 +830,92 @@ export type UserUpdateOneRequiredWithoutQuizAttemptsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutQuizAttemptsInput, Prisma.UserUpdateWithoutQuizAttemptsInput>, Prisma.UserUncheckedUpdateWithoutQuizAttemptsInput>
 }
 
+export type UserCreateNestedOneWithoutAssignmentSubmissionsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAssignmentSubmissionsInput, Prisma.UserUncheckedCreateWithoutAssignmentSubmissionsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAssignmentSubmissionsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutAssignmentSubmissionsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAssignmentSubmissionsInput, Prisma.UserUncheckedCreateWithoutAssignmentSubmissionsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAssignmentSubmissionsInput
+  upsert?: Prisma.UserUpsertWithoutAssignmentSubmissionsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAssignmentSubmissionsInput, Prisma.UserUpdateWithoutAssignmentSubmissionsInput>, Prisma.UserUncheckedUpdateWithoutAssignmentSubmissionsInput>
+}
+
+export type UserCreateNestedOneWithoutSubmissionFeedbackInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSubmissionFeedbackInput, Prisma.UserUncheckedCreateWithoutSubmissionFeedbackInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSubmissionFeedbackInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutSubmissionFeedbackNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSubmissionFeedbackInput, Prisma.UserUncheckedCreateWithoutSubmissionFeedbackInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSubmissionFeedbackInput
+  upsert?: Prisma.UserUpsertWithoutSubmissionFeedbackInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutSubmissionFeedbackInput, Prisma.UserUpdateWithoutSubmissionFeedbackInput>, Prisma.UserUncheckedUpdateWithoutSubmissionFeedbackInput>
+}
+
+export type UserCreateNestedOneWithoutNotificationsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutNotificationsInput, Prisma.UserUncheckedCreateWithoutNotificationsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutNotificationsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutNotificationsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutNotificationsInput, Prisma.UserUncheckedCreateWithoutNotificationsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutNotificationsInput
+  upsert?: Prisma.UserUpsertWithoutNotificationsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutNotificationsInput, Prisma.UserUpdateWithoutNotificationsInput>, Prisma.UserUncheckedUpdateWithoutNotificationsInput>
+}
+
+export type UserCreateNestedOneWithoutNotificationPreferenceInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutNotificationPreferenceInput, Prisma.UserUncheckedCreateWithoutNotificationPreferenceInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutNotificationPreferenceInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutNotificationPreferenceNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutNotificationPreferenceInput, Prisma.UserUncheckedCreateWithoutNotificationPreferenceInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutNotificationPreferenceInput
+  upsert?: Prisma.UserUpsertWithoutNotificationPreferenceInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutNotificationPreferenceInput, Prisma.UserUpdateWithoutNotificationPreferenceInput>, Prisma.UserUncheckedUpdateWithoutNotificationPreferenceInput>
+}
+
+export type UserCreateNestedOneWithoutEmailLogsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutEmailLogsInput, Prisma.UserUncheckedCreateWithoutEmailLogsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutEmailLogsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneWithoutEmailLogsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutEmailLogsInput, Prisma.UserUncheckedCreateWithoutEmailLogsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutEmailLogsInput
+  upsert?: Prisma.UserUpsertWithoutEmailLogsInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutEmailLogsInput, Prisma.UserUpdateWithoutEmailLogsInput>, Prisma.UserUncheckedUpdateWithoutEmailLogsInput>
+}
+
+export type UserCreateNestedOneWithoutCourseAnnouncementsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCourseAnnouncementsInput, Prisma.UserUncheckedCreateWithoutCourseAnnouncementsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCourseAnnouncementsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutCourseAnnouncementsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCourseAnnouncementsInput, Prisma.UserUncheckedCreateWithoutCourseAnnouncementsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCourseAnnouncementsInput
+  upsert?: Prisma.UserUpsertWithoutCourseAnnouncementsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutCourseAnnouncementsInput, Prisma.UserUpdateWithoutCourseAnnouncementsInput>, Prisma.UserUncheckedUpdateWithoutCourseAnnouncementsInput>
+}
+
 export type UserCreateNestedOneWithoutReviewsInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutReviewsInput, Prisma.UserUncheckedCreateWithoutReviewsInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutReviewsInput
@@ -586,12 +972,474 @@ export type UserUpdateOneRequiredWithoutCertificatesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutCertificatesInput, Prisma.UserUpdateWithoutCertificatesInput>, Prisma.UserUncheckedUpdateWithoutCertificatesInput>
 }
 
+export type UserCreateWithoutAuthSessionsInput = {
+  id?: string
+  fullName: string
+  email: string
+  passwordHash?: string | null
+  avatarUrl?: string | null
+  googleId?: string | null
+  githubId?: string | null
+  emailVerifiedAt?: Date | string | null
+  failedLoginAttempts?: number
+  lockedUntil?: Date | string | null
+  lastLoginAt?: Date | string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  courses?: Prisma.CourseCreateNestedManyWithoutInstructorInput
+  enrollments?: Prisma.EnrollmentCreateNestedManyWithoutStudentInput
+  lessonProgress?: Prisma.LessonProgressCreateNestedManyWithoutStudentInput
+  quizAttempts?: Prisma.QuizAttemptCreateNestedManyWithoutStudentInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionCreateNestedManyWithoutStudentInput
+  submissionFeedback?: Prisma.SubmissionFeedbackCreateNestedManyWithoutGraderInput
+  reviews?: Prisma.ReviewCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentCreateNestedManyWithoutUserInput
+  orders?: Prisma.OrderCreateNestedManyWithoutUserInput
+  certificates?: Prisma.CertificateCreateNestedManyWithoutStudentInput
+  authTokens?: Prisma.AuthTokenCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
+  emailLogs?: Prisma.EmailLogCreateNestedManyWithoutUserInput
+  courseAnnouncements?: Prisma.CourseAnnouncementCreateNestedManyWithoutAuthorInput
+}
+
+export type UserUncheckedCreateWithoutAuthSessionsInput = {
+  id?: string
+  fullName: string
+  email: string
+  passwordHash?: string | null
+  avatarUrl?: string | null
+  googleId?: string | null
+  githubId?: string | null
+  emailVerifiedAt?: Date | string | null
+  failedLoginAttempts?: number
+  lockedUntil?: Date | string | null
+  lastLoginAt?: Date | string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  courses?: Prisma.CourseUncheckedCreateNestedManyWithoutInstructorInput
+  enrollments?: Prisma.EnrollmentUncheckedCreateNestedManyWithoutStudentInput
+  lessonProgress?: Prisma.LessonProgressUncheckedCreateNestedManyWithoutStudentInput
+  quizAttempts?: Prisma.QuizAttemptUncheckedCreateNestedManyWithoutStudentInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionUncheckedCreateNestedManyWithoutStudentInput
+  submissionFeedback?: Prisma.SubmissionFeedbackUncheckedCreateNestedManyWithoutGraderInput
+  reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput
+  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
+  certificates?: Prisma.CertificateUncheckedCreateNestedManyWithoutStudentInput
+  authTokens?: Prisma.AuthTokenUncheckedCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
+  emailLogs?: Prisma.EmailLogUncheckedCreateNestedManyWithoutUserInput
+  courseAnnouncements?: Prisma.CourseAnnouncementUncheckedCreateNestedManyWithoutAuthorInput
+}
+
+export type UserCreateOrConnectWithoutAuthSessionsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutAuthSessionsInput, Prisma.UserUncheckedCreateWithoutAuthSessionsInput>
+}
+
+export type UserUpsertWithoutAuthSessionsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutAuthSessionsInput, Prisma.UserUncheckedUpdateWithoutAuthSessionsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutAuthSessionsInput, Prisma.UserUncheckedCreateWithoutAuthSessionsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutAuthSessionsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutAuthSessionsInput, Prisma.UserUncheckedUpdateWithoutAuthSessionsInput>
+}
+
+export type UserUpdateWithoutAuthSessionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  githubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failedLoginAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  courses?: Prisma.CourseUpdateManyWithoutInstructorNestedInput
+  enrollments?: Prisma.EnrollmentUpdateManyWithoutStudentNestedInput
+  lessonProgress?: Prisma.LessonProgressUpdateManyWithoutStudentNestedInput
+  quizAttempts?: Prisma.QuizAttemptUpdateManyWithoutStudentNestedInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionUpdateManyWithoutStudentNestedInput
+  submissionFeedback?: Prisma.SubmissionFeedbackUpdateManyWithoutGraderNestedInput
+  reviews?: Prisma.ReviewUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutUserNestedInput
+  orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
+  certificates?: Prisma.CertificateUpdateManyWithoutStudentNestedInput
+  authTokens?: Prisma.AuthTokenUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
+  emailLogs?: Prisma.EmailLogUpdateManyWithoutUserNestedInput
+  courseAnnouncements?: Prisma.CourseAnnouncementUpdateManyWithoutAuthorNestedInput
+}
+
+export type UserUncheckedUpdateWithoutAuthSessionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  githubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failedLoginAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  courses?: Prisma.CourseUncheckedUpdateManyWithoutInstructorNestedInput
+  enrollments?: Prisma.EnrollmentUncheckedUpdateManyWithoutStudentNestedInput
+  lessonProgress?: Prisma.LessonProgressUncheckedUpdateManyWithoutStudentNestedInput
+  quizAttempts?: Prisma.QuizAttemptUncheckedUpdateManyWithoutStudentNestedInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionUncheckedUpdateManyWithoutStudentNestedInput
+  submissionFeedback?: Prisma.SubmissionFeedbackUncheckedUpdateManyWithoutGraderNestedInput
+  reviews?: Prisma.ReviewUncheckedUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput
+  orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
+  certificates?: Prisma.CertificateUncheckedUpdateManyWithoutStudentNestedInput
+  authTokens?: Prisma.AuthTokenUncheckedUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
+  emailLogs?: Prisma.EmailLogUncheckedUpdateManyWithoutUserNestedInput
+  courseAnnouncements?: Prisma.CourseAnnouncementUncheckedUpdateManyWithoutAuthorNestedInput
+}
+
+export type UserCreateWithoutAuthTokensInput = {
+  id?: string
+  fullName: string
+  email: string
+  passwordHash?: string | null
+  avatarUrl?: string | null
+  googleId?: string | null
+  githubId?: string | null
+  emailVerifiedAt?: Date | string | null
+  failedLoginAttempts?: number
+  lockedUntil?: Date | string | null
+  lastLoginAt?: Date | string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  courses?: Prisma.CourseCreateNestedManyWithoutInstructorInput
+  enrollments?: Prisma.EnrollmentCreateNestedManyWithoutStudentInput
+  lessonProgress?: Prisma.LessonProgressCreateNestedManyWithoutStudentInput
+  quizAttempts?: Prisma.QuizAttemptCreateNestedManyWithoutStudentInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionCreateNestedManyWithoutStudentInput
+  submissionFeedback?: Prisma.SubmissionFeedbackCreateNestedManyWithoutGraderInput
+  reviews?: Prisma.ReviewCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentCreateNestedManyWithoutUserInput
+  orders?: Prisma.OrderCreateNestedManyWithoutUserInput
+  certificates?: Prisma.CertificateCreateNestedManyWithoutStudentInput
+  authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
+  emailLogs?: Prisma.EmailLogCreateNestedManyWithoutUserInput
+  courseAnnouncements?: Prisma.CourseAnnouncementCreateNestedManyWithoutAuthorInput
+}
+
+export type UserUncheckedCreateWithoutAuthTokensInput = {
+  id?: string
+  fullName: string
+  email: string
+  passwordHash?: string | null
+  avatarUrl?: string | null
+  googleId?: string | null
+  githubId?: string | null
+  emailVerifiedAt?: Date | string | null
+  failedLoginAttempts?: number
+  lockedUntil?: Date | string | null
+  lastLoginAt?: Date | string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  courses?: Prisma.CourseUncheckedCreateNestedManyWithoutInstructorInput
+  enrollments?: Prisma.EnrollmentUncheckedCreateNestedManyWithoutStudentInput
+  lessonProgress?: Prisma.LessonProgressUncheckedCreateNestedManyWithoutStudentInput
+  quizAttempts?: Prisma.QuizAttemptUncheckedCreateNestedManyWithoutStudentInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionUncheckedCreateNestedManyWithoutStudentInput
+  submissionFeedback?: Prisma.SubmissionFeedbackUncheckedCreateNestedManyWithoutGraderInput
+  reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput
+  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
+  certificates?: Prisma.CertificateUncheckedCreateNestedManyWithoutStudentInput
+  authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
+  emailLogs?: Prisma.EmailLogUncheckedCreateNestedManyWithoutUserInput
+  courseAnnouncements?: Prisma.CourseAnnouncementUncheckedCreateNestedManyWithoutAuthorInput
+}
+
+export type UserCreateOrConnectWithoutAuthTokensInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutAuthTokensInput, Prisma.UserUncheckedCreateWithoutAuthTokensInput>
+}
+
+export type UserUpsertWithoutAuthTokensInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutAuthTokensInput, Prisma.UserUncheckedUpdateWithoutAuthTokensInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutAuthTokensInput, Prisma.UserUncheckedCreateWithoutAuthTokensInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutAuthTokensInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutAuthTokensInput, Prisma.UserUncheckedUpdateWithoutAuthTokensInput>
+}
+
+export type UserUpdateWithoutAuthTokensInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  githubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failedLoginAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  courses?: Prisma.CourseUpdateManyWithoutInstructorNestedInput
+  enrollments?: Prisma.EnrollmentUpdateManyWithoutStudentNestedInput
+  lessonProgress?: Prisma.LessonProgressUpdateManyWithoutStudentNestedInput
+  quizAttempts?: Prisma.QuizAttemptUpdateManyWithoutStudentNestedInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionUpdateManyWithoutStudentNestedInput
+  submissionFeedback?: Prisma.SubmissionFeedbackUpdateManyWithoutGraderNestedInput
+  reviews?: Prisma.ReviewUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutUserNestedInput
+  orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
+  certificates?: Prisma.CertificateUpdateManyWithoutStudentNestedInput
+  authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
+  emailLogs?: Prisma.EmailLogUpdateManyWithoutUserNestedInput
+  courseAnnouncements?: Prisma.CourseAnnouncementUpdateManyWithoutAuthorNestedInput
+}
+
+export type UserUncheckedUpdateWithoutAuthTokensInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  githubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failedLoginAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  courses?: Prisma.CourseUncheckedUpdateManyWithoutInstructorNestedInput
+  enrollments?: Prisma.EnrollmentUncheckedUpdateManyWithoutStudentNestedInput
+  lessonProgress?: Prisma.LessonProgressUncheckedUpdateManyWithoutStudentNestedInput
+  quizAttempts?: Prisma.QuizAttemptUncheckedUpdateManyWithoutStudentNestedInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionUncheckedUpdateManyWithoutStudentNestedInput
+  submissionFeedback?: Prisma.SubmissionFeedbackUncheckedUpdateManyWithoutGraderNestedInput
+  reviews?: Prisma.ReviewUncheckedUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput
+  orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
+  certificates?: Prisma.CertificateUncheckedUpdateManyWithoutStudentNestedInput
+  authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
+  emailLogs?: Prisma.EmailLogUncheckedUpdateManyWithoutUserNestedInput
+  courseAnnouncements?: Prisma.CourseAnnouncementUncheckedUpdateManyWithoutAuthorNestedInput
+}
+
+export type UserCreateWithoutAuditLogsInput = {
+  id?: string
+  fullName: string
+  email: string
+  passwordHash?: string | null
+  avatarUrl?: string | null
+  googleId?: string | null
+  githubId?: string | null
+  emailVerifiedAt?: Date | string | null
+  failedLoginAttempts?: number
+  lockedUntil?: Date | string | null
+  lastLoginAt?: Date | string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  courses?: Prisma.CourseCreateNestedManyWithoutInstructorInput
+  enrollments?: Prisma.EnrollmentCreateNestedManyWithoutStudentInput
+  lessonProgress?: Prisma.LessonProgressCreateNestedManyWithoutStudentInput
+  quizAttempts?: Prisma.QuizAttemptCreateNestedManyWithoutStudentInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionCreateNestedManyWithoutStudentInput
+  submissionFeedback?: Prisma.SubmissionFeedbackCreateNestedManyWithoutGraderInput
+  reviews?: Prisma.ReviewCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentCreateNestedManyWithoutUserInput
+  orders?: Prisma.OrderCreateNestedManyWithoutUserInput
+  certificates?: Prisma.CertificateCreateNestedManyWithoutStudentInput
+  authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
+  authTokens?: Prisma.AuthTokenCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
+  emailLogs?: Prisma.EmailLogCreateNestedManyWithoutUserInput
+  courseAnnouncements?: Prisma.CourseAnnouncementCreateNestedManyWithoutAuthorInput
+}
+
+export type UserUncheckedCreateWithoutAuditLogsInput = {
+  id?: string
+  fullName: string
+  email: string
+  passwordHash?: string | null
+  avatarUrl?: string | null
+  googleId?: string | null
+  githubId?: string | null
+  emailVerifiedAt?: Date | string | null
+  failedLoginAttempts?: number
+  lockedUntil?: Date | string | null
+  lastLoginAt?: Date | string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  courses?: Prisma.CourseUncheckedCreateNestedManyWithoutInstructorInput
+  enrollments?: Prisma.EnrollmentUncheckedCreateNestedManyWithoutStudentInput
+  lessonProgress?: Prisma.LessonProgressUncheckedCreateNestedManyWithoutStudentInput
+  quizAttempts?: Prisma.QuizAttemptUncheckedCreateNestedManyWithoutStudentInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionUncheckedCreateNestedManyWithoutStudentInput
+  submissionFeedback?: Prisma.SubmissionFeedbackUncheckedCreateNestedManyWithoutGraderInput
+  reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput
+  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
+  certificates?: Prisma.CertificateUncheckedCreateNestedManyWithoutStudentInput
+  authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
+  authTokens?: Prisma.AuthTokenUncheckedCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
+  emailLogs?: Prisma.EmailLogUncheckedCreateNestedManyWithoutUserInput
+  courseAnnouncements?: Prisma.CourseAnnouncementUncheckedCreateNestedManyWithoutAuthorInput
+}
+
+export type UserCreateOrConnectWithoutAuditLogsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutAuditLogsInput, Prisma.UserUncheckedCreateWithoutAuditLogsInput>
+}
+
+export type UserUpsertWithoutAuditLogsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutAuditLogsInput, Prisma.UserUncheckedUpdateWithoutAuditLogsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutAuditLogsInput, Prisma.UserUncheckedCreateWithoutAuditLogsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutAuditLogsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutAuditLogsInput, Prisma.UserUncheckedUpdateWithoutAuditLogsInput>
+}
+
+export type UserUpdateWithoutAuditLogsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  githubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failedLoginAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  courses?: Prisma.CourseUpdateManyWithoutInstructorNestedInput
+  enrollments?: Prisma.EnrollmentUpdateManyWithoutStudentNestedInput
+  lessonProgress?: Prisma.LessonProgressUpdateManyWithoutStudentNestedInput
+  quizAttempts?: Prisma.QuizAttemptUpdateManyWithoutStudentNestedInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionUpdateManyWithoutStudentNestedInput
+  submissionFeedback?: Prisma.SubmissionFeedbackUpdateManyWithoutGraderNestedInput
+  reviews?: Prisma.ReviewUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutUserNestedInput
+  orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
+  certificates?: Prisma.CertificateUpdateManyWithoutStudentNestedInput
+  authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
+  authTokens?: Prisma.AuthTokenUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
+  emailLogs?: Prisma.EmailLogUpdateManyWithoutUserNestedInput
+  courseAnnouncements?: Prisma.CourseAnnouncementUpdateManyWithoutAuthorNestedInput
+}
+
+export type UserUncheckedUpdateWithoutAuditLogsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  githubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failedLoginAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  courses?: Prisma.CourseUncheckedUpdateManyWithoutInstructorNestedInput
+  enrollments?: Prisma.EnrollmentUncheckedUpdateManyWithoutStudentNestedInput
+  lessonProgress?: Prisma.LessonProgressUncheckedUpdateManyWithoutStudentNestedInput
+  quizAttempts?: Prisma.QuizAttemptUncheckedUpdateManyWithoutStudentNestedInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionUncheckedUpdateManyWithoutStudentNestedInput
+  submissionFeedback?: Prisma.SubmissionFeedbackUncheckedUpdateManyWithoutGraderNestedInput
+  reviews?: Prisma.ReviewUncheckedUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput
+  orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
+  certificates?: Prisma.CertificateUncheckedUpdateManyWithoutStudentNestedInput
+  authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
+  authTokens?: Prisma.AuthTokenUncheckedUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
+  emailLogs?: Prisma.EmailLogUncheckedUpdateManyWithoutUserNestedInput
+  courseAnnouncements?: Prisma.CourseAnnouncementUncheckedUpdateManyWithoutAuthorNestedInput
+}
+
 export type UserCreateWithoutCoursesInput = {
   id?: string
   fullName: string
   email: string
-  passwordHash: string
+  passwordHash?: string | null
   avatarUrl?: string | null
+  googleId?: string | null
+  githubId?: string | null
+  emailVerifiedAt?: Date | string | null
+  failedLoginAttempts?: number
+  lockedUntil?: Date | string | null
+  lastLoginAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
   createdAt?: Date | string
@@ -599,18 +1447,33 @@ export type UserCreateWithoutCoursesInput = {
   enrollments?: Prisma.EnrollmentCreateNestedManyWithoutStudentInput
   lessonProgress?: Prisma.LessonProgressCreateNestedManyWithoutStudentInput
   quizAttempts?: Prisma.QuizAttemptCreateNestedManyWithoutStudentInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionCreateNestedManyWithoutStudentInput
+  submissionFeedback?: Prisma.SubmissionFeedbackCreateNestedManyWithoutGraderInput
   reviews?: Prisma.ReviewCreateNestedManyWithoutUserInput
   comments?: Prisma.CommentCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
   certificates?: Prisma.CertificateCreateNestedManyWithoutStudentInput
+  authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
+  authTokens?: Prisma.AuthTokenCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
+  emailLogs?: Prisma.EmailLogCreateNestedManyWithoutUserInput
+  courseAnnouncements?: Prisma.CourseAnnouncementCreateNestedManyWithoutAuthorInput
 }
 
 export type UserUncheckedCreateWithoutCoursesInput = {
   id?: string
   fullName: string
   email: string
-  passwordHash: string
+  passwordHash?: string | null
   avatarUrl?: string | null
+  googleId?: string | null
+  githubId?: string | null
+  emailVerifiedAt?: Date | string | null
+  failedLoginAttempts?: number
+  lockedUntil?: Date | string | null
+  lastLoginAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
   createdAt?: Date | string
@@ -618,10 +1481,19 @@ export type UserUncheckedCreateWithoutCoursesInput = {
   enrollments?: Prisma.EnrollmentUncheckedCreateNestedManyWithoutStudentInput
   lessonProgress?: Prisma.LessonProgressUncheckedCreateNestedManyWithoutStudentInput
   quizAttempts?: Prisma.QuizAttemptUncheckedCreateNestedManyWithoutStudentInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionUncheckedCreateNestedManyWithoutStudentInput
+  submissionFeedback?: Prisma.SubmissionFeedbackUncheckedCreateNestedManyWithoutGraderInput
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutUserInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
   certificates?: Prisma.CertificateUncheckedCreateNestedManyWithoutStudentInput
+  authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
+  authTokens?: Prisma.AuthTokenUncheckedCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
+  emailLogs?: Prisma.EmailLogUncheckedCreateNestedManyWithoutUserInput
+  courseAnnouncements?: Prisma.CourseAnnouncementUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserCreateOrConnectWithoutCoursesInput = {
@@ -644,8 +1516,14 @@ export type UserUpdateWithoutCoursesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  githubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failedLoginAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -653,18 +1531,33 @@ export type UserUpdateWithoutCoursesInput = {
   enrollments?: Prisma.EnrollmentUpdateManyWithoutStudentNestedInput
   lessonProgress?: Prisma.LessonProgressUpdateManyWithoutStudentNestedInput
   quizAttempts?: Prisma.QuizAttemptUpdateManyWithoutStudentNestedInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionUpdateManyWithoutStudentNestedInput
+  submissionFeedback?: Prisma.SubmissionFeedbackUpdateManyWithoutGraderNestedInput
   reviews?: Prisma.ReviewUpdateManyWithoutUserNestedInput
   comments?: Prisma.CommentUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
   certificates?: Prisma.CertificateUpdateManyWithoutStudentNestedInput
+  authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
+  authTokens?: Prisma.AuthTokenUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
+  emailLogs?: Prisma.EmailLogUpdateManyWithoutUserNestedInput
+  courseAnnouncements?: Prisma.CourseAnnouncementUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCoursesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  githubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failedLoginAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -672,18 +1565,33 @@ export type UserUncheckedUpdateWithoutCoursesInput = {
   enrollments?: Prisma.EnrollmentUncheckedUpdateManyWithoutStudentNestedInput
   lessonProgress?: Prisma.LessonProgressUncheckedUpdateManyWithoutStudentNestedInput
   quizAttempts?: Prisma.QuizAttemptUncheckedUpdateManyWithoutStudentNestedInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionUncheckedUpdateManyWithoutStudentNestedInput
+  submissionFeedback?: Prisma.SubmissionFeedbackUncheckedUpdateManyWithoutGraderNestedInput
   reviews?: Prisma.ReviewUncheckedUpdateManyWithoutUserNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
   certificates?: Prisma.CertificateUncheckedUpdateManyWithoutStudentNestedInput
+  authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
+  authTokens?: Prisma.AuthTokenUncheckedUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
+  emailLogs?: Prisma.EmailLogUncheckedUpdateManyWithoutUserNestedInput
+  courseAnnouncements?: Prisma.CourseAnnouncementUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserCreateWithoutEnrollmentsInput = {
   id?: string
   fullName: string
   email: string
-  passwordHash: string
+  passwordHash?: string | null
   avatarUrl?: string | null
+  googleId?: string | null
+  githubId?: string | null
+  emailVerifiedAt?: Date | string | null
+  failedLoginAttempts?: number
+  lockedUntil?: Date | string | null
+  lastLoginAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
   createdAt?: Date | string
@@ -691,18 +1599,33 @@ export type UserCreateWithoutEnrollmentsInput = {
   courses?: Prisma.CourseCreateNestedManyWithoutInstructorInput
   lessonProgress?: Prisma.LessonProgressCreateNestedManyWithoutStudentInput
   quizAttempts?: Prisma.QuizAttemptCreateNestedManyWithoutStudentInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionCreateNestedManyWithoutStudentInput
+  submissionFeedback?: Prisma.SubmissionFeedbackCreateNestedManyWithoutGraderInput
   reviews?: Prisma.ReviewCreateNestedManyWithoutUserInput
   comments?: Prisma.CommentCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
   certificates?: Prisma.CertificateCreateNestedManyWithoutStudentInput
+  authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
+  authTokens?: Prisma.AuthTokenCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
+  emailLogs?: Prisma.EmailLogCreateNestedManyWithoutUserInput
+  courseAnnouncements?: Prisma.CourseAnnouncementCreateNestedManyWithoutAuthorInput
 }
 
 export type UserUncheckedCreateWithoutEnrollmentsInput = {
   id?: string
   fullName: string
   email: string
-  passwordHash: string
+  passwordHash?: string | null
   avatarUrl?: string | null
+  googleId?: string | null
+  githubId?: string | null
+  emailVerifiedAt?: Date | string | null
+  failedLoginAttempts?: number
+  lockedUntil?: Date | string | null
+  lastLoginAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
   createdAt?: Date | string
@@ -710,10 +1633,19 @@ export type UserUncheckedCreateWithoutEnrollmentsInput = {
   courses?: Prisma.CourseUncheckedCreateNestedManyWithoutInstructorInput
   lessonProgress?: Prisma.LessonProgressUncheckedCreateNestedManyWithoutStudentInput
   quizAttempts?: Prisma.QuizAttemptUncheckedCreateNestedManyWithoutStudentInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionUncheckedCreateNestedManyWithoutStudentInput
+  submissionFeedback?: Prisma.SubmissionFeedbackUncheckedCreateNestedManyWithoutGraderInput
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutUserInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
   certificates?: Prisma.CertificateUncheckedCreateNestedManyWithoutStudentInput
+  authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
+  authTokens?: Prisma.AuthTokenUncheckedCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
+  emailLogs?: Prisma.EmailLogUncheckedCreateNestedManyWithoutUserInput
+  courseAnnouncements?: Prisma.CourseAnnouncementUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserCreateOrConnectWithoutEnrollmentsInput = {
@@ -736,8 +1668,14 @@ export type UserUpdateWithoutEnrollmentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  githubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failedLoginAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -745,18 +1683,33 @@ export type UserUpdateWithoutEnrollmentsInput = {
   courses?: Prisma.CourseUpdateManyWithoutInstructorNestedInput
   lessonProgress?: Prisma.LessonProgressUpdateManyWithoutStudentNestedInput
   quizAttempts?: Prisma.QuizAttemptUpdateManyWithoutStudentNestedInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionUpdateManyWithoutStudentNestedInput
+  submissionFeedback?: Prisma.SubmissionFeedbackUpdateManyWithoutGraderNestedInput
   reviews?: Prisma.ReviewUpdateManyWithoutUserNestedInput
   comments?: Prisma.CommentUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
   certificates?: Prisma.CertificateUpdateManyWithoutStudentNestedInput
+  authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
+  authTokens?: Prisma.AuthTokenUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
+  emailLogs?: Prisma.EmailLogUpdateManyWithoutUserNestedInput
+  courseAnnouncements?: Prisma.CourseAnnouncementUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserUncheckedUpdateWithoutEnrollmentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  githubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failedLoginAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -764,18 +1717,33 @@ export type UserUncheckedUpdateWithoutEnrollmentsInput = {
   courses?: Prisma.CourseUncheckedUpdateManyWithoutInstructorNestedInput
   lessonProgress?: Prisma.LessonProgressUncheckedUpdateManyWithoutStudentNestedInput
   quizAttempts?: Prisma.QuizAttemptUncheckedUpdateManyWithoutStudentNestedInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionUncheckedUpdateManyWithoutStudentNestedInput
+  submissionFeedback?: Prisma.SubmissionFeedbackUncheckedUpdateManyWithoutGraderNestedInput
   reviews?: Prisma.ReviewUncheckedUpdateManyWithoutUserNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
   certificates?: Prisma.CertificateUncheckedUpdateManyWithoutStudentNestedInput
+  authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
+  authTokens?: Prisma.AuthTokenUncheckedUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
+  emailLogs?: Prisma.EmailLogUncheckedUpdateManyWithoutUserNestedInput
+  courseAnnouncements?: Prisma.CourseAnnouncementUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserCreateWithoutLessonProgressInput = {
   id?: string
   fullName: string
   email: string
-  passwordHash: string
+  passwordHash?: string | null
   avatarUrl?: string | null
+  googleId?: string | null
+  githubId?: string | null
+  emailVerifiedAt?: Date | string | null
+  failedLoginAttempts?: number
+  lockedUntil?: Date | string | null
+  lastLoginAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
   createdAt?: Date | string
@@ -783,18 +1751,33 @@ export type UserCreateWithoutLessonProgressInput = {
   courses?: Prisma.CourseCreateNestedManyWithoutInstructorInput
   enrollments?: Prisma.EnrollmentCreateNestedManyWithoutStudentInput
   quizAttempts?: Prisma.QuizAttemptCreateNestedManyWithoutStudentInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionCreateNestedManyWithoutStudentInput
+  submissionFeedback?: Prisma.SubmissionFeedbackCreateNestedManyWithoutGraderInput
   reviews?: Prisma.ReviewCreateNestedManyWithoutUserInput
   comments?: Prisma.CommentCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
   certificates?: Prisma.CertificateCreateNestedManyWithoutStudentInput
+  authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
+  authTokens?: Prisma.AuthTokenCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
+  emailLogs?: Prisma.EmailLogCreateNestedManyWithoutUserInput
+  courseAnnouncements?: Prisma.CourseAnnouncementCreateNestedManyWithoutAuthorInput
 }
 
 export type UserUncheckedCreateWithoutLessonProgressInput = {
   id?: string
   fullName: string
   email: string
-  passwordHash: string
+  passwordHash?: string | null
   avatarUrl?: string | null
+  googleId?: string | null
+  githubId?: string | null
+  emailVerifiedAt?: Date | string | null
+  failedLoginAttempts?: number
+  lockedUntil?: Date | string | null
+  lastLoginAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
   createdAt?: Date | string
@@ -802,10 +1785,19 @@ export type UserUncheckedCreateWithoutLessonProgressInput = {
   courses?: Prisma.CourseUncheckedCreateNestedManyWithoutInstructorInput
   enrollments?: Prisma.EnrollmentUncheckedCreateNestedManyWithoutStudentInput
   quizAttempts?: Prisma.QuizAttemptUncheckedCreateNestedManyWithoutStudentInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionUncheckedCreateNestedManyWithoutStudentInput
+  submissionFeedback?: Prisma.SubmissionFeedbackUncheckedCreateNestedManyWithoutGraderInput
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutUserInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
   certificates?: Prisma.CertificateUncheckedCreateNestedManyWithoutStudentInput
+  authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
+  authTokens?: Prisma.AuthTokenUncheckedCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
+  emailLogs?: Prisma.EmailLogUncheckedCreateNestedManyWithoutUserInput
+  courseAnnouncements?: Prisma.CourseAnnouncementUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserCreateOrConnectWithoutLessonProgressInput = {
@@ -828,8 +1820,14 @@ export type UserUpdateWithoutLessonProgressInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  githubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failedLoginAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -837,18 +1835,33 @@ export type UserUpdateWithoutLessonProgressInput = {
   courses?: Prisma.CourseUpdateManyWithoutInstructorNestedInput
   enrollments?: Prisma.EnrollmentUpdateManyWithoutStudentNestedInput
   quizAttempts?: Prisma.QuizAttemptUpdateManyWithoutStudentNestedInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionUpdateManyWithoutStudentNestedInput
+  submissionFeedback?: Prisma.SubmissionFeedbackUpdateManyWithoutGraderNestedInput
   reviews?: Prisma.ReviewUpdateManyWithoutUserNestedInput
   comments?: Prisma.CommentUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
   certificates?: Prisma.CertificateUpdateManyWithoutStudentNestedInput
+  authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
+  authTokens?: Prisma.AuthTokenUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
+  emailLogs?: Prisma.EmailLogUpdateManyWithoutUserNestedInput
+  courseAnnouncements?: Prisma.CourseAnnouncementUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserUncheckedUpdateWithoutLessonProgressInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  githubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failedLoginAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -856,18 +1869,33 @@ export type UserUncheckedUpdateWithoutLessonProgressInput = {
   courses?: Prisma.CourseUncheckedUpdateManyWithoutInstructorNestedInput
   enrollments?: Prisma.EnrollmentUncheckedUpdateManyWithoutStudentNestedInput
   quizAttempts?: Prisma.QuizAttemptUncheckedUpdateManyWithoutStudentNestedInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionUncheckedUpdateManyWithoutStudentNestedInput
+  submissionFeedback?: Prisma.SubmissionFeedbackUncheckedUpdateManyWithoutGraderNestedInput
   reviews?: Prisma.ReviewUncheckedUpdateManyWithoutUserNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
   certificates?: Prisma.CertificateUncheckedUpdateManyWithoutStudentNestedInput
+  authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
+  authTokens?: Prisma.AuthTokenUncheckedUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
+  emailLogs?: Prisma.EmailLogUncheckedUpdateManyWithoutUserNestedInput
+  courseAnnouncements?: Prisma.CourseAnnouncementUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserCreateWithoutQuizAttemptsInput = {
   id?: string
   fullName: string
   email: string
-  passwordHash: string
+  passwordHash?: string | null
   avatarUrl?: string | null
+  googleId?: string | null
+  githubId?: string | null
+  emailVerifiedAt?: Date | string | null
+  failedLoginAttempts?: number
+  lockedUntil?: Date | string | null
+  lastLoginAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
   createdAt?: Date | string
@@ -875,18 +1903,33 @@ export type UserCreateWithoutQuizAttemptsInput = {
   courses?: Prisma.CourseCreateNestedManyWithoutInstructorInput
   enrollments?: Prisma.EnrollmentCreateNestedManyWithoutStudentInput
   lessonProgress?: Prisma.LessonProgressCreateNestedManyWithoutStudentInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionCreateNestedManyWithoutStudentInput
+  submissionFeedback?: Prisma.SubmissionFeedbackCreateNestedManyWithoutGraderInput
   reviews?: Prisma.ReviewCreateNestedManyWithoutUserInput
   comments?: Prisma.CommentCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
   certificates?: Prisma.CertificateCreateNestedManyWithoutStudentInput
+  authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
+  authTokens?: Prisma.AuthTokenCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
+  emailLogs?: Prisma.EmailLogCreateNestedManyWithoutUserInput
+  courseAnnouncements?: Prisma.CourseAnnouncementCreateNestedManyWithoutAuthorInput
 }
 
 export type UserUncheckedCreateWithoutQuizAttemptsInput = {
   id?: string
   fullName: string
   email: string
-  passwordHash: string
+  passwordHash?: string | null
   avatarUrl?: string | null
+  googleId?: string | null
+  githubId?: string | null
+  emailVerifiedAt?: Date | string | null
+  failedLoginAttempts?: number
+  lockedUntil?: Date | string | null
+  lastLoginAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
   createdAt?: Date | string
@@ -894,10 +1937,19 @@ export type UserUncheckedCreateWithoutQuizAttemptsInput = {
   courses?: Prisma.CourseUncheckedCreateNestedManyWithoutInstructorInput
   enrollments?: Prisma.EnrollmentUncheckedCreateNestedManyWithoutStudentInput
   lessonProgress?: Prisma.LessonProgressUncheckedCreateNestedManyWithoutStudentInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionUncheckedCreateNestedManyWithoutStudentInput
+  submissionFeedback?: Prisma.SubmissionFeedbackUncheckedCreateNestedManyWithoutGraderInput
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutUserInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
   certificates?: Prisma.CertificateUncheckedCreateNestedManyWithoutStudentInput
+  authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
+  authTokens?: Prisma.AuthTokenUncheckedCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
+  emailLogs?: Prisma.EmailLogUncheckedCreateNestedManyWithoutUserInput
+  courseAnnouncements?: Prisma.CourseAnnouncementUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserCreateOrConnectWithoutQuizAttemptsInput = {
@@ -920,8 +1972,14 @@ export type UserUpdateWithoutQuizAttemptsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  githubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failedLoginAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -929,18 +1987,33 @@ export type UserUpdateWithoutQuizAttemptsInput = {
   courses?: Prisma.CourseUpdateManyWithoutInstructorNestedInput
   enrollments?: Prisma.EnrollmentUpdateManyWithoutStudentNestedInput
   lessonProgress?: Prisma.LessonProgressUpdateManyWithoutStudentNestedInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionUpdateManyWithoutStudentNestedInput
+  submissionFeedback?: Prisma.SubmissionFeedbackUpdateManyWithoutGraderNestedInput
   reviews?: Prisma.ReviewUpdateManyWithoutUserNestedInput
   comments?: Prisma.CommentUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
   certificates?: Prisma.CertificateUpdateManyWithoutStudentNestedInput
+  authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
+  authTokens?: Prisma.AuthTokenUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
+  emailLogs?: Prisma.EmailLogUpdateManyWithoutUserNestedInput
+  courseAnnouncements?: Prisma.CourseAnnouncementUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserUncheckedUpdateWithoutQuizAttemptsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  githubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failedLoginAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -948,18 +2021,33 @@ export type UserUncheckedUpdateWithoutQuizAttemptsInput = {
   courses?: Prisma.CourseUncheckedUpdateManyWithoutInstructorNestedInput
   enrollments?: Prisma.EnrollmentUncheckedUpdateManyWithoutStudentNestedInput
   lessonProgress?: Prisma.LessonProgressUncheckedUpdateManyWithoutStudentNestedInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionUncheckedUpdateManyWithoutStudentNestedInput
+  submissionFeedback?: Prisma.SubmissionFeedbackUncheckedUpdateManyWithoutGraderNestedInput
   reviews?: Prisma.ReviewUncheckedUpdateManyWithoutUserNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
   certificates?: Prisma.CertificateUncheckedUpdateManyWithoutStudentNestedInput
+  authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
+  authTokens?: Prisma.AuthTokenUncheckedUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
+  emailLogs?: Prisma.EmailLogUncheckedUpdateManyWithoutUserNestedInput
+  courseAnnouncements?: Prisma.CourseAnnouncementUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
-export type UserCreateWithoutReviewsInput = {
+export type UserCreateWithoutAssignmentSubmissionsInput = {
   id?: string
   fullName: string
   email: string
-  passwordHash: string
+  passwordHash?: string | null
   avatarUrl?: string | null
+  googleId?: string | null
+  githubId?: string | null
+  emailVerifiedAt?: Date | string | null
+  failedLoginAttempts?: number
+  lockedUntil?: Date | string | null
+  lastLoginAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
   createdAt?: Date | string
@@ -968,17 +2056,32 @@ export type UserCreateWithoutReviewsInput = {
   enrollments?: Prisma.EnrollmentCreateNestedManyWithoutStudentInput
   lessonProgress?: Prisma.LessonProgressCreateNestedManyWithoutStudentInput
   quizAttempts?: Prisma.QuizAttemptCreateNestedManyWithoutStudentInput
+  submissionFeedback?: Prisma.SubmissionFeedbackCreateNestedManyWithoutGraderInput
+  reviews?: Prisma.ReviewCreateNestedManyWithoutUserInput
   comments?: Prisma.CommentCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
   certificates?: Prisma.CertificateCreateNestedManyWithoutStudentInput
+  authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
+  authTokens?: Prisma.AuthTokenCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
+  emailLogs?: Prisma.EmailLogCreateNestedManyWithoutUserInput
+  courseAnnouncements?: Prisma.CourseAnnouncementCreateNestedManyWithoutAuthorInput
 }
 
-export type UserUncheckedCreateWithoutReviewsInput = {
+export type UserUncheckedCreateWithoutAssignmentSubmissionsInput = {
   id?: string
   fullName: string
   email: string
-  passwordHash: string
+  passwordHash?: string | null
   avatarUrl?: string | null
+  googleId?: string | null
+  githubId?: string | null
+  emailVerifiedAt?: Date | string | null
+  failedLoginAttempts?: number
+  lockedUntil?: Date | string | null
+  lastLoginAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
   createdAt?: Date | string
@@ -987,9 +2090,930 @@ export type UserUncheckedCreateWithoutReviewsInput = {
   enrollments?: Prisma.EnrollmentUncheckedCreateNestedManyWithoutStudentInput
   lessonProgress?: Prisma.LessonProgressUncheckedCreateNestedManyWithoutStudentInput
   quizAttempts?: Prisma.QuizAttemptUncheckedCreateNestedManyWithoutStudentInput
+  submissionFeedback?: Prisma.SubmissionFeedbackUncheckedCreateNestedManyWithoutGraderInput
+  reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutUserInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
   certificates?: Prisma.CertificateUncheckedCreateNestedManyWithoutStudentInput
+  authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
+  authTokens?: Prisma.AuthTokenUncheckedCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
+  emailLogs?: Prisma.EmailLogUncheckedCreateNestedManyWithoutUserInput
+  courseAnnouncements?: Prisma.CourseAnnouncementUncheckedCreateNestedManyWithoutAuthorInput
+}
+
+export type UserCreateOrConnectWithoutAssignmentSubmissionsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutAssignmentSubmissionsInput, Prisma.UserUncheckedCreateWithoutAssignmentSubmissionsInput>
+}
+
+export type UserUpsertWithoutAssignmentSubmissionsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutAssignmentSubmissionsInput, Prisma.UserUncheckedUpdateWithoutAssignmentSubmissionsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutAssignmentSubmissionsInput, Prisma.UserUncheckedCreateWithoutAssignmentSubmissionsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutAssignmentSubmissionsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutAssignmentSubmissionsInput, Prisma.UserUncheckedUpdateWithoutAssignmentSubmissionsInput>
+}
+
+export type UserUpdateWithoutAssignmentSubmissionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  githubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failedLoginAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  courses?: Prisma.CourseUpdateManyWithoutInstructorNestedInput
+  enrollments?: Prisma.EnrollmentUpdateManyWithoutStudentNestedInput
+  lessonProgress?: Prisma.LessonProgressUpdateManyWithoutStudentNestedInput
+  quizAttempts?: Prisma.QuizAttemptUpdateManyWithoutStudentNestedInput
+  submissionFeedback?: Prisma.SubmissionFeedbackUpdateManyWithoutGraderNestedInput
+  reviews?: Prisma.ReviewUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutUserNestedInput
+  orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
+  certificates?: Prisma.CertificateUpdateManyWithoutStudentNestedInput
+  authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
+  authTokens?: Prisma.AuthTokenUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
+  emailLogs?: Prisma.EmailLogUpdateManyWithoutUserNestedInput
+  courseAnnouncements?: Prisma.CourseAnnouncementUpdateManyWithoutAuthorNestedInput
+}
+
+export type UserUncheckedUpdateWithoutAssignmentSubmissionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  githubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failedLoginAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  courses?: Prisma.CourseUncheckedUpdateManyWithoutInstructorNestedInput
+  enrollments?: Prisma.EnrollmentUncheckedUpdateManyWithoutStudentNestedInput
+  lessonProgress?: Prisma.LessonProgressUncheckedUpdateManyWithoutStudentNestedInput
+  quizAttempts?: Prisma.QuizAttemptUncheckedUpdateManyWithoutStudentNestedInput
+  submissionFeedback?: Prisma.SubmissionFeedbackUncheckedUpdateManyWithoutGraderNestedInput
+  reviews?: Prisma.ReviewUncheckedUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput
+  orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
+  certificates?: Prisma.CertificateUncheckedUpdateManyWithoutStudentNestedInput
+  authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
+  authTokens?: Prisma.AuthTokenUncheckedUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
+  emailLogs?: Prisma.EmailLogUncheckedUpdateManyWithoutUserNestedInput
+  courseAnnouncements?: Prisma.CourseAnnouncementUncheckedUpdateManyWithoutAuthorNestedInput
+}
+
+export type UserCreateWithoutSubmissionFeedbackInput = {
+  id?: string
+  fullName: string
+  email: string
+  passwordHash?: string | null
+  avatarUrl?: string | null
+  googleId?: string | null
+  githubId?: string | null
+  emailVerifiedAt?: Date | string | null
+  failedLoginAttempts?: number
+  lockedUntil?: Date | string | null
+  lastLoginAt?: Date | string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  courses?: Prisma.CourseCreateNestedManyWithoutInstructorInput
+  enrollments?: Prisma.EnrollmentCreateNestedManyWithoutStudentInput
+  lessonProgress?: Prisma.LessonProgressCreateNestedManyWithoutStudentInput
+  quizAttempts?: Prisma.QuizAttemptCreateNestedManyWithoutStudentInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionCreateNestedManyWithoutStudentInput
+  reviews?: Prisma.ReviewCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentCreateNestedManyWithoutUserInput
+  orders?: Prisma.OrderCreateNestedManyWithoutUserInput
+  certificates?: Prisma.CertificateCreateNestedManyWithoutStudentInput
+  authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
+  authTokens?: Prisma.AuthTokenCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
+  emailLogs?: Prisma.EmailLogCreateNestedManyWithoutUserInput
+  courseAnnouncements?: Prisma.CourseAnnouncementCreateNestedManyWithoutAuthorInput
+}
+
+export type UserUncheckedCreateWithoutSubmissionFeedbackInput = {
+  id?: string
+  fullName: string
+  email: string
+  passwordHash?: string | null
+  avatarUrl?: string | null
+  googleId?: string | null
+  githubId?: string | null
+  emailVerifiedAt?: Date | string | null
+  failedLoginAttempts?: number
+  lockedUntil?: Date | string | null
+  lastLoginAt?: Date | string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  courses?: Prisma.CourseUncheckedCreateNestedManyWithoutInstructorInput
+  enrollments?: Prisma.EnrollmentUncheckedCreateNestedManyWithoutStudentInput
+  lessonProgress?: Prisma.LessonProgressUncheckedCreateNestedManyWithoutStudentInput
+  quizAttempts?: Prisma.QuizAttemptUncheckedCreateNestedManyWithoutStudentInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionUncheckedCreateNestedManyWithoutStudentInput
+  reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput
+  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
+  certificates?: Prisma.CertificateUncheckedCreateNestedManyWithoutStudentInput
+  authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
+  authTokens?: Prisma.AuthTokenUncheckedCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
+  emailLogs?: Prisma.EmailLogUncheckedCreateNestedManyWithoutUserInput
+  courseAnnouncements?: Prisma.CourseAnnouncementUncheckedCreateNestedManyWithoutAuthorInput
+}
+
+export type UserCreateOrConnectWithoutSubmissionFeedbackInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutSubmissionFeedbackInput, Prisma.UserUncheckedCreateWithoutSubmissionFeedbackInput>
+}
+
+export type UserUpsertWithoutSubmissionFeedbackInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutSubmissionFeedbackInput, Prisma.UserUncheckedUpdateWithoutSubmissionFeedbackInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutSubmissionFeedbackInput, Prisma.UserUncheckedCreateWithoutSubmissionFeedbackInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutSubmissionFeedbackInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutSubmissionFeedbackInput, Prisma.UserUncheckedUpdateWithoutSubmissionFeedbackInput>
+}
+
+export type UserUpdateWithoutSubmissionFeedbackInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  githubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failedLoginAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  courses?: Prisma.CourseUpdateManyWithoutInstructorNestedInput
+  enrollments?: Prisma.EnrollmentUpdateManyWithoutStudentNestedInput
+  lessonProgress?: Prisma.LessonProgressUpdateManyWithoutStudentNestedInput
+  quizAttempts?: Prisma.QuizAttemptUpdateManyWithoutStudentNestedInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionUpdateManyWithoutStudentNestedInput
+  reviews?: Prisma.ReviewUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutUserNestedInput
+  orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
+  certificates?: Prisma.CertificateUpdateManyWithoutStudentNestedInput
+  authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
+  authTokens?: Prisma.AuthTokenUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
+  emailLogs?: Prisma.EmailLogUpdateManyWithoutUserNestedInput
+  courseAnnouncements?: Prisma.CourseAnnouncementUpdateManyWithoutAuthorNestedInput
+}
+
+export type UserUncheckedUpdateWithoutSubmissionFeedbackInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  githubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failedLoginAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  courses?: Prisma.CourseUncheckedUpdateManyWithoutInstructorNestedInput
+  enrollments?: Prisma.EnrollmentUncheckedUpdateManyWithoutStudentNestedInput
+  lessonProgress?: Prisma.LessonProgressUncheckedUpdateManyWithoutStudentNestedInput
+  quizAttempts?: Prisma.QuizAttemptUncheckedUpdateManyWithoutStudentNestedInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionUncheckedUpdateManyWithoutStudentNestedInput
+  reviews?: Prisma.ReviewUncheckedUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput
+  orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
+  certificates?: Prisma.CertificateUncheckedUpdateManyWithoutStudentNestedInput
+  authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
+  authTokens?: Prisma.AuthTokenUncheckedUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
+  emailLogs?: Prisma.EmailLogUncheckedUpdateManyWithoutUserNestedInput
+  courseAnnouncements?: Prisma.CourseAnnouncementUncheckedUpdateManyWithoutAuthorNestedInput
+}
+
+export type UserCreateWithoutNotificationsInput = {
+  id?: string
+  fullName: string
+  email: string
+  passwordHash?: string | null
+  avatarUrl?: string | null
+  googleId?: string | null
+  githubId?: string | null
+  emailVerifiedAt?: Date | string | null
+  failedLoginAttempts?: number
+  lockedUntil?: Date | string | null
+  lastLoginAt?: Date | string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  courses?: Prisma.CourseCreateNestedManyWithoutInstructorInput
+  enrollments?: Prisma.EnrollmentCreateNestedManyWithoutStudentInput
+  lessonProgress?: Prisma.LessonProgressCreateNestedManyWithoutStudentInput
+  quizAttempts?: Prisma.QuizAttemptCreateNestedManyWithoutStudentInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionCreateNestedManyWithoutStudentInput
+  submissionFeedback?: Prisma.SubmissionFeedbackCreateNestedManyWithoutGraderInput
+  reviews?: Prisma.ReviewCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentCreateNestedManyWithoutUserInput
+  orders?: Prisma.OrderCreateNestedManyWithoutUserInput
+  certificates?: Prisma.CertificateCreateNestedManyWithoutStudentInput
+  authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
+  authTokens?: Prisma.AuthTokenCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
+  emailLogs?: Prisma.EmailLogCreateNestedManyWithoutUserInput
+  courseAnnouncements?: Prisma.CourseAnnouncementCreateNestedManyWithoutAuthorInput
+}
+
+export type UserUncheckedCreateWithoutNotificationsInput = {
+  id?: string
+  fullName: string
+  email: string
+  passwordHash?: string | null
+  avatarUrl?: string | null
+  googleId?: string | null
+  githubId?: string | null
+  emailVerifiedAt?: Date | string | null
+  failedLoginAttempts?: number
+  lockedUntil?: Date | string | null
+  lastLoginAt?: Date | string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  courses?: Prisma.CourseUncheckedCreateNestedManyWithoutInstructorInput
+  enrollments?: Prisma.EnrollmentUncheckedCreateNestedManyWithoutStudentInput
+  lessonProgress?: Prisma.LessonProgressUncheckedCreateNestedManyWithoutStudentInput
+  quizAttempts?: Prisma.QuizAttemptUncheckedCreateNestedManyWithoutStudentInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionUncheckedCreateNestedManyWithoutStudentInput
+  submissionFeedback?: Prisma.SubmissionFeedbackUncheckedCreateNestedManyWithoutGraderInput
+  reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput
+  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
+  certificates?: Prisma.CertificateUncheckedCreateNestedManyWithoutStudentInput
+  authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
+  authTokens?: Prisma.AuthTokenUncheckedCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
+  emailLogs?: Prisma.EmailLogUncheckedCreateNestedManyWithoutUserInput
+  courseAnnouncements?: Prisma.CourseAnnouncementUncheckedCreateNestedManyWithoutAuthorInput
+}
+
+export type UserCreateOrConnectWithoutNotificationsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutNotificationsInput, Prisma.UserUncheckedCreateWithoutNotificationsInput>
+}
+
+export type UserUpsertWithoutNotificationsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutNotificationsInput, Prisma.UserUncheckedUpdateWithoutNotificationsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutNotificationsInput, Prisma.UserUncheckedCreateWithoutNotificationsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutNotificationsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutNotificationsInput, Prisma.UserUncheckedUpdateWithoutNotificationsInput>
+}
+
+export type UserUpdateWithoutNotificationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  githubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failedLoginAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  courses?: Prisma.CourseUpdateManyWithoutInstructorNestedInput
+  enrollments?: Prisma.EnrollmentUpdateManyWithoutStudentNestedInput
+  lessonProgress?: Prisma.LessonProgressUpdateManyWithoutStudentNestedInput
+  quizAttempts?: Prisma.QuizAttemptUpdateManyWithoutStudentNestedInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionUpdateManyWithoutStudentNestedInput
+  submissionFeedback?: Prisma.SubmissionFeedbackUpdateManyWithoutGraderNestedInput
+  reviews?: Prisma.ReviewUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutUserNestedInput
+  orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
+  certificates?: Prisma.CertificateUpdateManyWithoutStudentNestedInput
+  authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
+  authTokens?: Prisma.AuthTokenUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
+  emailLogs?: Prisma.EmailLogUpdateManyWithoutUserNestedInput
+  courseAnnouncements?: Prisma.CourseAnnouncementUpdateManyWithoutAuthorNestedInput
+}
+
+export type UserUncheckedUpdateWithoutNotificationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  githubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failedLoginAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  courses?: Prisma.CourseUncheckedUpdateManyWithoutInstructorNestedInput
+  enrollments?: Prisma.EnrollmentUncheckedUpdateManyWithoutStudentNestedInput
+  lessonProgress?: Prisma.LessonProgressUncheckedUpdateManyWithoutStudentNestedInput
+  quizAttempts?: Prisma.QuizAttemptUncheckedUpdateManyWithoutStudentNestedInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionUncheckedUpdateManyWithoutStudentNestedInput
+  submissionFeedback?: Prisma.SubmissionFeedbackUncheckedUpdateManyWithoutGraderNestedInput
+  reviews?: Prisma.ReviewUncheckedUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput
+  orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
+  certificates?: Prisma.CertificateUncheckedUpdateManyWithoutStudentNestedInput
+  authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
+  authTokens?: Prisma.AuthTokenUncheckedUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
+  emailLogs?: Prisma.EmailLogUncheckedUpdateManyWithoutUserNestedInput
+  courseAnnouncements?: Prisma.CourseAnnouncementUncheckedUpdateManyWithoutAuthorNestedInput
+}
+
+export type UserCreateWithoutNotificationPreferenceInput = {
+  id?: string
+  fullName: string
+  email: string
+  passwordHash?: string | null
+  avatarUrl?: string | null
+  googleId?: string | null
+  githubId?: string | null
+  emailVerifiedAt?: Date | string | null
+  failedLoginAttempts?: number
+  lockedUntil?: Date | string | null
+  lastLoginAt?: Date | string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  courses?: Prisma.CourseCreateNestedManyWithoutInstructorInput
+  enrollments?: Prisma.EnrollmentCreateNestedManyWithoutStudentInput
+  lessonProgress?: Prisma.LessonProgressCreateNestedManyWithoutStudentInput
+  quizAttempts?: Prisma.QuizAttemptCreateNestedManyWithoutStudentInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionCreateNestedManyWithoutStudentInput
+  submissionFeedback?: Prisma.SubmissionFeedbackCreateNestedManyWithoutGraderInput
+  reviews?: Prisma.ReviewCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentCreateNestedManyWithoutUserInput
+  orders?: Prisma.OrderCreateNestedManyWithoutUserInput
+  certificates?: Prisma.CertificateCreateNestedManyWithoutStudentInput
+  authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
+  authTokens?: Prisma.AuthTokenCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  emailLogs?: Prisma.EmailLogCreateNestedManyWithoutUserInput
+  courseAnnouncements?: Prisma.CourseAnnouncementCreateNestedManyWithoutAuthorInput
+}
+
+export type UserUncheckedCreateWithoutNotificationPreferenceInput = {
+  id?: string
+  fullName: string
+  email: string
+  passwordHash?: string | null
+  avatarUrl?: string | null
+  googleId?: string | null
+  githubId?: string | null
+  emailVerifiedAt?: Date | string | null
+  failedLoginAttempts?: number
+  lockedUntil?: Date | string | null
+  lastLoginAt?: Date | string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  courses?: Prisma.CourseUncheckedCreateNestedManyWithoutInstructorInput
+  enrollments?: Prisma.EnrollmentUncheckedCreateNestedManyWithoutStudentInput
+  lessonProgress?: Prisma.LessonProgressUncheckedCreateNestedManyWithoutStudentInput
+  quizAttempts?: Prisma.QuizAttemptUncheckedCreateNestedManyWithoutStudentInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionUncheckedCreateNestedManyWithoutStudentInput
+  submissionFeedback?: Prisma.SubmissionFeedbackUncheckedCreateNestedManyWithoutGraderInput
+  reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput
+  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
+  certificates?: Prisma.CertificateUncheckedCreateNestedManyWithoutStudentInput
+  authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
+  authTokens?: Prisma.AuthTokenUncheckedCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  emailLogs?: Prisma.EmailLogUncheckedCreateNestedManyWithoutUserInput
+  courseAnnouncements?: Prisma.CourseAnnouncementUncheckedCreateNestedManyWithoutAuthorInput
+}
+
+export type UserCreateOrConnectWithoutNotificationPreferenceInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutNotificationPreferenceInput, Prisma.UserUncheckedCreateWithoutNotificationPreferenceInput>
+}
+
+export type UserUpsertWithoutNotificationPreferenceInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutNotificationPreferenceInput, Prisma.UserUncheckedUpdateWithoutNotificationPreferenceInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutNotificationPreferenceInput, Prisma.UserUncheckedCreateWithoutNotificationPreferenceInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutNotificationPreferenceInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutNotificationPreferenceInput, Prisma.UserUncheckedUpdateWithoutNotificationPreferenceInput>
+}
+
+export type UserUpdateWithoutNotificationPreferenceInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  githubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failedLoginAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  courses?: Prisma.CourseUpdateManyWithoutInstructorNestedInput
+  enrollments?: Prisma.EnrollmentUpdateManyWithoutStudentNestedInput
+  lessonProgress?: Prisma.LessonProgressUpdateManyWithoutStudentNestedInput
+  quizAttempts?: Prisma.QuizAttemptUpdateManyWithoutStudentNestedInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionUpdateManyWithoutStudentNestedInput
+  submissionFeedback?: Prisma.SubmissionFeedbackUpdateManyWithoutGraderNestedInput
+  reviews?: Prisma.ReviewUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutUserNestedInput
+  orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
+  certificates?: Prisma.CertificateUpdateManyWithoutStudentNestedInput
+  authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
+  authTokens?: Prisma.AuthTokenUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  emailLogs?: Prisma.EmailLogUpdateManyWithoutUserNestedInput
+  courseAnnouncements?: Prisma.CourseAnnouncementUpdateManyWithoutAuthorNestedInput
+}
+
+export type UserUncheckedUpdateWithoutNotificationPreferenceInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  githubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failedLoginAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  courses?: Prisma.CourseUncheckedUpdateManyWithoutInstructorNestedInput
+  enrollments?: Prisma.EnrollmentUncheckedUpdateManyWithoutStudentNestedInput
+  lessonProgress?: Prisma.LessonProgressUncheckedUpdateManyWithoutStudentNestedInput
+  quizAttempts?: Prisma.QuizAttemptUncheckedUpdateManyWithoutStudentNestedInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionUncheckedUpdateManyWithoutStudentNestedInput
+  submissionFeedback?: Prisma.SubmissionFeedbackUncheckedUpdateManyWithoutGraderNestedInput
+  reviews?: Prisma.ReviewUncheckedUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput
+  orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
+  certificates?: Prisma.CertificateUncheckedUpdateManyWithoutStudentNestedInput
+  authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
+  authTokens?: Prisma.AuthTokenUncheckedUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  emailLogs?: Prisma.EmailLogUncheckedUpdateManyWithoutUserNestedInput
+  courseAnnouncements?: Prisma.CourseAnnouncementUncheckedUpdateManyWithoutAuthorNestedInput
+}
+
+export type UserCreateWithoutEmailLogsInput = {
+  id?: string
+  fullName: string
+  email: string
+  passwordHash?: string | null
+  avatarUrl?: string | null
+  googleId?: string | null
+  githubId?: string | null
+  emailVerifiedAt?: Date | string | null
+  failedLoginAttempts?: number
+  lockedUntil?: Date | string | null
+  lastLoginAt?: Date | string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  courses?: Prisma.CourseCreateNestedManyWithoutInstructorInput
+  enrollments?: Prisma.EnrollmentCreateNestedManyWithoutStudentInput
+  lessonProgress?: Prisma.LessonProgressCreateNestedManyWithoutStudentInput
+  quizAttempts?: Prisma.QuizAttemptCreateNestedManyWithoutStudentInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionCreateNestedManyWithoutStudentInput
+  submissionFeedback?: Prisma.SubmissionFeedbackCreateNestedManyWithoutGraderInput
+  reviews?: Prisma.ReviewCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentCreateNestedManyWithoutUserInput
+  orders?: Prisma.OrderCreateNestedManyWithoutUserInput
+  certificates?: Prisma.CertificateCreateNestedManyWithoutStudentInput
+  authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
+  authTokens?: Prisma.AuthTokenCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
+  courseAnnouncements?: Prisma.CourseAnnouncementCreateNestedManyWithoutAuthorInput
+}
+
+export type UserUncheckedCreateWithoutEmailLogsInput = {
+  id?: string
+  fullName: string
+  email: string
+  passwordHash?: string | null
+  avatarUrl?: string | null
+  googleId?: string | null
+  githubId?: string | null
+  emailVerifiedAt?: Date | string | null
+  failedLoginAttempts?: number
+  lockedUntil?: Date | string | null
+  lastLoginAt?: Date | string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  courses?: Prisma.CourseUncheckedCreateNestedManyWithoutInstructorInput
+  enrollments?: Prisma.EnrollmentUncheckedCreateNestedManyWithoutStudentInput
+  lessonProgress?: Prisma.LessonProgressUncheckedCreateNestedManyWithoutStudentInput
+  quizAttempts?: Prisma.QuizAttemptUncheckedCreateNestedManyWithoutStudentInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionUncheckedCreateNestedManyWithoutStudentInput
+  submissionFeedback?: Prisma.SubmissionFeedbackUncheckedCreateNestedManyWithoutGraderInput
+  reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput
+  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
+  certificates?: Prisma.CertificateUncheckedCreateNestedManyWithoutStudentInput
+  authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
+  authTokens?: Prisma.AuthTokenUncheckedCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
+  courseAnnouncements?: Prisma.CourseAnnouncementUncheckedCreateNestedManyWithoutAuthorInput
+}
+
+export type UserCreateOrConnectWithoutEmailLogsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutEmailLogsInput, Prisma.UserUncheckedCreateWithoutEmailLogsInput>
+}
+
+export type UserUpsertWithoutEmailLogsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutEmailLogsInput, Prisma.UserUncheckedUpdateWithoutEmailLogsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutEmailLogsInput, Prisma.UserUncheckedCreateWithoutEmailLogsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutEmailLogsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutEmailLogsInput, Prisma.UserUncheckedUpdateWithoutEmailLogsInput>
+}
+
+export type UserUpdateWithoutEmailLogsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  githubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failedLoginAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  courses?: Prisma.CourseUpdateManyWithoutInstructorNestedInput
+  enrollments?: Prisma.EnrollmentUpdateManyWithoutStudentNestedInput
+  lessonProgress?: Prisma.LessonProgressUpdateManyWithoutStudentNestedInput
+  quizAttempts?: Prisma.QuizAttemptUpdateManyWithoutStudentNestedInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionUpdateManyWithoutStudentNestedInput
+  submissionFeedback?: Prisma.SubmissionFeedbackUpdateManyWithoutGraderNestedInput
+  reviews?: Prisma.ReviewUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutUserNestedInput
+  orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
+  certificates?: Prisma.CertificateUpdateManyWithoutStudentNestedInput
+  authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
+  authTokens?: Prisma.AuthTokenUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
+  courseAnnouncements?: Prisma.CourseAnnouncementUpdateManyWithoutAuthorNestedInput
+}
+
+export type UserUncheckedUpdateWithoutEmailLogsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  githubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failedLoginAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  courses?: Prisma.CourseUncheckedUpdateManyWithoutInstructorNestedInput
+  enrollments?: Prisma.EnrollmentUncheckedUpdateManyWithoutStudentNestedInput
+  lessonProgress?: Prisma.LessonProgressUncheckedUpdateManyWithoutStudentNestedInput
+  quizAttempts?: Prisma.QuizAttemptUncheckedUpdateManyWithoutStudentNestedInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionUncheckedUpdateManyWithoutStudentNestedInput
+  submissionFeedback?: Prisma.SubmissionFeedbackUncheckedUpdateManyWithoutGraderNestedInput
+  reviews?: Prisma.ReviewUncheckedUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput
+  orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
+  certificates?: Prisma.CertificateUncheckedUpdateManyWithoutStudentNestedInput
+  authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
+  authTokens?: Prisma.AuthTokenUncheckedUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
+  courseAnnouncements?: Prisma.CourseAnnouncementUncheckedUpdateManyWithoutAuthorNestedInput
+}
+
+export type UserCreateWithoutCourseAnnouncementsInput = {
+  id?: string
+  fullName: string
+  email: string
+  passwordHash?: string | null
+  avatarUrl?: string | null
+  googleId?: string | null
+  githubId?: string | null
+  emailVerifiedAt?: Date | string | null
+  failedLoginAttempts?: number
+  lockedUntil?: Date | string | null
+  lastLoginAt?: Date | string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  courses?: Prisma.CourseCreateNestedManyWithoutInstructorInput
+  enrollments?: Prisma.EnrollmentCreateNestedManyWithoutStudentInput
+  lessonProgress?: Prisma.LessonProgressCreateNestedManyWithoutStudentInput
+  quizAttempts?: Prisma.QuizAttemptCreateNestedManyWithoutStudentInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionCreateNestedManyWithoutStudentInput
+  submissionFeedback?: Prisma.SubmissionFeedbackCreateNestedManyWithoutGraderInput
+  reviews?: Prisma.ReviewCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentCreateNestedManyWithoutUserInput
+  orders?: Prisma.OrderCreateNestedManyWithoutUserInput
+  certificates?: Prisma.CertificateCreateNestedManyWithoutStudentInput
+  authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
+  authTokens?: Prisma.AuthTokenCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
+  emailLogs?: Prisma.EmailLogCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutCourseAnnouncementsInput = {
+  id?: string
+  fullName: string
+  email: string
+  passwordHash?: string | null
+  avatarUrl?: string | null
+  googleId?: string | null
+  githubId?: string | null
+  emailVerifiedAt?: Date | string | null
+  failedLoginAttempts?: number
+  lockedUntil?: Date | string | null
+  lastLoginAt?: Date | string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  courses?: Prisma.CourseUncheckedCreateNestedManyWithoutInstructorInput
+  enrollments?: Prisma.EnrollmentUncheckedCreateNestedManyWithoutStudentInput
+  lessonProgress?: Prisma.LessonProgressUncheckedCreateNestedManyWithoutStudentInput
+  quizAttempts?: Prisma.QuizAttemptUncheckedCreateNestedManyWithoutStudentInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionUncheckedCreateNestedManyWithoutStudentInput
+  submissionFeedback?: Prisma.SubmissionFeedbackUncheckedCreateNestedManyWithoutGraderInput
+  reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput
+  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
+  certificates?: Prisma.CertificateUncheckedCreateNestedManyWithoutStudentInput
+  authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
+  authTokens?: Prisma.AuthTokenUncheckedCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
+  emailLogs?: Prisma.EmailLogUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutCourseAnnouncementsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutCourseAnnouncementsInput, Prisma.UserUncheckedCreateWithoutCourseAnnouncementsInput>
+}
+
+export type UserUpsertWithoutCourseAnnouncementsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutCourseAnnouncementsInput, Prisma.UserUncheckedUpdateWithoutCourseAnnouncementsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutCourseAnnouncementsInput, Prisma.UserUncheckedCreateWithoutCourseAnnouncementsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutCourseAnnouncementsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutCourseAnnouncementsInput, Prisma.UserUncheckedUpdateWithoutCourseAnnouncementsInput>
+}
+
+export type UserUpdateWithoutCourseAnnouncementsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  githubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failedLoginAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  courses?: Prisma.CourseUpdateManyWithoutInstructorNestedInput
+  enrollments?: Prisma.EnrollmentUpdateManyWithoutStudentNestedInput
+  lessonProgress?: Prisma.LessonProgressUpdateManyWithoutStudentNestedInput
+  quizAttempts?: Prisma.QuizAttemptUpdateManyWithoutStudentNestedInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionUpdateManyWithoutStudentNestedInput
+  submissionFeedback?: Prisma.SubmissionFeedbackUpdateManyWithoutGraderNestedInput
+  reviews?: Prisma.ReviewUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutUserNestedInput
+  orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
+  certificates?: Prisma.CertificateUpdateManyWithoutStudentNestedInput
+  authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
+  authTokens?: Prisma.AuthTokenUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
+  emailLogs?: Prisma.EmailLogUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutCourseAnnouncementsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  githubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failedLoginAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  courses?: Prisma.CourseUncheckedUpdateManyWithoutInstructorNestedInput
+  enrollments?: Prisma.EnrollmentUncheckedUpdateManyWithoutStudentNestedInput
+  lessonProgress?: Prisma.LessonProgressUncheckedUpdateManyWithoutStudentNestedInput
+  quizAttempts?: Prisma.QuizAttemptUncheckedUpdateManyWithoutStudentNestedInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionUncheckedUpdateManyWithoutStudentNestedInput
+  submissionFeedback?: Prisma.SubmissionFeedbackUncheckedUpdateManyWithoutGraderNestedInput
+  reviews?: Prisma.ReviewUncheckedUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput
+  orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
+  certificates?: Prisma.CertificateUncheckedUpdateManyWithoutStudentNestedInput
+  authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
+  authTokens?: Prisma.AuthTokenUncheckedUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
+  emailLogs?: Prisma.EmailLogUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutReviewsInput = {
+  id?: string
+  fullName: string
+  email: string
+  passwordHash?: string | null
+  avatarUrl?: string | null
+  googleId?: string | null
+  githubId?: string | null
+  emailVerifiedAt?: Date | string | null
+  failedLoginAttempts?: number
+  lockedUntil?: Date | string | null
+  lastLoginAt?: Date | string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  courses?: Prisma.CourseCreateNestedManyWithoutInstructorInput
+  enrollments?: Prisma.EnrollmentCreateNestedManyWithoutStudentInput
+  lessonProgress?: Prisma.LessonProgressCreateNestedManyWithoutStudentInput
+  quizAttempts?: Prisma.QuizAttemptCreateNestedManyWithoutStudentInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionCreateNestedManyWithoutStudentInput
+  submissionFeedback?: Prisma.SubmissionFeedbackCreateNestedManyWithoutGraderInput
+  comments?: Prisma.CommentCreateNestedManyWithoutUserInput
+  orders?: Prisma.OrderCreateNestedManyWithoutUserInput
+  certificates?: Prisma.CertificateCreateNestedManyWithoutStudentInput
+  authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
+  authTokens?: Prisma.AuthTokenCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
+  emailLogs?: Prisma.EmailLogCreateNestedManyWithoutUserInput
+  courseAnnouncements?: Prisma.CourseAnnouncementCreateNestedManyWithoutAuthorInput
+}
+
+export type UserUncheckedCreateWithoutReviewsInput = {
+  id?: string
+  fullName: string
+  email: string
+  passwordHash?: string | null
+  avatarUrl?: string | null
+  googleId?: string | null
+  githubId?: string | null
+  emailVerifiedAt?: Date | string | null
+  failedLoginAttempts?: number
+  lockedUntil?: Date | string | null
+  lastLoginAt?: Date | string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  courses?: Prisma.CourseUncheckedCreateNestedManyWithoutInstructorInput
+  enrollments?: Prisma.EnrollmentUncheckedCreateNestedManyWithoutStudentInput
+  lessonProgress?: Prisma.LessonProgressUncheckedCreateNestedManyWithoutStudentInput
+  quizAttempts?: Prisma.QuizAttemptUncheckedCreateNestedManyWithoutStudentInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionUncheckedCreateNestedManyWithoutStudentInput
+  submissionFeedback?: Prisma.SubmissionFeedbackUncheckedCreateNestedManyWithoutGraderInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput
+  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
+  certificates?: Prisma.CertificateUncheckedCreateNestedManyWithoutStudentInput
+  authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
+  authTokens?: Prisma.AuthTokenUncheckedCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
+  emailLogs?: Prisma.EmailLogUncheckedCreateNestedManyWithoutUserInput
+  courseAnnouncements?: Prisma.CourseAnnouncementUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserCreateOrConnectWithoutReviewsInput = {
@@ -1012,8 +3036,14 @@ export type UserUpdateWithoutReviewsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  githubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failedLoginAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1022,17 +3052,32 @@ export type UserUpdateWithoutReviewsInput = {
   enrollments?: Prisma.EnrollmentUpdateManyWithoutStudentNestedInput
   lessonProgress?: Prisma.LessonProgressUpdateManyWithoutStudentNestedInput
   quizAttempts?: Prisma.QuizAttemptUpdateManyWithoutStudentNestedInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionUpdateManyWithoutStudentNestedInput
+  submissionFeedback?: Prisma.SubmissionFeedbackUpdateManyWithoutGraderNestedInput
   comments?: Prisma.CommentUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
   certificates?: Prisma.CertificateUpdateManyWithoutStudentNestedInput
+  authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
+  authTokens?: Prisma.AuthTokenUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
+  emailLogs?: Prisma.EmailLogUpdateManyWithoutUserNestedInput
+  courseAnnouncements?: Prisma.CourseAnnouncementUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReviewsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  githubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failedLoginAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1041,17 +3086,32 @@ export type UserUncheckedUpdateWithoutReviewsInput = {
   enrollments?: Prisma.EnrollmentUncheckedUpdateManyWithoutStudentNestedInput
   lessonProgress?: Prisma.LessonProgressUncheckedUpdateManyWithoutStudentNestedInput
   quizAttempts?: Prisma.QuizAttemptUncheckedUpdateManyWithoutStudentNestedInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionUncheckedUpdateManyWithoutStudentNestedInput
+  submissionFeedback?: Prisma.SubmissionFeedbackUncheckedUpdateManyWithoutGraderNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
   certificates?: Prisma.CertificateUncheckedUpdateManyWithoutStudentNestedInput
+  authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
+  authTokens?: Prisma.AuthTokenUncheckedUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
+  emailLogs?: Prisma.EmailLogUncheckedUpdateManyWithoutUserNestedInput
+  courseAnnouncements?: Prisma.CourseAnnouncementUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserCreateWithoutCommentsInput = {
   id?: string
   fullName: string
   email: string
-  passwordHash: string
+  passwordHash?: string | null
   avatarUrl?: string | null
+  googleId?: string | null
+  githubId?: string | null
+  emailVerifiedAt?: Date | string | null
+  failedLoginAttempts?: number
+  lockedUntil?: Date | string | null
+  lastLoginAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
   createdAt?: Date | string
@@ -1060,17 +3120,32 @@ export type UserCreateWithoutCommentsInput = {
   enrollments?: Prisma.EnrollmentCreateNestedManyWithoutStudentInput
   lessonProgress?: Prisma.LessonProgressCreateNestedManyWithoutStudentInput
   quizAttempts?: Prisma.QuizAttemptCreateNestedManyWithoutStudentInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionCreateNestedManyWithoutStudentInput
+  submissionFeedback?: Prisma.SubmissionFeedbackCreateNestedManyWithoutGraderInput
   reviews?: Prisma.ReviewCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
   certificates?: Prisma.CertificateCreateNestedManyWithoutStudentInput
+  authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
+  authTokens?: Prisma.AuthTokenCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
+  emailLogs?: Prisma.EmailLogCreateNestedManyWithoutUserInput
+  courseAnnouncements?: Prisma.CourseAnnouncementCreateNestedManyWithoutAuthorInput
 }
 
 export type UserUncheckedCreateWithoutCommentsInput = {
   id?: string
   fullName: string
   email: string
-  passwordHash: string
+  passwordHash?: string | null
   avatarUrl?: string | null
+  googleId?: string | null
+  githubId?: string | null
+  emailVerifiedAt?: Date | string | null
+  failedLoginAttempts?: number
+  lockedUntil?: Date | string | null
+  lastLoginAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
   createdAt?: Date | string
@@ -1079,9 +3154,18 @@ export type UserUncheckedCreateWithoutCommentsInput = {
   enrollments?: Prisma.EnrollmentUncheckedCreateNestedManyWithoutStudentInput
   lessonProgress?: Prisma.LessonProgressUncheckedCreateNestedManyWithoutStudentInput
   quizAttempts?: Prisma.QuizAttemptUncheckedCreateNestedManyWithoutStudentInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionUncheckedCreateNestedManyWithoutStudentInput
+  submissionFeedback?: Prisma.SubmissionFeedbackUncheckedCreateNestedManyWithoutGraderInput
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
   certificates?: Prisma.CertificateUncheckedCreateNestedManyWithoutStudentInput
+  authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
+  authTokens?: Prisma.AuthTokenUncheckedCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
+  emailLogs?: Prisma.EmailLogUncheckedCreateNestedManyWithoutUserInput
+  courseAnnouncements?: Prisma.CourseAnnouncementUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserCreateOrConnectWithoutCommentsInput = {
@@ -1104,8 +3188,14 @@ export type UserUpdateWithoutCommentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  githubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failedLoginAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1114,17 +3204,32 @@ export type UserUpdateWithoutCommentsInput = {
   enrollments?: Prisma.EnrollmentUpdateManyWithoutStudentNestedInput
   lessonProgress?: Prisma.LessonProgressUpdateManyWithoutStudentNestedInput
   quizAttempts?: Prisma.QuizAttemptUpdateManyWithoutStudentNestedInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionUpdateManyWithoutStudentNestedInput
+  submissionFeedback?: Prisma.SubmissionFeedbackUpdateManyWithoutGraderNestedInput
   reviews?: Prisma.ReviewUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
   certificates?: Prisma.CertificateUpdateManyWithoutStudentNestedInput
+  authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
+  authTokens?: Prisma.AuthTokenUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
+  emailLogs?: Prisma.EmailLogUpdateManyWithoutUserNestedInput
+  courseAnnouncements?: Prisma.CourseAnnouncementUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCommentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  githubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failedLoginAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1133,17 +3238,32 @@ export type UserUncheckedUpdateWithoutCommentsInput = {
   enrollments?: Prisma.EnrollmentUncheckedUpdateManyWithoutStudentNestedInput
   lessonProgress?: Prisma.LessonProgressUncheckedUpdateManyWithoutStudentNestedInput
   quizAttempts?: Prisma.QuizAttemptUncheckedUpdateManyWithoutStudentNestedInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionUncheckedUpdateManyWithoutStudentNestedInput
+  submissionFeedback?: Prisma.SubmissionFeedbackUncheckedUpdateManyWithoutGraderNestedInput
   reviews?: Prisma.ReviewUncheckedUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
   certificates?: Prisma.CertificateUncheckedUpdateManyWithoutStudentNestedInput
+  authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
+  authTokens?: Prisma.AuthTokenUncheckedUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
+  emailLogs?: Prisma.EmailLogUncheckedUpdateManyWithoutUserNestedInput
+  courseAnnouncements?: Prisma.CourseAnnouncementUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserCreateWithoutOrdersInput = {
   id?: string
   fullName: string
   email: string
-  passwordHash: string
+  passwordHash?: string | null
   avatarUrl?: string | null
+  googleId?: string | null
+  githubId?: string | null
+  emailVerifiedAt?: Date | string | null
+  failedLoginAttempts?: number
+  lockedUntil?: Date | string | null
+  lastLoginAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
   createdAt?: Date | string
@@ -1152,17 +3272,32 @@ export type UserCreateWithoutOrdersInput = {
   enrollments?: Prisma.EnrollmentCreateNestedManyWithoutStudentInput
   lessonProgress?: Prisma.LessonProgressCreateNestedManyWithoutStudentInput
   quizAttempts?: Prisma.QuizAttemptCreateNestedManyWithoutStudentInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionCreateNestedManyWithoutStudentInput
+  submissionFeedback?: Prisma.SubmissionFeedbackCreateNestedManyWithoutGraderInput
   reviews?: Prisma.ReviewCreateNestedManyWithoutUserInput
   comments?: Prisma.CommentCreateNestedManyWithoutUserInput
   certificates?: Prisma.CertificateCreateNestedManyWithoutStudentInput
+  authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
+  authTokens?: Prisma.AuthTokenCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
+  emailLogs?: Prisma.EmailLogCreateNestedManyWithoutUserInput
+  courseAnnouncements?: Prisma.CourseAnnouncementCreateNestedManyWithoutAuthorInput
 }
 
 export type UserUncheckedCreateWithoutOrdersInput = {
   id?: string
   fullName: string
   email: string
-  passwordHash: string
+  passwordHash?: string | null
   avatarUrl?: string | null
+  googleId?: string | null
+  githubId?: string | null
+  emailVerifiedAt?: Date | string | null
+  failedLoginAttempts?: number
+  lockedUntil?: Date | string | null
+  lastLoginAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
   createdAt?: Date | string
@@ -1171,9 +3306,18 @@ export type UserUncheckedCreateWithoutOrdersInput = {
   enrollments?: Prisma.EnrollmentUncheckedCreateNestedManyWithoutStudentInput
   lessonProgress?: Prisma.LessonProgressUncheckedCreateNestedManyWithoutStudentInput
   quizAttempts?: Prisma.QuizAttemptUncheckedCreateNestedManyWithoutStudentInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionUncheckedCreateNestedManyWithoutStudentInput
+  submissionFeedback?: Prisma.SubmissionFeedbackUncheckedCreateNestedManyWithoutGraderInput
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutUserInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput
   certificates?: Prisma.CertificateUncheckedCreateNestedManyWithoutStudentInput
+  authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
+  authTokens?: Prisma.AuthTokenUncheckedCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
+  emailLogs?: Prisma.EmailLogUncheckedCreateNestedManyWithoutUserInput
+  courseAnnouncements?: Prisma.CourseAnnouncementUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserCreateOrConnectWithoutOrdersInput = {
@@ -1196,8 +3340,14 @@ export type UserUpdateWithoutOrdersInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  githubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failedLoginAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1206,17 +3356,32 @@ export type UserUpdateWithoutOrdersInput = {
   enrollments?: Prisma.EnrollmentUpdateManyWithoutStudentNestedInput
   lessonProgress?: Prisma.LessonProgressUpdateManyWithoutStudentNestedInput
   quizAttempts?: Prisma.QuizAttemptUpdateManyWithoutStudentNestedInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionUpdateManyWithoutStudentNestedInput
+  submissionFeedback?: Prisma.SubmissionFeedbackUpdateManyWithoutGraderNestedInput
   reviews?: Prisma.ReviewUpdateManyWithoutUserNestedInput
   comments?: Prisma.CommentUpdateManyWithoutUserNestedInput
   certificates?: Prisma.CertificateUpdateManyWithoutStudentNestedInput
+  authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
+  authTokens?: Prisma.AuthTokenUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
+  emailLogs?: Prisma.EmailLogUpdateManyWithoutUserNestedInput
+  courseAnnouncements?: Prisma.CourseAnnouncementUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserUncheckedUpdateWithoutOrdersInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  githubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failedLoginAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1225,17 +3390,32 @@ export type UserUncheckedUpdateWithoutOrdersInput = {
   enrollments?: Prisma.EnrollmentUncheckedUpdateManyWithoutStudentNestedInput
   lessonProgress?: Prisma.LessonProgressUncheckedUpdateManyWithoutStudentNestedInput
   quizAttempts?: Prisma.QuizAttemptUncheckedUpdateManyWithoutStudentNestedInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionUncheckedUpdateManyWithoutStudentNestedInput
+  submissionFeedback?: Prisma.SubmissionFeedbackUncheckedUpdateManyWithoutGraderNestedInput
   reviews?: Prisma.ReviewUncheckedUpdateManyWithoutUserNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput
   certificates?: Prisma.CertificateUncheckedUpdateManyWithoutStudentNestedInput
+  authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
+  authTokens?: Prisma.AuthTokenUncheckedUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
+  emailLogs?: Prisma.EmailLogUncheckedUpdateManyWithoutUserNestedInput
+  courseAnnouncements?: Prisma.CourseAnnouncementUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserCreateWithoutCertificatesInput = {
   id?: string
   fullName: string
   email: string
-  passwordHash: string
+  passwordHash?: string | null
   avatarUrl?: string | null
+  googleId?: string | null
+  githubId?: string | null
+  emailVerifiedAt?: Date | string | null
+  failedLoginAttempts?: number
+  lockedUntil?: Date | string | null
+  lastLoginAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
   createdAt?: Date | string
@@ -1244,17 +3424,32 @@ export type UserCreateWithoutCertificatesInput = {
   enrollments?: Prisma.EnrollmentCreateNestedManyWithoutStudentInput
   lessonProgress?: Prisma.LessonProgressCreateNestedManyWithoutStudentInput
   quizAttempts?: Prisma.QuizAttemptCreateNestedManyWithoutStudentInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionCreateNestedManyWithoutStudentInput
+  submissionFeedback?: Prisma.SubmissionFeedbackCreateNestedManyWithoutGraderInput
   reviews?: Prisma.ReviewCreateNestedManyWithoutUserInput
   comments?: Prisma.CommentCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput
+  authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
+  authTokens?: Prisma.AuthTokenCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
+  emailLogs?: Prisma.EmailLogCreateNestedManyWithoutUserInput
+  courseAnnouncements?: Prisma.CourseAnnouncementCreateNestedManyWithoutAuthorInput
 }
 
 export type UserUncheckedCreateWithoutCertificatesInput = {
   id?: string
   fullName: string
   email: string
-  passwordHash: string
+  passwordHash?: string | null
   avatarUrl?: string | null
+  googleId?: string | null
+  githubId?: string | null
+  emailVerifiedAt?: Date | string | null
+  failedLoginAttempts?: number
+  lockedUntil?: Date | string | null
+  lastLoginAt?: Date | string | null
   role?: $Enums.UserRole
   status?: $Enums.UserStatus
   createdAt?: Date | string
@@ -1263,9 +3458,18 @@ export type UserUncheckedCreateWithoutCertificatesInput = {
   enrollments?: Prisma.EnrollmentUncheckedCreateNestedManyWithoutStudentInput
   lessonProgress?: Prisma.LessonProgressUncheckedCreateNestedManyWithoutStudentInput
   quizAttempts?: Prisma.QuizAttemptUncheckedCreateNestedManyWithoutStudentInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionUncheckedCreateNestedManyWithoutStudentInput
+  submissionFeedback?: Prisma.SubmissionFeedbackUncheckedCreateNestedManyWithoutGraderInput
   reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutUserInput
   comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
+  authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
+  authTokens?: Prisma.AuthTokenUncheckedCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
+  emailLogs?: Prisma.EmailLogUncheckedCreateNestedManyWithoutUserInput
+  courseAnnouncements?: Prisma.CourseAnnouncementUncheckedCreateNestedManyWithoutAuthorInput
 }
 
 export type UserCreateOrConnectWithoutCertificatesInput = {
@@ -1288,8 +3492,14 @@ export type UserUpdateWithoutCertificatesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  githubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failedLoginAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1298,17 +3508,32 @@ export type UserUpdateWithoutCertificatesInput = {
   enrollments?: Prisma.EnrollmentUpdateManyWithoutStudentNestedInput
   lessonProgress?: Prisma.LessonProgressUpdateManyWithoutStudentNestedInput
   quizAttempts?: Prisma.QuizAttemptUpdateManyWithoutStudentNestedInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionUpdateManyWithoutStudentNestedInput
+  submissionFeedback?: Prisma.SubmissionFeedbackUpdateManyWithoutGraderNestedInput
   reviews?: Prisma.ReviewUpdateManyWithoutUserNestedInput
   comments?: Prisma.CommentUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
+  authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
+  authTokens?: Prisma.AuthTokenUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
+  emailLogs?: Prisma.EmailLogUpdateManyWithoutUserNestedInput
+  courseAnnouncements?: Prisma.CourseAnnouncementUpdateManyWithoutAuthorNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCertificatesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.StringFieldUpdateOperationsInput | string
-  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  githubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failedLoginAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1317,9 +3542,18 @@ export type UserUncheckedUpdateWithoutCertificatesInput = {
   enrollments?: Prisma.EnrollmentUncheckedUpdateManyWithoutStudentNestedInput
   lessonProgress?: Prisma.LessonProgressUncheckedUpdateManyWithoutStudentNestedInput
   quizAttempts?: Prisma.QuizAttemptUncheckedUpdateManyWithoutStudentNestedInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionUncheckedUpdateManyWithoutStudentNestedInput
+  submissionFeedback?: Prisma.SubmissionFeedbackUncheckedUpdateManyWithoutGraderNestedInput
   reviews?: Prisma.ReviewUncheckedUpdateManyWithoutUserNestedInput
   comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
+  authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
+  authTokens?: Prisma.AuthTokenUncheckedUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
+  emailLogs?: Prisma.EmailLogUncheckedUpdateManyWithoutUserNestedInput
+  courseAnnouncements?: Prisma.CourseAnnouncementUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 
@@ -1332,10 +3566,18 @@ export type UserCountOutputType = {
   enrollments: number
   lessonProgress: number
   quizAttempts: number
+  assignmentSubmissions: number
+  submissionFeedback: number
   reviews: number
   comments: number
   orders: number
   certificates: number
+  authSessions: number
+  authTokens: number
+  auditLogs: number
+  notifications: number
+  emailLogs: number
+  courseAnnouncements: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1343,10 +3585,18 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   enrollments?: boolean | UserCountOutputTypeCountEnrollmentsArgs
   lessonProgress?: boolean | UserCountOutputTypeCountLessonProgressArgs
   quizAttempts?: boolean | UserCountOutputTypeCountQuizAttemptsArgs
+  assignmentSubmissions?: boolean | UserCountOutputTypeCountAssignmentSubmissionsArgs
+  submissionFeedback?: boolean | UserCountOutputTypeCountSubmissionFeedbackArgs
   reviews?: boolean | UserCountOutputTypeCountReviewsArgs
   comments?: boolean | UserCountOutputTypeCountCommentsArgs
   orders?: boolean | UserCountOutputTypeCountOrdersArgs
   certificates?: boolean | UserCountOutputTypeCountCertificatesArgs
+  authSessions?: boolean | UserCountOutputTypeCountAuthSessionsArgs
+  authTokens?: boolean | UserCountOutputTypeCountAuthTokensArgs
+  auditLogs?: boolean | UserCountOutputTypeCountAuditLogsArgs
+  notifications?: boolean | UserCountOutputTypeCountNotificationsArgs
+  emailLogs?: boolean | UserCountOutputTypeCountEmailLogsArgs
+  courseAnnouncements?: boolean | UserCountOutputTypeCountCourseAnnouncementsArgs
 }
 
 /**
@@ -1390,6 +3640,20 @@ export type UserCountOutputTypeCountQuizAttemptsArgs<ExtArgs extends runtime.Typ
 /**
  * UserCountOutputType without action
  */
+export type UserCountOutputTypeCountAssignmentSubmissionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AssignmentSubmissionWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountSubmissionFeedbackArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SubmissionFeedbackWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
 export type UserCountOutputTypeCountReviewsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.ReviewWhereInput
 }
@@ -1415,6 +3679,48 @@ export type UserCountOutputTypeCountCertificatesArgs<ExtArgs extends runtime.Typ
   where?: Prisma.CertificateWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountAuthSessionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AuthSessionWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountAuthTokensArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AuthTokenWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountAuditLogsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AuditLogWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountNotificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.NotificationWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountEmailLogsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.EmailLogWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountCourseAnnouncementsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.CourseAnnouncementWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1422,6 +3728,12 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   email?: boolean
   passwordHash?: boolean
   avatarUrl?: boolean
+  googleId?: boolean
+  githubId?: boolean
+  emailVerifiedAt?: boolean
+  failedLoginAttempts?: boolean
+  lockedUntil?: boolean
+  lastLoginAt?: boolean
   role?: boolean
   status?: boolean
   createdAt?: boolean
@@ -1430,10 +3742,19 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   enrollments?: boolean | Prisma.User$enrollmentsArgs<ExtArgs>
   lessonProgress?: boolean | Prisma.User$lessonProgressArgs<ExtArgs>
   quizAttempts?: boolean | Prisma.User$quizAttemptsArgs<ExtArgs>
+  assignmentSubmissions?: boolean | Prisma.User$assignmentSubmissionsArgs<ExtArgs>
+  submissionFeedback?: boolean | Prisma.User$submissionFeedbackArgs<ExtArgs>
   reviews?: boolean | Prisma.User$reviewsArgs<ExtArgs>
   comments?: boolean | Prisma.User$commentsArgs<ExtArgs>
   orders?: boolean | Prisma.User$ordersArgs<ExtArgs>
   certificates?: boolean | Prisma.User$certificatesArgs<ExtArgs>
+  authSessions?: boolean | Prisma.User$authSessionsArgs<ExtArgs>
+  authTokens?: boolean | Prisma.User$authTokensArgs<ExtArgs>
+  auditLogs?: boolean | Prisma.User$auditLogsArgs<ExtArgs>
+  notifications?: boolean | Prisma.User$notificationsArgs<ExtArgs>
+  notificationPreference?: boolean | Prisma.User$notificationPreferenceArgs<ExtArgs>
+  emailLogs?: boolean | Prisma.User$emailLogsArgs<ExtArgs>
+  courseAnnouncements?: boolean | Prisma.User$courseAnnouncementsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -1443,6 +3764,12 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   email?: boolean
   passwordHash?: boolean
   avatarUrl?: boolean
+  googleId?: boolean
+  githubId?: boolean
+  emailVerifiedAt?: boolean
+  failedLoginAttempts?: boolean
+  lockedUntil?: boolean
+  lastLoginAt?: boolean
   role?: boolean
   status?: boolean
   createdAt?: boolean
@@ -1455,6 +3782,12 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   email?: boolean
   passwordHash?: boolean
   avatarUrl?: boolean
+  googleId?: boolean
+  githubId?: boolean
+  emailVerifiedAt?: boolean
+  failedLoginAttempts?: boolean
+  lockedUntil?: boolean
+  lastLoginAt?: boolean
   role?: boolean
   status?: boolean
   createdAt?: boolean
@@ -1467,22 +3800,37 @@ export type UserSelectScalar = {
   email?: boolean
   passwordHash?: boolean
   avatarUrl?: boolean
+  googleId?: boolean
+  githubId?: boolean
+  emailVerifiedAt?: boolean
+  failedLoginAttempts?: boolean
+  lockedUntil?: boolean
+  lastLoginAt?: boolean
   role?: boolean
   status?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "fullName" | "email" | "passwordHash" | "avatarUrl" | "role" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "fullName" | "email" | "passwordHash" | "avatarUrl" | "googleId" | "githubId" | "emailVerifiedAt" | "failedLoginAttempts" | "lockedUntil" | "lastLoginAt" | "role" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   courses?: boolean | Prisma.User$coursesArgs<ExtArgs>
   enrollments?: boolean | Prisma.User$enrollmentsArgs<ExtArgs>
   lessonProgress?: boolean | Prisma.User$lessonProgressArgs<ExtArgs>
   quizAttempts?: boolean | Prisma.User$quizAttemptsArgs<ExtArgs>
+  assignmentSubmissions?: boolean | Prisma.User$assignmentSubmissionsArgs<ExtArgs>
+  submissionFeedback?: boolean | Prisma.User$submissionFeedbackArgs<ExtArgs>
   reviews?: boolean | Prisma.User$reviewsArgs<ExtArgs>
   comments?: boolean | Prisma.User$commentsArgs<ExtArgs>
   orders?: boolean | Prisma.User$ordersArgs<ExtArgs>
   certificates?: boolean | Prisma.User$certificatesArgs<ExtArgs>
+  authSessions?: boolean | Prisma.User$authSessionsArgs<ExtArgs>
+  authTokens?: boolean | Prisma.User$authTokensArgs<ExtArgs>
+  auditLogs?: boolean | Prisma.User$auditLogsArgs<ExtArgs>
+  notifications?: boolean | Prisma.User$notificationsArgs<ExtArgs>
+  notificationPreference?: boolean | Prisma.User$notificationPreferenceArgs<ExtArgs>
+  emailLogs?: boolean | Prisma.User$emailLogsArgs<ExtArgs>
+  courseAnnouncements?: boolean | Prisma.User$courseAnnouncementsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1495,17 +3843,32 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     enrollments: Prisma.$EnrollmentPayload<ExtArgs>[]
     lessonProgress: Prisma.$LessonProgressPayload<ExtArgs>[]
     quizAttempts: Prisma.$QuizAttemptPayload<ExtArgs>[]
+    assignmentSubmissions: Prisma.$AssignmentSubmissionPayload<ExtArgs>[]
+    submissionFeedback: Prisma.$SubmissionFeedbackPayload<ExtArgs>[]
     reviews: Prisma.$ReviewPayload<ExtArgs>[]
     comments: Prisma.$CommentPayload<ExtArgs>[]
     orders: Prisma.$OrderPayload<ExtArgs>[]
     certificates: Prisma.$CertificatePayload<ExtArgs>[]
+    authSessions: Prisma.$AuthSessionPayload<ExtArgs>[]
+    authTokens: Prisma.$AuthTokenPayload<ExtArgs>[]
+    auditLogs: Prisma.$AuditLogPayload<ExtArgs>[]
+    notifications: Prisma.$NotificationPayload<ExtArgs>[]
+    notificationPreference: Prisma.$NotificationPreferencePayload<ExtArgs> | null
+    emailLogs: Prisma.$EmailLogPayload<ExtArgs>[]
+    courseAnnouncements: Prisma.$CourseAnnouncementPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     fullName: string
     email: string
-    passwordHash: string
+    passwordHash: string | null
     avatarUrl: string | null
+    googleId: string | null
+    githubId: string | null
+    emailVerifiedAt: Date | null
+    failedLoginAttempts: number
+    lockedUntil: Date | null
+    lastLoginAt: Date | null
     role: $Enums.UserRole
     status: $Enums.UserStatus
     createdAt: Date
@@ -1908,10 +4271,19 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   enrollments<T extends Prisma.User$enrollmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$enrollmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EnrollmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   lessonProgress<T extends Prisma.User$lessonProgressArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$lessonProgressArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LessonProgressPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   quizAttempts<T extends Prisma.User$quizAttemptsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$quizAttemptsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$QuizAttemptPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  assignmentSubmissions<T extends Prisma.User$assignmentSubmissionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$assignmentSubmissionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AssignmentSubmissionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  submissionFeedback<T extends Prisma.User$submissionFeedbackArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$submissionFeedbackArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SubmissionFeedbackPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   reviews<T extends Prisma.User$reviewsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$reviewsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReviewPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   comments<T extends Prisma.User$commentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$commentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CommentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   orders<T extends Prisma.User$ordersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$ordersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   certificates<T extends Prisma.User$certificatesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$certificatesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CertificatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  authSessions<T extends Prisma.User$authSessionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$authSessionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AuthSessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  authTokens<T extends Prisma.User$authTokensArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$authTokensArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AuthTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  auditLogs<T extends Prisma.User$auditLogsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$auditLogsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AuditLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  notifications<T extends Prisma.User$notificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$notificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  notificationPreference<T extends Prisma.User$notificationPreferenceArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$notificationPreferenceArgs<ExtArgs>>): Prisma.Prisma__NotificationPreferenceClient<runtime.Types.Result.GetResult<Prisma.$NotificationPreferencePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  emailLogs<T extends Prisma.User$emailLogsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$emailLogsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EmailLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  courseAnnouncements<T extends Prisma.User$courseAnnouncementsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$courseAnnouncementsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CourseAnnouncementPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1946,6 +4318,12 @@ export interface UserFieldRefs {
   readonly email: Prisma.FieldRef<"User", 'String'>
   readonly passwordHash: Prisma.FieldRef<"User", 'String'>
   readonly avatarUrl: Prisma.FieldRef<"User", 'String'>
+  readonly googleId: Prisma.FieldRef<"User", 'String'>
+  readonly githubId: Prisma.FieldRef<"User", 'String'>
+  readonly emailVerifiedAt: Prisma.FieldRef<"User", 'DateTime'>
+  readonly failedLoginAttempts: Prisma.FieldRef<"User", 'Int'>
+  readonly lockedUntil: Prisma.FieldRef<"User", 'DateTime'>
+  readonly lastLoginAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly role: Prisma.FieldRef<"User", 'UserRole'>
   readonly status: Prisma.FieldRef<"User", 'UserStatus'>
   readonly createdAt: Prisma.FieldRef<"User", 'DateTime'>
@@ -2439,6 +4817,54 @@ export type User$quizAttemptsArgs<ExtArgs extends runtime.Types.Extensions.Inter
 }
 
 /**
+ * User.assignmentSubmissions
+ */
+export type User$assignmentSubmissionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AssignmentSubmission
+   */
+  select?: Prisma.AssignmentSubmissionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AssignmentSubmission
+   */
+  omit?: Prisma.AssignmentSubmissionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AssignmentSubmissionInclude<ExtArgs> | null
+  where?: Prisma.AssignmentSubmissionWhereInput
+  orderBy?: Prisma.AssignmentSubmissionOrderByWithRelationInput | Prisma.AssignmentSubmissionOrderByWithRelationInput[]
+  cursor?: Prisma.AssignmentSubmissionWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AssignmentSubmissionScalarFieldEnum | Prisma.AssignmentSubmissionScalarFieldEnum[]
+}
+
+/**
+ * User.submissionFeedback
+ */
+export type User$submissionFeedbackArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SubmissionFeedback
+   */
+  select?: Prisma.SubmissionFeedbackSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SubmissionFeedback
+   */
+  omit?: Prisma.SubmissionFeedbackOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SubmissionFeedbackInclude<ExtArgs> | null
+  where?: Prisma.SubmissionFeedbackWhereInput
+  orderBy?: Prisma.SubmissionFeedbackOrderByWithRelationInput | Prisma.SubmissionFeedbackOrderByWithRelationInput[]
+  cursor?: Prisma.SubmissionFeedbackWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SubmissionFeedbackScalarFieldEnum | Prisma.SubmissionFeedbackScalarFieldEnum[]
+}
+
+/**
  * User.reviews
  */
 export type User$reviewsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2532,6 +4958,169 @@ export type User$certificatesArgs<ExtArgs extends runtime.Types.Extensions.Inter
   take?: number
   skip?: number
   distinct?: Prisma.CertificateScalarFieldEnum | Prisma.CertificateScalarFieldEnum[]
+}
+
+/**
+ * User.authSessions
+ */
+export type User$authSessionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AuthSession
+   */
+  select?: Prisma.AuthSessionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AuthSession
+   */
+  omit?: Prisma.AuthSessionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AuthSessionInclude<ExtArgs> | null
+  where?: Prisma.AuthSessionWhereInput
+  orderBy?: Prisma.AuthSessionOrderByWithRelationInput | Prisma.AuthSessionOrderByWithRelationInput[]
+  cursor?: Prisma.AuthSessionWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AuthSessionScalarFieldEnum | Prisma.AuthSessionScalarFieldEnum[]
+}
+
+/**
+ * User.authTokens
+ */
+export type User$authTokensArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AuthToken
+   */
+  select?: Prisma.AuthTokenSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AuthToken
+   */
+  omit?: Prisma.AuthTokenOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AuthTokenInclude<ExtArgs> | null
+  where?: Prisma.AuthTokenWhereInput
+  orderBy?: Prisma.AuthTokenOrderByWithRelationInput | Prisma.AuthTokenOrderByWithRelationInput[]
+  cursor?: Prisma.AuthTokenWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AuthTokenScalarFieldEnum | Prisma.AuthTokenScalarFieldEnum[]
+}
+
+/**
+ * User.auditLogs
+ */
+export type User$auditLogsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AuditLog
+   */
+  select?: Prisma.AuditLogSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AuditLog
+   */
+  omit?: Prisma.AuditLogOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AuditLogInclude<ExtArgs> | null
+  where?: Prisma.AuditLogWhereInput
+  orderBy?: Prisma.AuditLogOrderByWithRelationInput | Prisma.AuditLogOrderByWithRelationInput[]
+  cursor?: Prisma.AuditLogWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AuditLogScalarFieldEnum | Prisma.AuditLogScalarFieldEnum[]
+}
+
+/**
+ * User.notifications
+ */
+export type User$notificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Notification
+   */
+  select?: Prisma.NotificationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Notification
+   */
+  omit?: Prisma.NotificationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.NotificationInclude<ExtArgs> | null
+  where?: Prisma.NotificationWhereInput
+  orderBy?: Prisma.NotificationOrderByWithRelationInput | Prisma.NotificationOrderByWithRelationInput[]
+  cursor?: Prisma.NotificationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.NotificationScalarFieldEnum | Prisma.NotificationScalarFieldEnum[]
+}
+
+/**
+ * User.notificationPreference
+ */
+export type User$notificationPreferenceArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the NotificationPreference
+   */
+  select?: Prisma.NotificationPreferenceSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the NotificationPreference
+   */
+  omit?: Prisma.NotificationPreferenceOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.NotificationPreferenceInclude<ExtArgs> | null
+  where?: Prisma.NotificationPreferenceWhereInput
+}
+
+/**
+ * User.emailLogs
+ */
+export type User$emailLogsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the EmailLog
+   */
+  select?: Prisma.EmailLogSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the EmailLog
+   */
+  omit?: Prisma.EmailLogOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.EmailLogInclude<ExtArgs> | null
+  where?: Prisma.EmailLogWhereInput
+  orderBy?: Prisma.EmailLogOrderByWithRelationInput | Prisma.EmailLogOrderByWithRelationInput[]
+  cursor?: Prisma.EmailLogWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.EmailLogScalarFieldEnum | Prisma.EmailLogScalarFieldEnum[]
+}
+
+/**
+ * User.courseAnnouncements
+ */
+export type User$courseAnnouncementsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the CourseAnnouncement
+   */
+  select?: Prisma.CourseAnnouncementSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the CourseAnnouncement
+   */
+  omit?: Prisma.CourseAnnouncementOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CourseAnnouncementInclude<ExtArgs> | null
+  where?: Prisma.CourseAnnouncementWhereInput
+  orderBy?: Prisma.CourseAnnouncementOrderByWithRelationInput | Prisma.CourseAnnouncementOrderByWithRelationInput[]
+  cursor?: Prisma.CourseAnnouncementWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.CourseAnnouncementScalarFieldEnum | Prisma.CourseAnnouncementScalarFieldEnum[]
 }
 
 /**

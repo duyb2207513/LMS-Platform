@@ -1,6 +1,6 @@
 # LMS Platform
 
-Nền tảng học trực tuyến gồm REST API Express/TypeScript, PostgreSQL/Prisma, web Vue 3 và mobile React Native/Expo. Dự án đã bao phủ đăng nhập, khóa học, học tập, quiz/tương tác, mock payment, certificate và quản trị.
+Nền tảng học trực tuyến gồm REST API Express/TypeScript, PostgreSQL/Prisma, web Vue 3 và mobile React Native/Expo. Dự án đã bao phủ đăng nhập, khóa học, học tập, quiz/tương tác, assignment, mock payment, certificate, notification realtime và quản trị.
 
 ## Chạy local bằng Docker
 
@@ -29,7 +29,7 @@ Tài khoản demo, cùng mật khẩu `Password123`:
 | Admin | `admin@lms.test` |
 | Blocked | `blocked@lms.test` |
 
-Seed có category, course miễn phí/trả phí, section/lesson, quiz, review/comment, một đơn đã thanh toán, enrollment hoàn thành và certificate `LMS-2026-DEMO0001`.
+Seed có category, course miễn phí/trả phí, section/lesson, quiz, assignment, review/comment, announcement, notification, email log, một đơn đã thanh toán, enrollment hoàn thành và certificate `LMS-2026-DEMO0001`.
 
 ## Cấu trúc
 
@@ -81,6 +81,8 @@ docker compose exec frontend npm run test:e2e
 
 E2E bao phủ xem course công khai và hành trình đăng nhập Admin qua dashboard, user, course, review và comment. CI nằm tại `.github/workflows/ci.yml`.
 
+Backend Sprint 8 bổ sung notification/preferences, course announcement, Socket.IO, email log và reminder assignment. Chi tiết tại `docs/SPRINT_8_BACKEND_IMPLEMENTATION.md`.
+
 ## Deploy production
 
 Sao chép file môi trường và thay toàn bộ secret:
@@ -89,6 +91,8 @@ Sao chép file môi trường và thay toàn bộ secret:
 cp .env.production.example .env.production
 docker compose --env-file .env.production -f docker-compose.prod.yml up -d --build
 ```
+
+Sprint 6 bổ sung xác minh email, quên/đặt lại mật khẩu, Google/GitHub login, đổi email, quản lý phiên đăng nhập, refresh-token rotation, khóa tạm khi đăng nhập sai, audit log, structured logging và Sentry tùy chọn. Hướng dẫn cấu hình chi tiết nằm tại `docs/SPRINT-6-PRODUCTION.md`.
 
 Production Compose tự chạy Prisma migration, phục vụ Vue qua Nginx, proxy `/api` và lưu PostgreSQL/uploads trong named volumes. Nên đặt reverse proxy HTTPS hoặc load balancer phía trước cổng 80, backup volume PostgreSQL định kỳ và không chạy seed demo trên dữ liệu thật.
 
