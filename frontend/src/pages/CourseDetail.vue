@@ -123,7 +123,10 @@ onMounted(async () => {
             <div class="p-3 sm:p-4">
               <div class="flex items-center justify-between gap-3"><p class="text-3xl font-black text-purple-700 dark:text-purple-300">{{ course.isFree ? 'Miễn phí' : money(course.price) }}</p><span v-if="enrollment" class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300">Đã đăng ký</span></div>
               <BaseButton class="mt-5" :full-width="true" size="lg" :loading="working" @click="primaryAction">{{ actionLabel }} <span aria-hidden="true">→</span></BaseButton>
-              <RouterLink v-if="enrollment" to="/my-courses" class="mt-4 block text-center text-sm font-semibold text-purple-700 dark:text-purple-300">Xem khóa học của tôi</RouterLink>
+              <div v-if="enrollment" class="mt-4 flex flex-col gap-2">
+                <RouterLink :to="`/learn/${course.id}`" class="block text-center text-sm font-semibold text-purple-700 dark:text-purple-300 hover:underline">Vào phòng học ngay</RouterLink>
+                <RouterLink :to="`/courses/${course.id}/announcements`" class="block text-center text-sm font-semibold text-slate-600 dark:text-slate-400 hover:text-purple-600">📢 Xem thông báo từ giảng viên</RouterLink>
+              </div>
               <p v-if="actionError" class="mt-4 rounded-xl bg-red-50 p-3 text-sm text-red-700 dark:bg-red-950/30 dark:text-red-300">{{ actionError }}</p>
               <div class="mt-5 grid grid-cols-2 gap-3 border-t border-slate-100 pt-5 text-sm dark:border-slate-800"><div><p class="text-slate-500">Hình thức</p><b>{{ course.isFree ? 'Miễn phí' : 'Thanh toán một lần' }}</b></div><div><p class="text-slate-500">Truy cập</p><b>Không giới hạn</b></div></div>
             </div>
