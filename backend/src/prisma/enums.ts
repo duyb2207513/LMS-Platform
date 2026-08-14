@@ -111,3 +111,33 @@ export const AssignmentSubmissionStatus = {
 } as const
 
 export type AssignmentSubmissionStatus = (typeof AssignmentSubmissionStatus)[keyof typeof AssignmentSubmissionStatus]
+
+
+export const NotificationType = {
+  WELCOME: 'WELCOME',
+  COURSE_ENROLLED: 'COURSE_ENROLLED',
+  NEW_LESSON: 'NEW_LESSON',
+  ASSIGNMENT_DUE: 'ASSIGNMENT_DUE',
+  QUIZ_RESULT: 'QUIZ_RESULT',
+  CERTIFICATE_ISSUED: 'CERTIFICATE_ISSUED',
+  COURSE_ANNOUNCEMENT: 'COURSE_ANNOUNCEMENT'
+} as const
+
+export type NotificationType = (typeof NotificationType)[keyof typeof NotificationType]
+
+
+export const EmailStatus = {
+  PENDING: 'PENDING',
+  SENT: 'SENT',
+  FAILED: 'FAILED'
+} as const
+
+export type EmailStatus = (typeof EmailStatus)[keyof typeof EmailStatus]
+
+
+export const AnnouncementStatus = {
+  DRAFT: 'DRAFT',
+  PUBLISHED: 'PUBLISHED'
+} as const
+
+export type AnnouncementStatus = (typeof AnnouncementStatus)[keyof typeof AnnouncementStatus]

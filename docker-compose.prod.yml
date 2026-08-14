@@ -37,6 +37,7 @@ services:
       SMTP_USER: ${SMTP_USER:-}
       SMTP_PASSWORD: ${SMTP_PASSWORD:-}
       MAIL_FROM: ${MAIL_FROM:-LMS Platform <no-reply@lms.example.com>}
+      ASSIGNMENT_REMINDER_INTERVAL_MINUTES: ${ASSIGNMENT_REMINDER_INTERVAL_MINUTES:-15}
       SENTRY_DSN: ${SENTRY_DSN:-}
       LOG_LEVEL: ${LOG_LEVEL:-info}
     command: sh -c "npm run db:deploy && npm start"

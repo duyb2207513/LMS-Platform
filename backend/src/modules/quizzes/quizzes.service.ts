@@ -4,6 +4,8 @@ import type { AuthTokenPayload } from "../auth/auth.types.js";
 import { assertLessonAccess, canManageCourse, UUID } from "../interactions/access.js";
 import { getManagedLesson } from "../lessons/lessons.service.js";
 import type { OptionInput, QuestionInput, QuizInput, SubmitAttemptInput, UpdateOptionInput, UpdateQuestionInput, UpdateQuizInput } from "./quizzes.types.js";
+import { safelyRunCommunication } from "../../services/communication/communication.service.js";
+import { createNotification } from "../notifications/notification.service.js";
 
 const quizTree = { questions: { orderBy: [{ position: "asc" as const }, { createdAt: "asc" as const }], include: { options: { orderBy: [{ position: "asc" as const }, { createdAt: "asc" as const }] } } } };
 
@@ -114,5 +116,6 @@ export async function submitAttempt(attemptId: string, studentId: string, input:
     if (!claimed.count) throw new AppError(409, "Quiz attempt has already been submitted");
     if (answers.length) await transaction.attemptAnswer.createMany({ data: answers.map(answer => ({ ...answer, attemptId })) });
   });
+  await safelyRunCommunication(() => createNotification({ userId: studentId, type: "QUIZ_RESULT", title: `Kết quả quiz: ${attempt.quiz.title}`, message: `Bạn đạt ${score}%${passed ? " và đã vượt qua" : ""}.`, data: { url: `/quizzes/${attempt.quizId}/result/${attempt.id}`, quizId: attempt.quizId, attemptId: attempt.id } }));
   return { id: attempt.id, quizId: attempt.quizId, attemptNumber: attempt.attemptNumber, status: "SUBMITTED" as const, score, earnedPoints, totalPoints, passed, submittedAt: new Date(), answers: attempt.quiz.questions.map(question => { const selected = answers.find(answer => answer.questionId === question.id); return { questionId: question.id, question: question.text, selectedOptionId: selected?.optionId ?? null, correctOptionId: question.options.find(option => option.isCorrect)?.id, isCorrect: selected?.isCorrect ?? false, pointsEarned: selected?.pointsEarned ?? 0, explanation: question.explanation }; }) };
 }

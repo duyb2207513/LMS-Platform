@@ -408,6 +408,30 @@ async function seedSprint7(studentId: string, instructorId: string) {
   });
 }
 
+async function seedSprint8(studentId: string, instructorId: string) {
+  const course = await prisma.course.findUniqueOrThrow({ where: { slug: "react-native-cho-nguoi-moi" } });
+  await prisma.notificationPreference.upsert({
+    where: { userId: studentId },
+    update: { inAppEnabled: true, emailEnabled: true, courseUpdates: true, assignmentReminders: true, quizResults: true, certificateUpdates: true },
+    create: { userId: studentId }
+  });
+  const announcement = await prisma.courseAnnouncement.upsert({
+    where: { id: "80000000-0000-4000-8000-000000000001" },
+    update: { courseId: course.id, authorId: instructorId, title: "Chào mừng đến Sprint 8", content: "Kênh thông báo khóa học đã sẵn sàng. Hãy kiểm tra bài tập sắp đến hạn.", status: "PUBLISHED", publishedAt: new Date("2026-08-14T08:00:00.000Z") },
+    create: { id: "80000000-0000-4000-8000-000000000001", courseId: course.id, authorId: instructorId, title: "Chào mừng đến Sprint 8", content: "Kênh thông báo khóa học đã sẵn sàng. Hãy kiểm tra bài tập sắp đến hạn.", status: "PUBLISHED", publishedAt: new Date("2026-08-14T08:00:00.000Z") }
+  });
+  await prisma.notification.upsert({
+    where: { id: "81000000-0000-4000-8000-000000000001" },
+    update: { userId: studentId, type: "COURSE_ANNOUNCEMENT", title: `Thông báo mới từ ${course.title}`, message: announcement.title, data: { url: `/courses/${course.id}/announcements/${announcement.id}`, courseId: course.id, announcementId: announcement.id }, isRead: false, readAt: null },
+    create: { id: "81000000-0000-4000-8000-000000000001", userId: studentId, type: "COURSE_ANNOUNCEMENT", title: `Thông báo mới từ ${course.title}`, message: announcement.title, data: { url: `/courses/${course.id}/announcements/${announcement.id}`, courseId: course.id, announcementId: announcement.id } }
+  });
+  await prisma.emailLog.upsert({
+    where: { id: "82000000-0000-4000-8000-000000000001" },
+    update: { userId: studentId, toEmail: "student@lms.test", subject: "Chào mừng đến LMS Platform", template: "WELCOME", status: "SENT", errorMessage: null, sentAt: new Date("2026-08-14T08:00:00.000Z") },
+    create: { id: "82000000-0000-4000-8000-000000000001", userId: studentId, toEmail: "student@lms.test", subject: "Chào mừng đến LMS Platform", template: "WELCOME", status: "SENT", sentAt: new Date("2026-08-14T08:00:00.000Z") }
+  });
+}
+
 async function main() {
   const passwordHash = await bcrypt.hash(TEST_PASSWORD, 12);
   const users = await seedUsers(passwordHash);
@@ -420,6 +444,7 @@ async function main() {
   await seedSprint4(student.id);
   await seedAdditionalLearningContent(student.id);
   await seedSprint7(student.id, instructor.id);
+  await seedSprint8(student.id, instructor.id);
 
   console.log("Seed completed successfully");
   console.log("Test password for every seeded account: Password123");

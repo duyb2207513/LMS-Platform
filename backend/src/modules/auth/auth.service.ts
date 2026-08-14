@@ -9,6 +9,7 @@ import { logger } from "../../config/logger.js";
 import { sendEmailChangeEmail, sendPasswordResetEmail, sendVerificationEmail } from "../../config/mail.js";
 import { createAccessToken, createRefreshToken, REFRESH_TOKEN_EXPIRES_IN_SECONDS, verifyRefreshToken } from "./auth.tokens.js";
 import type { ChangeEmailInput, GoogleLoginInput, LoginInput, RegisterInput, ResetPasswordInput } from "./auth.types.js";
+import { safelyRunCommunication, sendWelcomeCommunication } from "../../services/communication/communication.service.js";
 
 const PASSWORD_SALT_ROUNDS = 12;
 const DUMMY_PASSWORD_HASH = bcrypt.hashSync("invalid-password", PASSWORD_SALT_ROUNDS);
@@ -60,6 +61,7 @@ export async function register(input: RegisterInput, context?: ClientContext) {
     const user = await prisma.user.create({ data: { fullName: input.fullName, email: input.email, passwordHash, role: "STUDENT" }, select: publicUserSelect });
     const token = await createOneTimeToken(user.id, "VERIFY_EMAIL", 24 * 60);
     await safelySend(() => sendVerificationEmail(user.email, token));
+    await safelyRunCommunication(() => sendWelcomeCommunication(user));
     await writeAuditLog({ actorUserId: user.id, action: "AUTH_REGISTER", entityType: "USER", entityId: user.id, request: context?.request });
     return user;
   } catch (error) {
@@ -98,12 +100,14 @@ export async function googleLogin(input: GoogleLoginInput, context?: ClientConte
   if (!payload?.sub || !payload.email || !payload.email_verified) throw new AppError(401, "Google account email is not verified");
   const email = payload.email.toLowerCase();
   let user = await prisma.user.findFirst({ where: { OR: [{ googleId: payload.sub }, { email }] }, select: publicUserSelect });
+  const isNewGoogleUser = !user;
   if (user) {
     user = await prisma.user.update({ where: { id: user.id }, data: { googleId: payload.sub, emailVerifiedAt: user.emailVerifiedAt || new Date(), lastLoginAt: new Date(), failedLoginAttempts: 0, lockedUntil: null }, select: publicUserSelect });
   } else {
     user = await prisma.user.create({ data: { fullName: payload.name?.trim().slice(0, 100) || email.split("@")[0], email, googleId: payload.sub, emailVerifiedAt: new Date(), avatarUrl: payload.picture }, select: publicUserSelect });
   }
   if (user.status === "BLOCKED") throw new AppError(403, "Account is blocked");
+  if (isNewGoogleUser) await safelyRunCommunication(() => sendWelcomeCommunication(user));
   const session = await createSession(user, context);
   await writeAuditLog({ actorUserId: user.id, action: "AUTH_GOOGLE_LOGIN", entityType: "AUTH_SESSION", entityId: session.sessionId, request: context?.request });
   return { ...session, user };
@@ -209,6 +213,7 @@ export async function githubLogin(code: string, context?: ClientContext) {
   }
 
   const session = await createSession(user, context);
+  if (!existing) await safelyRunCommunication(() => sendWelcomeCommunication(user));
   await writeAuditLog({ actorUserId: user.id, action: "AUTH_GITHUB_LOGIN", entityType: "AUTH_SESSION", entityId: session.sessionId, request: context?.request });
   return { ...session, user };
 }

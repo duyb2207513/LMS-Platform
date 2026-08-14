@@ -142,6 +142,26 @@ export type SubmissionFeedback = Prisma.SubmissionFeedbackModel
  */
 export type CourseGradeRule = Prisma.CourseGradeRuleModel
 /**
+ * Model Notification
+ * 
+ */
+export type Notification = Prisma.NotificationModel
+/**
+ * Model NotificationPreference
+ * 
+ */
+export type NotificationPreference = Prisma.NotificationPreferenceModel
+/**
+ * Model EmailLog
+ * 
+ */
+export type EmailLog = Prisma.EmailLogModel
+/**
+ * Model CourseAnnouncement
+ * 
+ */
+export type CourseAnnouncement = Prisma.CourseAnnouncementModel
+/**
  * Model Review
  * 
  */

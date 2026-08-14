@@ -11,9 +11,13 @@ const transporter = env.smtpHost
     })
   : nodemailer.createTransport({ jsonTransport: true });
 
+export function sendMailMessage(input: { to: string; subject: string; text: string; html?: string }) {
+  if (env.nodeEnv === "production" && !env.smtpHost) throw new Error("SMTP is not configured");
+  return transporter.sendMail({ from: env.mailFrom, ...input });
+}
+
 async function sendActionEmail(to: string, subject: string, heading: string, description: string, actionUrl: string, actionLabel: string) {
-  await transporter.sendMail({
-    from: env.mailFrom,
+  await sendMailMessage({
     to,
     subject,
     text: `${heading}\n\n${description}\n\n${actionUrl}`,

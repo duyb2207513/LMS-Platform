@@ -657,6 +657,40 @@ const swaggerDefinition = {
         },
         description: "assignmentWeight and quizWeight must total 100"
       },
+      NotificationPreferenceRequest: {
+        type: "object", additionalProperties: false, minProperties: 1,
+        properties: {
+          inAppEnabled: { type: "boolean" }, emailEnabled: { type: "boolean" }, courseUpdates: { type: "boolean" },
+          assignmentReminders: { type: "boolean" }, quizResults: { type: "boolean" }, certificateUpdates: { type: "boolean" }
+        }
+      },
+      AnnouncementRequest: {
+        type: "object", additionalProperties: false, required: ["title", "content"],
+        properties: { title: { type: "string", maxLength: 255, example: "Thay đổi lịch học" }, content: { type: "string", maxLength: 50000, example: "Buổi học ngày mai bắt đầu lúc 08:00." } }
+      },
+      UpdateAnnouncementRequest: {
+        type: "object", additionalProperties: false, minProperties: 1,
+        properties: { title: { type: "string", maxLength: 255 }, content: { type: "string", maxLength: 50000 } }
+      },
+      Notification: {
+        type: "object", required: ["id", "type", "title", "message", "isRead", "createdAt"],
+        properties: {
+          id: { type: "string", format: "uuid" },
+          type: { type: "string", enum: ["WELCOME", "COURSE_ENROLLED", "NEW_LESSON", "ASSIGNMENT_DUE", "QUIZ_RESULT", "CERTIFICATE_ISSUED", "COURSE_ANNOUNCEMENT"] },
+          title: { type: "string" }, message: { type: "string" }, data: { type: "object", nullable: true, additionalProperties: true },
+          isRead: { type: "boolean" }, readAt: { type: "string", format: "date-time", nullable: true }, createdAt: { type: "string", format: "date-time" }
+        }
+      },
+      NotificationPreference: {
+        allOf: [
+          { $ref: "#/components/schemas/NotificationPreferenceRequest" },
+          { type: "object", required: ["id", "userId", "inAppEnabled", "emailEnabled", "courseUpdates", "assignmentReminders", "quizResults", "certificateUpdates", "createdAt", "updatedAt"], properties: { id: { type: "string", format: "uuid" }, userId: { type: "string", format: "uuid" }, createdAt: { type: "string", format: "date-time" }, updatedAt: { type: "string", format: "date-time" } } }
+        ]
+      },
+      CourseAnnouncement: {
+        type: "object", required: ["id", "courseId", "authorId", "title", "content", "status", "createdAt", "updatedAt"],
+        properties: { id: { type: "string", format: "uuid" }, courseId: { type: "string", format: "uuid" }, authorId: { type: "string", format: "uuid" }, title: { type: "string" }, content: { type: "string" }, status: { type: "string", enum: ["DRAFT", "PUBLISHED"] }, publishedAt: { type: "string", format: "date-time", nullable: true }, createdAt: { type: "string", format: "date-time" }, updatedAt: { type: "string", format: "date-time" } }
+      },
       AdminUserUpdateRequest: {
         type: "object", additionalProperties: false,
         properties: { role: { type: "string", enum: ["STUDENT", "INSTRUCTOR", "ADMIN"] }, status: { type: "string", enum: ["ACTIVE", "BLOCKED"] } }
