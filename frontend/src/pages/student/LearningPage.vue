@@ -7,6 +7,10 @@ import LoadingSpinner from '@/components/ui/LoadingSpinner.vue'
 import { API_BASE_URL, useApi } from '@/composables/useApi'
 import { useAuthStore } from '@/stores/auth'
 import type { ApiResponse, Comment, CourseContent, CourseProgress, Lesson } from '@/types'
+import VueOfficePdf from '@vue-office/pdf'
+import VueOfficeDocx from '@vue-office/docx'
+import '@vue-office/docx/lib/index.css'
+import VueOfficePptx from '@vue-office/pptx'
 
 const route = useRoute()
 const api = useApi()
@@ -19,6 +23,7 @@ const text = ref('')
 const replyTo = ref<string | null>(null)
 const error = ref('')
 const sidebarOpen = ref(false)
+const sidebarCollapsed = ref(false)
 const courseId = String(route.params.courseId)
 const lessons = computed(() => content.value?.sections.flatMap((section) => section.lessons) || [])
 const lessonIndex = computed(() => lessons.value.findIndex((lesson) => lesson.id === selected.value?.id))
@@ -27,6 +32,14 @@ const nextLesson = computed(() => lessonIndex.value >= 0 ? lessons.value[lessonI
 const selectedSection = computed(() => content.value?.sections.find((section) => section.lessons.some((lesson) => lesson.id === selected.value?.id)))
 const asset = (url: string | null) => !url ? '' : url.startsWith('http') ? url : `${API_BASE_URL.replace('/api/v1', '')}${url}`
 const lessonTypeLabel = (type: Lesson['lessonType']) => ({ TEXT: 'Bài đọc', VIDEO: 'Video', DOCUMENT: 'Tài liệu' }[type])
+const docType = computed(() => {
+  if (selected.value?.lessonType !== 'DOCUMENT' || !selected.value.documentUrl) return '';
+  const url = selected.value.documentUrl.toLowerCase();
+  if (url.endsWith('.pdf')) return 'pdf';
+  if (url.endsWith('.pptx') || url.endsWith('.ppt')) return 'pptx';
+  if (url.endsWith('.docx') || url.endsWith('.doc')) return 'docx';
+  return '';
+})
 
 async function load() {
   try {
@@ -65,17 +78,33 @@ async function send() {
 }
 
 async function remove(id: string) { await api.del(`/comments/${id}`); await loadComments() }
+const renderedContent = computed(() => {
+  if (!selected.value?.content) return ''
+  // Escape HTML to prevent XSS
+  let textVal = selected.value.content
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+
+  // Replace custom image tag [image:url]
+  textVal = textVal.replace(/\[image:(.+?)\]/g, (_, url) => {
+    return `<img src="${asset(url)}" alt="Sơ đồ cây quyết định" class="my-6 max-w-full rounded-2xl border border-slate-200 shadow-sm dark:border-slate-800" />`
+  })
+
+  return textVal
+})
+
 watch(() => selected.value?.id, () => void loadComments())
 onMounted(load)
 </script>
 
 <template>
   <DefaultLayout>
-    <div class="learning-shell">
+    <div :class="['learning-shell', sidebarCollapsed ? 'sidebar-collapsed' : '']"> 
       <button v-if="sidebarOpen" class="fixed inset-0 z-30 bg-slate-950/45 lg:hidden" aria-label="Đóng mục lục" @click="sidebarOpen = false" />
-      <aside :class="['learning-sidebar', sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0']">
+      <aside :class="['learning-sidebar', sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0', sidebarCollapsed ? 'sidebar-hidden' : '']">
         <div class="border-b border-slate-200 p-5 dark:border-slate-800">
-          <div class="flex items-start justify-between gap-3"><div><RouterLink to="/my-courses" class="text-xs font-bold text-purple-600 dark:text-purple-400">← Khóa học của tôi</RouterLink><h2 class="mt-3 line-clamp-2 text-lg font-black leading-snug">{{ content?.course.title }}</h2></div><button class="grid h-9 w-9 shrink-0 place-items-center rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 lg:hidden" @click="sidebarOpen = false">×</button></div>
+          <div class="flex items-start justify-between gap-3"><div><RouterLink to="/my-courses" class="sidebar-back-btn"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg><span>Khóa học của tôi</span></RouterLink><h2 class="mt-3 line-clamp-2 text-lg font-black leading-snug">{{ content?.course.title }}</h2></div><button class="grid h-9 w-9 shrink-0 place-items-center rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 lg:hidden" @click="sidebarOpen = false">×</button></div>
           <div class="mt-5 flex justify-between text-xs font-semibold"><span>{{ progress?.completedLessons || 0 }}/{{ progress?.totalLessons || 0 }} bài</span><span>{{ Math.round(progress?.progressPercent || 0) }}%</span></div>
           <div class="mt-2 h-2 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800"><div class="h-full rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-500" :style="{ width: `${progress?.progressPercent || 0}%` }" /></div>
         </div>
@@ -92,20 +121,44 @@ onMounted(load)
       </aside>
 
       <main class="min-w-0 flex-1">
-        <header class="learning-topbar"><button class="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-3 py-2 text-sm font-bold dark:border-slate-700 lg:hidden" @click="sidebarOpen = true">☰ Mục lục</button><p class="hidden min-w-0 text-sm text-slate-500 sm:block"><span class="font-semibold text-slate-700 dark:text-slate-300">{{ selectedSection?.title }}</span><span v-if="selected"> / {{ selected.title }}</span></p><span v-if="selected" :class="['rounded-full px-3 py-1 text-xs font-bold', selected.progress?.isCompleted ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300' : 'bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300']">{{ selected.progress?.isCompleted ? 'Đã hoàn thành' : 'Đang học' }}</span></header>
+        <header class="learning-topbar">
+          <div class="flex items-center gap-3">
+            <!-- Desktop: Nút ẩn/hiện mục lục -->
+            <button class="sidebar-toggle-btn hidden lg:flex" :title="sidebarCollapsed ? 'Hiện mục lục' : 'Ẩn mục lục'" @click="sidebarCollapsed = !sidebarCollapsed; sidebarOpen = false">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+            </button>
+
+            <!-- Mobile: Nút quay lại và nút mở mục lục riêng biệt -->
+            <RouterLink v-slot="{ navigate }" to="/my-courses" custom>
+              <button class="back-btn inline-flex lg:hidden" title="Quay lại khóa học của tôi" @click="navigate">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+              </button>
+            </RouterLink>
+            <button class="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-3 py-2 text-sm font-bold dark:border-slate-700 lg:hidden" @click="sidebarOpen = true; sidebarCollapsed = false">
+              ☰ Mục lục
+            </button>
+          </div>
+          <p class="hidden min-w-0 text-sm text-slate-500 sm:block"><span class="font-semibold text-slate-700 dark:text-slate-300">{{ selectedSection?.title }}</span><span v-if="selected"> / {{ selected.title }}</span></p>
+          <span v-if="selected" :class="['rounded-full px-3 py-1 text-xs font-bold', selected.progress?.isCompleted ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300' : 'bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300']">{{ selected.progress?.isCompleted ? 'Đã hoàn thành' : 'Đang học' }}</span>
+        </header>
         <div class="mx-auto max-w-5xl px-4 py-6 sm:px-6 lg:px-8 lg:py-9">
           <LoadingSpinner v-if="api.loading.value && !content" class="py-24" />
           <p v-else-if="error" class="rounded-2xl bg-red-50 p-4 text-red-700 dark:bg-red-950/30 dark:text-red-300">{{ error }}</p>
           <template v-else-if="selected">
             <div class="mb-6"><p class="text-xs font-extrabold uppercase tracking-[0.14em] text-purple-600 dark:text-purple-400">{{ lessonTypeLabel(selected.lessonType) }} · Bài {{ lessonIndex + 1 }}/{{ lessons.length }}</p><h1 class="mt-2 text-3xl font-black tracking-tight sm:text-4xl">{{ selected.title }}</h1></div>
             <section class="viewer-shell" :class="selected.lessonType === 'TEXT' ? 'viewer-shell--text' : ''">
-              <article v-if="selected.lessonType === 'TEXT'" class="lesson-prose whitespace-pre-line">{{ selected.content }}</article>
+              <article v-if="selected.lessonType === 'TEXT'" class="lesson-prose whitespace-pre-line" v-html="renderedContent" />
               <video v-else-if="selected.lessonType === 'VIDEO' && selected.videoUrl" :src="asset(selected.videoUrl)" controls class="max-h-[70vh] w-full bg-black" />
-              <iframe v-else-if="selected.lessonType === 'DOCUMENT' && selected.documentUrl" :src="asset(selected.documentUrl)" class="h-[70vh] min-h-[520px] w-full" title="Tài liệu bài học" />
+              <div v-else-if="selected.lessonType === 'DOCUMENT' && selected.documentUrl" class="h-[70vh] min-h-[520px] w-full overflow-hidden bg-white">
+                <VueOfficePdf v-if="docType === 'pdf'" :src="asset(selected.documentUrl)" class="h-full w-full" />
+                <VueOfficePptx v-else-if="docType === 'pptx'" :src="asset(selected.documentUrl)" class="h-full w-full" />
+                <VueOfficeDocx v-else-if="docType === 'docx'" :src="asset(selected.documentUrl)" class="h-full w-full" />
+                <iframe v-else :src="asset(selected.documentUrl)" class="h-full w-full" title="Tài liệu bài học" />
+              </div>
               <div v-else class="grid min-h-72 place-items-center p-8 text-center"><div><span class="text-4xl">◇</span><p class="mt-3 font-bold">Nội dung đang được cập nhật</p><p class="mt-1 text-sm text-slate-500">Giảng viên chưa tải nội dung cho bài học này.</p></div></div>
             </section>
 
-            <div class="mt-5 flex flex-wrap items-center justify-between gap-3"><BaseButton variant="secondary" :disabled="!previousLesson" @click="navigateLesson(previousLesson)">← Bài trước</BaseButton><div class="flex flex-wrap gap-2"><RouterLink v-if="selected.quiz" :to="`/quiz/${selected.quiz.id}`"><BaseButton variant="outline">Làm quiz</BaseButton></RouterLink><BaseButton @click="complete">{{ selected.progress?.isCompleted ? 'Đánh dấu chưa xong' : '✓ Hoàn thành bài học' }}</BaseButton></div><BaseButton variant="secondary" :disabled="!nextLesson" @click="navigateLesson(nextLesson)">Bài tiếp →</BaseButton></div>
+            <div class="mt-5 flex flex-wrap items-center justify-between gap-3"><BaseButton variant="secondary" :disabled="!previousLesson" @click="navigateLesson(previousLesson)">← Bài trước</BaseButton><div class="flex flex-wrap gap-2"><RouterLink v-slot="{ navigate }" v-if="selected.quiz" :to="`/quiz/${selected.quiz.id}`" custom><BaseButton variant="outline" @click="navigate">Làm quiz</BaseButton></RouterLink><BaseButton @click="complete">{{ selected.progress?.isCompleted ? 'Đánh dấu chưa xong' : '✓ Hoàn thành bài học' }}</BaseButton></div><BaseButton variant="secondary" :disabled="!nextLesson" @click="navigateLesson(nextLesson)">Bài tiếp →</BaseButton></div>
 
             <section class="surface-card mt-10 overflow-hidden">
               <header class="border-b border-slate-100 p-5 dark:border-slate-800 sm:p-6"><div class="flex items-center justify-between gap-4"><div><h2 class="text-xl font-black">Thảo luận bài học</h2><p class="mt-1 text-sm text-slate-500">Đặt câu hỏi và trao đổi cùng cộng đồng.</p></div><span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-600 dark:bg-slate-800 dark:text-slate-300">{{ comments.length }} chủ đề</span></div></header>
@@ -124,8 +177,21 @@ onMounted(load)
 </template>
 
 <style scoped>
-.learning-shell{display:flex;min-height:calc(100vh - 4.5rem)}.learning-sidebar{position:fixed;inset:0 auto 0 0;z-index:40;display:flex;width:min(22rem,88vw);flex-direction:column;border-right:1px solid var(--border);background:var(--surface);padding-top:4.5rem;transition:transform .25s ease}.learning-topbar{position:sticky;top:4.5rem;z-index:20;display:flex;min-height:3.75rem;align-items:center;justify-content:space-between;gap:1rem;border-bottom:1px solid var(--border);background:color-mix(in srgb,var(--surface) 90%,transparent);padding:.75rem 1rem;backdrop-filter:blur(12px)}
+.learning-shell{display:flex;min-height:calc(100vh - 4.5rem)}
+.learning-sidebar{position:fixed;inset:0 auto 0 0;z-index:40;display:flex;width:min(22rem,88vw);flex-direction:column;border-right:1px solid var(--border);background:var(--surface);padding-top:4.5rem;transition:transform .25s ease}
+.learning-topbar{position:sticky;top:4.5rem;z-index:20;display:flex;min-height:3.75rem;align-items:center;justify-content:space-between;gap:1rem;border-bottom:1px solid var(--border);background:color-mix(in srgb,var(--surface) 90%,transparent);padding:.75rem 1rem;backdrop-filter:blur(12px)}
+.back-btn{align-items:center;gap:.5rem;padding:.5rem .85rem;border-radius:.625rem;font-size:.875rem;font-weight:700;color:var(--text-muted);border:1px solid var(--border);background:var(--surface);transition:all .2s ease;text-decoration:none;line-height:1}
+.back-btn:hover{background:var(--surface-muted);color:var(--text);border-color:var(--text-muted)}
+.sidebar-back-btn{display:inline-flex;align-items:center;gap:.375rem;padding:.4rem .75rem;border-radius:.5rem;font-size:.75rem;font-weight:700;color:var(--brand);background:var(--brand-soft);transition:all .2s ease;text-decoration:none}
+.sidebar-back-btn:hover{background:var(--brand);color:#fff;transform:translateX(-2px)}
+.sidebar-toggle-btn{align-items:center;justify-content:center;width:2.25rem;height:2.25rem;border-radius:.625rem;color:var(--text-muted);border:1px solid var(--border);background:var(--surface);transition:all .2s ease;flex-shrink:0}
+.sidebar-toggle-btn:hover{background:var(--surface-muted);color:var(--brand);border-color:var(--brand)}
+.sidebar-collapsed .sidebar-toggle-btn{color:var(--brand)}
 .lesson-link{display:flex;width:100%;align-items:flex-start;gap:.75rem;border-radius:.9rem;padding:.7rem .6rem;text-align:left;color:var(--text-muted);transition:.18s}.lesson-link:hover{background:var(--surface-muted);color:var(--text)}.lesson-link--active{background:var(--brand-soft)!important;color:var(--brand)!important}.lesson-state{display:grid;width:1.7rem;height:1.7rem;flex-shrink:0;place-items:center;border:1px solid var(--border);border-radius:.6rem;font-size:.65rem;font-weight:800}.lesson-state--done{border-color:#10b981;background:#10b981;color:white}
 .viewer-shell{overflow:hidden;border:1px solid var(--border);border-radius:1.35rem;background:var(--surface);box-shadow:var(--shadow-sm)}.viewer-shell--text{padding:clamp(1.5rem,5vw,4rem)}.lesson-prose{margin:auto;max-width:46rem;font-size:1.03rem;line-height:2;color:var(--text)}.comment-box{width:100%;resize:vertical;border:1px solid var(--border);border-radius:1rem;background:var(--surface-muted);padding:1rem;color:var(--text);outline:none}.comment-box:focus{border-color:#a855f7;box-shadow:0 0 0 4px rgba(168,85,247,.1)}
-@media(min-width:1024px){.learning-sidebar{position:sticky;top:4.5rem;z-index:10;height:calc(100vh - 4.5rem);width:21rem;padding-top:0}.learning-topbar{padding-inline:2rem}}
+@media(min-width:1024px){
+  .learning-sidebar{position:sticky;top:4.5rem;z-index:10;height:calc(100vh - 4.5rem);width:21rem;padding-top:0;transition:width .3s ease, opacity .3s ease, margin .3s ease}
+  .sidebar-collapsed .learning-sidebar.sidebar-hidden{width:0;min-width:0;overflow:hidden;opacity:0;border-right:none;margin-left:0;pointer-events:none}
+  .learning-topbar{padding-inline:2rem}
+}
 </style>

@@ -3,7 +3,9 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "engines": { "node": "^20.19.0 || >=22.12.0" },
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  },
   "scripts": {
     "dev": "vite",
     "build": "run-p type-check build-only",
@@ -17,9 +19,13 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "latest",
+    "@vue-office/docx": "^1.6.3",
+    "@vue-office/pdf": "^2.0.10",
+    "@vue-office/pptx": "^1.0.1",
     "pinia": "latest",
     "tailwindcss": "latest",
     "vue": "latest",
+    "vue-demi": "^0.14.10",
     "vue-router": "latest"
   },
   "devDependencies": {
