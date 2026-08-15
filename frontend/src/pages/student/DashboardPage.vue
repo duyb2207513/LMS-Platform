@@ -55,10 +55,11 @@ onMounted(load)
         <div v-else class="rounded-2xl border border-dashed p-12 text-center"><p class="text-slate-500">Bạn chưa đăng ký khóa học nào.</p><RouterLink to="/courses" class="mt-4 inline-block font-bold text-purple-600">Chọn khóa học đầu tiên →</RouterLink></div>
       </section>
 
-      <section class="mt-10 grid gap-4 md:grid-cols-3">
-        <RouterLink to="/my-courses" class="rounded-2xl bg-gradient-to-br from-purple-600 to-violet-700 p-6 text-white"><p class="text-3xl">📖</p><h3 class="mt-4 text-xl font-bold">Khóa học của tôi</h3><p class="mt-1 text-purple-100">Xem toàn bộ nội dung đang học.</p></RouterLink>
-        <RouterLink to="/orders" class="rounded-2xl bg-gradient-to-br from-blue-600 to-cyan-600 p-6 text-white"><p class="text-3xl">🧾</p><h3 class="mt-4 text-xl font-bold">Đơn hàng</h3><p class="mt-1 text-blue-100">Checkout và lịch sử thanh toán.</p></RouterLink>
-        <RouterLink to="/certificates" class="rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 p-6 text-white"><p class="text-3xl">🎓</p><h3 class="mt-4 text-xl font-bold">Chứng chỉ</h3><p class="mt-1 text-amber-100">Xem và xác minh chứng chỉ.</p></RouterLink>
+      <section class="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <RouterLink to="/dashboard/analytics" class="rounded-2xl bg-gradient-to-br from-indigo-600 to-purple-700 p-6 text-white transition hover:scale-[1.02] shadow-lg shadow-purple-500/15"><p class="text-3xl">📊</p><h3 class="mt-4 text-xl font-bold">Phân tích tiến độ</h3><p class="mt-1 text-indigo-100">Xem chuỗi ngày học 🔥 & biểu đồ thời gian.</p></RouterLink>
+        <RouterLink to="/my-courses" class="rounded-2xl bg-gradient-to-br from-purple-600 to-violet-700 p-6 text-white transition hover:scale-[1.02]"><p class="text-3xl">📖</p><h3 class="mt-4 text-xl font-bold">Khóa học của tôi</h3><p class="mt-1 text-purple-100">Xem toàn bộ nội dung đang học.</p></RouterLink>
+        <RouterLink to="/orders" class="rounded-2xl bg-gradient-to-br from-blue-600 to-cyan-600 p-6 text-white transition hover:scale-[1.02]"><p class="text-3xl">🧾</p><h3 class="mt-4 text-xl font-bold">Đơn hàng</h3><p class="mt-1 text-blue-100">Checkout và lịch sử thanh toán.</p></RouterLink>
+        <RouterLink to="/certificates" class="rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 p-6 text-white transition hover:scale-[1.02]"><p class="text-3xl">🎓</p><h3 class="mt-4 text-xl font-bold">Chứng chỉ</h3><p class="mt-1 text-amber-100">Xem và xác minh chứng chỉ.</p></RouterLink>
       </section>
     </main>
   </DefaultLayout>
