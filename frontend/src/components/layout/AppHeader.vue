@@ -91,6 +91,8 @@ watch(() => route.fullPath, () => {
                 <span class="mt-2 inline-flex rounded-full bg-purple-100 px-2 py-1 text-[10px] font-bold tracking-wide text-purple-700 dark:bg-purple-950/50 dark:text-purple-300">{{ auth.user?.role }}</span>
               </div>
               <RouterLink :to="dashboardPath()" class="profile-link" role="menuitem">Dashboard</RouterLink>
+              <RouterLink v-if="auth.isStudent" to="/dashboard/analytics" class="profile-link" role="menuitem">📊 Phân tích tiến độ</RouterLink>
+              <RouterLink v-if="auth.isInstructor" to="/instructor/analytics" class="profile-link" role="menuitem">📊 Báo cáo giảng dạy</RouterLink>
               <RouterLink to="/profile" class="profile-link" role="menuitem">Hồ sơ cá nhân</RouterLink>
               <RouterLink to="/change-password" class="profile-link" role="menuitem">Đổi mật khẩu</RouterLink>
               <RouterLink to="/notifications" class="profile-link" role="menuitem">Trung tâm thông báo</RouterLink>

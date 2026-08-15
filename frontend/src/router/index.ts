@@ -48,6 +48,12 @@ const router = createRouter({
       component: () => import('@/pages/student/DashboardPage.vue'),
       meta: { requiresAuth: true, roles: [UserRole.STUDENT] },
     },
+    {
+      path: '/dashboard/analytics',
+      name: 'student-analytics',
+      component: () => import('@/pages/student/StudentAnalyticsPage.vue'),
+      meta: { requiresAuth: true, roles: [UserRole.STUDENT] },
+    },
     { path: '/403', name: 'forbidden', component: () => import('@/pages/ForbiddenPage.vue') },
     { path: '/profile', name: 'profile', component: () => import('@/pages/student/ProfilePage.vue'), meta: { requiresAuth: true } },
     { path: '/change-password', name: 'change-password', component: () => import('@/pages/student/ChangePasswordPage.vue'), meta: { requiresAuth: true } },
@@ -73,6 +79,12 @@ const router = createRouter({
       path: '/instructor',
       name: 'instructor-dashboard',
       component: () => import('@/pages/instructor/DashboardPage.vue'),
+      meta: { requiresAuth: true, roles: [UserRole.INSTRUCTOR] },
+    },
+    {
+      path: '/instructor/analytics',
+      name: 'instructor-analytics',
+      component: () => import('@/pages/instructor/InstructorAnalyticsPage.vue'),
       meta: { requiresAuth: true, roles: [UserRole.INSTRUCTOR] },
     },
     {
