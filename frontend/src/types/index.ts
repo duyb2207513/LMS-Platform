@@ -1,4 +1,5 @@
 // ==================== Enums ====================
+export * from './notification'
 export enum UserRole {
   STUDENT = 'STUDENT',
   INSTRUCTOR = 'INSTRUCTOR',

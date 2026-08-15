@@ -61,9 +61,14 @@ const router = createRouter({
     { path: '/orders', name: 'orders', component: () => import('@/pages/student/OrdersPage.vue'), meta: { requiresAuth: true, roles: [UserRole.STUDENT] } },
     { path: '/checkout/:orderId', name: 'checkout', component: () => import('@/pages/student/CheckoutPage.vue'), meta: { requiresAuth: true, roles: [UserRole.STUDENT] } },
     { path: '/payment-result/:orderId', name: 'payment-result', component: () => import('@/pages/student/PaymentResultPage.vue'), meta: { requiresAuth: true, roles: [UserRole.STUDENT] } },
+    { path: '/notifications', name: 'notifications', component: () => import('@/pages/NotificationCenterPage.vue'), meta: { requiresAuth: true } },
+    { path: '/notifications/settings', name: 'notification-settings', component: () => import('@/pages/NotificationSettingsPage.vue'), meta: { requiresAuth: true } },
+    { path: '/courses/:courseId/announcements', name: 'course-announcements', component: () => import('@/pages/student/CourseAnnouncementsPage.vue'), meta: { requiresAuth: true } },
+    { path: '/courses/:courseId/announcements/:announcementId', name: 'course-announcement-detail', component: () => import('@/pages/student/AnnouncementDetailPage.vue'), meta: { requiresAuth: true } },
     { path: '/certificates', name: 'certificates', component: () => import('@/pages/student/CertificatesPage.vue'), meta: { requiresAuth: true, roles: [UserRole.STUDENT] } },
     { path: '/certificates/verify/:code?', name: 'verify-certificate', component: () => import('@/pages/VerifyCertificatePage.vue') },
     // Instructor routes
+    { path: '/instructor/courses/:courseId/announcements', name: 'instructor-announcements', component: () => import('@/pages/instructor/CourseAnnouncementsPage.vue'), meta: { requiresAuth: true, roles: [UserRole.INSTRUCTOR, UserRole.ADMIN] } },
     {
       path: '/instructor',
       name: 'instructor-dashboard',

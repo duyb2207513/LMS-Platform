@@ -137,6 +137,13 @@ onMounted(load)
             <button class="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-3 py-2 text-sm font-bold dark:border-slate-700 lg:hidden" @click="sidebarOpen = true; sidebarCollapsed = false">
               ☰ Mục lục
             </button>
+            <RouterLink
+              :to="`/courses/${courseId}/announcements`"
+              class="inline-flex items-center gap-1.5 rounded-xl border border-purple-200 bg-purple-50/70 px-3 py-2 text-xs sm:text-sm font-bold text-purple-700 hover:bg-purple-100 dark:border-purple-800 dark:bg-purple-950/40 dark:text-purple-300"
+              title="Xem thông báo khóa học từ giảng viên"
+            >
+              📢 <span class="hidden sm:inline">Bảng tin thông báo</span><span class="sm:hidden">Thông báo</span>
+            </RouterLink>
           </div>
           <p class="hidden min-w-0 text-sm text-slate-500 sm:block"><span class="font-semibold text-slate-700 dark:text-slate-300">{{ selectedSection?.title }}</span><span v-if="selected"> / {{ selected.title }}</span></p>
           <span v-if="selected" :class="['rounded-full px-3 py-1 text-xs font-bold', selected.progress?.isCompleted ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300' : 'bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300']">{{ selected.progress?.isCompleted ? 'Đã hoàn thành' : 'Đang học' }}</span>

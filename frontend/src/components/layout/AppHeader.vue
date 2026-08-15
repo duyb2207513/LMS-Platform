@@ -3,6 +3,7 @@ import { ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import AppBrand from '@/components/layout/AppBrand.vue'
 import ThemeToggle from '@/components/ui/ThemeToggle.vue'
+import NotificationBell from '@/components/notifications/NotificationBell.vue'
 import { useAuthStore } from '@/stores/auth'
 
 const props = withDefaults(defineProps<{ workspace?: boolean }>(), { workspace: false })
@@ -57,6 +58,8 @@ watch(() => route.fullPath, () => {
       <div class="flex shrink-0 items-center gap-1.5 sm:gap-2">
         <ThemeToggle />
 
+        <NotificationBell v-if="auth.isLoggedIn" />
+
         <template v-if="!auth.isLoggedIn">
           <RouterLink to="/login" class="hidden min-h-10 items-center rounded-xl px-3.5 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-100 sm:inline-flex dark:text-slate-200 dark:hover:bg-slate-800">
             Đăng nhập
@@ -76,7 +79,7 @@ watch(() => route.fullPath, () => {
           >
             <img v-if="auth.user?.avatarUrl" :src="auth.user.avatarUrl" alt="" class="h-7 w-7 rounded-lg object-cover">
             <span v-else class="grid h-7 w-7 place-items-center rounded-lg bg-gradient-to-br from-violet-600 to-purple-600 text-xs font-bold text-white">{{ auth.userInitials }}</span>
-            <span class="hidden max-w-36 truncate text-sm font-semibold text-slate-800 sm:block dark:text-slate-100">{{ auth.user?.fullName }}</span>
+            <span class="hidden text-sm font-semibold text-slate-800 sm:block dark:text-slate-100 whitespace-nowrap">{{ auth.user?.fullName }}</span>
             <svg class="hidden h-4 w-4 text-slate-400 sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m6 9 6 6 6-6" /></svg>
           </button>
 
@@ -90,7 +93,8 @@ watch(() => route.fullPath, () => {
               <RouterLink :to="dashboardPath()" class="profile-link" role="menuitem">Dashboard</RouterLink>
               <RouterLink to="/profile" class="profile-link" role="menuitem">Hồ sơ cá nhân</RouterLink>
               <RouterLink to="/change-password" class="profile-link" role="menuitem">Đổi mật khẩu</RouterLink>
-              <RouterLink to="/security" class="profile-link" role="menuitem">Bảo mật và thiết bị</RouterLink>
+              <RouterLink to="/notifications" class="profile-link" role="menuitem">Trung tâm thông báo</RouterLink>
+              <RouterLink to="/notifications/settings" class="profile-link" role="menuitem">Cài đặt thông báo</RouterLink>
               <template v-if="auth.isStudent">
                 <RouterLink to="/my-courses" class="profile-link" role="menuitem">Khóa học của tôi</RouterLink>
                 <RouterLink to="/orders" class="profile-link" role="menuitem">Đơn hàng</RouterLink>
