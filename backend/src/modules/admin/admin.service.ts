@@ -32,7 +32,7 @@ export async function dashboardStats() {
 
 export async function listAdminUsers(query: AdminListQuery) {
   const where = { ...(query.search ? { OR: [{ fullName: { contains: query.search, mode: "insensitive" as const } }, { email: { contains: query.search, mode: "insensitive" as const } }] } : {}), ...(query.role ? { role: query.role } : {}), ...(query.userStatus ? { status: query.userStatus } : {}) };
-  const [items, total] = await Promise.all([prisma.user.findMany({ where, skip: (query.page - 1) * query.limit, take: query.limit, orderBy: { createdAt: "desc" }, select: { id: true, fullName: true, email: true, avatarUrl: true, role: true, status: true, createdAt: true, updatedAt: true, _count: { select: { courses: true, enrollments: true, reviews: true } } } }), prisma.user.count({ where })]);
+  const [items, total] = await Promise.all([prisma.user.findMany({ where, skip: (query.page - 1) * query.limit, take: query.limit, orderBy: { createdAt: "desc" }, select: { id: true, fullName: true, email: true, avatarUrl: true, role: true, status: true, googleId: true, githubId: true, lastLoginAt: true, createdAt: true, updatedAt: true, _count: { select: { courses: true, enrollments: true, reviews: true } } } }), prisma.user.count({ where })]);
   return { items, meta: meta(query, total) };
 }
 export async function updateAdminUser(userId: string, actorId: string, input: UpdateAdminUserInput) {

@@ -11,6 +11,6 @@ async function request<T>(endpoint:string,options:RequestInit={}){let response=a
 
 export function useApi(){const loading=ref(false),error=ref<string|null>(null);async function run<T>(job:()=>Promise<T>){loading.value=true;error.value=null;try{return await job()}catch(e){error.value=e instanceof Error?e.message:'Đã có lỗi xảy ra';throw e}finally{loading.value=false}}
   const get=<T>(endpoint:string,params?:Record<string,string|number|boolean|undefined>)=>run(()=>{const q=new URLSearchParams();Object.entries(params||{}).forEach(([k,v])=>{if(v!==undefined&&v!=='')q.set(k,String(v))});return request<T>(endpoint+(q.size?`?${q}`:''))})
-  const send=<T>(method:string,endpoint:string,body?:unknown)=>run(()=>request<T>(endpoint,{method,body:body instanceof FormData?body:body===undefined?undefined:JSON.stringify(body)}))
-  return {loading,error,get,post:<T>(e:string,b?:unknown)=>send<T>('POST',e,b),put:<T>(e:string,b?:unknown)=>send<T>('PUT',e,b),patch:<T>(e:string,b?:unknown)=>send<T>('PATCH',e,b),del:<T>(e:string)=>send<T>('DELETE',e)}
+  const send = <T>(method: string, endpoint: string, body?: unknown, customHeaders?: Record<string, string>) => run(() => request<T>(endpoint, { method, body: body instanceof FormData ? body : body === undefined ? undefined : JSON.stringify(body), headers: customHeaders }))
+  return { loading, error, get, post: <T>(e: string, b?: unknown, headers?: Record<string, string>) => send<T>('POST', e, b, headers), put: <T>(e: string, b?: unknown, headers?: Record<string, string>) => send<T>('PUT', e, b, headers), patch: <T>(e: string, b?: unknown, headers?: Record<string, string>) => send<T>('PATCH', e, b, headers), del: <T>(e: string) => send<T>('DELETE', e) }
 }

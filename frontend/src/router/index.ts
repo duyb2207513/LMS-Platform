@@ -65,6 +65,7 @@ const router = createRouter({
     { path: '/quiz/:quizId', name: 'take-quiz', component: () => import('@/pages/student/QuizPage.vue'), meta: { requiresAuth: true, roles: [UserRole.STUDENT] } },
     { path: '/quiz-result', name: 'quiz-result', component: () => import('@/pages/student/QuizResultPage.vue'), meta: { requiresAuth: true, roles: [UserRole.STUDENT] } },
     { path: '/orders', name: 'orders', component: () => import('@/pages/student/OrdersPage.vue'), meta: { requiresAuth: true, roles: [UserRole.STUDENT] } },
+    { path: '/refund-requests', name: 'refund-requests', component: () => import('@/pages/student/RefundRequestsView.vue'), meta: { requiresAuth: true, roles: [UserRole.STUDENT] } },
     { path: '/checkout/:orderId', name: 'checkout', component: () => import('@/pages/student/CheckoutPage.vue'), meta: { requiresAuth: true, roles: [UserRole.STUDENT] } },
     { path: '/payment-result/:orderId', name: 'payment-result', component: () => import('@/pages/student/PaymentResultPage.vue'), meta: { requiresAuth: true, roles: [UserRole.STUDENT] } },
     { path: '/notifications', name: 'notifications', component: () => import('@/pages/NotificationCenterPage.vue'), meta: { requiresAuth: true } },
@@ -79,6 +80,12 @@ const router = createRouter({
       path: '/instructor',
       name: 'instructor-dashboard',
       component: () => import('@/pages/instructor/DashboardPage.vue'),
+      meta: { requiresAuth: true, roles: [UserRole.INSTRUCTOR] },
+    },
+    {
+      path: '/instructor/revenue',
+      name: 'instructor-revenue',
+      component: () => import('@/pages/instructor/RevenueDashboardView.vue'),
       meta: { requiresAuth: true, roles: [UserRole.INSTRUCTOR] },
     },
     {
@@ -114,6 +121,24 @@ const router = createRouter({
       path: '/admin',
       name: 'admin-dashboard',
       component: () => import('@/pages/admin/DashboardPage.vue'),
+      meta: { requiresAuth: true, roles: [UserRole.ADMIN] },
+    },
+    {
+      path: '/admin/coupons',
+      name: 'admin-coupons',
+      component: () => import('@/pages/admin/CouponManagementView.vue'),
+      meta: { requiresAuth: true, roles: [UserRole.ADMIN] },
+    },
+    {
+      path: '/admin/refunds',
+      name: 'admin-refunds',
+      component: () => import('@/pages/admin/RefundManagementView.vue'),
+      meta: { requiresAuth: true, roles: [UserRole.ADMIN] },
+    },
+    {
+      path: '/admin/payouts',
+      name: 'admin-payouts',
+      component: () => import('@/pages/admin/PayoutManagementView.vue'),
       meta: { requiresAuth: true, roles: [UserRole.ADMIN] },
     },
     {
