@@ -1,5 +1,6 @@
 // ==================== Enums ====================
 export * from './notification'
+export * from './commerce'
 export enum UserRole {
   STUDENT = 'STUDENT',
   INSTRUCTOR = 'INSTRUCTOR',
@@ -31,6 +32,9 @@ export interface User {
   avatarUrl?: string | null
   role: UserRole
   status: UserStatus
+  googleId?: string | null
+  githubId?: string | null
+  lastLoginAt?: string | null
   emailVerifiedAt?: string | null
   createdAt: string
   updatedAt: string

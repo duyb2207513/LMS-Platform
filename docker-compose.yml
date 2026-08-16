@@ -56,7 +56,7 @@ services:
       LOGIN_MAX_ATTEMPTS: 5
       LOGIN_LOCK_MINUTES: 15
       REQUIRE_EMAIL_VERIFICATION: "false"
-      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-456249048931-5aa460ojovj1qfo7ap3hbv7qauh7avdj.apps.googleusercontent.com}
       SMTP_HOST: ${SMTP_HOST:-}
       SMTP_PORT: ${SMTP_PORT:-587}
       SMTP_SECURE: ${SMTP_SECURE:-false}
@@ -89,7 +89,7 @@ services:
 
     environment:
       VITE_API_BASE_URL: http://localhost:3000/api/v1
-      VITE_GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      VITE_GOOGLE_CLIENT_ID: ${VITE_GOOGLE_CLIENT_ID:-${GOOGLE_CLIENT_ID:-456249048931-5aa460ojovj1qfo7ap3hbv7qauh7avdj.apps.googleusercontent.com}}
 
     command: npm run dev -- --host 0.0.0.0
 
