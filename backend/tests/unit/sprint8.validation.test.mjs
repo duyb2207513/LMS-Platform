@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { validatePreferenceInput } from "../../dist/modules/notification-preferences/preference.validation.js";
 import { validateCreateAnnouncement, validateUpdateAnnouncement } from "../../dist/modules/announcements/announcement.validation.js";
-import { parseNotificationQuery } from "../../dist/modules/notifications/notification.validation.js";
+import { parseNotificationQuery, validatePushDeviceInput } from "../../dist/modules/notifications/notification.validation.js";
 import { allowsInApp } from "../../dist/modules/notifications/notification.service.js";
 import { allowsEmail } from "../../dist/services/email/email.service.js";
 
@@ -9,6 +9,9 @@ assert.deepEqual(validatePreferenceInput({ emailEnabled: false }).data, { emailE
 assert.ok(validatePreferenceInput({ emailEnabled: "false" }).errors.emailEnabled);
 assert.ok(validatePreferenceInput({ userId: "forbidden" }).errors.userId);
 assert.ok(validatePreferenceInput({}).errors.body);
+assert.equal(validatePreferenceInput({ pushEnabled: false }).data.pushEnabled, false);
+assert.deepEqual(validatePushDeviceInput({ expoPushToken: "ExponentPushToken[demo-device-token]", platform: "ios", deviceName: "iPhone" }).data, { expoPushToken: "ExponentPushToken[demo-device-token]", platform: "ios", deviceName: "iPhone" });
+assert.ok(validatePushDeviceInput({ expoPushToken: "not-a-token", platform: "desktop" }).errors.expoPushToken);
 assert.equal(validateCreateAnnouncement({ title: "Thông báo", content: "Nội dung" }).data.title, "Thông báo");
 assert.ok(validateCreateAnnouncement({ title: "", content: "Nội dung" }).errors.title);
 assert.ok(validateUpdateAnnouncement({ status: "PUBLISHED" }).errors.status);

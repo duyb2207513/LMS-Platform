@@ -7,6 +7,7 @@ import { normalizeMediaUrls } from './media';
 
 export { API_URL } from './clientConfig';
 export const ACCESS_TOKEN_KEY = 'lms.accessToken';
+export const REFRESH_TOKEN_KEY = 'lms.refreshToken';
 const CACHE_PREFIX = 'lms.apiCache.';
 const CACHE_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
 let cacheScope = 'guest';
@@ -45,7 +46,13 @@ export const apiClient = axios.create({
   baseURL: API_URL,
   timeout: 15000,
   withCredentials: true,
-  headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+  headers: { Accept: 'application/json', 'Content-Type': 'application/json', 'X-Client-Platform': 'mobile' },
+});
+
+const refreshClient = axios.create({
+  baseURL: API_URL,
+  timeout: 15000,
+  headers: { Accept: 'application/json', 'Content-Type': 'application/json', 'X-Client-Platform': 'mobile' },
 });
 
 let refreshPromise: Promise<string> | null = null;
@@ -53,6 +60,28 @@ let onSessionExpired: (() => void) | null = null;
 
 export function setSessionExpiredHandler(handler: () => void) {
   onSessionExpired = handler;
+}
+
+export async function saveMobileTokens(accessToken: string, refreshToken: string) {
+  await Promise.all([
+    SecureStore.setItemAsync(ACCESS_TOKEN_KEY, accessToken),
+    SecureStore.setItemAsync(REFRESH_TOKEN_KEY, refreshToken),
+  ]);
+}
+
+export async function clearMobileTokens() {
+  await Promise.all([
+    SecureStore.deleteItemAsync(ACCESS_TOKEN_KEY),
+    SecureStore.deleteItemAsync(REFRESH_TOKEN_KEY),
+  ]);
+}
+
+export async function refreshMobileAccessToken() {
+  const refreshToken = await SecureStore.getItemAsync(REFRESH_TOKEN_KEY);
+  if (!refreshToken) throw new Error('Refresh token is missing');
+  const { data } = await refreshClient.post<ApiResponse<{ accessToken: string; refreshToken: string }>>('/auth/mobile/refresh-token', { refreshToken });
+  await saveMobileTokens(data.data.accessToken, data.data.refreshToken);
+  return data.data.accessToken;
 }
 
 apiClient.interceptors.request.use(async (config: InternalAxiosRequestConfig) => {
@@ -72,24 +101,17 @@ apiClient.interceptors.response.use(
   },
   async (error: AxiosError<ApiResponse<unknown>>) => {
     const original = error.config as (InternalAxiosRequestConfig & { _retry?: boolean }) | undefined;
-    const isAuthRoute = original?.url?.includes('/auth/login') ||
-      original?.url?.includes('/auth/register') || original?.url?.includes('/auth/refresh-token');
+    const isAuthRoute = /\/auth\/(?:mobile\/)?(?:login|register|google|refresh-token|oauth-exchange|logout)$/.test(original?.url || '');
 
     if (error.response?.status === 401 && original && !original._retry && !isAuthRoute) {
       original._retry = true;
       try {
-        refreshPromise ??= apiClient
-          .post<ApiResponse<{ accessToken: string }>>('/auth/refresh-token')
-          .then(async ({ data }) => {
-            await SecureStore.setItemAsync(ACCESS_TOKEN_KEY, data.data.accessToken);
-            return data.data.accessToken;
-          })
-          .finally(() => { refreshPromise = null; });
+        refreshPromise ??= refreshMobileAccessToken().finally(() => { refreshPromise = null; });
         const token = await refreshPromise;
         original.headers.Authorization = `Bearer ${token}`;
         return apiClient(original);
       } catch {
-        await SecureStore.deleteItemAsync(ACCESS_TOKEN_KEY);
+        await clearMobileTokens();
         onSessionExpired?.();
       }
     }

@@ -9,3 +9,9 @@ export type CreateNotificationInput = {
 };
 
 export type NotificationListQuery = { page: number; limit: number; isRead?: boolean };
+
+export type RegisterPushDeviceInput = {
+  expoPushToken: string;
+  platform: "ios" | "android";
+  deviceName?: string;
+};

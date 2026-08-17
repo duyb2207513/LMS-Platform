@@ -29,6 +29,7 @@ export type NotificationPreferenceMinAggregateOutputType = {
   userId: string | null
   inAppEnabled: boolean | null
   emailEnabled: boolean | null
+  pushEnabled: boolean | null
   courseUpdates: boolean | null
   assignmentReminders: boolean | null
   quizResults: boolean | null
@@ -42,6 +43,7 @@ export type NotificationPreferenceMaxAggregateOutputType = {
   userId: string | null
   inAppEnabled: boolean | null
   emailEnabled: boolean | null
+  pushEnabled: boolean | null
   courseUpdates: boolean | null
   assignmentReminders: boolean | null
   quizResults: boolean | null
@@ -55,6 +57,7 @@ export type NotificationPreferenceCountAggregateOutputType = {
   userId: number
   inAppEnabled: number
   emailEnabled: number
+  pushEnabled: number
   courseUpdates: number
   assignmentReminders: number
   quizResults: number
@@ -70,6 +73,7 @@ export type NotificationPreferenceMinAggregateInputType = {
   userId?: true
   inAppEnabled?: true
   emailEnabled?: true
+  pushEnabled?: true
   courseUpdates?: true
   assignmentReminders?: true
   quizResults?: true
@@ -83,6 +87,7 @@ export type NotificationPreferenceMaxAggregateInputType = {
   userId?: true
   inAppEnabled?: true
   emailEnabled?: true
+  pushEnabled?: true
   courseUpdates?: true
   assignmentReminders?: true
   quizResults?: true
@@ -96,6 +101,7 @@ export type NotificationPreferenceCountAggregateInputType = {
   userId?: true
   inAppEnabled?: true
   emailEnabled?: true
+  pushEnabled?: true
   courseUpdates?: true
   assignmentReminders?: true
   quizResults?: true
@@ -182,6 +188,7 @@ export type NotificationPreferenceGroupByOutputType = {
   userId: string
   inAppEnabled: boolean
   emailEnabled: boolean
+  pushEnabled: boolean
   courseUpdates: boolean
   assignmentReminders: boolean
   quizResults: boolean
@@ -216,6 +223,7 @@ export type NotificationPreferenceWhereInput = {
   userId?: Prisma.UuidFilter<"NotificationPreference"> | string
   inAppEnabled?: Prisma.BoolFilter<"NotificationPreference"> | boolean
   emailEnabled?: Prisma.BoolFilter<"NotificationPreference"> | boolean
+  pushEnabled?: Prisma.BoolFilter<"NotificationPreference"> | boolean
   courseUpdates?: Prisma.BoolFilter<"NotificationPreference"> | boolean
   assignmentReminders?: Prisma.BoolFilter<"NotificationPreference"> | boolean
   quizResults?: Prisma.BoolFilter<"NotificationPreference"> | boolean
@@ -230,6 +238,7 @@ export type NotificationPreferenceOrderByWithRelationInput = {
   userId?: Prisma.SortOrder
   inAppEnabled?: Prisma.SortOrder
   emailEnabled?: Prisma.SortOrder
+  pushEnabled?: Prisma.SortOrder
   courseUpdates?: Prisma.SortOrder
   assignmentReminders?: Prisma.SortOrder
   quizResults?: Prisma.SortOrder
@@ -247,6 +256,7 @@ export type NotificationPreferenceWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.NotificationPreferenceWhereInput | Prisma.NotificationPreferenceWhereInput[]
   inAppEnabled?: Prisma.BoolFilter<"NotificationPreference"> | boolean
   emailEnabled?: Prisma.BoolFilter<"NotificationPreference"> | boolean
+  pushEnabled?: Prisma.BoolFilter<"NotificationPreference"> | boolean
   courseUpdates?: Prisma.BoolFilter<"NotificationPreference"> | boolean
   assignmentReminders?: Prisma.BoolFilter<"NotificationPreference"> | boolean
   quizResults?: Prisma.BoolFilter<"NotificationPreference"> | boolean
@@ -261,6 +271,7 @@ export type NotificationPreferenceOrderByWithAggregationInput = {
   userId?: Prisma.SortOrder
   inAppEnabled?: Prisma.SortOrder
   emailEnabled?: Prisma.SortOrder
+  pushEnabled?: Prisma.SortOrder
   courseUpdates?: Prisma.SortOrder
   assignmentReminders?: Prisma.SortOrder
   quizResults?: Prisma.SortOrder
@@ -280,6 +291,7 @@ export type NotificationPreferenceScalarWhereWithAggregatesInput = {
   userId?: Prisma.UuidWithAggregatesFilter<"NotificationPreference"> | string
   inAppEnabled?: Prisma.BoolWithAggregatesFilter<"NotificationPreference"> | boolean
   emailEnabled?: Prisma.BoolWithAggregatesFilter<"NotificationPreference"> | boolean
+  pushEnabled?: Prisma.BoolWithAggregatesFilter<"NotificationPreference"> | boolean
   courseUpdates?: Prisma.BoolWithAggregatesFilter<"NotificationPreference"> | boolean
   assignmentReminders?: Prisma.BoolWithAggregatesFilter<"NotificationPreference"> | boolean
   quizResults?: Prisma.BoolWithAggregatesFilter<"NotificationPreference"> | boolean
@@ -292,6 +304,7 @@ export type NotificationPreferenceCreateInput = {
   id?: string
   inAppEnabled?: boolean
   emailEnabled?: boolean
+  pushEnabled?: boolean
   courseUpdates?: boolean
   assignmentReminders?: boolean
   quizResults?: boolean
@@ -306,6 +319,7 @@ export type NotificationPreferenceUncheckedCreateInput = {
   userId: string
   inAppEnabled?: boolean
   emailEnabled?: boolean
+  pushEnabled?: boolean
   courseUpdates?: boolean
   assignmentReminders?: boolean
   quizResults?: boolean
@@ -318,6 +332,7 @@ export type NotificationPreferenceUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   inAppEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pushEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   courseUpdates?: Prisma.BoolFieldUpdateOperationsInput | boolean
   assignmentReminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
   quizResults?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -332,6 +347,7 @@ export type NotificationPreferenceUncheckedUpdateInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   inAppEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pushEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   courseUpdates?: Prisma.BoolFieldUpdateOperationsInput | boolean
   assignmentReminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
   quizResults?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -345,6 +361,7 @@ export type NotificationPreferenceCreateManyInput = {
   userId: string
   inAppEnabled?: boolean
   emailEnabled?: boolean
+  pushEnabled?: boolean
   courseUpdates?: boolean
   assignmentReminders?: boolean
   quizResults?: boolean
@@ -357,6 +374,7 @@ export type NotificationPreferenceUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   inAppEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pushEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   courseUpdates?: Prisma.BoolFieldUpdateOperationsInput | boolean
   assignmentReminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
   quizResults?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -370,6 +388,7 @@ export type NotificationPreferenceUncheckedUpdateManyInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   inAppEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pushEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   courseUpdates?: Prisma.BoolFieldUpdateOperationsInput | boolean
   assignmentReminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
   quizResults?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -388,6 +407,7 @@ export type NotificationPreferenceCountOrderByAggregateInput = {
   userId?: Prisma.SortOrder
   inAppEnabled?: Prisma.SortOrder
   emailEnabled?: Prisma.SortOrder
+  pushEnabled?: Prisma.SortOrder
   courseUpdates?: Prisma.SortOrder
   assignmentReminders?: Prisma.SortOrder
   quizResults?: Prisma.SortOrder
@@ -401,6 +421,7 @@ export type NotificationPreferenceMaxOrderByAggregateInput = {
   userId?: Prisma.SortOrder
   inAppEnabled?: Prisma.SortOrder
   emailEnabled?: Prisma.SortOrder
+  pushEnabled?: Prisma.SortOrder
   courseUpdates?: Prisma.SortOrder
   assignmentReminders?: Prisma.SortOrder
   quizResults?: Prisma.SortOrder
@@ -414,6 +435,7 @@ export type NotificationPreferenceMinOrderByAggregateInput = {
   userId?: Prisma.SortOrder
   inAppEnabled?: Prisma.SortOrder
   emailEnabled?: Prisma.SortOrder
+  pushEnabled?: Prisma.SortOrder
   courseUpdates?: Prisma.SortOrder
   assignmentReminders?: Prisma.SortOrder
   quizResults?: Prisma.SortOrder
@@ -458,6 +480,7 @@ export type NotificationPreferenceCreateWithoutUserInput = {
   id?: string
   inAppEnabled?: boolean
   emailEnabled?: boolean
+  pushEnabled?: boolean
   courseUpdates?: boolean
   assignmentReminders?: boolean
   quizResults?: boolean
@@ -470,6 +493,7 @@ export type NotificationPreferenceUncheckedCreateWithoutUserInput = {
   id?: string
   inAppEnabled?: boolean
   emailEnabled?: boolean
+  pushEnabled?: boolean
   courseUpdates?: boolean
   assignmentReminders?: boolean
   quizResults?: boolean
@@ -498,6 +522,7 @@ export type NotificationPreferenceUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   inAppEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pushEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   courseUpdates?: Prisma.BoolFieldUpdateOperationsInput | boolean
   assignmentReminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
   quizResults?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -510,6 +535,7 @@ export type NotificationPreferenceUncheckedUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   inAppEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   emailEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pushEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   courseUpdates?: Prisma.BoolFieldUpdateOperationsInput | boolean
   assignmentReminders?: Prisma.BoolFieldUpdateOperationsInput | boolean
   quizResults?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -525,6 +551,7 @@ export type NotificationPreferenceSelect<ExtArgs extends runtime.Types.Extension
   userId?: boolean
   inAppEnabled?: boolean
   emailEnabled?: boolean
+  pushEnabled?: boolean
   courseUpdates?: boolean
   assignmentReminders?: boolean
   quizResults?: boolean
@@ -539,6 +566,7 @@ export type NotificationPreferenceSelectCreateManyAndReturn<ExtArgs extends runt
   userId?: boolean
   inAppEnabled?: boolean
   emailEnabled?: boolean
+  pushEnabled?: boolean
   courseUpdates?: boolean
   assignmentReminders?: boolean
   quizResults?: boolean
@@ -553,6 +581,7 @@ export type NotificationPreferenceSelectUpdateManyAndReturn<ExtArgs extends runt
   userId?: boolean
   inAppEnabled?: boolean
   emailEnabled?: boolean
+  pushEnabled?: boolean
   courseUpdates?: boolean
   assignmentReminders?: boolean
   quizResults?: boolean
@@ -567,6 +596,7 @@ export type NotificationPreferenceSelectScalar = {
   userId?: boolean
   inAppEnabled?: boolean
   emailEnabled?: boolean
+  pushEnabled?: boolean
   courseUpdates?: boolean
   assignmentReminders?: boolean
   quizResults?: boolean
@@ -575,7 +605,7 @@ export type NotificationPreferenceSelectScalar = {
   updatedAt?: boolean
 }
 
-export type NotificationPreferenceOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "inAppEnabled" | "emailEnabled" | "courseUpdates" | "assignmentReminders" | "quizResults" | "certificateUpdates" | "createdAt" | "updatedAt", ExtArgs["result"]["notificationPreference"]>
+export type NotificationPreferenceOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "inAppEnabled" | "emailEnabled" | "pushEnabled" | "courseUpdates" | "assignmentReminders" | "quizResults" | "certificateUpdates" | "createdAt" | "updatedAt", ExtArgs["result"]["notificationPreference"]>
 export type NotificationPreferenceInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
@@ -596,6 +626,7 @@ export type $NotificationPreferencePayload<ExtArgs extends runtime.Types.Extensi
     userId: string
     inAppEnabled: boolean
     emailEnabled: boolean
+    pushEnabled: boolean
     courseUpdates: boolean
     assignmentReminders: boolean
     quizResults: boolean
@@ -1030,6 +1061,7 @@ export interface NotificationPreferenceFieldRefs {
   readonly userId: Prisma.FieldRef<"NotificationPreference", 'String'>
   readonly inAppEnabled: Prisma.FieldRef<"NotificationPreference", 'Boolean'>
   readonly emailEnabled: Prisma.FieldRef<"NotificationPreference", 'Boolean'>
+  readonly pushEnabled: Prisma.FieldRef<"NotificationPreference", 'Boolean'>
   readonly courseUpdates: Prisma.FieldRef<"NotificationPreference", 'Boolean'>
   readonly assignmentReminders: Prisma.FieldRef<"NotificationPreference", 'Boolean'>
   readonly quizResults: Prisma.FieldRef<"NotificationPreference", 'Boolean'>

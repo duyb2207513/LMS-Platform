@@ -1,0 +1,15 @@
+appId: com.lmsplatform.mobile
+---
+- launchApp:
+    clearState: true
+- tapOn: "Cá nhân"
+- tapOn: "Đăng nhập"
+- tapOn: "ban@example.com"
+- inputText: "instructor@lms.test"
+- tapOn: "••••••••"
+- inputText: "Password123"
+- tapOn: "Đăng nhập"
+- tapOn: "Khóa học"
+- tapOn: "Nội dung"
+- tapOn: "Sổ điểm"
+- assertVisible: "Quy tắc điểm tổng kết"

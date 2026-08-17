@@ -9,6 +9,8 @@ import { CourseCard } from '../components/CourseCard';
 import type { AppNotification, Category, Course, NotificationPreference } from '../types';
 import { colors, shadow } from '../theme';
 import { useAppTheme } from '../providers/ThemeProvider';
+import { useNotifications } from '../notifications/NotificationContext';
+import { notificationDestination } from '../notifications/notificationNavigation';
 
 export function SearchScreen({ navigation }: { navigation: any }) {
   const { palette } = useAppTheme();
@@ -30,19 +32,25 @@ export function SearchScreen({ navigation }: { navigation: any }) {
 
 export function NotificationsScreen({ navigation }: { navigation: any }) {
   const { user } = useAuth();
+  const { refreshUnread } = useNotifications();
   const { palette } = useAppTheme();
   const [items, setItems] = useState<AppNotification[]>([]); const [unreadOnly, setUnreadOnly] = useState(false);
   const [loading, setLoading] = useState(true); const [error, setError] = useState(''); const [prefsOpen, setPrefsOpen] = useState(false);
   const [prefs, setPrefs] = useState<NotificationPreference | null>(null);
   const load = useCallback(async () => {
     if (!user) { setLoading(false); return; }
-    setLoading(true); try { const result = await notificationsApi.list({ page: 1, limit: 50, ...(unreadOnly ? { isRead: false } : {}) }); setItems(result.data.data); setError(''); navigation.setOptions?.({ tabBarBadge: result.data.meta.unreadCount || undefined }); }
+    setLoading(true); try { const result = await notificationsApi.list({ page: 1, limit: 50, ...(unreadOnly ? { isRead: false } : {}) }); setItems(result.data.data); setError(''); await refreshUnread(); }
     catch (e) { setError(getApiMessage(e)); } finally { setLoading(false); }
-  }, [navigation, unreadOnly, user]);
+  }, [refreshUnread, unreadOnly, user]);
   useEffect(() => { void load(); }, [load]);
   const openPreferences = async () => { setPrefsOpen(true); if (!prefs) try { setPrefs((await notificationPreferencesApi.get()).data.data); } catch (e) { Alert.alert('Không thể tải tùy chọn', getApiMessage(e)); } };
   const patchPreference = async (key: keyof NotificationPreference, value: boolean) => { if (!prefs) return; const next = { ...prefs, [key]: value }; setPrefs(next); try { setPrefs((await notificationPreferencesApi.update({ [key]: value })).data.data); } catch (e) { setPrefs(prefs); Alert.alert('Không thể lưu', getApiMessage(e)); } };
-  const read = async (item: AppNotification) => { if (!item.isRead) await notificationsApi.markRead(item.id); await load(); };
+  const read = async (item: AppNotification) => {
+    if (!item.isRead) await notificationsApi.markRead(item.id);
+    const destination = notificationDestination(item.type, item.data || {});
+    navigation.navigate(destination.name, destination.params);
+    await load();
+  };
   const remove = async (item: AppNotification) => { try { await notificationsApi.remove(item.id); setItems(current => current.filter(row => row.id !== item.id)); } catch (e) { Alert.alert('Không thể xóa', getApiMessage(e)); } };
   if (!user) return <Screen topInset><AppBar title="Thông báo" /><StateView empty="Đăng nhập để xem thông báo của bạn" /><Button title="Đăng nhập" onPress={() => navigation.navigate('Login')} /></Screen>;
   return <View style={[styles.page, { backgroundColor: palette.background }]}><Screen topInset scroll={false} quickScroll={false}>
@@ -65,10 +73,11 @@ function SwipeNotification({ item, onPress, onDelete }: { item: AppNotification;
 
 const preferenceRows: Array<{ key: keyof NotificationPreference; label: string; note: string }> = [
   { key: 'inAppEnabled', label: 'Thông báo trong ứng dụng', note: 'Bật hoặc tắt toàn bộ thông báo trong app' }, { key: 'emailEnabled', label: 'Thông báo qua email', note: 'Nhận các cập nhật quan trọng qua email' },
+  { key: 'pushEnabled', label: 'Thông báo đẩy', note: 'Nhận thông báo khi ứng dụng đang đóng' },
   { key: 'courseUpdates', label: 'Cập nhật khóa học', note: 'Bài học mới và thông báo khóa học' }, { key: 'assignmentReminders', label: 'Nhắc hạn bài tập', note: 'Nhắc các bài tập sắp đến hạn' },
   { key: 'quizResults', label: 'Kết quả quiz', note: 'Thông báo sau khi chấm quiz' }, { key: 'certificateUpdates', label: 'Chứng chỉ', note: 'Thông báo khi chứng chỉ được cấp' },
 ];
-const notificationIcon: Partial<Record<AppNotification['type'], keyof typeof Ionicons.glyphMap>> = { WELCOME: 'sparkles-outline', COURSE_ENROLLED: 'school-outline', NEW_LESSON: 'play-circle-outline', COURSE_ANNOUNCEMENT: 'megaphone-outline', ASSIGNMENT_DUE: 'document-text-outline', QUIZ_RESULT: 'ribbon-outline', CERTIFICATE_ISSUED: 'medal-outline' };
+const notificationIcon: Partial<Record<AppNotification['type'], keyof typeof Ionicons.glyphMap>> = { WELCOME: 'sparkles-outline', COURSE_ENROLLED: 'school-outline', NEW_LESSON: 'play-circle-outline', COURSE_ANNOUNCEMENT: 'megaphone-outline', ASSIGNMENT_DUE: 'document-text-outline', ASSIGNMENT_GRADED: 'checkmark-done-outline', QUIZ_RESULT: 'ribbon-outline', PAYMENT_SUCCEEDED: 'card-outline', CERTIFICATE_ISSUED: 'medal-outline', DIRECT_MESSAGE: 'chatbubble-ellipses-outline' };
 const notificationColor: Partial<Record<AppNotification['type'], string>> = { ASSIGNMENT_DUE: colors.warning, CERTIFICATE_ISSUED: colors.success, WELCOME: colors.primary };
 function relativeTime(value: string) { const seconds = Math.max(0, Math.floor((Date.now() - new Date(value).getTime()) / 1000)); if (seconds < 60) return 'Vừa xong'; if (seconds < 3600) return `${Math.floor(seconds / 60)} phút trước`; if (seconds < 86400) return `${Math.floor(seconds / 3600)} giờ trước`; return new Intl.DateTimeFormat('vi-VN', { dateStyle: 'medium' }).format(new Date(value)); }
 function FilterRow({ label, selected, onPress }: { label: string; selected: boolean; onPress(): void }) { const { palette } = useAppTheme(); return <Pressable onPress={onPress} style={[styles.filterRow, { borderBottomColor: palette.border }]}><Text style={[styles.filterLabel, { color: palette.ink }, selected && { color: palette.primary, fontWeight: '900' }]}>{label}</Text>{selected && <Ionicons name="checkmark-circle" size={23} color={palette.primary} />}</Pressable>; }

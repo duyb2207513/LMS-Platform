@@ -49,6 +49,7 @@ services:
     environment:
       NODE_ENV: development
       PORT: 3000
+      MOBILE_APP_URL: lmsplatform://
       DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-lms_db}
       JWT_ACCESS_SECRET: local-development-access-secret-change-me
       JWT_REFRESH_SECRET: local-development-refresh-secret-change-me
@@ -122,6 +123,11 @@ services:
 
     environment:
       EXPO_PUBLIC_API_URL: ${MOBILE_API_URL:-http://10.0.2.2:3000/api/v1}
+      EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID: ${GOOGLE_CLIENT_ID:-456249048931-5aa460ojovj1qfo7ap3hbv7qauh7avdj.apps.googleusercontent.com}
+      EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID: ${EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID:-}
+      EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID: ${EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID:-}
+      EXPO_PUBLIC_EAS_PROJECT_ID: ${EXPO_PUBLIC_EAS_PROJECT_ID:-}
+      EXPO_PUBLIC_SENTRY_DSN: ${EXPO_PUBLIC_SENTRY_DSN:-}
       REACT_NATIVE_PACKAGER_HOSTNAME: ${MOBILE_HOST_IP:-10.0.2.2}
       WATCHPACK_POLLING: "true"
 

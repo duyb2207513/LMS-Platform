@@ -157,6 +157,11 @@ export type Notification = Prisma.NotificationModel
  */
 export type NotificationPreference = Prisma.NotificationPreferenceModel
 /**
+ * Model PushDevice
+ * 
+ */
+export type PushDevice = Prisma.PushDeviceModel
+/**
  * Model EmailLog
  * 
  */

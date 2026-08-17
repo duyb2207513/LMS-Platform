@@ -4,13 +4,14 @@ import { validateRequest } from "../../common/middlewares/validateRequest.js";
 import { asyncHandler } from "../../common/utils/asyncHandler.js";
 import {
   confirmEmailChangeController, forgotPasswordController, githubCallbackController, googleLoginController, listSessionsController,
-  loginController, logoutController, refreshTokenController, registerController, resendVerificationController,
+  loginController, logoutController, mobileGoogleLoginController, mobileLoginController, mobileLogoutController,
+  mobileOAuthExchangeController, mobileRefreshTokenController, refreshTokenController, registerController, resendVerificationController,
   requestEmailChangeController, resetPasswordController, revokeOtherSessionsController,
   revokeSessionController, startGitHubLoginController, verifyEmailController
 } from "./auth.controller.js";
 import {
   validateChangeEmailInput, validateEmailInput, validateGoogleLoginInput, validateLoginInput,
-  validateRegisterInput, validateResetPasswordInput, validateTokenInput
+  validateMobileOAuthExchangeInput, validateMobileRefreshInput, validateRegisterInput, validateResetPasswordInput, validateTokenInput
 } from "./auth.validation.js";
 
 const authRouter = Router();
@@ -45,6 +46,36 @@ authRouter.post("/login", validateRequest(validateLoginInput), asyncHandler(logi
  *     responses: { 200: { description: Google login successful }, 401: { description: Invalid Google token }, 503: { description: Google login is not configured } }
  */
 authRouter.post("/google", validateRequest(validateGoogleLoginInput), asyncHandler(googleLoginController));
+/** @openapi
+ * /auth/mobile/login:
+ *   post:
+ *     tags: [Mobile auth]
+ *     summary: Login from a native client and return both tokens in JSON
+ *     security: []
+ *     requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/LoginRequest' } } } }
+ *     responses: { 200: { description: Mobile login successful }, 401: { description: Invalid credentials }, 423: { description: Account temporarily locked } }
+ */
+authRouter.post("/mobile/login", validateRequest(validateLoginInput), asyncHandler(mobileLoginController));
+/** @openapi
+ * /auth/mobile/google:
+ *   post:
+ *     tags: [Mobile auth]
+ *     summary: Login from a native client using a Google ID token
+ *     security: []
+ *     requestBody: { required: true, content: { application/json: { schema: { type: object, required: [idToken], properties: { idToken: { type: string } } } } } }
+ *     responses: { 200: { description: Mobile Google login successful }, 401: { description: Invalid Google token } }
+ */
+authRouter.post("/mobile/google", validateRequest(validateGoogleLoginInput), asyncHandler(mobileGoogleLoginController));
+/** @openapi
+ * /auth/mobile/oauth-exchange:
+ *   post:
+ *     tags: [Mobile auth]
+ *     summary: Exchange a one-time OAuth handoff code for a native session
+ *     security: []
+ *     requestBody: { required: true, content: { application/json: { schema: { type: object, required: [code], properties: { code: { type: string } } } } } }
+ *     responses: { 200: { description: OAuth login successful }, 401: { description: Code invalid or expired } }
+ */
+authRouter.post("/mobile/oauth-exchange", validateRequest(validateMobileOAuthExchangeInput), asyncHandler(mobileOAuthExchangeController));
 /** @openapi
  * /auth/github:
  *   get:
@@ -81,6 +112,16 @@ authRouter.get("/github/callback", asyncHandler(githubCallbackController));
  */
 authRouter.post("/refresh-token", asyncHandler(refreshTokenController));
 /** @openapi
+ * /auth/mobile/refresh-token:
+ *   post:
+ *     tags: [Mobile auth]
+ *     summary: Rotate a native refresh token
+ *     security: []
+ *     requestBody: { required: true, content: { application/json: { schema: { type: object, required: [refreshToken], properties: { refreshToken: { type: string } } } } } }
+ *     responses: { 200: { description: Tokens rotated }, 401: { description: Refresh token invalid, revoked, or expired } }
+ */
+authRouter.post("/mobile/refresh-token", validateRequest(validateMobileRefreshInput), asyncHandler(mobileRefreshTokenController));
+/** @openapi
  * /auth/logout:
  *   post:
  *     tags: [Auth]
@@ -88,6 +129,16 @@ authRouter.post("/refresh-token", asyncHandler(refreshTokenController));
  *     responses: { 200: { description: Logout successful } }
  */
 authRouter.post("/logout", asyncHandler(logoutController));
+/** @openapi
+ * /auth/mobile/logout:
+ *   post:
+ *     tags: [Mobile auth]
+ *     summary: Revoke a native refresh-token session
+ *     security: []
+ *     requestBody: { required: true, content: { application/json: { schema: { type: object, required: [refreshToken], properties: { refreshToken: { type: string } } } } } }
+ *     responses: { 200: { description: Logout successful } }
+ */
+authRouter.post("/mobile/logout", validateRequest(validateMobileRefreshInput), asyncHandler(mobileLogoutController));
 
 /** @openapi
  * /auth/verify-email:

@@ -1,5 +1,6 @@
 import { AppError } from "../../common/errors/AppError.js";
-import type { NotificationListQuery } from "./notification.types.js";
+import type { RequestValidationResult } from "../../common/middlewares/validateRequest.js";
+import type { NotificationListQuery, RegisterPushDeviceInput } from "./notification.types.js";
 
 export function parseNotificationQuery(query: Record<string, unknown>): NotificationListQuery {
   const page = Number(query.page ?? 1), limit = Number(query.limit ?? 20);
@@ -11,4 +12,16 @@ export function parseNotificationQuery(query: Record<string, unknown>): Notifica
     isRead = query.isRead === "true";
   }
   return { page, limit, ...(isRead === undefined ? {} : { isRead }) };
+}
+
+export function validatePushDeviceInput(body: unknown): RequestValidationResult<RegisterPushDeviceInput> {
+  if (!body || typeof body !== "object" || Array.isArray(body)) return { errors: { body: "Request body must be a JSON object" } };
+  const input = body as Record<string, unknown>, errors: Record<string, string> = {};
+  for (const key of Object.keys(input)) if (!["expoPushToken", "platform", "deviceName"].includes(key)) errors[key] = `${key} cannot be set through this endpoint`;
+  const token = typeof input.expoPushToken === "string" ? input.expoPushToken.trim() : "";
+  if (!/^(Exponent|Expo)PushToken\[[^\]]+\]$/.test(token)) errors.expoPushToken = "expoPushToken must be a valid Expo push token";
+  if (input.platform !== "ios" && input.platform !== "android") errors.platform = "platform must be ios or android";
+  const deviceName = typeof input.deviceName === "string" ? input.deviceName.trim() : undefined;
+  if (deviceName && deviceName.length > 120) errors.deviceName = "deviceName must not exceed 120 characters";
+  return Object.keys(errors).length ? { errors } : { data: { expoPushToken: token, platform: input.platform as "ios" | "android", ...(deviceName ? { deviceName } : {}) } };
 }

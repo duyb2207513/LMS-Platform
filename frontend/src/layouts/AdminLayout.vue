@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import AppHeader from "@/components/layout/AppHeader.vue";
+import WorkspaceHeader from "@/components/layout/WorkspaceHeader.vue";
 import AppSidebar from "@/components/layout/AppSidebar.vue";
 
 const sidebarOpen = ref(false);
@@ -70,7 +70,7 @@ const navItems = [
   <div
     class="flex min-h-screen flex-col bg-[var(--app-bg)] transition-colors duration-300"
   >
-    <AppHeader workspace @toggle-workspace="sidebarOpen = true" />
+    <WorkspaceHeader @toggle-workspace="sidebarOpen = true" />
     <div class="flex flex-1">
       <AppSidebar
         :items="navItems"
