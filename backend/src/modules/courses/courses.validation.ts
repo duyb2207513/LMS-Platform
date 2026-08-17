@@ -196,9 +196,11 @@ function validateCourseFields(
     else data.level = level as CourseLevel;
   }
   if (Object.prototype.hasOwnProperty.call(input, "price")) {
-    if (typeof input.price !== "number" || !Number.isFinite(input.price) || input.price < 0) {
+    const rawPrice = input.price;
+    const priceNum = typeof rawPrice === "number" ? rawPrice : typeof rawPrice === "string" && rawPrice.trim() !== "" ? Number(rawPrice) : NaN;
+    if (isNaN(priceNum) || !Number.isFinite(priceNum) || priceNum < 0) {
       errors.price = "Price must be a non-negative number";
-    } else data.price = input.price;
+    } else data.price = priceNum;
   }
   if (Object.prototype.hasOwnProperty.call(input, "isFree")) {
     if (typeof input.isFree !== "boolean") errors.isFree = "isFree must be a boolean";

@@ -48,12 +48,30 @@ async function handleSubmit() {
   success.value = ''
   if (!form.value.categoryId) { error.value = 'Vui lòng chọn danh mục'; return }
   if (!form.value.title.trim()) { error.value = 'Vui lòng nhập tên khóa học'; return }
-  if (!form.value.description.trim()) { error.value = 'Vui lòng nhập mô tả'; return }
+  if (form.value.title.trim().length > 255) { error.value = 'Tên khóa học không được vượt quá 255 ký tự'; return }
+  if (!form.value.description.trim()) { error.value = 'Vui lòng nhập mô tả chi tiết'; return }
+
+  const priceNum = form.value.isFree ? 0 : Number(form.value.price)
+  if (!form.value.isFree && (isNaN(priceNum) || priceNum <= 0)) {
+    error.value = 'Vui lòng nhập học phí hợp lệ (lớn hơn 0 VND) khi không chọn Miễn phí'
+    return
+  }
+
+  const payload: CourseFormData = {
+    ...form.value,
+    title: form.value.title.trim(),
+    description: form.value.description.trim(),
+    price: priceNum,
+    isFree: form.value.isFree,
+    language: form.value.language.trim() || 'Vietnamese',
+    requirements: form.value.requirements?.trim() || '',
+    learningOutcomes: form.value.learningOutcomes?.trim() || '',
+  }
 
   loading.value = true
   try {
     const courseId = route.params.id as string
-    await courseStore.updateCourse(courseId, form.value)
+    await courseStore.updateCourse(courseId, payload)
     if (thumbnailFile.value) {
       const uploadResponse = await courseStore.uploadCourseThumbnail(courseId, thumbnailFile.value)
       currentThumbnailUrl.value = uploadResponse.data?.thumbnailUrl || currentThumbnailUrl.value

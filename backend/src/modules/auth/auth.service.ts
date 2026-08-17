@@ -140,10 +140,12 @@ export async function githubLogin(code: string, context?: ClientContext) {
   if (env.nodeEnv === "development" && code.startsWith("mock_")) {
     const suffix = code.replace(/^mock_github_code_?/, "").trim();
     if (suffix) {
-      const cleanSuffix = suffix.replace(/[^a-zA-Z0-9_-]/g, "");
+      const isEmail = suffix.includes("@");
+      const cleanSuffix = suffix.replace(/[^a-zA-Z0-9_@.-]/g, "");
       const numericId = Math.abs(cleanSuffix.split("").reduce((acc, char) => (acc * 31 + char.charCodeAt(0)) | 0, 99990000));
-      profile = { id: numericId, login: `github-${cleanSuffix}`, name: `GitHub ${cleanSuffix}`, avatar_url: `https://avatars.githubusercontent.com/u/${numericId}` };
-      verifiedEmail = `github-${cleanSuffix}@lms.local`;
+      const displayName = isEmail ? cleanSuffix.split("@")[0] : cleanSuffix;
+      profile = { id: numericId, login: `github-${displayName}`, name: displayName, avatar_url: `https://avatars.githubusercontent.com/u/${numericId}` };
+      verifiedEmail = isEmail ? cleanSuffix : `github-${cleanSuffix}@lms.local`;
     } else {
       profile = { id: 99999999, login: "github-developer", name: "GitHub Developer", avatar_url: "https://avatars.githubusercontent.com/u/99999999" };
       verifiedEmail = "github-developer@lms.local";

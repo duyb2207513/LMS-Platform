@@ -107,7 +107,16 @@ function prepareResubmission() {
   textContent.value = latestAttempt.value.textContent || "";
   files.value = [];
   fileKey.value++;
-  message.value = "Đã sao chép nội dung lần nộp gần nhất. Hãy chỉnh sửa rồi nộp lại như một phiên bản mới.";
+  message.value = `Đã sao chép nội dung lần nộp gần nhất. Bạn còn ${item.value?.remainingSubmissions} lần chỉnh sửa & nộp lại (tối đa ${item.value?.maxSubmissions || 3} lần).`;
+  window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+}
+
+function editAttempt(attempt: { textContent?: string | null }) {
+  if (!canSubmit.value) return;
+  textContent.value = attempt.textContent || "";
+  files.value = [];
+  fileKey.value++;
+  message.value = `Đã lấy nội dung lần nộp để chỉnh sửa. Hãy cập nhật rồi bấm nút Nộp lại. (Còn lại ${item.value?.remainingSubmissions} lần nộp, tối đa ${item.value?.maxSubmissions || 3} lần).`;
   window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
 }
 onMounted(load);
@@ -208,19 +217,30 @@ onMounted(load);
                         {{ formatDate(attempt.submittedAt) }}
                       </p>
                     </div>
-                    <span
-                      :class="[
-                        'rounded-full px-2.5 py-1 text-xs font-bold',
-                        attempt.feedback
-                          ? 'bg-emerald-100 text-emerald-700'
-                          : 'bg-amber-100 text-amber-700',
-                      ]"
-                      >{{
-                        attempt.feedback
-                          ? `${attempt.feedback.score}/${item.maxScore} điểm`
-                          : "Đang chờ chấm"
-                      }}</span
-                    >
+                    <div class="flex items-center gap-2">
+                      <span
+                        :class="[
+                          'rounded-full px-2.5 py-1 text-xs font-bold',
+                          attempt.feedback
+                            ? 'bg-emerald-100 text-emerald-700'
+                            : 'bg-amber-100 text-amber-700',
+                        ]"
+                        >{{
+                          attempt.feedback
+                            ? `${attempt.feedback.score}/${item.maxScore} điểm`
+                            : "Đang chờ chấm"
+                        }}</span
+                      >
+                      <button
+                        v-if="canSubmit"
+                        type="button"
+                        class="flex items-center gap-1 rounded-lg border border-purple-200 bg-purple-50 px-2.5 py-1 text-xs font-bold text-purple-700 transition hover:bg-purple-100 dark:border-purple-800 dark:bg-purple-950/40 dark:text-purple-300"
+                        title="Chỉnh sửa nội dung lần nộp này"
+                        @click="editAttempt(attempt)"
+                      >
+                        ✏️ Chỉnh sửa
+                      </button>
+                    </div>
                   </div>
                   <p
                     v-if="attempt.textContent"
@@ -312,16 +332,16 @@ onMounted(load);
                 type="submit"
                 :full-width="true"
                 :loading="submitting"
-                >{{ attempts.length ? "Nộp lại bài" : "Nộp bài" }}</BaseButton
+                >{{ attempts.length ? `Chỉnh sửa & Nộp lại (Lần ${attempts.length + 1}/${item.maxSubmissions})` : "Nộp bài" }}</BaseButton
               >
             </form>
             <div
               v-else
-              class="mt-5 rounded-2xl bg-slate-100 p-4 text-sm leading-6 text-slate-600 dark:bg-slate-800 dark:text-slate-300"
+              class="mt-5 rounded-2xl bg-amber-50 p-4 text-sm leading-6 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300 border border-amber-200 dark:border-amber-900"
             >
               <template v-if="item.isOverdue && !item.allowLateSubmissions"
-                >Đã hết hạn nộp bài.</template
-              ><template v-else>Bạn đã sử dụng hết số lần nộp.</template>
+                >⏰ Đã hết hạn nộp bài.</template
+              ><template v-else>⚠️ Bạn đã sử dụng hết tối đa {{ item.maxSubmissions }} lần nộp/chỉnh sửa bài tập.</template>
             </div>
             <dl
               class="mt-5 space-y-3 border-t border-slate-100 pt-5 text-sm dark:border-slate-800"
