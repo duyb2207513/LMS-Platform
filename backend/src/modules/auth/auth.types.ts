@@ -21,3 +21,5 @@ export interface ResetPasswordInput { token: string; newPassword: string; confir
 export interface TokenInput { token: string; }
 export interface GoogleLoginInput { idToken: string; }
 export interface ChangeEmailInput { newEmail: string; currentPassword?: string; }
+export interface MobileRefreshInput { refreshToken: string; }
+export interface MobileOAuthExchangeInput { code: string; }

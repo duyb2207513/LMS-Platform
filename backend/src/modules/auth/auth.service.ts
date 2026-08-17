@@ -18,14 +18,14 @@ const hashToken = (token: string) => createHash("sha256").update(token).digest("
 const opaqueToken = () => randomBytes(32).toString("hex");
 const publicUserSelect = { id: true, fullName: true, email: true, avatarUrl: true, role: true, status: true, emailVerifiedAt: true, createdAt: true, updatedAt: true } as const;
 
-type ClientContext = { request?: AuditContext; ipAddress?: string; userAgent?: string };
+type ClientContext = { request?: AuditContext; ipAddress?: string; userAgent?: string; actionBaseUrl?: string };
 const contextFrom = (context?: ClientContext) => ({ ipAddress: context?.ipAddress, userAgent: context?.userAgent?.slice(0, 500) });
 
 function isUniqueConstraintError(error: unknown) {
   return typeof error === "object" && error !== null && "code" in error && error.code === "P2002";
 }
 
-async function createOneTimeToken(userId: string, type: "VERIFY_EMAIL" | "RESET_PASSWORD" | "CHANGE_EMAIL", expiresMinutes: number, targetEmail?: string) {
+async function createOneTimeToken(userId: string, type: "VERIFY_EMAIL" | "RESET_PASSWORD" | "CHANGE_EMAIL" | "MOBILE_OAUTH", expiresMinutes: number, targetEmail?: string) {
   const token = opaqueToken();
   await prisma.$transaction([
     prisma.authToken.updateMany({ where: { userId, type, usedAt: null }, data: { usedAt: new Date() } }),
@@ -60,7 +60,7 @@ export async function register(input: RegisterInput, context?: ClientContext) {
   try {
     const user = await prisma.user.create({ data: { fullName: input.fullName, email: input.email, passwordHash, role: "STUDENT" }, select: publicUserSelect });
     const token = await createOneTimeToken(user.id, "VERIFY_EMAIL", 24 * 60);
-    await safelySend(() => sendVerificationEmail(user.email, token));
+    await safelySend(() => sendVerificationEmail(user.email, token, context?.actionBaseUrl));
     await safelyRunCommunication(() => sendWelcomeCommunication(user));
     await writeAuditLog({ actorUserId: user.id, action: "AUTH_REGISTER", entityType: "USER", entityId: user.id, request: context?.request });
     return user;
@@ -218,6 +218,24 @@ export async function githubLogin(code: string, context?: ClientContext) {
   return { ...session, user };
 }
 
+export function createMobileOAuthHandoff(userId: string) {
+  return createOneTimeToken(userId, "MOBILE_OAUTH", 5);
+}
+
+export async function exchangeMobileOAuthCode(code: string, context?: ClientContext) {
+  const record = await prisma.authToken.findUnique({ where: { tokenHash: hashToken(code) } });
+  if (!record || record.type !== "MOBILE_OAUTH" || record.usedAt || record.expiresAt <= new Date()) {
+    throw new AppError(401, "OAuth exchange code is invalid or expired");
+  }
+  const user = await prisma.user.findUnique({ where: { id: record.userId }, select: publicUserSelect });
+  if (!user || user.status !== "ACTIVE") throw new AppError(401, "OAuth exchange code is invalid or expired");
+  const consumed = await prisma.authToken.updateMany({ where: { id: record.id, usedAt: null }, data: { usedAt: new Date() } });
+  if (!consumed.count) throw new AppError(401, "OAuth exchange code is invalid or expired");
+  const session = await createSession(user, context);
+  await writeAuditLog({ actorUserId: user.id, action: "AUTH_MOBILE_OAUTH_EXCHANGE", entityType: "AUTH_SESSION", entityId: session.sessionId, request: context?.request });
+  return { ...session, user };
+}
+
 export async function refreshSession(refreshToken: string, context?: ClientContext) {
   let payload;
   try { payload = verifyRefreshToken(refreshToken); } catch { throw new AppError(401, "Invalid or expired refresh token"); }
@@ -238,17 +256,17 @@ export async function revokeRefreshToken(refreshToken?: string) {
   } catch { /* Invalid cookie is cleared by the controller. */ }
 }
 
-export async function requestEmailVerification(userId: string) {
+export async function requestEmailVerification(userId: string, actionBaseUrl?: string) {
   const user = await prisma.user.findUnique({ where: { id: userId }, select: { email: true, emailVerifiedAt: true } });
   if (!user || user.emailVerifiedAt) return;
   const token = await createOneTimeToken(userId, "VERIFY_EMAIL", 24 * 60);
-  await safelySend(() => sendVerificationEmail(user.email, token));
+  await safelySend(() => sendVerificationEmail(user.email, token, actionBaseUrl));
 }
 
-export async function requestEmailVerificationByEmail(email: string) {
+export async function requestEmailVerificationByEmail(email: string, actionBaseUrl?: string) {
   const user = await prisma.user.findUnique({ where: { email }, select: { id: true, emailVerifiedAt: true } });
   if (!user || user.emailVerifiedAt) return;
-  await requestEmailVerification(user.id);
+  await requestEmailVerification(user.id, actionBaseUrl);
 }
 
 export async function verifyEmail(token: string) {
@@ -261,11 +279,11 @@ export async function verifyEmail(token: string) {
   await writeAuditLog({ actorUserId: record.userId, action: "AUTH_EMAIL_VERIFIED", entityType: "USER", entityId: record.userId });
 }
 
-export async function forgotPassword(email: string) {
+export async function forgotPassword(email: string, actionBaseUrl?: string) {
   const user = await prisma.user.findUnique({ where: { email }, select: { id: true, email: true } });
   if (!user) return;
   const token = await createOneTimeToken(user.id, "RESET_PASSWORD", 30);
-  await safelySend(() => sendPasswordResetEmail(user.email, token));
+  await safelySend(() => sendPasswordResetEmail(user.email, token, actionBaseUrl));
 }
 
 export async function resetPassword(input: ResetPasswordInput) {
@@ -280,7 +298,7 @@ export async function resetPassword(input: ResetPasswordInput) {
   await writeAuditLog({ actorUserId: record.userId, action: "AUTH_PASSWORD_RESET", entityType: "USER", entityId: record.userId });
 }
 
-export async function requestEmailChange(userId: string, input: ChangeEmailInput) {
+export async function requestEmailChange(userId: string, input: ChangeEmailInput, actionBaseUrl?: string) {
   const [user, existing] = await Promise.all([
     prisma.user.findUnique({ where: { id: userId }, select: { email: true, passwordHash: true } }),
     prisma.user.findUnique({ where: { email: input.newEmail }, select: { id: true } })
@@ -289,7 +307,7 @@ export async function requestEmailChange(userId: string, input: ChangeEmailInput
   if (existing || input.newEmail === user.email) throw new AppError(409, "Email already exists");
   if (user.passwordHash && (!input.currentPassword || !(await bcrypt.compare(input.currentPassword, user.passwordHash)))) throw new AppError(401, "Current password is incorrect");
   const token = await createOneTimeToken(userId, "CHANGE_EMAIL", 30, input.newEmail);
-  await safelySend(() => sendEmailChangeEmail(input.newEmail, token));
+  await safelySend(() => sendEmailChangeEmail(input.newEmail, token, actionBaseUrl));
 }
 
 export async function confirmEmailChange(token: string) {

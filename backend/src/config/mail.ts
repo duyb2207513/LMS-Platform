@@ -26,6 +26,11 @@ async function sendActionEmail(to: string, subject: string, heading: string, des
   if (!env.smtpHost && env.nodeEnv !== "production") logger.info({ to, actionUrl }, "Development email generated");
 }
 
-export const sendVerificationEmail = (to: string, token: string) => sendActionEmail(to, "Xác minh email LMS Platform", "Xác minh địa chỉ email", "Hoàn tất xác minh để bảo vệ tài khoản LMS Platform của bạn.", `${env.frontendUrl}/verify-email?token=${encodeURIComponent(token)}`, "Xác minh email");
-export const sendPasswordResetEmail = (to: string, token: string) => sendActionEmail(to, "Đặt lại mật khẩu LMS Platform", "Đặt lại mật khẩu", "Liên kết này có hiệu lực trong 30 phút.", `${env.frontendUrl}/reset-password?token=${encodeURIComponent(token)}`, "Đặt lại mật khẩu");
-export const sendEmailChangeEmail = (to: string, token: string) => sendActionEmail(to, "Xác nhận email mới LMS Platform", "Xác nhận email mới", "Nhấn nút bên dưới để chuyển tài khoản sang địa chỉ email này.", `${env.frontendUrl}/confirm-email-change?token=${encodeURIComponent(token)}`, "Xác nhận email mới");
+function buildActionUrl(baseUrl: string, path: string, token: string) {
+  const separator = baseUrl.endsWith("/") ? "" : "/";
+  return `${baseUrl}${separator}${path}?token=${encodeURIComponent(token)}`;
+}
+
+export const sendVerificationEmail = (to: string, token: string, baseUrl = env.frontendUrl) => sendActionEmail(to, "Xác minh email LMS Platform", "Xác minh địa chỉ email", "Hoàn tất xác minh để bảo vệ tài khoản LMS Platform của bạn.", buildActionUrl(baseUrl, "verify-email", token), "Xác minh email");
+export const sendPasswordResetEmail = (to: string, token: string, baseUrl = env.frontendUrl) => sendActionEmail(to, "Đặt lại mật khẩu LMS Platform", "Đặt lại mật khẩu", "Liên kết này có hiệu lực trong 30 phút.", buildActionUrl(baseUrl, "reset-password", token), "Đặt lại mật khẩu");
+export const sendEmailChangeEmail = (to: string, token: string, baseUrl = env.frontendUrl) => sendActionEmail(to, "Xác nhận email mới LMS Platform", "Xác nhận email mới", "Nhấn nút bên dưới để chuyển tài khoản sang địa chỉ email này.", buildActionUrl(baseUrl, "confirm-email-change", token), "Xác nhận email mới");

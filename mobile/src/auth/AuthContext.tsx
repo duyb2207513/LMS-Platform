@@ -1,9 +1,10 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import * as SecureStore from 'expo-secure-store';
-import { ACCESS_TOKEN_KEY, clearApiCache, setApiCacheScope, setSessionExpiredHandler } from '../api/client';
+import { ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY, clearApiCache, clearMobileTokens, refreshMobileAccessToken, saveMobileTokens, setApiCacheScope, setSessionExpiredHandler } from '../api/client';
 import { normalizeMediaUrls } from '../api/media';
 import { authApi, usersApi } from '../api/services';
 import type { User } from '../types';
+import { unregisterCurrentPushDevice } from '../notifications/pushDevice';
 
 const USER_KEY = 'lms.user';
 
@@ -11,6 +12,8 @@ interface AuthContextValue {
   user: User | null;
   isBooting: boolean;
   login(email: string, password: string): Promise<User>;
+  googleLogin(idToken: string): Promise<User>;
+  completeOAuth(code: string): Promise<User>;
   register(input: { fullName: string; email: string; password: string; confirmPassword: string }): Promise<void>;
   logout(): Promise<void>;
   refreshProfile(): Promise<User>;
@@ -25,7 +28,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const clearSession = useCallback(async () => {
     await Promise.all([
-      SecureStore.deleteItemAsync(ACCESS_TOKEN_KEY),
+      clearMobileTokens(),
       SecureStore.deleteItemAsync(USER_KEY),
       clearApiCache().catch(() => undefined),
     ]);
@@ -42,19 +45,38 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     setSessionExpiredHandler(() => { void clearSession(); });
-    Promise.all([
-      SecureStore.getItemAsync(ACCESS_TOKEN_KEY),
-      SecureStore.getItemAsync(USER_KEY),
-    ]).then(([token, savedUser]) => {
-      if (token && savedUser) {
-        try { const restoredUser = normalizeMediaUrls(JSON.parse(savedUser) as User); setApiCacheScope(restoredUser.id); setUserState(restoredUser); } catch { void clearSession(); }
-      }
-    }).finally(() => setBooting(false));
+    void (async () => {
+      try {
+        const [accessToken, refreshToken, savedUser] = await Promise.all([
+          SecureStore.getItemAsync(ACCESS_TOKEN_KEY), SecureStore.getItemAsync(REFRESH_TOKEN_KEY), SecureStore.getItemAsync(USER_KEY),
+        ]);
+        if (!savedUser || (!accessToken && !refreshToken)) return;
+        if (!accessToken && refreshToken) await refreshMobileAccessToken();
+        const restoredUser = normalizeMediaUrls(JSON.parse(savedUser) as User);
+        setApiCacheScope(restoredUser.id);
+        setUserState(restoredUser);
+      } catch { await clearSession(); }
+      finally { setBooting(false); }
+    })();
   }, [clearSession]);
 
   const login = useCallback(async (email: string, password: string) => {
     const { data } = await authApi.login({ email, password });
-    await SecureStore.setItemAsync(ACCESS_TOKEN_KEY, data.data.accessToken);
+    await saveMobileTokens(data.data.accessToken, data.data.refreshToken);
+    await setUser(data.data.user);
+    return data.data.user;
+  }, [setUser]);
+
+  const googleLogin = useCallback(async (idToken: string) => {
+    const { data } = await authApi.googleLogin(idToken);
+    await saveMobileTokens(data.data.accessToken, data.data.refreshToken);
+    await setUser(data.data.user);
+    return data.data.user;
+  }, [setUser]);
+
+  const completeOAuth = useCallback(async (code: string) => {
+    const { data } = await authApi.exchangeOAuth(code);
+    await saveMobileTokens(data.data.accessToken, data.data.refreshToken);
     await setUser(data.data.user);
     return data.data.user;
   }, [setUser]);
@@ -64,7 +86,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const logout = useCallback(async () => {
-    try { await authApi.logout(); } finally { await clearSession(); }
+    const refreshToken = await SecureStore.getItemAsync(REFRESH_TOKEN_KEY);
+    try { await unregisterCurrentPushDevice(); if (refreshToken) await authApi.logout(refreshToken); } finally { await clearSession(); }
   }, [clearSession]);
 
   const refreshProfile = useCallback(async () => {
@@ -73,8 +96,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return data.data;
   }, [setUser]);
 
-  const value = useMemo(() => ({ user, isBooting, login, register, logout, refreshProfile, setUser }),
-    [user, isBooting, login, register, logout, refreshProfile, setUser]);
+  const value = useMemo(() => ({ user, isBooting, login, googleLogin, completeOAuth, register, logout, refreshProfile, setUser }),
+    [user, isBooting, login, googleLogin, completeOAuth, register, logout, refreshProfile, setUser]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

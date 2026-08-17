@@ -5,6 +5,7 @@ import type { NotificationType } from "../../prisma/enums.js";
 import type { Prisma } from "../../prisma/client.js";
 import type { CreateNotificationInput, NotificationListQuery } from "./notification.types.js";
 import { UUID } from "../interactions/access.js";
+import { deliverPushNotification } from "./push.service.js";
 
 type Preference = { inAppEnabled: boolean; courseUpdates: boolean; assignmentReminders: boolean; quizResults: boolean; certificateUpdates: boolean } | null;
 export function allowsInApp(type: NotificationType, preference: Preference) {
@@ -23,7 +24,10 @@ const publicNotification = <T extends { userId: string }>(item: T) => {
 
 export async function createNotification(input: CreateNotificationInput) {
   const preference = await prisma.notificationPreference.findUnique({ where: { userId: input.userId } });
-  if (!allowsInApp(input.type, preference)) return null;
+  const topicAllowed = allowsInApp(input.type, preference ? { ...preference, inAppEnabled: true } : null);
+  if (!topicAllowed) return null;
+  void deliverPushNotification(input);
+  if (preference?.inAppEnabled === false) return null;
   const item = await prisma.notification.create({ data: { ...input, data: input.data as Prisma.InputJsonValue | undefined } });
   emitNewNotification(item);
   return publicNotification(item);
@@ -34,7 +38,9 @@ export async function createManyNotifications(inputs: CreateNotificationInput[])
   const userIds = [...new Set(inputs.map(item => item.userId))];
   const preferences = await prisma.notificationPreference.findMany({ where: { userId: { in: userIds } } });
   const map = new Map(preferences.map(item => [item.userId, item]));
-  const allowed = inputs.filter(input => allowsInApp(input.type, map.get(input.userId) ?? null));
+  const topicAllowed = inputs.filter(input => { const preference = map.get(input.userId); return allowsInApp(input.type, preference ? { ...preference, inAppEnabled: true } : null); });
+  for (const input of topicAllowed) void deliverPushNotification(input);
+  const allowed = topicAllowed.filter(input => map.get(input.userId)?.inAppEnabled !== false);
   if (!allowed.length) return [];
   const created = await prisma.notification.createManyAndReturn({ data: allowed.map(input => ({ ...input, data: input.data as Prisma.InputJsonValue | undefined })) });
   for (const item of created) emitNewNotification(item);

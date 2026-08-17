@@ -9,6 +9,11 @@ jobs:
       RATE_LIMIT_MAX: 10000
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: mobile/package-lock.json
       - name: Start development stack
         run: docker compose up -d --build postgres backend frontend
       - name: Wait for API
@@ -19,6 +24,9 @@ jobs:
         run: docker compose exec -T backend npm run lint && docker compose exec -T backend npm run type-check && docker compose exec -T backend npm test && docker compose exec -T backend npm run test:integration
       - name: Frontend build
         run: docker compose exec -T frontend npm run build
+      - name: Mobile checks
+        working-directory: mobile
+        run: npm ci && npm run check
       - name: Install E2E browser
         run: docker compose exec -T frontend npx playwright install --with-deps chromium
       - name: Critical E2E journeys

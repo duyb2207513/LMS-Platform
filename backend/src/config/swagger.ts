@@ -1134,6 +1134,7 @@ const swaggerDefinition = {
         properties: {
           inAppEnabled: { type: "boolean" },
           emailEnabled: { type: "boolean" },
+          pushEnabled: { type: "boolean" },
           courseUpdates: { type: "boolean" },
           assignmentReminders: { type: "boolean" },
           quizResults: { type: "boolean" },

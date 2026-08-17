@@ -63,10 +63,10 @@ export function LearningScreen({ route, navigation }: NativeStackScreenProps<Roo
       const nextContent = contentResult.data.data;
       setContent(nextContent); setSummary(progressResult.data.data); setError('');
       const lessons = nextContent.sections.flatMap(section => section.lessons);
-      setSelectedId(current => current && lessons.some(item => item.id === current) ? current : (lessons.find(item => !item.progress?.isCompleted) || lessons[0])?.id || null);
+      setSelectedId(current => route.params.lessonId && lessons.some(item => item.id === route.params.lessonId) ? route.params.lessonId : current && lessons.some(item => item.id === current) ? current : (lessons.find(item => !item.progress?.isCompleted) || lessons[0])?.id || null);
     } catch (e) { setError(getApiMessage(e)); }
     finally { setLoading(false); }
-  }, [courseId]);
+  }, [courseId, route.params.lessonId]);
   useEffect(() => { void load(); }, [load]);
 
   const lessons = useMemo(() => content?.sections.flatMap(section => section.lessons) || [], [content]);

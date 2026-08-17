@@ -420,6 +420,7 @@ export const ModelName = {
   CourseGradeRule: 'CourseGradeRule',
   Notification: 'Notification',
   NotificationPreference: 'NotificationPreference',
+  PushDevice: 'PushDevice',
   EmailLog: 'EmailLog',
   CourseAnnouncement: 'CourseAnnouncement',
   LearningEvent: 'LearningEvent',
@@ -453,7 +454,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "directMessage" | "authSession" | "authToken" | "auditLog" | "category" | "course" | "section" | "lesson" | "enrollment" | "lessonProgress" | "quiz" | "question" | "quizOption" | "quizAttempt" | "attemptAnswer" | "assignment" | "assignmentSubmission" | "submissionFile" | "submissionFeedback" | "courseGradeRule" | "notification" | "notificationPreference" | "emailLog" | "courseAnnouncement" | "learningEvent" | "videoWatchEvent" | "review" | "comment" | "order" | "orderItem" | "payment" | "paymentWebhookEvent" | "certificate" | "coupon" | "couponCourse" | "couponUsage" | "refundRequest" | "paymentRefund" | "instructorEarning" | "payout"
+    modelProps: "user" | "directMessage" | "authSession" | "authToken" | "auditLog" | "category" | "course" | "section" | "lesson" | "enrollment" | "lessonProgress" | "quiz" | "question" | "quizOption" | "quizAttempt" | "attemptAnswer" | "assignment" | "assignmentSubmission" | "submissionFile" | "submissionFeedback" | "courseGradeRule" | "notification" | "notificationPreference" | "pushDevice" | "emailLog" | "courseAnnouncement" | "learningEvent" | "videoWatchEvent" | "review" | "comment" | "order" | "orderItem" | "payment" | "paymentWebhookEvent" | "certificate" | "coupon" | "couponCourse" | "couponUsage" | "refundRequest" | "paymentRefund" | "instructorEarning" | "payout"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2156,6 +2157,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.NotificationPreferenceCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.NotificationPreferenceCountAggregateOutputType> | number
+        }
+      }
+    }
+    PushDevice: {
+      payload: Prisma.$PushDevicePayload<ExtArgs>
+      fields: Prisma.PushDeviceFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PushDeviceFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PushDevicePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PushDeviceFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PushDevicePayload>
+        }
+        findFirst: {
+          args: Prisma.PushDeviceFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PushDevicePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PushDeviceFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PushDevicePayload>
+        }
+        findMany: {
+          args: Prisma.PushDeviceFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PushDevicePayload>[]
+        }
+        create: {
+          args: Prisma.PushDeviceCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PushDevicePayload>
+        }
+        createMany: {
+          args: Prisma.PushDeviceCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PushDeviceCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PushDevicePayload>[]
+        }
+        delete: {
+          args: Prisma.PushDeviceDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PushDevicePayload>
+        }
+        update: {
+          args: Prisma.PushDeviceUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PushDevicePayload>
+        }
+        deleteMany: {
+          args: Prisma.PushDeviceDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PushDeviceUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PushDeviceUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PushDevicePayload>[]
+        }
+        upsert: {
+          args: Prisma.PushDeviceUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PushDevicePayload>
+        }
+        aggregate: {
+          args: Prisma.PushDeviceAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePushDevice>
+        }
+        groupBy: {
+          args: Prisma.PushDeviceGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PushDeviceGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PushDeviceCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PushDeviceCountAggregateOutputType> | number
         }
       }
     }
@@ -3870,6 +3945,7 @@ export const NotificationPreferenceScalarFieldEnum = {
   userId: 'userId',
   inAppEnabled: 'inAppEnabled',
   emailEnabled: 'emailEnabled',
+  pushEnabled: 'pushEnabled',
   courseUpdates: 'courseUpdates',
   assignmentReminders: 'assignmentReminders',
   quizResults: 'quizResults',
@@ -3879,6 +3955,21 @@ export const NotificationPreferenceScalarFieldEnum = {
 } as const
 
 export type NotificationPreferenceScalarFieldEnum = (typeof NotificationPreferenceScalarFieldEnum)[keyof typeof NotificationPreferenceScalarFieldEnum]
+
+
+export const PushDeviceScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  expoPushToken: 'expoPushToken',
+  platform: 'platform',
+  deviceName: 'deviceName',
+  isActive: 'isActive',
+  lastUsedAt: 'lastUsedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PushDeviceScalarFieldEnum = (typeof PushDeviceScalarFieldEnum)[keyof typeof PushDeviceScalarFieldEnum]
 
 
 export const EmailLogScalarFieldEnum = {
@@ -4800,6 +4891,7 @@ export type GlobalOmitConfig = {
   courseGradeRule?: Prisma.CourseGradeRuleOmit
   notification?: Prisma.NotificationOmit
   notificationPreference?: Prisma.NotificationPreferenceOmit
+  pushDevice?: Prisma.PushDeviceOmit
   emailLog?: Prisma.EmailLogOmit
   courseAnnouncement?: Prisma.CourseAnnouncementOmit
   learningEvent?: Prisma.LearningEventOmit

@@ -2,14 +2,16 @@
 withDefaults(defineProps<{
   compact?: boolean
   iconSize?: 'sm' | 'md' | 'lg'
+  to?: string
 }>(), {
   compact: false,
   iconSize: 'md',
+  to: '/',
 })
 </script>
 
 <template>
-  <RouterLink to="/" class="group inline-flex min-w-0 items-center gap-2.5" aria-label="LMS Platform - Trang chủ">
+  <RouterLink :to="to" class="group inline-flex min-w-0 items-center gap-2.5" aria-label="LMS Platform">
     <span
       :class="[
         'grid shrink-0 place-items-center rounded-xl bg-gradient-to-br from-violet-600 via-purple-600 to-fuchsia-600 text-white shadow-md shadow-purple-500/20 transition-transform duration-200 group-hover:-rotate-3 group-hover:scale-105',

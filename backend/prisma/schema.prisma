@@ -115,6 +115,7 @@ enum AuthTokenType {
   VERIFY_EMAIL
   RESET_PASSWORD
   CHANGE_EMAIL
+  MOBILE_OAUTH
 }
 
 enum AssignmentSubmissionStatus {
@@ -190,6 +191,7 @@ model User {
   auditLogs              AuditLog[]              @relation("AuditActor")
   notifications          Notification[]
   notificationPreference NotificationPreference?
+  pushDevices            PushDevice[]
   emailLogs              EmailLog[]
   courseAnnouncements    CourseAnnouncement[]    @relation("AnnouncementAuthor")
   learningEvents         LearningEvent[]
@@ -620,6 +622,7 @@ model NotificationPreference {
   userId              String   @unique @map("user_id") @db.Uuid
   inAppEnabled        Boolean  @default(true) @map("in_app_enabled")
   emailEnabled        Boolean  @default(true) @map("email_enabled")
+  pushEnabled         Boolean  @default(true) @map("push_enabled")
   courseUpdates       Boolean  @default(true) @map("course_updates")
   assignmentReminders Boolean  @default(true) @map("assignment_reminders")
   quizResults         Boolean  @default(true) @map("quiz_results")
@@ -630,6 +633,23 @@ model NotificationPreference {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("notification_preferences")
+}
+
+model PushDevice {
+  id           String    @id @default(uuid()) @db.Uuid
+  userId       String    @map("user_id") @db.Uuid
+  expoPushToken String   @unique @map("expo_push_token") @db.VarChar(255)
+  platform     String    @db.VarChar(20)
+  deviceName   String?   @map("device_name") @db.VarChar(120)
+  isActive     Boolean   @default(true) @map("is_active")
+  lastUsedAt   DateTime  @default(now()) @map("last_used_at") @db.Timestamptz(3)
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt    DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isActive])
+  @@map("push_devices")
 }
 
 model EmailLog {

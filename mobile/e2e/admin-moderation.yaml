@@ -1,0 +1,14 @@
+appId: com.lmsplatform.mobile
+---
+- launchApp:
+    clearState: true
+- tapOn: "Cá nhân"
+- tapOn: "Đăng nhập"
+- tapOn: "ban@example.com"
+- inputText: "admin@lms.test"
+- tapOn: "••••••••"
+- inputText: "Password123"
+- tapOn: "Đăng nhập"
+- assertVisible: "Trung tâm quản trị"
+- tapOn: "Quản trị nhanh"
+- assertVisible: "Thao tác nhanh và kiểm duyệt"

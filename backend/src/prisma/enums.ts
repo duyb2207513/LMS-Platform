@@ -162,7 +162,8 @@ export type PayoutStatus = (typeof PayoutStatus)[keyof typeof PayoutStatus]
 export const AuthTokenType = {
   VERIFY_EMAIL: 'VERIFY_EMAIL',
   RESET_PASSWORD: 'RESET_PASSWORD',
-  CHANGE_EMAIL: 'CHANGE_EMAIL'
+  CHANGE_EMAIL: 'CHANGE_EMAIL',
+  MOBILE_OAUTH: 'MOBILE_OAUTH'
 } as const
 
 export type AuthTokenType = (typeof AuthTokenType)[keyof typeof AuthTokenType]

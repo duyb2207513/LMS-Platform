@@ -74,6 +74,7 @@ export const ModelName = {
   CourseGradeRule: 'CourseGradeRule',
   Notification: 'Notification',
   NotificationPreference: 'NotificationPreference',
+  PushDevice: 'PushDevice',
   EmailLog: 'EmailLog',
   CourseAnnouncement: 'CourseAnnouncement',
   LearningEvent: 'LearningEvent',
@@ -450,6 +451,7 @@ export const NotificationPreferenceScalarFieldEnum = {
   userId: 'userId',
   inAppEnabled: 'inAppEnabled',
   emailEnabled: 'emailEnabled',
+  pushEnabled: 'pushEnabled',
   courseUpdates: 'courseUpdates',
   assignmentReminders: 'assignmentReminders',
   quizResults: 'quizResults',
@@ -459,6 +461,21 @@ export const NotificationPreferenceScalarFieldEnum = {
 } as const
 
 export type NotificationPreferenceScalarFieldEnum = (typeof NotificationPreferenceScalarFieldEnum)[keyof typeof NotificationPreferenceScalarFieldEnum]
+
+
+export const PushDeviceScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  expoPushToken: 'expoPushToken',
+  platform: 'platform',
+  deviceName: 'deviceName',
+  isActive: 'isActive',
+  lastUsedAt: 'lastUsedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PushDeviceScalarFieldEnum = (typeof PushDeviceScalarFieldEnum)[keyof typeof PushDeviceScalarFieldEnum]
 
 
 export const EmailLogScalarFieldEnum = {

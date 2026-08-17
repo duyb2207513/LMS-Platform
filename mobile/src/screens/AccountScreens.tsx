@@ -88,15 +88,19 @@ export function ChangePasswordScreen({ navigation }: NativeStackScreenProps<Root
 type AccountShortcutItem = { icon: keyof typeof Ionicons.glyphMap; title: string; note: string; route: string; tone: string };
 const roleShortcuts: Record<'STUDENT' | 'INSTRUCTOR' | 'ADMIN', AccountShortcutItem[]> = {
   STUDENT: [
+    { icon: 'shield-checkmark-outline', title: 'Bảo mật', note: 'Email và thiết bị', route: 'Security', tone: colors.success },
     { icon: 'play-circle-outline', title: 'Học tiếp', note: 'Khóa học và tiến độ', route: 'MyCourses', tone: colors.primary },
     { icon: 'stats-chart-outline', title: 'Kết quả học tập', note: 'Điểm và hoạt động', route: 'Analytics', tone: '#0ea5e9' },
   ],
   INSTRUCTOR: [
+    { icon: 'shield-checkmark-outline', title: 'Bảo mật', note: 'Email và thiết bị', route: 'Security', tone: colors.success },
     { icon: 'albums-outline', title: 'Khóa học', note: 'Xây dựng nội dung', route: 'InstructorCourses', tone: colors.primary },
     { icon: 'analytics-outline', title: 'Phân tích', note: 'Học viên và hiệu quả', route: 'Analytics', tone: '#0ea5e9' },
     { icon: 'wallet-outline', title: 'Doanh thu', note: 'Khoản thu và payout', route: 'Revenue', tone: colors.success },
   ],
   ADMIN: [
+    { icon: 'shield-checkmark-outline', title: 'Bảo mật', note: 'Email và thiết bị', route: 'Security', tone: colors.success },
+    { icon: 'speedometer-outline', title: 'Quản trị nhanh', note: 'User, course và kiểm duyệt', route: 'AdminControlCenter', tone: '#0ea5e9' },
     { icon: 'grid-outline', title: 'Danh mục', note: 'Cấu trúc khóa học', route: 'AdminCategories', tone: colors.primary },
     { icon: 'ticket-outline', title: 'Mã giảm giá', note: 'Coupon toàn hệ thống', route: 'AdminCoupons', tone: colors.warning },
     { icon: 'reload-outline', title: 'Hoàn tiền', note: 'Duyệt yêu cầu', route: 'AdminRefunds', tone: colors.danger },
