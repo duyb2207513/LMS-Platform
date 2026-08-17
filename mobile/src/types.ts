@@ -11,6 +11,8 @@ export interface User {
   avatarUrl: string | null;
   role: UserRole;
   status: UserStatus;
+  emailVerifiedAt?: string | null;
+  lastLoginAt?: string | null;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -232,7 +234,7 @@ export interface CourseGradeRule {
   passingScore: number;
 }
 
-export type NotificationType = 'WELCOME' | 'COURSE_ENROLLED' | 'NEW_LESSON' | 'COURSE_ANNOUNCEMENT' | 'ASSIGNMENT_DUE' | 'QUIZ_RESULT' | 'CERTIFICATE_ISSUED';
+export type NotificationType = 'WELCOME' | 'COURSE_ENROLLED' | 'NEW_LESSON' | 'COURSE_ANNOUNCEMENT' | 'ASSIGNMENT_DUE' | 'ASSIGNMENT_GRADED' | 'QUIZ_RESULT' | 'PAYMENT_SUCCEEDED' | 'CERTIFICATE_ISSUED' | 'DIRECT_MESSAGE';
 export interface AppNotification {
   id: string;
   type: NotificationType;
@@ -247,10 +249,55 @@ export interface AppNotification {
 export interface NotificationPreference {
   inAppEnabled: boolean;
   emailEnabled: boolean;
+  pushEnabled: boolean;
   courseUpdates: boolean;
   assignmentReminders: boolean;
   quizResults: boolean;
   certificateUpdates: boolean;
+}
+
+export interface AdminDashboard {
+  users: { total: number; byRole: Partial<Record<UserRole, number>> };
+  courses: { total: number; byStatus: Partial<Record<CourseStatus, number>> };
+  learning: { enrollments: number; reviews: number; comments: number };
+  commerce: { paidOrders: number; revenue: number; currency: string };
+  certificates: number;
+  recent?: { users?: AdminUser[]; orders?: Array<{ id: string; orderNumber: string; status: string; total: number; currency: string; createdAt: string }> };
+}
+export interface AdminUser extends User { _count?: { courses: number; enrollments: number }; lastLoginAt?: string | null }
+export type AdminCourse = Omit<Course, 'instructor' | 'category'> & { instructor?: Pick<User, 'id' | 'fullName' | 'email'>; category?: Pick<Category, 'id' | 'name'>; _count?: { enrollments: number; reviews: number } };
+export interface AdminReview { id: string; rating: number; content: string | null; createdAt: string; user: Pick<User, 'id' | 'fullName' | 'email'>; course: Pick<Course, 'id' | 'title' | 'slug'> }
+export interface AdminComment { id: string; content: string | null; isDeleted?: boolean; createdAt: string; user: Pick<User, 'id' | 'fullName' | 'email' | 'role'>; lesson: { id: string; title: string; section?: { course?: Pick<Course, 'id' | 'title'> } } }
+
+export interface AuthSession {
+  id: string;
+  ipAddress: string | null;
+  userAgent: string | null;
+  lastUsedAt: string;
+  expiresAt: string;
+  createdAt: string;
+  isCurrent: boolean;
+}
+
+export interface MessageContact extends Pick<User, 'id' | 'fullName' | 'avatarUrl' | 'role' | 'status'> {
+  email?: string;
+}
+
+export interface DirectMessage {
+  id: string;
+  senderId: string;
+  recipientId: string;
+  content: string;
+  readAt: string | null;
+  createdAt: string;
+  sender: Pick<User, 'id' | 'fullName' | 'avatarUrl' | 'role' | 'status'>;
+  recipient: Pick<User, 'id' | 'fullName' | 'avatarUrl' | 'role' | 'status'>;
+}
+
+export interface MessageConversation {
+  contact: MessageContact;
+  lastMessage: DirectMessage;
+  unreadCount: number;
 }
 
 export interface Announcement {
@@ -403,13 +450,20 @@ export type RootStackParamList = {
   CourseDetail: { slug: string };
   Login: undefined;
   Register: undefined;
+  ForgotPassword: undefined;
+  ResetPassword: { token?: string } | undefined;
+  VerifyEmail: { token?: string } | undefined;
+  ConfirmEmailChange: { token?: string } | undefined;
+  Security: undefined;
+  Messages: { initialUserId?: string } | undefined;
+  Chat: { contact: MessageContact };
   Profile: undefined;
   ChangePassword: undefined;
   InstructorCourses: undefined;
   CourseForm: { course?: Course } | undefined;
   CourseBuilder: { course: Course };
   MyCourses: undefined;
-  Learning: { courseId: string; courseTitle: string };
+  Learning: { courseId: string; courseTitle: string; lessonId?: string };
   QuizBuilder: { lesson: Lesson };
   Quiz: { quizId: string; title: string };
   QuizResult: { result: QuizResult; quizTitle: string };
@@ -425,6 +479,7 @@ export type RootStackParamList = {
   AssignmentManager: { courseId: string; courseTitle: string };
   AssignmentSubmissions: { assignmentId: string; assignmentTitle: string; maxScore: number };
   SubmissionDetail: { submissionId: string; maxScore: number };
+  Gradebook: { courseId: string; courseTitle: string };
   Announcements: { courseId: string; courseTitle: string };
   Analytics: undefined;
   Refunds: undefined;
@@ -432,6 +487,7 @@ export type RootStackParamList = {
   AdminCoupons: undefined;
   Revenue: undefined;
   AdminPayouts: undefined;
+  AdminControlCenter: undefined;
 };
 
 export type MainTabParamList = {

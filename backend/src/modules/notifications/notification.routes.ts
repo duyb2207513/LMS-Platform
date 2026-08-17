@@ -1,7 +1,9 @@
 import { Router } from "express";
 import { authenticate } from "../../common/middlewares/authenticate.js";
 import { asyncHandler } from "../../common/utils/asyncHandler.js";
-import { deleteNotificationController, listNotificationsController, readAllNotificationsController, readNotificationController, unreadCountController } from "./notification.controller.js";
+import { validateRequest } from "../../common/middlewares/validateRequest.js";
+import { deleteNotificationController, listNotificationsController, readAllNotificationsController, readNotificationController, registerPushDeviceController, unregisterPushDeviceController, unreadCountController } from "./notification.controller.js";
+import { validatePushDeviceInput } from "./notification.validation.js";
 
 const router = Router();
 /**
@@ -42,8 +44,24 @@ const router = Router();
  *     security: [{ bearerAuth: [] }]
  *     parameters: [{ in: path, name: id, required: true, schema: { type: string, format: uuid } }]
  *     responses: { 204: { description: Notification deleted }, 404: { description: Owned notification not found } }
+ * /notifications/devices:
+ *   post:
+ *     summary: Register or refresh an Expo push notification device
+ *     tags: [Notifications]
+ *     security: [{ bearerAuth: [] }]
+ *     requestBody: { required: true, content: { application/json: { schema: { type: object, required: [expoPushToken, platform], properties: { expoPushToken: { type: string }, platform: { type: string, enum: [ios, android] }, deviceName: { type: string } } } } } }
+ *     responses: { 200: { description: Push device registered }, 400: { description: Invalid Expo push token } }
+ * /notifications/devices/{deviceId}:
+ *   delete:
+ *     summary: Disable one owned push notification device
+ *     tags: [Notifications]
+ *     security: [{ bearerAuth: [] }]
+ *     parameters: [{ in: path, name: deviceId, required: true, schema: { type: string, format: uuid } }]
+ *     responses: { 204: { description: Push device disabled } }
  */
 router.use(authenticate);
+router.post("/devices", validateRequest(validatePushDeviceInput), asyncHandler(registerPushDeviceController));
+router.delete("/devices/:deviceId", asyncHandler(unregisterPushDeviceController));
 router.get("/", asyncHandler(listNotificationsController));
 router.get("/unread-count", asyncHandler(unreadCountController));
 router.patch("/read-all", asyncHandler(readAllNotificationsController));

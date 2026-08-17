@@ -6,11 +6,14 @@ import { env } from "../../config/env.js";
 import { logger } from "../../config/logger.js";
 import { REFRESH_TOKEN_EXPIRES_IN_SECONDS } from "./auth.tokens.js";
 import {
-  confirmEmailChange, forgotPassword, githubLogin, googleLogin, listSessions, login, refreshSession, register,
-  requestEmailChange, requestEmailVerificationByEmail, resetPassword, revokeOtherSessions,
-  revokeRefreshToken, revokeSession, verifyEmail
+  confirmEmailChange, createMobileOAuthHandoff, exchangeMobileOAuthCode, forgotPassword, githubLogin, googleLogin,
+  listSessions, login, refreshSession, register, requestEmailChange, requestEmailVerificationByEmail, resetPassword,
+  revokeOtherSessions, revokeRefreshToken, revokeSession, verifyEmail
 } from "./auth.service.js";
-import type { ChangeEmailInput, ForgotPasswordInput, GoogleLoginInput, LoginInput, RegisterInput, ResetPasswordInput, TokenInput } from "./auth.types.js";
+import type {
+  ChangeEmailInput, ForgotPasswordInput, GoogleLoginInput, LoginInput, MobileOAuthExchangeInput,
+  MobileRefreshInput, RegisterInput, ResetPasswordInput, TokenInput
+} from "./auth.types.js";
 
 const cookieOptions = () => ({
   httpOnly: true,
@@ -19,7 +22,12 @@ const cookieOptions = () => ({
   maxAge: REFRESH_TOKEN_EXPIRES_IN_SECONDS * 1000,
   path: "/api/v1/auth"
 });
-const clientContext = (request: Request) => ({ request, ipAddress: request.ip, userAgent: request.headers["user-agent"] });
+const clientContext = (request: Request) => ({
+  request,
+  ipAddress: request.ip,
+  userAgent: request.headers["user-agent"],
+  actionBaseUrl: request.headers["x-client-platform"] === "mobile" ? env.mobileAppUrl : undefined
+});
 const setRefreshCookie = (response: Response, token: string) => response.cookie("refreshToken", token, cookieOptions());
 const clearRefreshCookie = (response: Response) => response.clearCookie("refreshToken", cookieOptions());
 const githubStateCookieOptions = () => ({
@@ -32,6 +40,21 @@ const githubCallbackPage = (error?: string) => {
   const url = new URL("/auth/github/callback", env.frontendUrl);
   if (error) url.searchParams.set("error", error);
   return url.toString();
+};
+const githubMobileCallbackPage = (redirectUri: string, input: { code?: string; error?: string }) => {
+  const url = new URL(redirectUri);
+  if (input.code) url.searchParams.set("code", input.code);
+  if (input.error) url.searchParams.set("error", input.error);
+  return url.toString();
+};
+const allowedMobileRedirect = (value: unknown) => {
+  if (typeof value !== "string" || !value) return undefined;
+  try {
+    const requested = new URL(value);
+    const configured = new URL(env.mobileAppUrl);
+    const developmentExpoScheme = env.nodeEnv !== "production" && ["exp:", "exps:"].includes(requested.protocol);
+    return requested.protocol === configured.protocol || developmentExpoScheme ? requested.toString() : undefined;
+  } catch { return undefined; }
 };
 const stateMatches = (received: string, stored: string) => {
   const left = Buffer.from(received);
@@ -56,7 +79,17 @@ export async function googleLoginController(request: Request, response: Response
   sendSuccess(response, 200, "Google login successful", { accessToken: result.accessToken, user: result.user });
 }
 
-export async function startGitHubLoginController(_request: Request, response: Response) {
+export async function mobileLoginController(request: Request, response: Response) {
+  const result = await login(request.body as LoginInput, clientContext(request));
+  sendSuccess(response, 200, "Login successful", { accessToken: result.accessToken, refreshToken: result.refreshToken, user: result.user });
+}
+
+export async function mobileGoogleLoginController(request: Request, response: Response) {
+  const result = await googleLogin(request.body as GoogleLoginInput, clientContext(request));
+  sendSuccess(response, 200, "Google login successful", { accessToken: result.accessToken, refreshToken: result.refreshToken, user: result.user });
+}
+
+export async function startGitHubLoginController(request: Request, response: Response) {
   if (!env.githubClientId || !env.githubClientSecret) throw new AppError(503, "GitHub login is not configured");
   const state = randomBytes(32).toString("hex");
   const authorizationUrl = new URL("https://github.com/login/oauth/authorize");
@@ -65,6 +98,8 @@ export async function startGitHubLoginController(_request: Request, response: Re
   authorizationUrl.searchParams.set("scope", "read:user user:email");
   authorizationUrl.searchParams.set("state", state);
   response.cookie("githubOAuthState", state, { ...githubStateCookieOptions(), maxAge: 10 * 60 * 1000 });
+  const mobileRedirect = allowedMobileRedirect(request.query.redirectUri);
+  if (mobileRedirect) response.cookie("githubOAuthReturn", mobileRedirect, { ...githubStateCookieOptions(), maxAge: 10 * 60 * 1000 });
   response.redirect(authorizationUrl.toString());
 }
 
@@ -72,22 +107,37 @@ export async function githubCallbackController(request: Request, response: Respo
   const code = typeof request.query.code === "string" ? request.query.code : "";
   const state = typeof request.query.state === "string" ? request.query.state : "";
   const storedState = typeof request.cookies?.githubOAuthState === "string" ? request.cookies.githubOAuthState : "";
+  const mobileRedirect = allowedMobileRedirect(request.cookies?.githubOAuthReturn);
   response.clearCookie("githubOAuthState", githubStateCookieOptions());
+  response.clearCookie("githubOAuthReturn", githubStateCookieOptions());
 
   if (request.query.error || !code || !state || !storedState || !stateMatches(state, storedState)) {
-    response.redirect(githubCallbackPage("Phiên đăng nhập GitHub không hợp lệ hoặc đã hết hạn"));
+    const message = "Phiên đăng nhập GitHub không hợp lệ hoặc đã hết hạn";
+    response.redirect(mobileRedirect ? githubMobileCallbackPage(mobileRedirect, { error: message }) : githubCallbackPage(message));
     return;
   }
 
   try {
     const result = await githubLogin(code, clientContext(request));
+    if (mobileRedirect) {
+      const handoffCode = await createMobileOAuthHandoff(result.user.id);
+      await revokeSession(result.user.id, result.sessionId);
+      response.redirect(githubMobileCallbackPage(mobileRedirect, { code: handoffCode }));
+      return;
+    }
     setRefreshCookie(response, result.refreshToken);
     response.redirect(githubCallbackPage());
   } catch (error) {
     if (error instanceof AppError) logger.warn({ statusCode: error.statusCode }, "GitHub login was rejected");
     else logger.error({ err: error }, "Unexpected GitHub login error");
-    response.redirect(githubCallbackPage(error instanceof AppError ? error.message : "Đăng nhập GitHub thất bại"));
+    const message = error instanceof AppError ? error.message : "Đăng nhập GitHub thất bại";
+    response.redirect(mobileRedirect ? githubMobileCallbackPage(mobileRedirect, { error: message }) : githubCallbackPage(message));
   }
+}
+
+export async function mobileOAuthExchangeController(request: Request, response: Response) {
+  const result = await exchangeMobileOAuthCode((request.body as MobileOAuthExchangeInput).code, clientContext(request));
+  sendSuccess(response, 200, "OAuth login successful", { accessToken: result.accessToken, refreshToken: result.refreshToken, user: result.user });
 }
 
 export async function refreshTokenController(request: Request, response: Response) {
@@ -98,9 +148,19 @@ export async function refreshTokenController(request: Request, response: Respons
   sendSuccess(response, 200, "Token refreshed successfully", { accessToken: result.accessToken });
 }
 
+export async function mobileRefreshTokenController(request: Request, response: Response) {
+  const result = await refreshSession((request.body as MobileRefreshInput).refreshToken, clientContext(request));
+  sendSuccess(response, 200, "Token refreshed successfully", result);
+}
+
 export async function logoutController(request: Request, response: Response) {
   await revokeRefreshToken(typeof request.cookies?.refreshToken === "string" ? request.cookies.refreshToken : undefined);
   clearRefreshCookie(response);
+  sendSuccess(response, 200, "Logout successful", null);
+}
+
+export async function mobileLogoutController(request: Request, response: Response) {
+  await revokeRefreshToken((request.body as MobileRefreshInput).refreshToken);
   sendSuccess(response, 200, "Logout successful", null);
 }
 
@@ -110,12 +170,12 @@ export async function verifyEmailController(request: Request, response: Response
 }
 
 export async function resendVerificationController(request: Request, response: Response) {
-  await requestEmailVerificationByEmail((request.body as ForgotPasswordInput).email);
+  await requestEmailVerificationByEmail((request.body as ForgotPasswordInput).email, clientContext(request).actionBaseUrl);
   sendSuccess(response, 200, "If the account needs verification, an email has been sent", null);
 }
 
 export async function forgotPasswordController(request: Request, response: Response) {
-  await forgotPassword((request.body as ForgotPasswordInput).email);
+  await forgotPassword((request.body as ForgotPasswordInput).email, clientContext(request).actionBaseUrl);
   sendSuccess(response, 200, "If the account exists, a password reset email has been sent", null);
 }
 
@@ -126,7 +186,7 @@ export async function resetPasswordController(request: Request, response: Respon
 }
 
 export async function requestEmailChangeController(request: Request, response: Response) {
-  await requestEmailChange(request.auth!.userId, request.body as ChangeEmailInput);
+  await requestEmailChange(request.auth!.userId, request.body as ChangeEmailInput, clientContext(request).actionBaseUrl);
   sendSuccess(response, 200, "A confirmation link has been sent to the new email", null);
 }
 

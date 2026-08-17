@@ -1,5 +1,5 @@
 import type { RequestValidationResult } from "../../common/middlewares/validateRequest.js";
-import type { ChangeEmailInput, ForgotPasswordInput, GoogleLoginInput, LoginInput, RegisterInput, ResetPasswordInput, TokenInput } from "./auth.types.js";
+import type { ChangeEmailInput, ForgotPasswordInput, GoogleLoginInput, LoginInput, MobileOAuthExchangeInput, MobileRefreshInput, RegisterInput, ResetPasswordInput, TokenInput } from "./auth.types.js";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const object = (body: unknown) => body && typeof body === "object" && !Array.isArray(body) ? body as Record<string, unknown> : null;
@@ -68,4 +68,16 @@ export function validateChangeEmailInput(body: unknown): RequestValidationResult
   if (!EMAIL_PATTERN.test(newEmail) || newEmail.length > 255) errors.newEmail = "Email must be a valid email address";
   if (input.currentPassword !== undefined && !currentPassword) errors.currentPassword = "Current password is invalid";
   return Object.keys(errors).length ? { errors } : { data: { newEmail, currentPassword } };
+}
+
+export function validateMobileRefreshInput(body: unknown): RequestValidationResult<MobileRefreshInput> {
+  const input = object(body);
+  const refreshToken = typeof input?.refreshToken === "string" ? input.refreshToken.trim() : "";
+  return refreshToken.length >= 32 ? { data: { refreshToken } } : { errors: { refreshToken: "Refresh token is required" } };
+}
+
+export function validateMobileOAuthExchangeInput(body: unknown): RequestValidationResult<MobileOAuthExchangeInput> {
+  const input = object(body);
+  const code = typeof input?.code === "string" ? input.code.trim() : "";
+  return code.length >= 32 ? { data: { code } } : { errors: { code: "OAuth exchange code is required" } };
 }

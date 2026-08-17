@@ -24,7 +24,7 @@ export * from './enums.js';
 export type User = Prisma.UserModel
 /**
  * Model DirectMessage
- *
+ * 
  */
 export type DirectMessage = Prisma.DirectMessageModel
 /**
@@ -132,6 +132,11 @@ export type Notification = Prisma.NotificationModel
  * 
  */
 export type NotificationPreference = Prisma.NotificationPreferenceModel
+/**
+ * Model PushDevice
+ * 
+ */
+export type PushDevice = Prisma.PushDeviceModel
 /**
  * Model EmailLog
  * 

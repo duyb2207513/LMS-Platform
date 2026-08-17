@@ -1,9 +1,10 @@
 import type {
   Announcement, ApiResponse, AppNotification, Assignment, AssignmentSubmission, Category, Course, CourseContent, CourseGrade,
-  CourseGradeRule, CourseInput, CourseProgress, Coupon, CouponValidation, Certificate, CertificateVerification, Comment,
+  AuthSession, CourseGradeRule, CourseInput, CourseProgress, Coupon, CouponValidation, Certificate, CertificateVerification, Comment,
   CourseSection, Enrollment, InstructorAnalyticsOverview, InstructorEarning, Lesson, LessonType, NotificationPreference, Order,
   PaginatedResponse, Payment, Payout, Quiz, QuizAttempt, QuizOption, QuizQuestion, QuizResult, RefundRequest, RevenueOverview,
-  Review, StudentAnalyticsOverview, User,
+  DirectMessage, MessageContact, MessageConversation, Review, StudentAnalyticsOverview, User,
+  AdminDashboard, AdminUser, AdminCourse, AdminReview, AdminComment,
 } from '../types';
 import { apiClient } from './client';
 import type { MobileUploadFile } from './media';
@@ -12,8 +13,28 @@ export const authApi = {
   register: (input: { fullName: string; email: string; password: string; confirmPassword: string }) =>
     apiClient.post<ApiResponse<{ user: User }>>('/auth/register', input),
   login: (input: { email: string; password: string }) =>
-    apiClient.post<ApiResponse<{ accessToken: string; user: User }>>('/auth/login', input),
-  logout: () => apiClient.post<ApiResponse<null>>('/auth/logout'),
+    apiClient.post<ApiResponse<{ accessToken: string; refreshToken: string; user: User }>>('/auth/mobile/login', input),
+  googleLogin: (idToken: string) =>
+    apiClient.post<ApiResponse<{ accessToken: string; refreshToken: string; user: User }>>('/auth/mobile/google', { idToken }),
+  exchangeOAuth: (code: string) =>
+    apiClient.post<ApiResponse<{ accessToken: string; refreshToken: string; user: User }>>('/auth/mobile/oauth-exchange', { code }),
+  logout: (refreshToken: string) => apiClient.post<ApiResponse<null>>('/auth/mobile/logout', { refreshToken }),
+  forgotPassword: (email: string) => apiClient.post<ApiResponse<null>>('/auth/forgot-password', { email }),
+  resetPassword: (input: { token: string; newPassword: string; confirmNewPassword: string }) => apiClient.post<ApiResponse<null>>('/auth/reset-password', input),
+  verifyEmail: (token: string) => apiClient.post<ApiResponse<null>>('/auth/verify-email', { token }),
+  resendVerification: (email: string) => apiClient.post<ApiResponse<null>>('/auth/resend-verification', { email }),
+  changeEmail: (input: { newEmail: string; currentPassword?: string }) => apiClient.post<ApiResponse<null>>('/auth/change-email', input),
+  confirmEmailChange: (token: string) => apiClient.post<ApiResponse<null>>('/auth/confirm-email-change', { token }),
+  sessions: () => apiClient.get<ApiResponse<AuthSession[]>>('/auth/sessions'),
+  revokeSession: (sessionId: string) => apiClient.delete<ApiResponse<null>>(`/auth/sessions/${sessionId}`),
+  revokeOtherSessions: () => apiClient.delete<ApiResponse<null>>('/auth/sessions/others'),
+};
+
+export const messagesApi = {
+  contacts: (search = '') => apiClient.get<ApiResponse<MessageContact[]>>('/messages/contacts', { params: search ? { search } : undefined }),
+  conversations: () => apiClient.get<ApiResponse<MessageConversation[]>>('/messages/conversations'),
+  history: (userId: string) => apiClient.get<ApiResponse<{ contact: MessageContact; messages: DirectMessage[] }>>(`/messages/${userId}`),
+  send: (userId: string, content: string) => apiClient.post<ApiResponse<DirectMessage>>(`/messages/${userId}`, { content }),
 };
 
 export const usersApi = {
@@ -178,6 +199,20 @@ export const notificationsApi = {
   markRead: (id: string) => apiClient.patch<ApiResponse<AppNotification>>(`/notifications/${id}/read`),
   markAllRead: () => apiClient.patch<ApiResponse<{ updatedCount: number; readAt: string }>>('/notifications/read-all'),
   remove: (id: string) => apiClient.delete(`/notifications/${id}`),
+  registerDevice: (input: { expoPushToken: string; platform: 'ios' | 'android'; deviceName?: string }) => apiClient.post<ApiResponse<{ id: string; platform: string; deviceName: string | null; isActive: boolean }>>('/notifications/devices', input),
+  unregisterDevice: (deviceId: string) => apiClient.delete(`/notifications/devices/${deviceId}`),
+};
+
+export const adminApi = {
+  dashboard: () => apiClient.get<ApiResponse<AdminDashboard>>('/admin/dashboard'),
+  users: (params?: { search?: string; role?: User['role']; status?: User['status'] }) => apiClient.get<ApiResponse<{ items: AdminUser[]; meta: Record<string, number> }>>('/admin/users', { params: { page: 1, limit: 100, ...params } }),
+  updateUser: (userId: string, input: { role?: User['role']; status?: User['status'] }) => apiClient.patch<ApiResponse<AdminUser>>(`/admin/users/${userId}`, input),
+  courses: (params?: { search?: string; status?: Course['status'] }) => apiClient.get<ApiResponse<{ items: AdminCourse[]; meta: Record<string, number> }>>('/admin/courses', { params: { page: 1, limit: 100, ...params } }),
+  updateCourse: (courseId: string, status: Course['status']) => apiClient.patch<ApiResponse<AdminCourse>>(`/admin/courses/${courseId}`, { status }),
+  reviews: (search?: string) => apiClient.get<ApiResponse<{ items: AdminReview[]; meta: Record<string, number> }>>('/admin/reviews', { params: { page: 1, limit: 100, ...(search ? { search } : {}) } }),
+  removeReview: (reviewId: string) => apiClient.delete(`/admin/reviews/${reviewId}`),
+  comments: (search?: string) => apiClient.get<ApiResponse<{ items: AdminComment[]; meta: Record<string, number> }>>('/admin/comments', { params: { page: 1, limit: 100, ...(search ? { search } : {}) } }),
+  removeComment: (commentId: string) => apiClient.delete(`/admin/comments/${commentId}`),
 };
 
 export const notificationPreferencesApi = {
