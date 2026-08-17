@@ -55,10 +55,42 @@ async function load() {
         : "Không thể tải danh sách bài nộp";
   }
 }
+function preventNegativeScore(event: KeyboardEvent) {
+  if (event.key === "-" || event.key === "e" || event.key === "E") {
+    event.preventDefault();
+  }
+}
+
+function handleScoreInput(itemId: string, event: Event) {
+  const inputEl = event.target as HTMLInputElement;
+  const val = inputEl.value;
+  if (!val) return;
+  const num = parseFloat(val);
+  const max = Number(assignment.value?.maxScore || 100);
+  if (num < 0) {
+    drafts[itemId].score = "0";
+    inputEl.value = "0";
+  } else if (num > max) {
+    drafts[itemId].score = String(max);
+    inputEl.value = String(max);
+  }
+}
+
 async function grade(item: AssignmentSubmission) {
-  const score = Number(drafts[item.id]?.score);
-  if (!Number.isFinite(score) || score < 0 || score > Number(assignment.value?.maxScore || 100)) {
-    error.value = `Điểm phải từ 0 đến ${assignment.value?.maxScore || 100}.`;
+  const rawScore = drafts[item.id]?.score;
+  const score = Number(rawScore);
+  const maxScore = Number(assignment.value?.maxScore || 100);
+
+  if (rawScore === "" || rawScore === null || rawScore === undefined || !Number.isFinite(score)) {
+    error.value = "Vui lòng nhập điểm hợp lệ.";
+    return;
+  }
+  if (score < 0) {
+    error.value = "Điểm số không được là số âm (phải từ 0 trở lên).";
+    return;
+  }
+  if (score > maxScore) {
+    error.value = `Điểm số không được vượt quá thang điểm tối đa (${maxScore}).`;
     return;
   }
   savingId.value = item.id;
@@ -234,8 +266,11 @@ onBeforeUnmount(closePreview);
                 min="0"
                 :max="assignment?.maxScore || 100"
                 step="0.01"
-                :label="`Điểm / ${assignment?.maxScore || 100}`"
+                :label="`Điểm (Thang 0 đến ${assignment?.maxScore || 100})`"
+                placeholder="Nhập điểm số (0 - 100)"
                 required
+                @keydown="preventNegativeScore"
+                @input="handleScoreInput(item.id, $event)"
               /><BaseTextarea
                 :id="`comment-${item.id}`"
                 v-model="drafts[item.id].comment"

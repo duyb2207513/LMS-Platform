@@ -172,6 +172,8 @@ export interface CourseFilters {
   categoryId?: string
   level?: CourseLevel
   isFree?: boolean
+  sortBy?: string
+  sortOrder?: string
   page?: number
   limit?: number
 }

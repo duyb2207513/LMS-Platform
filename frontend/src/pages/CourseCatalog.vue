@@ -17,7 +17,7 @@ const categoryStore = useCategoryStore()
 const search = ref('')
 const selectedCategory = ref('')
 const selectedLevel = ref('')
-const selectedFree = ref('')
+const selectedPrice = ref('')
 
 const levels = [
   { value: '', label: 'Tất cả cấp độ' },
@@ -25,14 +25,35 @@ const levels = [
   { value: CourseLevel.INTERMEDIATE, label: 'Trung cấp' },
   { value: CourseLevel.ADVANCED, label: 'Nâng cao' },
 ]
-const priceFilters = [{ value: '', label: 'Mọi mức giá' }, { value: 'true', label: 'Miễn phí' }, { value: 'false', label: 'Có phí' }]
-const hasFilters = computed(() => Boolean(search.value || selectedCategory.value || selectedLevel.value || selectedFree.value))
+const priceOptions = [
+  { value: '', label: 'Mọi mức giá' },
+  { value: 'free', label: 'Miễn phí' },
+  { value: 'paid', label: 'Có phí' },
+  { value: 'price_asc', label: 'Giá thấp - cao' },
+  { value: 'price_desc', label: 'Giá cao - thấp' },
+]
+const hasFilters = computed(() => Boolean(search.value || selectedCategory.value || selectedLevel.value || selectedPrice.value))
 
 function loadFiltersFromQuery() {
   search.value = String(route.query.search || '')
   selectedCategory.value = String(route.query.categoryId || '')
   selectedLevel.value = String(route.query.level || '')
-  selectedFree.value = String(route.query.isFree || '')
+  
+  const priceQ = String(route.query.price || '')
+  const isFreeQ = String(route.query.isFree || '')
+  const sortQ = String(route.query.sort || '')
+
+  if (priceQ) {
+    selectedPrice.value = priceQ
+  } else if (isFreeQ === 'true') {
+    selectedPrice.value = 'free'
+  } else if (isFreeQ === 'false') {
+    selectedPrice.value = 'paid'
+  } else if (sortQ) {
+    selectedPrice.value = sortQ
+  } else {
+    selectedPrice.value = ''
+  }
 }
 
 async function fetchWithFilters(page = 1) {
@@ -40,13 +61,26 @@ async function fetchWithFilters(page = 1) {
   if (search.value.trim()) filters.search = search.value.trim()
   if (selectedCategory.value) filters.categoryId = selectedCategory.value
   if (selectedLevel.value) filters.level = selectedLevel.value as CourseLevel
-  if (selectedFree.value) filters.isFree = selectedFree.value === 'true'
+
+  if (selectedPrice.value === 'free') {
+    filters.isFree = true
+  } else if (selectedPrice.value === 'paid') {
+    filters.isFree = false
+  } else if (selectedPrice.value === 'price_asc') {
+    filters.sortBy = 'price'
+    filters.sortOrder = 'asc'
+  } else if (selectedPrice.value === 'price_desc') {
+    filters.sortBy = 'price'
+    filters.sortOrder = 'desc'
+  }
+
   const query: Record<string, string> = {}
   if (filters.search) query.search = filters.search
   if (filters.categoryId) query.categoryId = filters.categoryId
   if (filters.level) query.level = filters.level
-  if (selectedFree.value) query.isFree = selectedFree.value
+  if (selectedPrice.value) query.price = selectedPrice.value
   if (page > 1) query.page = String(page)
+
   await router.replace({ query })
   await courseStore.fetchCourses(filters)
 }
@@ -55,7 +89,7 @@ function clearFilters() {
   search.value = ''
   selectedCategory.value = ''
   selectedLevel.value = ''
-  selectedFree.value = ''
+  selectedPrice.value = ''
   void fetchWithFilters()
 }
 
@@ -93,7 +127,7 @@ onMounted(async () => {
         <div class="mt-4 grid gap-3 sm:grid-cols-3 lg:grid-cols-[1fr_1fr_1fr_auto]">
           <select v-model="selectedCategory" class="filter-select" @change="fetchWithFilters()"><option value="">Tất cả danh mục</option><option v-for="category in categoryStore.categories" :key="category.id" :value="category.id">{{ category.name }}</option></select>
           <select v-model="selectedLevel" class="filter-select" @change="fetchWithFilters()"><option v-for="level in levels" :key="level.value" :value="level.value">{{ level.label }}</option></select>
-          <select v-model="selectedFree" class="filter-select" @change="fetchWithFilters()"><option v-for="price in priceFilters" :key="price.value" :value="price.value">{{ price.label }}</option></select>
+          <select v-model="selectedPrice" class="filter-select" @change="fetchWithFilters()"><option v-for="price in priceOptions" :key="price.value" :value="price.value">{{ price.label }}</option></select>
           <BaseButton v-if="hasFilters" variant="ghost" size="sm" @click="clearFilters">Đặt lại</BaseButton>
         </div>
       </section>

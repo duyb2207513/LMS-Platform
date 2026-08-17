@@ -24,7 +24,7 @@ export async function mockCheckoutController(request: Request, response: Respons
     // Sử dụng chuẩn VietQR chuyển khoản (MoMo & tất cả các ngân hàng đều quét và nhận diện tài khoản chính xác)
     const momoPhone = "0941014007"; // Số điện thoại MoMo cá nhân
     // Định dạng VietQR tĩnh cho MoMo (Ngân hàng nhận: MoMo / Napas)
-    const qrUrl = `https://img.vietqr.io/image/momo-${momoPhone}-compact2.png?amount=${payment.amount}&addInfo=${encodeURIComponent(payment.order.orderNumber)}&accountName=${encodeURIComponent("LE DUC DUY")}`;
+    const qrUrl = `https://img.vietqr.io/image/momo-${momoPhone}-compact2.png?amount=${payment.amount}&addInfo=${encodeURIComponent(payment.order.orderNumber)}&accountName=${encodeURIComponent("MA QUOC DAT")}`;
 
     response.type("html").send(`<!doctype html>
 <html lang="vi">

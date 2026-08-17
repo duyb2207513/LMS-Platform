@@ -28,12 +28,6 @@ async function loginWithGoogle(idToken: string) {
   catch (cause) { error.value = cause instanceof Error ? cause.message : 'Đăng nhập Google thất bại' }
   finally { loading.value = false }
 }
-async function finishPopupOAuth() {
-  loading.value = true; error.value = ''
-  try { await auth.completeOAuthLogin(); await finishLogin() }
-  catch (cause) { error.value = cause instanceof Error ? cause.message : 'Không thể hoàn tất đăng nhập GitHub' }
-  finally { loading.value = false }
-}
 </script>
 
 <template>
@@ -43,7 +37,7 @@ async function finishPopupOAuth() {
       <p v-if="$route.query.registered" class="rounded-xl bg-emerald-50 p-3 text-sm text-emerald-700">Đăng ký thành công. Hãy kiểm tra email để xác minh tài khoản.</p>
       <p v-if="$route.query.reset" class="rounded-xl bg-emerald-50 p-3 text-sm text-emerald-700">Mật khẩu đã được đặt lại. Bạn có thể đăng nhập.</p>
       <p v-if="$route.query.expired" class="rounded-xl bg-amber-50 p-3 text-sm text-amber-700">Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại để tiếp tục.</p>
-      <GitHubSignInButton @success="finishPopupOAuth" @error="error = $event" />
+      <GitHubSignInButton />
       <GoogleSignInButton @credential="loginWithGoogle" @error="error = $event" />
       <div class="flex items-center gap-3"><span class="h-px flex-1 bg-slate-200 dark:bg-slate-700"/><span class="text-xs text-slate-400">hoặc dùng email</span><span class="h-px flex-1 bg-slate-200 dark:bg-slate-700"/></div>
       <form class="space-y-5" @submit.prevent="submit">

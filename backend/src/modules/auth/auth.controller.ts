@@ -56,15 +56,27 @@ export async function googleLoginController(request: Request, response: Response
   sendSuccess(response, 200, "Google login successful", { accessToken: result.accessToken, user: result.user });
 }
 
-export async function startGitHubLoginController(_request: Request, response: Response) {
+export async function startGitHubLoginController(request: Request, response: Response) {
   if (!env.githubClientId || !env.githubClientSecret) throw new AppError(503, "GitHub login is not configured");
   const state = randomBytes(32).toString("hex");
+  response.cookie("githubOAuthState", state, { ...githubStateCookieOptions(), maxAge: 10 * 60 * 1000 });
+
+  const accountParam = typeof request.query.account === "string" ? request.query.account : "";
+
+  if (env.nodeEnv === "development" && (env.githubClientId.startsWith("dev_") || env.githubClientId.startsWith("mock_"))) {
+    const mockCallbackUrl = new URL("/api/v1/auth/github/callback", `http://localhost:${env.port}`);
+    const mockCode = accountParam ? `mock_github_code_${accountParam}` : "mock_github_code";
+    mockCallbackUrl.searchParams.set("code", mockCode);
+    mockCallbackUrl.searchParams.set("state", state);
+    response.redirect(mockCallbackUrl.toString());
+    return;
+  }
+
   const authorizationUrl = new URL("https://github.com/login/oauth/authorize");
   authorizationUrl.searchParams.set("client_id", env.githubClientId);
   authorizationUrl.searchParams.set("redirect_uri", env.githubCallbackUrl);
   authorizationUrl.searchParams.set("scope", "read:user user:email");
   authorizationUrl.searchParams.set("state", state);
-  response.cookie("githubOAuthState", state, { ...githubStateCookieOptions(), maxAge: 10 * 60 * 1000 });
   response.redirect(authorizationUrl.toString());
 }
 

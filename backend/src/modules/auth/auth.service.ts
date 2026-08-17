@@ -134,44 +134,60 @@ async function fetchGitHubJson<T>(url: string, accessToken: string): Promise<T> 
 export async function githubLogin(code: string, context?: ClientContext) {
   if (!env.githubClientId || !env.githubClientSecret) throw new AppError(503, "GitHub login is not configured");
 
-  let tokenData: GitHubTokenResponse;
-  try {
-    const tokenResponse = await fetch("https://github.com/login/oauth/access_token", {
-      method: "POST",
-      headers: { Accept: "application/json", "Content-Type": "application/x-www-form-urlencoded" },
-      body: new URLSearchParams({
-        client_id: env.githubClientId,
-        client_secret: env.githubClientSecret,
-        code,
-        redirect_uri: env.githubCallbackUrl
-      }),
-      signal: AbortSignal.timeout(10_000)
-    });
-    if (!tokenResponse.ok) throw new Error("GitHub token exchange failed");
-    tokenData = await tokenResponse.json() as GitHubTokenResponse;
-  } catch (error) {
-    logger.warn({ err: error }, "GitHub OAuth token exchange failed");
-    throw new AppError(502, "GitHub authentication is temporarily unavailable");
-  }
-  if (!tokenData.access_token || tokenData.error) throw new AppError(401, "GitHub authorization code is invalid or expired");
-
   let profile: GitHubProfile;
-  let emails: GitHubEmail[];
-  try {
-    [profile, emails] = await Promise.all([
-      fetchGitHubJson<GitHubProfile>("https://api.github.com/user", tokenData.access_token),
-      fetchGitHubJson<GitHubEmail[]>("https://api.github.com/user/emails", tokenData.access_token)
-    ]);
-  } catch (error) {
-    if (error instanceof AppError) throw error;
-    logger.warn({ err: error }, "Could not load GitHub profile");
-    throw new AppError(502, "GitHub authentication is temporarily unavailable");
-  }
+  let verifiedEmail: string;
 
-  if (typeof profile.id !== "number" || !profile.login) throw new AppError(401, "GitHub profile is invalid");
-  const verifiedEmail = emails.find(item => item.primary && item.verified && item.email)?.email
-    ?? emails.find(item => item.verified && item.email)?.email;
-  if (!verifiedEmail) throw new AppError(403, "A verified GitHub email is required");
+  if (env.nodeEnv === "development" && code.startsWith("mock_")) {
+    const suffix = code.replace(/^mock_github_code_?/, "").trim();
+    if (suffix) {
+      const cleanSuffix = suffix.replace(/[^a-zA-Z0-9_-]/g, "");
+      const numericId = Math.abs(cleanSuffix.split("").reduce((acc, char) => (acc * 31 + char.charCodeAt(0)) | 0, 99990000));
+      profile = { id: numericId, login: `github-${cleanSuffix}`, name: `GitHub ${cleanSuffix}`, avatar_url: `https://avatars.githubusercontent.com/u/${numericId}` };
+      verifiedEmail = `github-${cleanSuffix}@lms.local`;
+    } else {
+      profile = { id: 99999999, login: "github-developer", name: "GitHub Developer", avatar_url: "https://avatars.githubusercontent.com/u/99999999" };
+      verifiedEmail = "github-developer@lms.local";
+    }
+  } else {
+    let tokenData: GitHubTokenResponse;
+    try {
+      const tokenResponse = await fetch("https://github.com/login/oauth/access_token", {
+        method: "POST",
+        headers: { Accept: "application/json", "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({
+          client_id: env.githubClientId,
+          client_secret: env.githubClientSecret,
+          code,
+          redirect_uri: env.githubCallbackUrl
+        }),
+        signal: AbortSignal.timeout(10_000)
+      });
+      if (!tokenResponse.ok) throw new Error("GitHub token exchange failed");
+      tokenData = await tokenResponse.json() as GitHubTokenResponse;
+    } catch (error) {
+      logger.warn({ err: error }, "GitHub OAuth token exchange failed");
+      throw new AppError(502, "GitHub authentication is temporarily unavailable");
+    }
+    if (!tokenData.access_token || tokenData.error) throw new AppError(401, "GitHub authorization code is invalid or expired");
+
+    let emails: GitHubEmail[];
+    try {
+      [profile, emails] = await Promise.all([
+        fetchGitHubJson<GitHubProfile>("https://api.github.com/user", tokenData.access_token),
+        fetchGitHubJson<GitHubEmail[]>("https://api.github.com/user/emails", tokenData.access_token)
+      ]);
+    } catch (error) {
+      if (error instanceof AppError) throw error;
+      logger.warn({ err: error }, "Could not load GitHub profile");
+      throw new AppError(502, "GitHub authentication is temporarily unavailable");
+    }
+
+    if (typeof profile.id !== "number" || !profile.login) throw new AppError(401, "GitHub profile is invalid");
+    const foundEmail = emails.find(item => item.primary && item.verified && item.email)?.email
+      ?? emails.find(item => item.verified && item.email)?.email;
+    if (!foundEmail) throw new AppError(403, "A verified GitHub email is required");
+    verifiedEmail = foundEmail;
+  }
 
   const githubId = String(profile.id);
   const email = verifiedEmail.toLowerCase();
@@ -198,7 +214,7 @@ export async function githubLogin(code: string, context?: ClientContext) {
         })
       : await prisma.user.create({
           data: {
-            fullName: (profile.name?.trim() || profile.login).slice(0, 100),
+            fullName: (profile.name?.trim() || profile.login || "GitHub User").slice(0, 100),
             email,
             githubId,
             avatarUrl: profile.avatar_url || null,

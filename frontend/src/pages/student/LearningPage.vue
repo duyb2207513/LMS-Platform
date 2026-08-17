@@ -117,6 +117,21 @@ onMounted(load)
               <span class="min-w-0 flex-1"><span class="line-clamp-2 font-semibold">{{ lesson.title }}</span><span class="mt-1 block text-[11px] opacity-65">{{ lessonTypeLabel(lesson.lessonType) }}<template v-if="lesson.durationSeconds"> · {{ Math.ceil(lesson.durationSeconds / 60) }} phút</template></span></span>
             </button>
           </section>
+
+          <section class="mt-6 border-t border-slate-200 pt-4 dark:border-slate-800">
+            <p class="px-2 pb-2 text-xs font-extrabold uppercase tracking-wider text-slate-400">Tổng kết &amp; Đánh giá</p>
+            <RouterLink
+              :to="`/courses/${courseId}/assignments`"
+              class="lesson-link flex items-center justify-between !border !border-amber-200/80 !bg-amber-50/70 !text-amber-800 hover:!bg-amber-100 dark:!border-amber-800/60 dark:!bg-amber-950/40 dark:!text-amber-200"
+              title="Xem bài tập và điểm số"
+            >
+              <div class="flex items-center gap-3 min-w-0">
+                <span class="lesson-state !border-amber-300 !bg-amber-100 !text-amber-700 dark:!border-amber-800 dark:!bg-amber-900/60 dark:!text-amber-300">📝</span>
+                <span class="font-bold truncate">Bài tập &amp; điểm</span>
+              </div>
+              <span class="text-xs font-bold text-amber-600 dark:text-amber-400">Xem →</span>
+            </RouterLink>
+          </section>
         </nav>
       </aside>
 

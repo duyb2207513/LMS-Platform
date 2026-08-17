@@ -12,8 +12,13 @@ function fail(code: string, message: string, status = 409): never { throw new Ap
 
 export async function createRefundRequest(userId: string, input: CreateRefundInput) {
   const order = await prisma.order.findFirst({ where: { id: input.orderId, userId }, include: { payments: { where: { status: "SUCCEEDED" }, orderBy: { paidAt: "desc" }, take: 1 } } });
-  if (!order || order.status !== "PAID" || !order.payments[0]?.paidAt) fail("REFUND_NOT_ALLOWED", "A paid order was not found", 404);
-  const payment = order.payments[0]; const paidAt = payment.paidAt!; if (Date.now() > paidAt.getTime() + env.commerceRefundWindowDays * 86_400_000) fail("REFUND_WINDOW_EXPIRED", "Refund window has expired");
+  if (!order || order.status !== "PAID" || !order.payments[0]?.paidAt) fail("REFUND_NOT_ALLOWED", "Không tìm thấy đơn hàng đã thanh toán phù hợp", 404);
+  const payment = order.payments[0];
+  const paidAt = payment.paidAt!;
+  const refundWindowMs = (env.commerceRefundWindowDays || 1) * 86_400_000;
+  if (Date.now() > paidAt.getTime() + refundWindowMs) {
+    fail("REFUND_WINDOW_EXPIRED", "Yêu cầu hoàn tiền bị từ chối: Đã quá thời hạn 1 ngày (24 giờ) kể từ khi mua khóa học");
+  }
   const active = await prisma.refundRequest.findFirst({ where: { paymentId: payment.id, status: { in: ["PENDING", "APPROVED", "PROCESSING", "REFUNDED"] } }, select: { id: true } }); if (active) fail("REFUND_ALREADY_EXISTS", "A refund request already exists for this payment");
   const courseIds = (await prisma.orderItem.findMany({ where: { orderId: order.id }, select: { courseId: true } })).map(item => item.courseId);
   const progress = await prisma.enrollment.findMany({ where: { studentId: userId, courseId: { in: courseIds } }, select: { progressPercent: true } }); if (progress.some(item => Number(item.progressPercent) > env.commerceRefundMaxProgressPercent)) fail("REFUND_NOT_ALLOWED", "Course progress exceeds the refund policy threshold");

@@ -165,6 +165,7 @@ export async function gradeSubmission(submissionId: string, actor: AuthTokenPayl
   const submission = await prisma.assignmentSubmission.findUnique({ where: { id: submissionId }, include: { assignment: { include: { course: { select: { id: true, title: true, instructorId: true } } } } } });
   if (!submission) throw new AppError(404, "Submission not found");
   if (!canManageCourse(submission.assignment.course.instructorId, actor)) throw new AppError(403, "You do not have permission to grade this submission");
+  if (input.score < 0) throw new AppError(400, "score must not be negative (minimum score is 0)");
   if (input.score > decimal(submission.assignment.maxScore)) throw new AppError(400, `score must not exceed ${decimal(submission.assignment.maxScore)}`);
   const [, feedback] = await prisma.$transaction([
     prisma.assignmentSubmission.update({ where: { id: submissionId }, data: { status: "GRADED" } }),
