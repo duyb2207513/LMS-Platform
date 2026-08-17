@@ -7,6 +7,8 @@ import { isValidStoredSubmissionFile, SUBMISSION_FILE_DIRECTORY, SUBMISSION_TOTA
 import type { AuthTokenPayload } from "../auth/auth.types.js";
 import { assertCourseEnrollment, canManageCourse, UUID } from "../interactions/access.js";
 import type { AssignmentInput, CourseGradeRuleInput, GradeSubmissionInput, UpdateAssignmentInput } from "./assignments.types.js";
+import { safelyRunCommunication } from "../../services/communication/communication.service.js";
+import { createNotification } from "../notifications/notification.service.js";
 
 const studentSelect = { id: true, fullName: true, email: true, avatarUrl: true } as const;
 const submissionInclude = { student: { select: studentSelect }, files: { orderBy: { createdAt: "asc" as const } }, feedback: { include: { grader: { select: { id: true, fullName: true } } } } };
@@ -160,7 +162,7 @@ export async function getSubmission(submissionId: string, actor: AuthTokenPayloa
 
 export async function gradeSubmission(submissionId: string, actor: AuthTokenPayload, input: GradeSubmissionInput) {
   if (!UUID.test(submissionId)) throw new AppError(404, "Submission not found");
-  const submission = await prisma.assignmentSubmission.findUnique({ where: { id: submissionId }, include: { assignment: { include: { course: { select: { instructorId: true } } } } } });
+  const submission = await prisma.assignmentSubmission.findUnique({ where: { id: submissionId }, include: { assignment: { include: { course: { select: { id: true, title: true, instructorId: true } } } } } });
   if (!submission) throw new AppError(404, "Submission not found");
   if (!canManageCourse(submission.assignment.course.instructorId, actor)) throw new AppError(403, "You do not have permission to grade this submission");
   if (input.score > decimal(submission.assignment.maxScore)) throw new AppError(400, `score must not exceed ${decimal(submission.assignment.maxScore)}`);
@@ -168,6 +170,18 @@ export async function gradeSubmission(submissionId: string, actor: AuthTokenPayl
     prisma.assignmentSubmission.update({ where: { id: submissionId }, data: { status: "GRADED" } }),
     prisma.submissionFeedback.upsert({ where: { submissionId }, create: { submissionId, graderId: actor.userId, score: input.score, comment: input.comment ?? null }, update: { graderId: actor.userId, score: input.score, comment: input.comment ?? null, gradedAt: new Date() }, include: { grader: { select: { id: true, fullName: true } } } })
   ]);
+  await safelyRunCommunication(() => createNotification({
+    userId: submission.studentId,
+    type: "ASSIGNMENT_GRADED",
+    title: `Bài tập đã được chấm: ${submission.assignment.title}`,
+    message: `Bạn nhận được ${input.score}/${decimal(submission.assignment.maxScore)} điểm trong khóa học ${submission.assignment.course.title}.`,
+    data: {
+      url: `/assignments/${submission.assignmentId}`,
+      assignmentId: submission.assignmentId,
+      submissionId,
+      courseId: submission.assignment.course.id
+    }
+  }));
   return { ...feedback, score: decimal(feedback.score) };
 }
 

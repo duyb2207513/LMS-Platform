@@ -8,6 +8,7 @@ import {
   isValidStoredImage
 } from "../../config/upload.js";
 import {
+  archiveCourse,
   createCourse,
   deleteOrArchiveCourse,
   getPublicCourse,
@@ -137,6 +138,14 @@ export async function unpublishCourseController(
 ): Promise<void> {
   const course = await unpublishCourse(routeParameter(request, "courseId"), request.auth);
   sendSuccess(response, 200, "Course unpublished successfully", course);
+}
+
+export async function archiveCourseController(
+  request: Request,
+  response: Response
+): Promise<void> {
+  const course = await archiveCourse(routeParameter(request, "courseId"), request.auth);
+  sendSuccess(response, 200, "Course archived successfully", course);
 }
 
 export async function deleteCourseController(

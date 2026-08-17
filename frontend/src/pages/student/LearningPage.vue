@@ -148,7 +148,7 @@ onMounted(load)
           <p class="hidden min-w-0 text-sm text-slate-500 sm:block"><span class="font-semibold text-slate-700 dark:text-slate-300">{{ selectedSection?.title }}</span><span v-if="selected"> / {{ selected.title }}</span></p>
           <span v-if="selected" :class="['rounded-full px-3 py-1 text-xs font-bold', selected.progress?.isCompleted ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300' : 'bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300']">{{ selected.progress?.isCompleted ? 'Đã hoàn thành' : 'Đang học' }}</span>
         </header>
-        <div class="mx-auto max-w-5xl px-4 py-6 sm:px-6 lg:px-8 lg:py-9">
+        <div :class="['mx-auto px-4 py-6 transition-[max-width] sm:px-6 lg:px-8 lg:py-9', sidebarCollapsed ? 'max-w-7xl' : 'max-w-5xl']">
           <LoadingSpinner v-if="api.loading.value && !content" class="py-24" />
           <p v-else-if="error" class="rounded-2xl bg-red-50 p-4 text-red-700 dark:bg-red-950/30 dark:text-red-300">{{ error }}</p>
           <template v-else-if="selected">
@@ -165,9 +165,9 @@ onMounted(load)
               <div v-else class="grid min-h-72 place-items-center p-8 text-center"><div><span class="text-4xl">◇</span><p class="mt-3 font-bold">Nội dung đang được cập nhật</p><p class="mt-1 text-sm text-slate-500">Giảng viên chưa tải nội dung cho bài học này.</p></div></div>
             </section>
 
-            <div class="mt-5 flex flex-wrap items-center justify-between gap-3"><BaseButton variant="secondary" :disabled="!previousLesson" @click="navigateLesson(previousLesson)">← Bài trước</BaseButton><div class="flex flex-wrap gap-2"><RouterLink v-slot="{ navigate }" v-if="selected.quiz" :to="`/quiz/${selected.quiz.id}`" custom><BaseButton variant="outline" @click="navigate">Làm quiz</BaseButton></RouterLink><BaseButton @click="complete">{{ selected.progress?.isCompleted ? 'Đánh dấu chưa xong' : '✓ Hoàn thành bài học' }}</BaseButton></div><BaseButton variant="secondary" :disabled="!nextLesson" @click="navigateLesson(nextLesson)">Bài tiếp →</BaseButton></div>
+            <div class="mt-5 flex flex-wrap items-center justify-between gap-3"><BaseButton variant="secondary" :disabled="!previousLesson" @click="navigateLesson(previousLesson)">← Bài trước</BaseButton><div class="flex flex-wrap gap-2"><RouterLink v-slot="{ navigate }" v-if="selected.quiz" :to="{ path: `/quiz/${selected.quiz.id}`, query: { courseId } }" custom><BaseButton variant="outline" @click="navigate">Làm quiz</BaseButton></RouterLink><BaseButton @click="complete">{{ selected.progress?.isCompleted ? 'Đánh dấu chưa xong' : '✓ Hoàn thành bài học' }}</BaseButton></div><BaseButton variant="secondary" :disabled="!nextLesson" @click="navigateLesson(nextLesson)">Bài tiếp →</BaseButton></div>
 
-            <section class="surface-card mt-10 overflow-hidden">
+            <section class="surface-card mx-auto mt-10 max-w-3xl overflow-hidden">
               <header class="border-b border-slate-100 p-5 dark:border-slate-800 sm:p-6"><div class="flex items-center justify-between gap-4"><div><h2 class="text-xl font-black">Thảo luận bài học</h2><p class="mt-1 text-sm text-slate-500">Đặt câu hỏi và trao đổi cùng cộng đồng.</p></div><span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-600 dark:bg-slate-800 dark:text-slate-300">{{ comments.length }} chủ đề</span></div></header>
               <div class="p-5 sm:p-6"><div v-if="replyTo" class="mb-3 flex items-center justify-between rounded-xl bg-purple-50 px-4 py-2 text-sm text-purple-700 dark:bg-purple-950/30 dark:text-purple-300"><span>Đang trả lời một bình luận</span><button class="font-bold" @click="replyTo = null">Hủy</button></div><textarea v-model="text" rows="3" class="comment-box" placeholder="Viết câu hỏi hoặc chia sẻ của bạn..." /><div class="mt-3 flex justify-end"><BaseButton :disabled="!text.trim()" @click="send">Gửi bình luận</BaseButton></div></div>
               <div class="divide-y divide-slate-100 border-t border-slate-100 px-5 dark:divide-slate-800 dark:border-slate-800 sm:px-6">

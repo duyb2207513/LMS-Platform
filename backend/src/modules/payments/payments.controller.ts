@@ -4,13 +4,13 @@ import { AppError } from "../../common/errors/AppError.js";
 import { sendSuccess } from "../../common/utils/response.js";
 import { env } from "../../config/env.js";
 import { completeMockPayment, getMockPayment, initiateMockPayment, processMockWebhook } from "./payments.service.js";
-import type { MockCallbackInput, MockWebhookInput } from "./payments.types.js";
+import type { InitiateMockPaymentInput, MockCallbackInput, MockWebhookInput } from "./payments.types.js";
 
 const origin = (request: Request) => `${request.protocol}://${request.get("host")}`;
 const p = (request: Request, key: string) => String(request.params[key] ?? "");
 
 export async function initiateMockPaymentController(request: Request, response: Response) {
-  sendSuccess(response, 201, "Mock payment initiated successfully", await initiateMockPayment(p(request, "orderId"), request.auth.userId, origin(request)));
+  sendSuccess(response, 201, "Mock payment initiated successfully", await initiateMockPayment(p(request, "orderId"), request.auth.userId, origin(request), request.body as InitiateMockPaymentInput));
 }
 
 export async function mockCheckoutController(request: Request, response: Response) {

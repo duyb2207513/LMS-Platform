@@ -49,7 +49,10 @@ export async function listCategories() {
       id: true,
       name: true,
       slug: true,
-      description: true
+      description: true,
+      createdAt: true,
+      updatedAt: true,
+      _count: { select: { courses: true } }
     }
   });
 }
@@ -74,7 +77,10 @@ export async function createCategory(input: CreateCategoryInput) {
         id: true,
         name: true,
         slug: true,
-        description: true
+        description: true,
+        createdAt: true,
+        updatedAt: true,
+        _count: { select: { courses: true } }
       }
     });
   } catch (error) {
@@ -120,7 +126,10 @@ export async function updateCategory(categoryId: string, input: UpdateCategoryIn
         id: true,
         name: true,
         slug: true,
-        description: true
+        description: true,
+        createdAt: true,
+        updatedAt: true,
+        _count: { select: { courses: true } }
       }
     });
   } catch (error) {

@@ -13,14 +13,21 @@ onMounted(async () => {
   const providerError = typeof route.query.error === 'string' ? route.query.error : ''
   if (providerError) {
     error.value = providerError
+    window.opener?.postMessage({ type: 'lms:oauth-error', message: providerError }, window.location.origin)
     return
   }
 
   try {
     await auth.completeOAuthLogin()
+    if (window.opener && !window.opener.closed) {
+      window.opener.postMessage({ type: 'lms:oauth-success' }, window.location.origin)
+      window.close()
+      return
+    }
     await router.replace(auth.isAdmin ? '/admin' : auth.isInstructor ? '/instructor/courses' : '/dashboard')
   } catch (cause) {
     error.value = cause instanceof Error ? cause.message : 'Không thể hoàn tất đăng nhập GitHub'
+    window.opener?.postMessage({ type: 'lms:oauth-error', message: error.value }, window.location.origin)
   }
 })
 </script>
