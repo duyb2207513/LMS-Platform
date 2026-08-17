@@ -37,6 +37,9 @@ export type UserSumAggregateOutputType = {
 export type UserMinAggregateOutputType = {
   id: string | null
   fullName: string | null
+  firstName: string | null
+  lastName: string | null
+  phoneNumber: string | null
   email: string | null
   passwordHash: string | null
   avatarUrl: string | null
@@ -55,6 +58,9 @@ export type UserMinAggregateOutputType = {
 export type UserMaxAggregateOutputType = {
   id: string | null
   fullName: string | null
+  firstName: string | null
+  lastName: string | null
+  phoneNumber: string | null
   email: string | null
   passwordHash: string | null
   avatarUrl: string | null
@@ -73,6 +79,9 @@ export type UserMaxAggregateOutputType = {
 export type UserCountAggregateOutputType = {
   id: number
   fullName: number
+  firstName: number
+  lastName: number
+  phoneNumber: number
   email: number
   passwordHash: number
   avatarUrl: number
@@ -101,6 +110,9 @@ export type UserSumAggregateInputType = {
 export type UserMinAggregateInputType = {
   id?: true
   fullName?: true
+  firstName?: true
+  lastName?: true
+  phoneNumber?: true
   email?: true
   passwordHash?: true
   avatarUrl?: true
@@ -119,6 +131,9 @@ export type UserMinAggregateInputType = {
 export type UserMaxAggregateInputType = {
   id?: true
   fullName?: true
+  firstName?: true
+  lastName?: true
+  phoneNumber?: true
   email?: true
   passwordHash?: true
   avatarUrl?: true
@@ -137,6 +152,9 @@ export type UserMaxAggregateInputType = {
 export type UserCountAggregateInputType = {
   id?: true
   fullName?: true
+  firstName?: true
+  lastName?: true
+  phoneNumber?: true
   email?: true
   passwordHash?: true
   avatarUrl?: true
@@ -242,6 +260,9 @@ export type UserGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
 export type UserGroupByOutputType = {
   id: string
   fullName: string
+  firstName: string | null
+  lastName: string | null
+  phoneNumber: string | null
   email: string
   passwordHash: string | null
   avatarUrl: string | null
@@ -283,6 +304,9 @@ export type UserWhereInput = {
   NOT?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
   id?: Prisma.UuidFilter<"User"> | string
   fullName?: Prisma.StringFilter<"User"> | string
+  firstName?: Prisma.StringNullableFilter<"User"> | string | null
+  lastName?: Prisma.StringNullableFilter<"User"> | string | null
+  phoneNumber?: Prisma.StringNullableFilter<"User"> | string | null
   email?: Prisma.StringFilter<"User"> | string
   passwordHash?: Prisma.StringNullableFilter<"User"> | string | null
   avatarUrl?: Prisma.StringNullableFilter<"User"> | string | null
@@ -322,11 +346,16 @@ export type UserWhereInput = {
   instructorEarnings?: Prisma.InstructorEarningListRelationFilter
   instructorPayouts?: Prisma.PayoutListRelationFilter
   payoutsCreated?: Prisma.PayoutListRelationFilter
+  sentMessages?: Prisma.DirectMessageListRelationFilter
+  receivedMessages?: Prisma.DirectMessageListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   fullName?: Prisma.SortOrder
+  firstName?: Prisma.SortOrderInput | Prisma.SortOrder
+  lastName?: Prisma.SortOrderInput | Prisma.SortOrder
+  phoneNumber?: Prisma.SortOrderInput | Prisma.SortOrder
   email?: Prisma.SortOrder
   passwordHash?: Prisma.SortOrderInput | Prisma.SortOrder
   avatarUrl?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -366,10 +395,13 @@ export type UserOrderByWithRelationInput = {
   instructorEarnings?: Prisma.InstructorEarningOrderByRelationAggregateInput
   instructorPayouts?: Prisma.PayoutOrderByRelationAggregateInput
   payoutsCreated?: Prisma.PayoutOrderByRelationAggregateInput
+  sentMessages?: Prisma.DirectMessageOrderByRelationAggregateInput
+  receivedMessages?: Prisma.DirectMessageOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  phoneNumber?: string
   email?: string
   googleId?: string
   githubId?: string
@@ -377,6 +409,8 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.UserWhereInput[]
   NOT?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
   fullName?: Prisma.StringFilter<"User"> | string
+  firstName?: Prisma.StringNullableFilter<"User"> | string | null
+  lastName?: Prisma.StringNullableFilter<"User"> | string | null
   passwordHash?: Prisma.StringNullableFilter<"User"> | string | null
   avatarUrl?: Prisma.StringNullableFilter<"User"> | string | null
   emailVerifiedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
@@ -413,11 +447,16 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   instructorEarnings?: Prisma.InstructorEarningListRelationFilter
   instructorPayouts?: Prisma.PayoutListRelationFilter
   payoutsCreated?: Prisma.PayoutListRelationFilter
-}, "id" | "email" | "googleId" | "githubId">
+  sentMessages?: Prisma.DirectMessageListRelationFilter
+  receivedMessages?: Prisma.DirectMessageListRelationFilter
+}, "id" | "phoneNumber" | "email" | "googleId" | "githubId">
 
 export type UserOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   fullName?: Prisma.SortOrder
+  firstName?: Prisma.SortOrderInput | Prisma.SortOrder
+  lastName?: Prisma.SortOrderInput | Prisma.SortOrder
+  phoneNumber?: Prisma.SortOrderInput | Prisma.SortOrder
   email?: Prisma.SortOrder
   passwordHash?: Prisma.SortOrderInput | Prisma.SortOrder
   avatarUrl?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -444,6 +483,9 @@ export type UserScalarWhereWithAggregatesInput = {
   NOT?: Prisma.UserScalarWhereWithAggregatesInput | Prisma.UserScalarWhereWithAggregatesInput[]
   id?: Prisma.UuidWithAggregatesFilter<"User"> | string
   fullName?: Prisma.StringWithAggregatesFilter<"User"> | string
+  firstName?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  lastName?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  phoneNumber?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   email?: Prisma.StringWithAggregatesFilter<"User"> | string
   passwordHash?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   avatarUrl?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
@@ -462,6 +504,9 @@ export type UserScalarWhereWithAggregatesInput = {
 export type UserCreateInput = {
   id?: string
   fullName: string
+  firstName?: string | null
+  lastName?: string | null
+  phoneNumber?: string | null
   email: string
   passwordHash?: string | null
   avatarUrl?: string | null
@@ -501,11 +546,16 @@ export type UserCreateInput = {
   instructorEarnings?: Prisma.InstructorEarningCreateNestedManyWithoutInstructorInput
   instructorPayouts?: Prisma.PayoutCreateNestedManyWithoutInstructorInput
   payoutsCreated?: Prisma.PayoutCreateNestedManyWithoutCreatedByInput
+  sentMessages?: Prisma.DirectMessageCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.DirectMessageCreateNestedManyWithoutRecipientInput
 }
 
 export type UserUncheckedCreateInput = {
   id?: string
   fullName: string
+  firstName?: string | null
+  lastName?: string | null
+  phoneNumber?: string | null
   email: string
   passwordHash?: string | null
   avatarUrl?: string | null
@@ -545,11 +595,16 @@ export type UserUncheckedCreateInput = {
   instructorEarnings?: Prisma.InstructorEarningUncheckedCreateNestedManyWithoutInstructorInput
   instructorPayouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutInstructorInput
   payoutsCreated?: Prisma.PayoutUncheckedCreateNestedManyWithoutCreatedByInput
+  sentMessages?: Prisma.DirectMessageUncheckedCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.DirectMessageUncheckedCreateNestedManyWithoutRecipientInput
 }
 
 export type UserUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -589,11 +644,16 @@ export type UserUpdateInput = {
   instructorEarnings?: Prisma.InstructorEarningUpdateManyWithoutInstructorNestedInput
   instructorPayouts?: Prisma.PayoutUpdateManyWithoutInstructorNestedInput
   payoutsCreated?: Prisma.PayoutUpdateManyWithoutCreatedByNestedInput
+  sentMessages?: Prisma.DirectMessageUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.DirectMessageUpdateManyWithoutRecipientNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -633,11 +693,16 @@ export type UserUncheckedUpdateInput = {
   instructorEarnings?: Prisma.InstructorEarningUncheckedUpdateManyWithoutInstructorNestedInput
   instructorPayouts?: Prisma.PayoutUncheckedUpdateManyWithoutInstructorNestedInput
   payoutsCreated?: Prisma.PayoutUncheckedUpdateManyWithoutCreatedByNestedInput
+  sentMessages?: Prisma.DirectMessageUncheckedUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.DirectMessageUncheckedUpdateManyWithoutRecipientNestedInput
 }
 
 export type UserCreateManyInput = {
   id?: string
   fullName: string
+  firstName?: string | null
+  lastName?: string | null
+  phoneNumber?: string | null
   email: string
   passwordHash?: string | null
   avatarUrl?: string | null
@@ -656,6 +721,9 @@ export type UserCreateManyInput = {
 export type UserUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -674,6 +742,9 @@ export type UserUpdateManyMutationInput = {
 export type UserUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -692,6 +763,9 @@ export type UserUncheckedUpdateManyInput = {
 export type UserCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   fullName?: Prisma.SortOrder
+  firstName?: Prisma.SortOrder
+  lastName?: Prisma.SortOrder
+  phoneNumber?: Prisma.SortOrder
   email?: Prisma.SortOrder
   passwordHash?: Prisma.SortOrder
   avatarUrl?: Prisma.SortOrder
@@ -714,6 +788,9 @@ export type UserAvgOrderByAggregateInput = {
 export type UserMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   fullName?: Prisma.SortOrder
+  firstName?: Prisma.SortOrder
+  lastName?: Prisma.SortOrder
+  phoneNumber?: Prisma.SortOrder
   email?: Prisma.SortOrder
   passwordHash?: Prisma.SortOrder
   avatarUrl?: Prisma.SortOrder
@@ -732,6 +809,9 @@ export type UserMaxOrderByAggregateInput = {
 export type UserMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   fullName?: Prisma.SortOrder
+  firstName?: Prisma.SortOrder
+  lastName?: Prisma.SortOrder
+  phoneNumber?: Prisma.SortOrder
   email?: Prisma.SortOrder
   passwordHash?: Prisma.SortOrder
   avatarUrl?: Prisma.SortOrder
@@ -791,6 +871,34 @@ export type EnumUserStatusFieldUpdateOperationsInput = {
 
 export type DateTimeFieldUpdateOperationsInput = {
   set?: Date | string
+}
+
+export type UserCreateNestedOneWithoutSentMessagesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSentMessagesInput, Prisma.UserUncheckedCreateWithoutSentMessagesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSentMessagesInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserCreateNestedOneWithoutReceivedMessagesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutReceivedMessagesInput, Prisma.UserUncheckedCreateWithoutReceivedMessagesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutReceivedMessagesInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutSentMessagesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSentMessagesInput, Prisma.UserUncheckedCreateWithoutSentMessagesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSentMessagesInput
+  upsert?: Prisma.UserUpsertWithoutSentMessagesInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutSentMessagesInput, Prisma.UserUpdateWithoutSentMessagesInput>, Prisma.UserUncheckedUpdateWithoutSentMessagesInput>
+}
+
+export type UserUpdateOneRequiredWithoutReceivedMessagesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutReceivedMessagesInput, Prisma.UserUncheckedCreateWithoutReceivedMessagesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutReceivedMessagesInput
+  upsert?: Prisma.UserUpsertWithoutReceivedMessagesInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutReceivedMessagesInput, Prisma.UserUpdateWithoutReceivedMessagesInput>, Prisma.UserUncheckedUpdateWithoutReceivedMessagesInput>
 }
 
 export type UserCreateNestedOneWithoutAuthSessionsInput = {
@@ -1163,9 +1271,428 @@ export type UserUpdateOneRequiredWithoutPayoutsCreatedNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutPayoutsCreatedInput, Prisma.UserUpdateWithoutPayoutsCreatedInput>, Prisma.UserUncheckedUpdateWithoutPayoutsCreatedInput>
 }
 
+export type UserCreateWithoutSentMessagesInput = {
+  id?: string
+  fullName: string
+  firstName?: string | null
+  lastName?: string | null
+  phoneNumber?: string | null
+  email: string
+  passwordHash?: string | null
+  avatarUrl?: string | null
+  googleId?: string | null
+  githubId?: string | null
+  emailVerifiedAt?: Date | string | null
+  failedLoginAttempts?: number
+  lockedUntil?: Date | string | null
+  lastLoginAt?: Date | string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  courses?: Prisma.CourseCreateNestedManyWithoutInstructorInput
+  enrollments?: Prisma.EnrollmentCreateNestedManyWithoutStudentInput
+  lessonProgress?: Prisma.LessonProgressCreateNestedManyWithoutStudentInput
+  quizAttempts?: Prisma.QuizAttemptCreateNestedManyWithoutStudentInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionCreateNestedManyWithoutStudentInput
+  submissionFeedback?: Prisma.SubmissionFeedbackCreateNestedManyWithoutGraderInput
+  reviews?: Prisma.ReviewCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentCreateNestedManyWithoutUserInput
+  orders?: Prisma.OrderCreateNestedManyWithoutUserInput
+  certificates?: Prisma.CertificateCreateNestedManyWithoutStudentInput
+  authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
+  authTokens?: Prisma.AuthTokenCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
+  emailLogs?: Prisma.EmailLogCreateNestedManyWithoutUserInput
+  courseAnnouncements?: Prisma.CourseAnnouncementCreateNestedManyWithoutAuthorInput
+  learningEvents?: Prisma.LearningEventCreateNestedManyWithoutUserInput
+  videoWatchEvents?: Prisma.VideoWatchEventCreateNestedManyWithoutUserInput
+  couponsCreated?: Prisma.CouponCreateNestedManyWithoutCreatedByInput
+  couponUsages?: Prisma.CouponUsageCreateNestedManyWithoutUserInput
+  refundRequests?: Prisma.RefundRequestCreateNestedManyWithoutUserInput
+  refundReviews?: Prisma.RefundRequestCreateNestedManyWithoutReviewerInput
+  instructorEarnings?: Prisma.InstructorEarningCreateNestedManyWithoutInstructorInput
+  instructorPayouts?: Prisma.PayoutCreateNestedManyWithoutInstructorInput
+  payoutsCreated?: Prisma.PayoutCreateNestedManyWithoutCreatedByInput
+  receivedMessages?: Prisma.DirectMessageCreateNestedManyWithoutRecipientInput
+}
+
+export type UserUncheckedCreateWithoutSentMessagesInput = {
+  id?: string
+  fullName: string
+  firstName?: string | null
+  lastName?: string | null
+  phoneNumber?: string | null
+  email: string
+  passwordHash?: string | null
+  avatarUrl?: string | null
+  googleId?: string | null
+  githubId?: string | null
+  emailVerifiedAt?: Date | string | null
+  failedLoginAttempts?: number
+  lockedUntil?: Date | string | null
+  lastLoginAt?: Date | string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  courses?: Prisma.CourseUncheckedCreateNestedManyWithoutInstructorInput
+  enrollments?: Prisma.EnrollmentUncheckedCreateNestedManyWithoutStudentInput
+  lessonProgress?: Prisma.LessonProgressUncheckedCreateNestedManyWithoutStudentInput
+  quizAttempts?: Prisma.QuizAttemptUncheckedCreateNestedManyWithoutStudentInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionUncheckedCreateNestedManyWithoutStudentInput
+  submissionFeedback?: Prisma.SubmissionFeedbackUncheckedCreateNestedManyWithoutGraderInput
+  reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput
+  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
+  certificates?: Prisma.CertificateUncheckedCreateNestedManyWithoutStudentInput
+  authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
+  authTokens?: Prisma.AuthTokenUncheckedCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
+  emailLogs?: Prisma.EmailLogUncheckedCreateNestedManyWithoutUserInput
+  courseAnnouncements?: Prisma.CourseAnnouncementUncheckedCreateNestedManyWithoutAuthorInput
+  learningEvents?: Prisma.LearningEventUncheckedCreateNestedManyWithoutUserInput
+  videoWatchEvents?: Prisma.VideoWatchEventUncheckedCreateNestedManyWithoutUserInput
+  couponsCreated?: Prisma.CouponUncheckedCreateNestedManyWithoutCreatedByInput
+  couponUsages?: Prisma.CouponUsageUncheckedCreateNestedManyWithoutUserInput
+  refundRequests?: Prisma.RefundRequestUncheckedCreateNestedManyWithoutUserInput
+  refundReviews?: Prisma.RefundRequestUncheckedCreateNestedManyWithoutReviewerInput
+  instructorEarnings?: Prisma.InstructorEarningUncheckedCreateNestedManyWithoutInstructorInput
+  instructorPayouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutInstructorInput
+  payoutsCreated?: Prisma.PayoutUncheckedCreateNestedManyWithoutCreatedByInput
+  receivedMessages?: Prisma.DirectMessageUncheckedCreateNestedManyWithoutRecipientInput
+}
+
+export type UserCreateOrConnectWithoutSentMessagesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutSentMessagesInput, Prisma.UserUncheckedCreateWithoutSentMessagesInput>
+}
+
+export type UserCreateWithoutReceivedMessagesInput = {
+  id?: string
+  fullName: string
+  firstName?: string | null
+  lastName?: string | null
+  phoneNumber?: string | null
+  email: string
+  passwordHash?: string | null
+  avatarUrl?: string | null
+  googleId?: string | null
+  githubId?: string | null
+  emailVerifiedAt?: Date | string | null
+  failedLoginAttempts?: number
+  lockedUntil?: Date | string | null
+  lastLoginAt?: Date | string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  courses?: Prisma.CourseCreateNestedManyWithoutInstructorInput
+  enrollments?: Prisma.EnrollmentCreateNestedManyWithoutStudentInput
+  lessonProgress?: Prisma.LessonProgressCreateNestedManyWithoutStudentInput
+  quizAttempts?: Prisma.QuizAttemptCreateNestedManyWithoutStudentInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionCreateNestedManyWithoutStudentInput
+  submissionFeedback?: Prisma.SubmissionFeedbackCreateNestedManyWithoutGraderInput
+  reviews?: Prisma.ReviewCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentCreateNestedManyWithoutUserInput
+  orders?: Prisma.OrderCreateNestedManyWithoutUserInput
+  certificates?: Prisma.CertificateCreateNestedManyWithoutStudentInput
+  authSessions?: Prisma.AuthSessionCreateNestedManyWithoutUserInput
+  authTokens?: Prisma.AuthTokenCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  notificationPreference?: Prisma.NotificationPreferenceCreateNestedOneWithoutUserInput
+  emailLogs?: Prisma.EmailLogCreateNestedManyWithoutUserInput
+  courseAnnouncements?: Prisma.CourseAnnouncementCreateNestedManyWithoutAuthorInput
+  learningEvents?: Prisma.LearningEventCreateNestedManyWithoutUserInput
+  videoWatchEvents?: Prisma.VideoWatchEventCreateNestedManyWithoutUserInput
+  couponsCreated?: Prisma.CouponCreateNestedManyWithoutCreatedByInput
+  couponUsages?: Prisma.CouponUsageCreateNestedManyWithoutUserInput
+  refundRequests?: Prisma.RefundRequestCreateNestedManyWithoutUserInput
+  refundReviews?: Prisma.RefundRequestCreateNestedManyWithoutReviewerInput
+  instructorEarnings?: Prisma.InstructorEarningCreateNestedManyWithoutInstructorInput
+  instructorPayouts?: Prisma.PayoutCreateNestedManyWithoutInstructorInput
+  payoutsCreated?: Prisma.PayoutCreateNestedManyWithoutCreatedByInput
+  sentMessages?: Prisma.DirectMessageCreateNestedManyWithoutSenderInput
+}
+
+export type UserUncheckedCreateWithoutReceivedMessagesInput = {
+  id?: string
+  fullName: string
+  firstName?: string | null
+  lastName?: string | null
+  phoneNumber?: string | null
+  email: string
+  passwordHash?: string | null
+  avatarUrl?: string | null
+  googleId?: string | null
+  githubId?: string | null
+  emailVerifiedAt?: Date | string | null
+  failedLoginAttempts?: number
+  lockedUntil?: Date | string | null
+  lastLoginAt?: Date | string | null
+  role?: $Enums.UserRole
+  status?: $Enums.UserStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  courses?: Prisma.CourseUncheckedCreateNestedManyWithoutInstructorInput
+  enrollments?: Prisma.EnrollmentUncheckedCreateNestedManyWithoutStudentInput
+  lessonProgress?: Prisma.LessonProgressUncheckedCreateNestedManyWithoutStudentInput
+  quizAttempts?: Prisma.QuizAttemptUncheckedCreateNestedManyWithoutStudentInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionUncheckedCreateNestedManyWithoutStudentInput
+  submissionFeedback?: Prisma.SubmissionFeedbackUncheckedCreateNestedManyWithoutGraderInput
+  reviews?: Prisma.ReviewUncheckedCreateNestedManyWithoutUserInput
+  comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput
+  orders?: Prisma.OrderUncheckedCreateNestedManyWithoutUserInput
+  certificates?: Prisma.CertificateUncheckedCreateNestedManyWithoutStudentInput
+  authSessions?: Prisma.AuthSessionUncheckedCreateNestedManyWithoutUserInput
+  authTokens?: Prisma.AuthTokenUncheckedCreateNestedManyWithoutUserInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  notificationPreference?: Prisma.NotificationPreferenceUncheckedCreateNestedOneWithoutUserInput
+  emailLogs?: Prisma.EmailLogUncheckedCreateNestedManyWithoutUserInput
+  courseAnnouncements?: Prisma.CourseAnnouncementUncheckedCreateNestedManyWithoutAuthorInput
+  learningEvents?: Prisma.LearningEventUncheckedCreateNestedManyWithoutUserInput
+  videoWatchEvents?: Prisma.VideoWatchEventUncheckedCreateNestedManyWithoutUserInput
+  couponsCreated?: Prisma.CouponUncheckedCreateNestedManyWithoutCreatedByInput
+  couponUsages?: Prisma.CouponUsageUncheckedCreateNestedManyWithoutUserInput
+  refundRequests?: Prisma.RefundRequestUncheckedCreateNestedManyWithoutUserInput
+  refundReviews?: Prisma.RefundRequestUncheckedCreateNestedManyWithoutReviewerInput
+  instructorEarnings?: Prisma.InstructorEarningUncheckedCreateNestedManyWithoutInstructorInput
+  instructorPayouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutInstructorInput
+  payoutsCreated?: Prisma.PayoutUncheckedCreateNestedManyWithoutCreatedByInput
+  sentMessages?: Prisma.DirectMessageUncheckedCreateNestedManyWithoutSenderInput
+}
+
+export type UserCreateOrConnectWithoutReceivedMessagesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutReceivedMessagesInput, Prisma.UserUncheckedCreateWithoutReceivedMessagesInput>
+}
+
+export type UserUpsertWithoutSentMessagesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutSentMessagesInput, Prisma.UserUncheckedUpdateWithoutSentMessagesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutSentMessagesInput, Prisma.UserUncheckedCreateWithoutSentMessagesInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutSentMessagesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutSentMessagesInput, Prisma.UserUncheckedUpdateWithoutSentMessagesInput>
+}
+
+export type UserUpdateWithoutSentMessagesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  githubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failedLoginAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  courses?: Prisma.CourseUpdateManyWithoutInstructorNestedInput
+  enrollments?: Prisma.EnrollmentUpdateManyWithoutStudentNestedInput
+  lessonProgress?: Prisma.LessonProgressUpdateManyWithoutStudentNestedInput
+  quizAttempts?: Prisma.QuizAttemptUpdateManyWithoutStudentNestedInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionUpdateManyWithoutStudentNestedInput
+  submissionFeedback?: Prisma.SubmissionFeedbackUpdateManyWithoutGraderNestedInput
+  reviews?: Prisma.ReviewUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutUserNestedInput
+  orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
+  certificates?: Prisma.CertificateUpdateManyWithoutStudentNestedInput
+  authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
+  authTokens?: Prisma.AuthTokenUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
+  emailLogs?: Prisma.EmailLogUpdateManyWithoutUserNestedInput
+  courseAnnouncements?: Prisma.CourseAnnouncementUpdateManyWithoutAuthorNestedInput
+  learningEvents?: Prisma.LearningEventUpdateManyWithoutUserNestedInput
+  videoWatchEvents?: Prisma.VideoWatchEventUpdateManyWithoutUserNestedInput
+  couponsCreated?: Prisma.CouponUpdateManyWithoutCreatedByNestedInput
+  couponUsages?: Prisma.CouponUsageUpdateManyWithoutUserNestedInput
+  refundRequests?: Prisma.RefundRequestUpdateManyWithoutUserNestedInput
+  refundReviews?: Prisma.RefundRequestUpdateManyWithoutReviewerNestedInput
+  instructorEarnings?: Prisma.InstructorEarningUpdateManyWithoutInstructorNestedInput
+  instructorPayouts?: Prisma.PayoutUpdateManyWithoutInstructorNestedInput
+  payoutsCreated?: Prisma.PayoutUpdateManyWithoutCreatedByNestedInput
+  receivedMessages?: Prisma.DirectMessageUpdateManyWithoutRecipientNestedInput
+}
+
+export type UserUncheckedUpdateWithoutSentMessagesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  githubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failedLoginAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  courses?: Prisma.CourseUncheckedUpdateManyWithoutInstructorNestedInput
+  enrollments?: Prisma.EnrollmentUncheckedUpdateManyWithoutStudentNestedInput
+  lessonProgress?: Prisma.LessonProgressUncheckedUpdateManyWithoutStudentNestedInput
+  quizAttempts?: Prisma.QuizAttemptUncheckedUpdateManyWithoutStudentNestedInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionUncheckedUpdateManyWithoutStudentNestedInput
+  submissionFeedback?: Prisma.SubmissionFeedbackUncheckedUpdateManyWithoutGraderNestedInput
+  reviews?: Prisma.ReviewUncheckedUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput
+  orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
+  certificates?: Prisma.CertificateUncheckedUpdateManyWithoutStudentNestedInput
+  authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
+  authTokens?: Prisma.AuthTokenUncheckedUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
+  emailLogs?: Prisma.EmailLogUncheckedUpdateManyWithoutUserNestedInput
+  courseAnnouncements?: Prisma.CourseAnnouncementUncheckedUpdateManyWithoutAuthorNestedInput
+  learningEvents?: Prisma.LearningEventUncheckedUpdateManyWithoutUserNestedInput
+  videoWatchEvents?: Prisma.VideoWatchEventUncheckedUpdateManyWithoutUserNestedInput
+  couponsCreated?: Prisma.CouponUncheckedUpdateManyWithoutCreatedByNestedInput
+  couponUsages?: Prisma.CouponUsageUncheckedUpdateManyWithoutUserNestedInput
+  refundRequests?: Prisma.RefundRequestUncheckedUpdateManyWithoutUserNestedInput
+  refundReviews?: Prisma.RefundRequestUncheckedUpdateManyWithoutReviewerNestedInput
+  instructorEarnings?: Prisma.InstructorEarningUncheckedUpdateManyWithoutInstructorNestedInput
+  instructorPayouts?: Prisma.PayoutUncheckedUpdateManyWithoutInstructorNestedInput
+  payoutsCreated?: Prisma.PayoutUncheckedUpdateManyWithoutCreatedByNestedInput
+  receivedMessages?: Prisma.DirectMessageUncheckedUpdateManyWithoutRecipientNestedInput
+}
+
+export type UserUpsertWithoutReceivedMessagesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutReceivedMessagesInput, Prisma.UserUncheckedUpdateWithoutReceivedMessagesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutReceivedMessagesInput, Prisma.UserUncheckedCreateWithoutReceivedMessagesInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutReceivedMessagesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutReceivedMessagesInput, Prisma.UserUncheckedUpdateWithoutReceivedMessagesInput>
+}
+
+export type UserUpdateWithoutReceivedMessagesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  githubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failedLoginAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  courses?: Prisma.CourseUpdateManyWithoutInstructorNestedInput
+  enrollments?: Prisma.EnrollmentUpdateManyWithoutStudentNestedInput
+  lessonProgress?: Prisma.LessonProgressUpdateManyWithoutStudentNestedInput
+  quizAttempts?: Prisma.QuizAttemptUpdateManyWithoutStudentNestedInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionUpdateManyWithoutStudentNestedInput
+  submissionFeedback?: Prisma.SubmissionFeedbackUpdateManyWithoutGraderNestedInput
+  reviews?: Prisma.ReviewUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUpdateManyWithoutUserNestedInput
+  orders?: Prisma.OrderUpdateManyWithoutUserNestedInput
+  certificates?: Prisma.CertificateUpdateManyWithoutStudentNestedInput
+  authSessions?: Prisma.AuthSessionUpdateManyWithoutUserNestedInput
+  authTokens?: Prisma.AuthTokenUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  notificationPreference?: Prisma.NotificationPreferenceUpdateOneWithoutUserNestedInput
+  emailLogs?: Prisma.EmailLogUpdateManyWithoutUserNestedInput
+  courseAnnouncements?: Prisma.CourseAnnouncementUpdateManyWithoutAuthorNestedInput
+  learningEvents?: Prisma.LearningEventUpdateManyWithoutUserNestedInput
+  videoWatchEvents?: Prisma.VideoWatchEventUpdateManyWithoutUserNestedInput
+  couponsCreated?: Prisma.CouponUpdateManyWithoutCreatedByNestedInput
+  couponUsages?: Prisma.CouponUsageUpdateManyWithoutUserNestedInput
+  refundRequests?: Prisma.RefundRequestUpdateManyWithoutUserNestedInput
+  refundReviews?: Prisma.RefundRequestUpdateManyWithoutReviewerNestedInput
+  instructorEarnings?: Prisma.InstructorEarningUpdateManyWithoutInstructorNestedInput
+  instructorPayouts?: Prisma.PayoutUpdateManyWithoutInstructorNestedInput
+  payoutsCreated?: Prisma.PayoutUpdateManyWithoutCreatedByNestedInput
+  sentMessages?: Prisma.DirectMessageUpdateManyWithoutSenderNestedInput
+}
+
+export type UserUncheckedUpdateWithoutReceivedMessagesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  googleId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  githubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerifiedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  failedLoginAttempts?: Prisma.IntFieldUpdateOperationsInput | number
+  lockedUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  status?: Prisma.EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  courses?: Prisma.CourseUncheckedUpdateManyWithoutInstructorNestedInput
+  enrollments?: Prisma.EnrollmentUncheckedUpdateManyWithoutStudentNestedInput
+  lessonProgress?: Prisma.LessonProgressUncheckedUpdateManyWithoutStudentNestedInput
+  quizAttempts?: Prisma.QuizAttemptUncheckedUpdateManyWithoutStudentNestedInput
+  assignmentSubmissions?: Prisma.AssignmentSubmissionUncheckedUpdateManyWithoutStudentNestedInput
+  submissionFeedback?: Prisma.SubmissionFeedbackUncheckedUpdateManyWithoutGraderNestedInput
+  reviews?: Prisma.ReviewUncheckedUpdateManyWithoutUserNestedInput
+  comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput
+  orders?: Prisma.OrderUncheckedUpdateManyWithoutUserNestedInput
+  certificates?: Prisma.CertificateUncheckedUpdateManyWithoutStudentNestedInput
+  authSessions?: Prisma.AuthSessionUncheckedUpdateManyWithoutUserNestedInput
+  authTokens?: Prisma.AuthTokenUncheckedUpdateManyWithoutUserNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  notificationPreference?: Prisma.NotificationPreferenceUncheckedUpdateOneWithoutUserNestedInput
+  emailLogs?: Prisma.EmailLogUncheckedUpdateManyWithoutUserNestedInput
+  courseAnnouncements?: Prisma.CourseAnnouncementUncheckedUpdateManyWithoutAuthorNestedInput
+  learningEvents?: Prisma.LearningEventUncheckedUpdateManyWithoutUserNestedInput
+  videoWatchEvents?: Prisma.VideoWatchEventUncheckedUpdateManyWithoutUserNestedInput
+  couponsCreated?: Prisma.CouponUncheckedUpdateManyWithoutCreatedByNestedInput
+  couponUsages?: Prisma.CouponUsageUncheckedUpdateManyWithoutUserNestedInput
+  refundRequests?: Prisma.RefundRequestUncheckedUpdateManyWithoutUserNestedInput
+  refundReviews?: Prisma.RefundRequestUncheckedUpdateManyWithoutReviewerNestedInput
+  instructorEarnings?: Prisma.InstructorEarningUncheckedUpdateManyWithoutInstructorNestedInput
+  instructorPayouts?: Prisma.PayoutUncheckedUpdateManyWithoutInstructorNestedInput
+  payoutsCreated?: Prisma.PayoutUncheckedUpdateManyWithoutCreatedByNestedInput
+  sentMessages?: Prisma.DirectMessageUncheckedUpdateManyWithoutSenderNestedInput
+}
+
 export type UserCreateWithoutAuthSessionsInput = {
   id?: string
   fullName: string
+  firstName?: string | null
+  lastName?: string | null
+  phoneNumber?: string | null
   email: string
   passwordHash?: string | null
   avatarUrl?: string | null
@@ -1204,11 +1731,16 @@ export type UserCreateWithoutAuthSessionsInput = {
   instructorEarnings?: Prisma.InstructorEarningCreateNestedManyWithoutInstructorInput
   instructorPayouts?: Prisma.PayoutCreateNestedManyWithoutInstructorInput
   payoutsCreated?: Prisma.PayoutCreateNestedManyWithoutCreatedByInput
+  sentMessages?: Prisma.DirectMessageCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.DirectMessageCreateNestedManyWithoutRecipientInput
 }
 
 export type UserUncheckedCreateWithoutAuthSessionsInput = {
   id?: string
   fullName: string
+  firstName?: string | null
+  lastName?: string | null
+  phoneNumber?: string | null
   email: string
   passwordHash?: string | null
   avatarUrl?: string | null
@@ -1247,6 +1779,8 @@ export type UserUncheckedCreateWithoutAuthSessionsInput = {
   instructorEarnings?: Prisma.InstructorEarningUncheckedCreateNestedManyWithoutInstructorInput
   instructorPayouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutInstructorInput
   payoutsCreated?: Prisma.PayoutUncheckedCreateNestedManyWithoutCreatedByInput
+  sentMessages?: Prisma.DirectMessageUncheckedCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.DirectMessageUncheckedCreateNestedManyWithoutRecipientInput
 }
 
 export type UserCreateOrConnectWithoutAuthSessionsInput = {
@@ -1268,6 +1802,9 @@ export type UserUpdateToOneWithWhereWithoutAuthSessionsInput = {
 export type UserUpdateWithoutAuthSessionsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1306,11 +1843,16 @@ export type UserUpdateWithoutAuthSessionsInput = {
   instructorEarnings?: Prisma.InstructorEarningUpdateManyWithoutInstructorNestedInput
   instructorPayouts?: Prisma.PayoutUpdateManyWithoutInstructorNestedInput
   payoutsCreated?: Prisma.PayoutUpdateManyWithoutCreatedByNestedInput
+  sentMessages?: Prisma.DirectMessageUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.DirectMessageUpdateManyWithoutRecipientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAuthSessionsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1349,11 +1891,16 @@ export type UserUncheckedUpdateWithoutAuthSessionsInput = {
   instructorEarnings?: Prisma.InstructorEarningUncheckedUpdateManyWithoutInstructorNestedInput
   instructorPayouts?: Prisma.PayoutUncheckedUpdateManyWithoutInstructorNestedInput
   payoutsCreated?: Prisma.PayoutUncheckedUpdateManyWithoutCreatedByNestedInput
+  sentMessages?: Prisma.DirectMessageUncheckedUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.DirectMessageUncheckedUpdateManyWithoutRecipientNestedInput
 }
 
 export type UserCreateWithoutAuthTokensInput = {
   id?: string
   fullName: string
+  firstName?: string | null
+  lastName?: string | null
+  phoneNumber?: string | null
   email: string
   passwordHash?: string | null
   avatarUrl?: string | null
@@ -1392,11 +1939,16 @@ export type UserCreateWithoutAuthTokensInput = {
   instructorEarnings?: Prisma.InstructorEarningCreateNestedManyWithoutInstructorInput
   instructorPayouts?: Prisma.PayoutCreateNestedManyWithoutInstructorInput
   payoutsCreated?: Prisma.PayoutCreateNestedManyWithoutCreatedByInput
+  sentMessages?: Prisma.DirectMessageCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.DirectMessageCreateNestedManyWithoutRecipientInput
 }
 
 export type UserUncheckedCreateWithoutAuthTokensInput = {
   id?: string
   fullName: string
+  firstName?: string | null
+  lastName?: string | null
+  phoneNumber?: string | null
   email: string
   passwordHash?: string | null
   avatarUrl?: string | null
@@ -1435,6 +1987,8 @@ export type UserUncheckedCreateWithoutAuthTokensInput = {
   instructorEarnings?: Prisma.InstructorEarningUncheckedCreateNestedManyWithoutInstructorInput
   instructorPayouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutInstructorInput
   payoutsCreated?: Prisma.PayoutUncheckedCreateNestedManyWithoutCreatedByInput
+  sentMessages?: Prisma.DirectMessageUncheckedCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.DirectMessageUncheckedCreateNestedManyWithoutRecipientInput
 }
 
 export type UserCreateOrConnectWithoutAuthTokensInput = {
@@ -1456,6 +2010,9 @@ export type UserUpdateToOneWithWhereWithoutAuthTokensInput = {
 export type UserUpdateWithoutAuthTokensInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1494,11 +2051,16 @@ export type UserUpdateWithoutAuthTokensInput = {
   instructorEarnings?: Prisma.InstructorEarningUpdateManyWithoutInstructorNestedInput
   instructorPayouts?: Prisma.PayoutUpdateManyWithoutInstructorNestedInput
   payoutsCreated?: Prisma.PayoutUpdateManyWithoutCreatedByNestedInput
+  sentMessages?: Prisma.DirectMessageUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.DirectMessageUpdateManyWithoutRecipientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAuthTokensInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1537,11 +2099,16 @@ export type UserUncheckedUpdateWithoutAuthTokensInput = {
   instructorEarnings?: Prisma.InstructorEarningUncheckedUpdateManyWithoutInstructorNestedInput
   instructorPayouts?: Prisma.PayoutUncheckedUpdateManyWithoutInstructorNestedInput
   payoutsCreated?: Prisma.PayoutUncheckedUpdateManyWithoutCreatedByNestedInput
+  sentMessages?: Prisma.DirectMessageUncheckedUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.DirectMessageUncheckedUpdateManyWithoutRecipientNestedInput
 }
 
 export type UserCreateWithoutAuditLogsInput = {
   id?: string
   fullName: string
+  firstName?: string | null
+  lastName?: string | null
+  phoneNumber?: string | null
   email: string
   passwordHash?: string | null
   avatarUrl?: string | null
@@ -1580,11 +2147,16 @@ export type UserCreateWithoutAuditLogsInput = {
   instructorEarnings?: Prisma.InstructorEarningCreateNestedManyWithoutInstructorInput
   instructorPayouts?: Prisma.PayoutCreateNestedManyWithoutInstructorInput
   payoutsCreated?: Prisma.PayoutCreateNestedManyWithoutCreatedByInput
+  sentMessages?: Prisma.DirectMessageCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.DirectMessageCreateNestedManyWithoutRecipientInput
 }
 
 export type UserUncheckedCreateWithoutAuditLogsInput = {
   id?: string
   fullName: string
+  firstName?: string | null
+  lastName?: string | null
+  phoneNumber?: string | null
   email: string
   passwordHash?: string | null
   avatarUrl?: string | null
@@ -1623,6 +2195,8 @@ export type UserUncheckedCreateWithoutAuditLogsInput = {
   instructorEarnings?: Prisma.InstructorEarningUncheckedCreateNestedManyWithoutInstructorInput
   instructorPayouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutInstructorInput
   payoutsCreated?: Prisma.PayoutUncheckedCreateNestedManyWithoutCreatedByInput
+  sentMessages?: Prisma.DirectMessageUncheckedCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.DirectMessageUncheckedCreateNestedManyWithoutRecipientInput
 }
 
 export type UserCreateOrConnectWithoutAuditLogsInput = {
@@ -1644,6 +2218,9 @@ export type UserUpdateToOneWithWhereWithoutAuditLogsInput = {
 export type UserUpdateWithoutAuditLogsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1682,11 +2259,16 @@ export type UserUpdateWithoutAuditLogsInput = {
   instructorEarnings?: Prisma.InstructorEarningUpdateManyWithoutInstructorNestedInput
   instructorPayouts?: Prisma.PayoutUpdateManyWithoutInstructorNestedInput
   payoutsCreated?: Prisma.PayoutUpdateManyWithoutCreatedByNestedInput
+  sentMessages?: Prisma.DirectMessageUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.DirectMessageUpdateManyWithoutRecipientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAuditLogsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1725,11 +2307,16 @@ export type UserUncheckedUpdateWithoutAuditLogsInput = {
   instructorEarnings?: Prisma.InstructorEarningUncheckedUpdateManyWithoutInstructorNestedInput
   instructorPayouts?: Prisma.PayoutUncheckedUpdateManyWithoutInstructorNestedInput
   payoutsCreated?: Prisma.PayoutUncheckedUpdateManyWithoutCreatedByNestedInput
+  sentMessages?: Prisma.DirectMessageUncheckedUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.DirectMessageUncheckedUpdateManyWithoutRecipientNestedInput
 }
 
 export type UserCreateWithoutCoursesInput = {
   id?: string
   fullName: string
+  firstName?: string | null
+  lastName?: string | null
+  phoneNumber?: string | null
   email: string
   passwordHash?: string | null
   avatarUrl?: string | null
@@ -1768,11 +2355,16 @@ export type UserCreateWithoutCoursesInput = {
   instructorEarnings?: Prisma.InstructorEarningCreateNestedManyWithoutInstructorInput
   instructorPayouts?: Prisma.PayoutCreateNestedManyWithoutInstructorInput
   payoutsCreated?: Prisma.PayoutCreateNestedManyWithoutCreatedByInput
+  sentMessages?: Prisma.DirectMessageCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.DirectMessageCreateNestedManyWithoutRecipientInput
 }
 
 export type UserUncheckedCreateWithoutCoursesInput = {
   id?: string
   fullName: string
+  firstName?: string | null
+  lastName?: string | null
+  phoneNumber?: string | null
   email: string
   passwordHash?: string | null
   avatarUrl?: string | null
@@ -1811,6 +2403,8 @@ export type UserUncheckedCreateWithoutCoursesInput = {
   instructorEarnings?: Prisma.InstructorEarningUncheckedCreateNestedManyWithoutInstructorInput
   instructorPayouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutInstructorInput
   payoutsCreated?: Prisma.PayoutUncheckedCreateNestedManyWithoutCreatedByInput
+  sentMessages?: Prisma.DirectMessageUncheckedCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.DirectMessageUncheckedCreateNestedManyWithoutRecipientInput
 }
 
 export type UserCreateOrConnectWithoutCoursesInput = {
@@ -1832,6 +2426,9 @@ export type UserUpdateToOneWithWhereWithoutCoursesInput = {
 export type UserUpdateWithoutCoursesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1870,11 +2467,16 @@ export type UserUpdateWithoutCoursesInput = {
   instructorEarnings?: Prisma.InstructorEarningUpdateManyWithoutInstructorNestedInput
   instructorPayouts?: Prisma.PayoutUpdateManyWithoutInstructorNestedInput
   payoutsCreated?: Prisma.PayoutUpdateManyWithoutCreatedByNestedInput
+  sentMessages?: Prisma.DirectMessageUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.DirectMessageUpdateManyWithoutRecipientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCoursesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1913,11 +2515,16 @@ export type UserUncheckedUpdateWithoutCoursesInput = {
   instructorEarnings?: Prisma.InstructorEarningUncheckedUpdateManyWithoutInstructorNestedInput
   instructorPayouts?: Prisma.PayoutUncheckedUpdateManyWithoutInstructorNestedInput
   payoutsCreated?: Prisma.PayoutUncheckedUpdateManyWithoutCreatedByNestedInput
+  sentMessages?: Prisma.DirectMessageUncheckedUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.DirectMessageUncheckedUpdateManyWithoutRecipientNestedInput
 }
 
 export type UserCreateWithoutEnrollmentsInput = {
   id?: string
   fullName: string
+  firstName?: string | null
+  lastName?: string | null
+  phoneNumber?: string | null
   email: string
   passwordHash?: string | null
   avatarUrl?: string | null
@@ -1956,11 +2563,16 @@ export type UserCreateWithoutEnrollmentsInput = {
   instructorEarnings?: Prisma.InstructorEarningCreateNestedManyWithoutInstructorInput
   instructorPayouts?: Prisma.PayoutCreateNestedManyWithoutInstructorInput
   payoutsCreated?: Prisma.PayoutCreateNestedManyWithoutCreatedByInput
+  sentMessages?: Prisma.DirectMessageCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.DirectMessageCreateNestedManyWithoutRecipientInput
 }
 
 export type UserUncheckedCreateWithoutEnrollmentsInput = {
   id?: string
   fullName: string
+  firstName?: string | null
+  lastName?: string | null
+  phoneNumber?: string | null
   email: string
   passwordHash?: string | null
   avatarUrl?: string | null
@@ -1999,6 +2611,8 @@ export type UserUncheckedCreateWithoutEnrollmentsInput = {
   instructorEarnings?: Prisma.InstructorEarningUncheckedCreateNestedManyWithoutInstructorInput
   instructorPayouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutInstructorInput
   payoutsCreated?: Prisma.PayoutUncheckedCreateNestedManyWithoutCreatedByInput
+  sentMessages?: Prisma.DirectMessageUncheckedCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.DirectMessageUncheckedCreateNestedManyWithoutRecipientInput
 }
 
 export type UserCreateOrConnectWithoutEnrollmentsInput = {
@@ -2020,6 +2634,9 @@ export type UserUpdateToOneWithWhereWithoutEnrollmentsInput = {
 export type UserUpdateWithoutEnrollmentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2058,11 +2675,16 @@ export type UserUpdateWithoutEnrollmentsInput = {
   instructorEarnings?: Prisma.InstructorEarningUpdateManyWithoutInstructorNestedInput
   instructorPayouts?: Prisma.PayoutUpdateManyWithoutInstructorNestedInput
   payoutsCreated?: Prisma.PayoutUpdateManyWithoutCreatedByNestedInput
+  sentMessages?: Prisma.DirectMessageUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.DirectMessageUpdateManyWithoutRecipientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutEnrollmentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2101,11 +2723,16 @@ export type UserUncheckedUpdateWithoutEnrollmentsInput = {
   instructorEarnings?: Prisma.InstructorEarningUncheckedUpdateManyWithoutInstructorNestedInput
   instructorPayouts?: Prisma.PayoutUncheckedUpdateManyWithoutInstructorNestedInput
   payoutsCreated?: Prisma.PayoutUncheckedUpdateManyWithoutCreatedByNestedInput
+  sentMessages?: Prisma.DirectMessageUncheckedUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.DirectMessageUncheckedUpdateManyWithoutRecipientNestedInput
 }
 
 export type UserCreateWithoutLessonProgressInput = {
   id?: string
   fullName: string
+  firstName?: string | null
+  lastName?: string | null
+  phoneNumber?: string | null
   email: string
   passwordHash?: string | null
   avatarUrl?: string | null
@@ -2144,11 +2771,16 @@ export type UserCreateWithoutLessonProgressInput = {
   instructorEarnings?: Prisma.InstructorEarningCreateNestedManyWithoutInstructorInput
   instructorPayouts?: Prisma.PayoutCreateNestedManyWithoutInstructorInput
   payoutsCreated?: Prisma.PayoutCreateNestedManyWithoutCreatedByInput
+  sentMessages?: Prisma.DirectMessageCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.DirectMessageCreateNestedManyWithoutRecipientInput
 }
 
 export type UserUncheckedCreateWithoutLessonProgressInput = {
   id?: string
   fullName: string
+  firstName?: string | null
+  lastName?: string | null
+  phoneNumber?: string | null
   email: string
   passwordHash?: string | null
   avatarUrl?: string | null
@@ -2187,6 +2819,8 @@ export type UserUncheckedCreateWithoutLessonProgressInput = {
   instructorEarnings?: Prisma.InstructorEarningUncheckedCreateNestedManyWithoutInstructorInput
   instructorPayouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutInstructorInput
   payoutsCreated?: Prisma.PayoutUncheckedCreateNestedManyWithoutCreatedByInput
+  sentMessages?: Prisma.DirectMessageUncheckedCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.DirectMessageUncheckedCreateNestedManyWithoutRecipientInput
 }
 
 export type UserCreateOrConnectWithoutLessonProgressInput = {
@@ -2208,6 +2842,9 @@ export type UserUpdateToOneWithWhereWithoutLessonProgressInput = {
 export type UserUpdateWithoutLessonProgressInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2246,11 +2883,16 @@ export type UserUpdateWithoutLessonProgressInput = {
   instructorEarnings?: Prisma.InstructorEarningUpdateManyWithoutInstructorNestedInput
   instructorPayouts?: Prisma.PayoutUpdateManyWithoutInstructorNestedInput
   payoutsCreated?: Prisma.PayoutUpdateManyWithoutCreatedByNestedInput
+  sentMessages?: Prisma.DirectMessageUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.DirectMessageUpdateManyWithoutRecipientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutLessonProgressInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2289,11 +2931,16 @@ export type UserUncheckedUpdateWithoutLessonProgressInput = {
   instructorEarnings?: Prisma.InstructorEarningUncheckedUpdateManyWithoutInstructorNestedInput
   instructorPayouts?: Prisma.PayoutUncheckedUpdateManyWithoutInstructorNestedInput
   payoutsCreated?: Prisma.PayoutUncheckedUpdateManyWithoutCreatedByNestedInput
+  sentMessages?: Prisma.DirectMessageUncheckedUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.DirectMessageUncheckedUpdateManyWithoutRecipientNestedInput
 }
 
 export type UserCreateWithoutQuizAttemptsInput = {
   id?: string
   fullName: string
+  firstName?: string | null
+  lastName?: string | null
+  phoneNumber?: string | null
   email: string
   passwordHash?: string | null
   avatarUrl?: string | null
@@ -2332,11 +2979,16 @@ export type UserCreateWithoutQuizAttemptsInput = {
   instructorEarnings?: Prisma.InstructorEarningCreateNestedManyWithoutInstructorInput
   instructorPayouts?: Prisma.PayoutCreateNestedManyWithoutInstructorInput
   payoutsCreated?: Prisma.PayoutCreateNestedManyWithoutCreatedByInput
+  sentMessages?: Prisma.DirectMessageCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.DirectMessageCreateNestedManyWithoutRecipientInput
 }
 
 export type UserUncheckedCreateWithoutQuizAttemptsInput = {
   id?: string
   fullName: string
+  firstName?: string | null
+  lastName?: string | null
+  phoneNumber?: string | null
   email: string
   passwordHash?: string | null
   avatarUrl?: string | null
@@ -2375,6 +3027,8 @@ export type UserUncheckedCreateWithoutQuizAttemptsInput = {
   instructorEarnings?: Prisma.InstructorEarningUncheckedCreateNestedManyWithoutInstructorInput
   instructorPayouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutInstructorInput
   payoutsCreated?: Prisma.PayoutUncheckedCreateNestedManyWithoutCreatedByInput
+  sentMessages?: Prisma.DirectMessageUncheckedCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.DirectMessageUncheckedCreateNestedManyWithoutRecipientInput
 }
 
 export type UserCreateOrConnectWithoutQuizAttemptsInput = {
@@ -2396,6 +3050,9 @@ export type UserUpdateToOneWithWhereWithoutQuizAttemptsInput = {
 export type UserUpdateWithoutQuizAttemptsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2434,11 +3091,16 @@ export type UserUpdateWithoutQuizAttemptsInput = {
   instructorEarnings?: Prisma.InstructorEarningUpdateManyWithoutInstructorNestedInput
   instructorPayouts?: Prisma.PayoutUpdateManyWithoutInstructorNestedInput
   payoutsCreated?: Prisma.PayoutUpdateManyWithoutCreatedByNestedInput
+  sentMessages?: Prisma.DirectMessageUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.DirectMessageUpdateManyWithoutRecipientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutQuizAttemptsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2477,11 +3139,16 @@ export type UserUncheckedUpdateWithoutQuizAttemptsInput = {
   instructorEarnings?: Prisma.InstructorEarningUncheckedUpdateManyWithoutInstructorNestedInput
   instructorPayouts?: Prisma.PayoutUncheckedUpdateManyWithoutInstructorNestedInput
   payoutsCreated?: Prisma.PayoutUncheckedUpdateManyWithoutCreatedByNestedInput
+  sentMessages?: Prisma.DirectMessageUncheckedUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.DirectMessageUncheckedUpdateManyWithoutRecipientNestedInput
 }
 
 export type UserCreateWithoutAssignmentSubmissionsInput = {
   id?: string
   fullName: string
+  firstName?: string | null
+  lastName?: string | null
+  phoneNumber?: string | null
   email: string
   passwordHash?: string | null
   avatarUrl?: string | null
@@ -2520,11 +3187,16 @@ export type UserCreateWithoutAssignmentSubmissionsInput = {
   instructorEarnings?: Prisma.InstructorEarningCreateNestedManyWithoutInstructorInput
   instructorPayouts?: Prisma.PayoutCreateNestedManyWithoutInstructorInput
   payoutsCreated?: Prisma.PayoutCreateNestedManyWithoutCreatedByInput
+  sentMessages?: Prisma.DirectMessageCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.DirectMessageCreateNestedManyWithoutRecipientInput
 }
 
 export type UserUncheckedCreateWithoutAssignmentSubmissionsInput = {
   id?: string
   fullName: string
+  firstName?: string | null
+  lastName?: string | null
+  phoneNumber?: string | null
   email: string
   passwordHash?: string | null
   avatarUrl?: string | null
@@ -2563,6 +3235,8 @@ export type UserUncheckedCreateWithoutAssignmentSubmissionsInput = {
   instructorEarnings?: Prisma.InstructorEarningUncheckedCreateNestedManyWithoutInstructorInput
   instructorPayouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutInstructorInput
   payoutsCreated?: Prisma.PayoutUncheckedCreateNestedManyWithoutCreatedByInput
+  sentMessages?: Prisma.DirectMessageUncheckedCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.DirectMessageUncheckedCreateNestedManyWithoutRecipientInput
 }
 
 export type UserCreateOrConnectWithoutAssignmentSubmissionsInput = {
@@ -2584,6 +3258,9 @@ export type UserUpdateToOneWithWhereWithoutAssignmentSubmissionsInput = {
 export type UserUpdateWithoutAssignmentSubmissionsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2622,11 +3299,16 @@ export type UserUpdateWithoutAssignmentSubmissionsInput = {
   instructorEarnings?: Prisma.InstructorEarningUpdateManyWithoutInstructorNestedInput
   instructorPayouts?: Prisma.PayoutUpdateManyWithoutInstructorNestedInput
   payoutsCreated?: Prisma.PayoutUpdateManyWithoutCreatedByNestedInput
+  sentMessages?: Prisma.DirectMessageUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.DirectMessageUpdateManyWithoutRecipientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAssignmentSubmissionsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2665,11 +3347,16 @@ export type UserUncheckedUpdateWithoutAssignmentSubmissionsInput = {
   instructorEarnings?: Prisma.InstructorEarningUncheckedUpdateManyWithoutInstructorNestedInput
   instructorPayouts?: Prisma.PayoutUncheckedUpdateManyWithoutInstructorNestedInput
   payoutsCreated?: Prisma.PayoutUncheckedUpdateManyWithoutCreatedByNestedInput
+  sentMessages?: Prisma.DirectMessageUncheckedUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.DirectMessageUncheckedUpdateManyWithoutRecipientNestedInput
 }
 
 export type UserCreateWithoutSubmissionFeedbackInput = {
   id?: string
   fullName: string
+  firstName?: string | null
+  lastName?: string | null
+  phoneNumber?: string | null
   email: string
   passwordHash?: string | null
   avatarUrl?: string | null
@@ -2708,11 +3395,16 @@ export type UserCreateWithoutSubmissionFeedbackInput = {
   instructorEarnings?: Prisma.InstructorEarningCreateNestedManyWithoutInstructorInput
   instructorPayouts?: Prisma.PayoutCreateNestedManyWithoutInstructorInput
   payoutsCreated?: Prisma.PayoutCreateNestedManyWithoutCreatedByInput
+  sentMessages?: Prisma.DirectMessageCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.DirectMessageCreateNestedManyWithoutRecipientInput
 }
 
 export type UserUncheckedCreateWithoutSubmissionFeedbackInput = {
   id?: string
   fullName: string
+  firstName?: string | null
+  lastName?: string | null
+  phoneNumber?: string | null
   email: string
   passwordHash?: string | null
   avatarUrl?: string | null
@@ -2751,6 +3443,8 @@ export type UserUncheckedCreateWithoutSubmissionFeedbackInput = {
   instructorEarnings?: Prisma.InstructorEarningUncheckedCreateNestedManyWithoutInstructorInput
   instructorPayouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutInstructorInput
   payoutsCreated?: Prisma.PayoutUncheckedCreateNestedManyWithoutCreatedByInput
+  sentMessages?: Prisma.DirectMessageUncheckedCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.DirectMessageUncheckedCreateNestedManyWithoutRecipientInput
 }
 
 export type UserCreateOrConnectWithoutSubmissionFeedbackInput = {
@@ -2772,6 +3466,9 @@ export type UserUpdateToOneWithWhereWithoutSubmissionFeedbackInput = {
 export type UserUpdateWithoutSubmissionFeedbackInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2810,11 +3507,16 @@ export type UserUpdateWithoutSubmissionFeedbackInput = {
   instructorEarnings?: Prisma.InstructorEarningUpdateManyWithoutInstructorNestedInput
   instructorPayouts?: Prisma.PayoutUpdateManyWithoutInstructorNestedInput
   payoutsCreated?: Prisma.PayoutUpdateManyWithoutCreatedByNestedInput
+  sentMessages?: Prisma.DirectMessageUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.DirectMessageUpdateManyWithoutRecipientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSubmissionFeedbackInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2853,11 +3555,16 @@ export type UserUncheckedUpdateWithoutSubmissionFeedbackInput = {
   instructorEarnings?: Prisma.InstructorEarningUncheckedUpdateManyWithoutInstructorNestedInput
   instructorPayouts?: Prisma.PayoutUncheckedUpdateManyWithoutInstructorNestedInput
   payoutsCreated?: Prisma.PayoutUncheckedUpdateManyWithoutCreatedByNestedInput
+  sentMessages?: Prisma.DirectMessageUncheckedUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.DirectMessageUncheckedUpdateManyWithoutRecipientNestedInput
 }
 
 export type UserCreateWithoutNotificationsInput = {
   id?: string
   fullName: string
+  firstName?: string | null
+  lastName?: string | null
+  phoneNumber?: string | null
   email: string
   passwordHash?: string | null
   avatarUrl?: string | null
@@ -2896,11 +3603,16 @@ export type UserCreateWithoutNotificationsInput = {
   instructorEarnings?: Prisma.InstructorEarningCreateNestedManyWithoutInstructorInput
   instructorPayouts?: Prisma.PayoutCreateNestedManyWithoutInstructorInput
   payoutsCreated?: Prisma.PayoutCreateNestedManyWithoutCreatedByInput
+  sentMessages?: Prisma.DirectMessageCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.DirectMessageCreateNestedManyWithoutRecipientInput
 }
 
 export type UserUncheckedCreateWithoutNotificationsInput = {
   id?: string
   fullName: string
+  firstName?: string | null
+  lastName?: string | null
+  phoneNumber?: string | null
   email: string
   passwordHash?: string | null
   avatarUrl?: string | null
@@ -2939,6 +3651,8 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
   instructorEarnings?: Prisma.InstructorEarningUncheckedCreateNestedManyWithoutInstructorInput
   instructorPayouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutInstructorInput
   payoutsCreated?: Prisma.PayoutUncheckedCreateNestedManyWithoutCreatedByInput
+  sentMessages?: Prisma.DirectMessageUncheckedCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.DirectMessageUncheckedCreateNestedManyWithoutRecipientInput
 }
 
 export type UserCreateOrConnectWithoutNotificationsInput = {
@@ -2960,6 +3674,9 @@ export type UserUpdateToOneWithWhereWithoutNotificationsInput = {
 export type UserUpdateWithoutNotificationsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2998,11 +3715,16 @@ export type UserUpdateWithoutNotificationsInput = {
   instructorEarnings?: Prisma.InstructorEarningUpdateManyWithoutInstructorNestedInput
   instructorPayouts?: Prisma.PayoutUpdateManyWithoutInstructorNestedInput
   payoutsCreated?: Prisma.PayoutUpdateManyWithoutCreatedByNestedInput
+  sentMessages?: Prisma.DirectMessageUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.DirectMessageUpdateManyWithoutRecipientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutNotificationsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3041,11 +3763,16 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
   instructorEarnings?: Prisma.InstructorEarningUncheckedUpdateManyWithoutInstructorNestedInput
   instructorPayouts?: Prisma.PayoutUncheckedUpdateManyWithoutInstructorNestedInput
   payoutsCreated?: Prisma.PayoutUncheckedUpdateManyWithoutCreatedByNestedInput
+  sentMessages?: Prisma.DirectMessageUncheckedUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.DirectMessageUncheckedUpdateManyWithoutRecipientNestedInput
 }
 
 export type UserCreateWithoutNotificationPreferenceInput = {
   id?: string
   fullName: string
+  firstName?: string | null
+  lastName?: string | null
+  phoneNumber?: string | null
   email: string
   passwordHash?: string | null
   avatarUrl?: string | null
@@ -3084,11 +3811,16 @@ export type UserCreateWithoutNotificationPreferenceInput = {
   instructorEarnings?: Prisma.InstructorEarningCreateNestedManyWithoutInstructorInput
   instructorPayouts?: Prisma.PayoutCreateNestedManyWithoutInstructorInput
   payoutsCreated?: Prisma.PayoutCreateNestedManyWithoutCreatedByInput
+  sentMessages?: Prisma.DirectMessageCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.DirectMessageCreateNestedManyWithoutRecipientInput
 }
 
 export type UserUncheckedCreateWithoutNotificationPreferenceInput = {
   id?: string
   fullName: string
+  firstName?: string | null
+  lastName?: string | null
+  phoneNumber?: string | null
   email: string
   passwordHash?: string | null
   avatarUrl?: string | null
@@ -3127,6 +3859,8 @@ export type UserUncheckedCreateWithoutNotificationPreferenceInput = {
   instructorEarnings?: Prisma.InstructorEarningUncheckedCreateNestedManyWithoutInstructorInput
   instructorPayouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutInstructorInput
   payoutsCreated?: Prisma.PayoutUncheckedCreateNestedManyWithoutCreatedByInput
+  sentMessages?: Prisma.DirectMessageUncheckedCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.DirectMessageUncheckedCreateNestedManyWithoutRecipientInput
 }
 
 export type UserCreateOrConnectWithoutNotificationPreferenceInput = {
@@ -3148,6 +3882,9 @@ export type UserUpdateToOneWithWhereWithoutNotificationPreferenceInput = {
 export type UserUpdateWithoutNotificationPreferenceInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3186,11 +3923,16 @@ export type UserUpdateWithoutNotificationPreferenceInput = {
   instructorEarnings?: Prisma.InstructorEarningUpdateManyWithoutInstructorNestedInput
   instructorPayouts?: Prisma.PayoutUpdateManyWithoutInstructorNestedInput
   payoutsCreated?: Prisma.PayoutUpdateManyWithoutCreatedByNestedInput
+  sentMessages?: Prisma.DirectMessageUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.DirectMessageUpdateManyWithoutRecipientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutNotificationPreferenceInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3229,11 +3971,16 @@ export type UserUncheckedUpdateWithoutNotificationPreferenceInput = {
   instructorEarnings?: Prisma.InstructorEarningUncheckedUpdateManyWithoutInstructorNestedInput
   instructorPayouts?: Prisma.PayoutUncheckedUpdateManyWithoutInstructorNestedInput
   payoutsCreated?: Prisma.PayoutUncheckedUpdateManyWithoutCreatedByNestedInput
+  sentMessages?: Prisma.DirectMessageUncheckedUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.DirectMessageUncheckedUpdateManyWithoutRecipientNestedInput
 }
 
 export type UserCreateWithoutEmailLogsInput = {
   id?: string
   fullName: string
+  firstName?: string | null
+  lastName?: string | null
+  phoneNumber?: string | null
   email: string
   passwordHash?: string | null
   avatarUrl?: string | null
@@ -3272,11 +4019,16 @@ export type UserCreateWithoutEmailLogsInput = {
   instructorEarnings?: Prisma.InstructorEarningCreateNestedManyWithoutInstructorInput
   instructorPayouts?: Prisma.PayoutCreateNestedManyWithoutInstructorInput
   payoutsCreated?: Prisma.PayoutCreateNestedManyWithoutCreatedByInput
+  sentMessages?: Prisma.DirectMessageCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.DirectMessageCreateNestedManyWithoutRecipientInput
 }
 
 export type UserUncheckedCreateWithoutEmailLogsInput = {
   id?: string
   fullName: string
+  firstName?: string | null
+  lastName?: string | null
+  phoneNumber?: string | null
   email: string
   passwordHash?: string | null
   avatarUrl?: string | null
@@ -3315,6 +4067,8 @@ export type UserUncheckedCreateWithoutEmailLogsInput = {
   instructorEarnings?: Prisma.InstructorEarningUncheckedCreateNestedManyWithoutInstructorInput
   instructorPayouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutInstructorInput
   payoutsCreated?: Prisma.PayoutUncheckedCreateNestedManyWithoutCreatedByInput
+  sentMessages?: Prisma.DirectMessageUncheckedCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.DirectMessageUncheckedCreateNestedManyWithoutRecipientInput
 }
 
 export type UserCreateOrConnectWithoutEmailLogsInput = {
@@ -3336,6 +4090,9 @@ export type UserUpdateToOneWithWhereWithoutEmailLogsInput = {
 export type UserUpdateWithoutEmailLogsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3374,11 +4131,16 @@ export type UserUpdateWithoutEmailLogsInput = {
   instructorEarnings?: Prisma.InstructorEarningUpdateManyWithoutInstructorNestedInput
   instructorPayouts?: Prisma.PayoutUpdateManyWithoutInstructorNestedInput
   payoutsCreated?: Prisma.PayoutUpdateManyWithoutCreatedByNestedInput
+  sentMessages?: Prisma.DirectMessageUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.DirectMessageUpdateManyWithoutRecipientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutEmailLogsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3417,11 +4179,16 @@ export type UserUncheckedUpdateWithoutEmailLogsInput = {
   instructorEarnings?: Prisma.InstructorEarningUncheckedUpdateManyWithoutInstructorNestedInput
   instructorPayouts?: Prisma.PayoutUncheckedUpdateManyWithoutInstructorNestedInput
   payoutsCreated?: Prisma.PayoutUncheckedUpdateManyWithoutCreatedByNestedInput
+  sentMessages?: Prisma.DirectMessageUncheckedUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.DirectMessageUncheckedUpdateManyWithoutRecipientNestedInput
 }
 
 export type UserCreateWithoutCourseAnnouncementsInput = {
   id?: string
   fullName: string
+  firstName?: string | null
+  lastName?: string | null
+  phoneNumber?: string | null
   email: string
   passwordHash?: string | null
   avatarUrl?: string | null
@@ -3460,11 +4227,16 @@ export type UserCreateWithoutCourseAnnouncementsInput = {
   instructorEarnings?: Prisma.InstructorEarningCreateNestedManyWithoutInstructorInput
   instructorPayouts?: Prisma.PayoutCreateNestedManyWithoutInstructorInput
   payoutsCreated?: Prisma.PayoutCreateNestedManyWithoutCreatedByInput
+  sentMessages?: Prisma.DirectMessageCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.DirectMessageCreateNestedManyWithoutRecipientInput
 }
 
 export type UserUncheckedCreateWithoutCourseAnnouncementsInput = {
   id?: string
   fullName: string
+  firstName?: string | null
+  lastName?: string | null
+  phoneNumber?: string | null
   email: string
   passwordHash?: string | null
   avatarUrl?: string | null
@@ -3503,6 +4275,8 @@ export type UserUncheckedCreateWithoutCourseAnnouncementsInput = {
   instructorEarnings?: Prisma.InstructorEarningUncheckedCreateNestedManyWithoutInstructorInput
   instructorPayouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutInstructorInput
   payoutsCreated?: Prisma.PayoutUncheckedCreateNestedManyWithoutCreatedByInput
+  sentMessages?: Prisma.DirectMessageUncheckedCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.DirectMessageUncheckedCreateNestedManyWithoutRecipientInput
 }
 
 export type UserCreateOrConnectWithoutCourseAnnouncementsInput = {
@@ -3524,6 +4298,9 @@ export type UserUpdateToOneWithWhereWithoutCourseAnnouncementsInput = {
 export type UserUpdateWithoutCourseAnnouncementsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3562,11 +4339,16 @@ export type UserUpdateWithoutCourseAnnouncementsInput = {
   instructorEarnings?: Prisma.InstructorEarningUpdateManyWithoutInstructorNestedInput
   instructorPayouts?: Prisma.PayoutUpdateManyWithoutInstructorNestedInput
   payoutsCreated?: Prisma.PayoutUpdateManyWithoutCreatedByNestedInput
+  sentMessages?: Prisma.DirectMessageUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.DirectMessageUpdateManyWithoutRecipientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCourseAnnouncementsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3605,11 +4387,16 @@ export type UserUncheckedUpdateWithoutCourseAnnouncementsInput = {
   instructorEarnings?: Prisma.InstructorEarningUncheckedUpdateManyWithoutInstructorNestedInput
   instructorPayouts?: Prisma.PayoutUncheckedUpdateManyWithoutInstructorNestedInput
   payoutsCreated?: Prisma.PayoutUncheckedUpdateManyWithoutCreatedByNestedInput
+  sentMessages?: Prisma.DirectMessageUncheckedUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.DirectMessageUncheckedUpdateManyWithoutRecipientNestedInput
 }
 
 export type UserCreateWithoutLearningEventsInput = {
   id?: string
   fullName: string
+  firstName?: string | null
+  lastName?: string | null
+  phoneNumber?: string | null
   email: string
   passwordHash?: string | null
   avatarUrl?: string | null
@@ -3648,11 +4435,16 @@ export type UserCreateWithoutLearningEventsInput = {
   instructorEarnings?: Prisma.InstructorEarningCreateNestedManyWithoutInstructorInput
   instructorPayouts?: Prisma.PayoutCreateNestedManyWithoutInstructorInput
   payoutsCreated?: Prisma.PayoutCreateNestedManyWithoutCreatedByInput
+  sentMessages?: Prisma.DirectMessageCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.DirectMessageCreateNestedManyWithoutRecipientInput
 }
 
 export type UserUncheckedCreateWithoutLearningEventsInput = {
   id?: string
   fullName: string
+  firstName?: string | null
+  lastName?: string | null
+  phoneNumber?: string | null
   email: string
   passwordHash?: string | null
   avatarUrl?: string | null
@@ -3691,6 +4483,8 @@ export type UserUncheckedCreateWithoutLearningEventsInput = {
   instructorEarnings?: Prisma.InstructorEarningUncheckedCreateNestedManyWithoutInstructorInput
   instructorPayouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutInstructorInput
   payoutsCreated?: Prisma.PayoutUncheckedCreateNestedManyWithoutCreatedByInput
+  sentMessages?: Prisma.DirectMessageUncheckedCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.DirectMessageUncheckedCreateNestedManyWithoutRecipientInput
 }
 
 export type UserCreateOrConnectWithoutLearningEventsInput = {
@@ -3712,6 +4506,9 @@ export type UserUpdateToOneWithWhereWithoutLearningEventsInput = {
 export type UserUpdateWithoutLearningEventsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3750,11 +4547,16 @@ export type UserUpdateWithoutLearningEventsInput = {
   instructorEarnings?: Prisma.InstructorEarningUpdateManyWithoutInstructorNestedInput
   instructorPayouts?: Prisma.PayoutUpdateManyWithoutInstructorNestedInput
   payoutsCreated?: Prisma.PayoutUpdateManyWithoutCreatedByNestedInput
+  sentMessages?: Prisma.DirectMessageUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.DirectMessageUpdateManyWithoutRecipientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutLearningEventsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3793,11 +4595,16 @@ export type UserUncheckedUpdateWithoutLearningEventsInput = {
   instructorEarnings?: Prisma.InstructorEarningUncheckedUpdateManyWithoutInstructorNestedInput
   instructorPayouts?: Prisma.PayoutUncheckedUpdateManyWithoutInstructorNestedInput
   payoutsCreated?: Prisma.PayoutUncheckedUpdateManyWithoutCreatedByNestedInput
+  sentMessages?: Prisma.DirectMessageUncheckedUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.DirectMessageUncheckedUpdateManyWithoutRecipientNestedInput
 }
 
 export type UserCreateWithoutVideoWatchEventsInput = {
   id?: string
   fullName: string
+  firstName?: string | null
+  lastName?: string | null
+  phoneNumber?: string | null
   email: string
   passwordHash?: string | null
   avatarUrl?: string | null
@@ -3836,11 +4643,16 @@ export type UserCreateWithoutVideoWatchEventsInput = {
   instructorEarnings?: Prisma.InstructorEarningCreateNestedManyWithoutInstructorInput
   instructorPayouts?: Prisma.PayoutCreateNestedManyWithoutInstructorInput
   payoutsCreated?: Prisma.PayoutCreateNestedManyWithoutCreatedByInput
+  sentMessages?: Prisma.DirectMessageCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.DirectMessageCreateNestedManyWithoutRecipientInput
 }
 
 export type UserUncheckedCreateWithoutVideoWatchEventsInput = {
   id?: string
   fullName: string
+  firstName?: string | null
+  lastName?: string | null
+  phoneNumber?: string | null
   email: string
   passwordHash?: string | null
   avatarUrl?: string | null
@@ -3879,6 +4691,8 @@ export type UserUncheckedCreateWithoutVideoWatchEventsInput = {
   instructorEarnings?: Prisma.InstructorEarningUncheckedCreateNestedManyWithoutInstructorInput
   instructorPayouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutInstructorInput
   payoutsCreated?: Prisma.PayoutUncheckedCreateNestedManyWithoutCreatedByInput
+  sentMessages?: Prisma.DirectMessageUncheckedCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.DirectMessageUncheckedCreateNestedManyWithoutRecipientInput
 }
 
 export type UserCreateOrConnectWithoutVideoWatchEventsInput = {
@@ -3900,6 +4714,9 @@ export type UserUpdateToOneWithWhereWithoutVideoWatchEventsInput = {
 export type UserUpdateWithoutVideoWatchEventsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3938,11 +4755,16 @@ export type UserUpdateWithoutVideoWatchEventsInput = {
   instructorEarnings?: Prisma.InstructorEarningUpdateManyWithoutInstructorNestedInput
   instructorPayouts?: Prisma.PayoutUpdateManyWithoutInstructorNestedInput
   payoutsCreated?: Prisma.PayoutUpdateManyWithoutCreatedByNestedInput
+  sentMessages?: Prisma.DirectMessageUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.DirectMessageUpdateManyWithoutRecipientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutVideoWatchEventsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3981,11 +4803,16 @@ export type UserUncheckedUpdateWithoutVideoWatchEventsInput = {
   instructorEarnings?: Prisma.InstructorEarningUncheckedUpdateManyWithoutInstructorNestedInput
   instructorPayouts?: Prisma.PayoutUncheckedUpdateManyWithoutInstructorNestedInput
   payoutsCreated?: Prisma.PayoutUncheckedUpdateManyWithoutCreatedByNestedInput
+  sentMessages?: Prisma.DirectMessageUncheckedUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.DirectMessageUncheckedUpdateManyWithoutRecipientNestedInput
 }
 
 export type UserCreateWithoutReviewsInput = {
   id?: string
   fullName: string
+  firstName?: string | null
+  lastName?: string | null
+  phoneNumber?: string | null
   email: string
   passwordHash?: string | null
   avatarUrl?: string | null
@@ -4024,11 +4851,16 @@ export type UserCreateWithoutReviewsInput = {
   instructorEarnings?: Prisma.InstructorEarningCreateNestedManyWithoutInstructorInput
   instructorPayouts?: Prisma.PayoutCreateNestedManyWithoutInstructorInput
   payoutsCreated?: Prisma.PayoutCreateNestedManyWithoutCreatedByInput
+  sentMessages?: Prisma.DirectMessageCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.DirectMessageCreateNestedManyWithoutRecipientInput
 }
 
 export type UserUncheckedCreateWithoutReviewsInput = {
   id?: string
   fullName: string
+  firstName?: string | null
+  lastName?: string | null
+  phoneNumber?: string | null
   email: string
   passwordHash?: string | null
   avatarUrl?: string | null
@@ -4067,6 +4899,8 @@ export type UserUncheckedCreateWithoutReviewsInput = {
   instructorEarnings?: Prisma.InstructorEarningUncheckedCreateNestedManyWithoutInstructorInput
   instructorPayouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutInstructorInput
   payoutsCreated?: Prisma.PayoutUncheckedCreateNestedManyWithoutCreatedByInput
+  sentMessages?: Prisma.DirectMessageUncheckedCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.DirectMessageUncheckedCreateNestedManyWithoutRecipientInput
 }
 
 export type UserCreateOrConnectWithoutReviewsInput = {
@@ -4088,6 +4922,9 @@ export type UserUpdateToOneWithWhereWithoutReviewsInput = {
 export type UserUpdateWithoutReviewsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4126,11 +4963,16 @@ export type UserUpdateWithoutReviewsInput = {
   instructorEarnings?: Prisma.InstructorEarningUpdateManyWithoutInstructorNestedInput
   instructorPayouts?: Prisma.PayoutUpdateManyWithoutInstructorNestedInput
   payoutsCreated?: Prisma.PayoutUpdateManyWithoutCreatedByNestedInput
+  sentMessages?: Prisma.DirectMessageUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.DirectMessageUpdateManyWithoutRecipientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReviewsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4169,11 +5011,16 @@ export type UserUncheckedUpdateWithoutReviewsInput = {
   instructorEarnings?: Prisma.InstructorEarningUncheckedUpdateManyWithoutInstructorNestedInput
   instructorPayouts?: Prisma.PayoutUncheckedUpdateManyWithoutInstructorNestedInput
   payoutsCreated?: Prisma.PayoutUncheckedUpdateManyWithoutCreatedByNestedInput
+  sentMessages?: Prisma.DirectMessageUncheckedUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.DirectMessageUncheckedUpdateManyWithoutRecipientNestedInput
 }
 
 export type UserCreateWithoutCommentsInput = {
   id?: string
   fullName: string
+  firstName?: string | null
+  lastName?: string | null
+  phoneNumber?: string | null
   email: string
   passwordHash?: string | null
   avatarUrl?: string | null
@@ -4212,11 +5059,16 @@ export type UserCreateWithoutCommentsInput = {
   instructorEarnings?: Prisma.InstructorEarningCreateNestedManyWithoutInstructorInput
   instructorPayouts?: Prisma.PayoutCreateNestedManyWithoutInstructorInput
   payoutsCreated?: Prisma.PayoutCreateNestedManyWithoutCreatedByInput
+  sentMessages?: Prisma.DirectMessageCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.DirectMessageCreateNestedManyWithoutRecipientInput
 }
 
 export type UserUncheckedCreateWithoutCommentsInput = {
   id?: string
   fullName: string
+  firstName?: string | null
+  lastName?: string | null
+  phoneNumber?: string | null
   email: string
   passwordHash?: string | null
   avatarUrl?: string | null
@@ -4255,6 +5107,8 @@ export type UserUncheckedCreateWithoutCommentsInput = {
   instructorEarnings?: Prisma.InstructorEarningUncheckedCreateNestedManyWithoutInstructorInput
   instructorPayouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutInstructorInput
   payoutsCreated?: Prisma.PayoutUncheckedCreateNestedManyWithoutCreatedByInput
+  sentMessages?: Prisma.DirectMessageUncheckedCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.DirectMessageUncheckedCreateNestedManyWithoutRecipientInput
 }
 
 export type UserCreateOrConnectWithoutCommentsInput = {
@@ -4276,6 +5130,9 @@ export type UserUpdateToOneWithWhereWithoutCommentsInput = {
 export type UserUpdateWithoutCommentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4314,11 +5171,16 @@ export type UserUpdateWithoutCommentsInput = {
   instructorEarnings?: Prisma.InstructorEarningUpdateManyWithoutInstructorNestedInput
   instructorPayouts?: Prisma.PayoutUpdateManyWithoutInstructorNestedInput
   payoutsCreated?: Prisma.PayoutUpdateManyWithoutCreatedByNestedInput
+  sentMessages?: Prisma.DirectMessageUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.DirectMessageUpdateManyWithoutRecipientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCommentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4357,11 +5219,16 @@ export type UserUncheckedUpdateWithoutCommentsInput = {
   instructorEarnings?: Prisma.InstructorEarningUncheckedUpdateManyWithoutInstructorNestedInput
   instructorPayouts?: Prisma.PayoutUncheckedUpdateManyWithoutInstructorNestedInput
   payoutsCreated?: Prisma.PayoutUncheckedUpdateManyWithoutCreatedByNestedInput
+  sentMessages?: Prisma.DirectMessageUncheckedUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.DirectMessageUncheckedUpdateManyWithoutRecipientNestedInput
 }
 
 export type UserCreateWithoutOrdersInput = {
   id?: string
   fullName: string
+  firstName?: string | null
+  lastName?: string | null
+  phoneNumber?: string | null
   email: string
   passwordHash?: string | null
   avatarUrl?: string | null
@@ -4400,11 +5267,16 @@ export type UserCreateWithoutOrdersInput = {
   instructorEarnings?: Prisma.InstructorEarningCreateNestedManyWithoutInstructorInput
   instructorPayouts?: Prisma.PayoutCreateNestedManyWithoutInstructorInput
   payoutsCreated?: Prisma.PayoutCreateNestedManyWithoutCreatedByInput
+  sentMessages?: Prisma.DirectMessageCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.DirectMessageCreateNestedManyWithoutRecipientInput
 }
 
 export type UserUncheckedCreateWithoutOrdersInput = {
   id?: string
   fullName: string
+  firstName?: string | null
+  lastName?: string | null
+  phoneNumber?: string | null
   email: string
   passwordHash?: string | null
   avatarUrl?: string | null
@@ -4443,6 +5315,8 @@ export type UserUncheckedCreateWithoutOrdersInput = {
   instructorEarnings?: Prisma.InstructorEarningUncheckedCreateNestedManyWithoutInstructorInput
   instructorPayouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutInstructorInput
   payoutsCreated?: Prisma.PayoutUncheckedCreateNestedManyWithoutCreatedByInput
+  sentMessages?: Prisma.DirectMessageUncheckedCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.DirectMessageUncheckedCreateNestedManyWithoutRecipientInput
 }
 
 export type UserCreateOrConnectWithoutOrdersInput = {
@@ -4464,6 +5338,9 @@ export type UserUpdateToOneWithWhereWithoutOrdersInput = {
 export type UserUpdateWithoutOrdersInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4502,11 +5379,16 @@ export type UserUpdateWithoutOrdersInput = {
   instructorEarnings?: Prisma.InstructorEarningUpdateManyWithoutInstructorNestedInput
   instructorPayouts?: Prisma.PayoutUpdateManyWithoutInstructorNestedInput
   payoutsCreated?: Prisma.PayoutUpdateManyWithoutCreatedByNestedInput
+  sentMessages?: Prisma.DirectMessageUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.DirectMessageUpdateManyWithoutRecipientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutOrdersInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4545,11 +5427,16 @@ export type UserUncheckedUpdateWithoutOrdersInput = {
   instructorEarnings?: Prisma.InstructorEarningUncheckedUpdateManyWithoutInstructorNestedInput
   instructorPayouts?: Prisma.PayoutUncheckedUpdateManyWithoutInstructorNestedInput
   payoutsCreated?: Prisma.PayoutUncheckedUpdateManyWithoutCreatedByNestedInput
+  sentMessages?: Prisma.DirectMessageUncheckedUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.DirectMessageUncheckedUpdateManyWithoutRecipientNestedInput
 }
 
 export type UserCreateWithoutCertificatesInput = {
   id?: string
   fullName: string
+  firstName?: string | null
+  lastName?: string | null
+  phoneNumber?: string | null
   email: string
   passwordHash?: string | null
   avatarUrl?: string | null
@@ -4588,11 +5475,16 @@ export type UserCreateWithoutCertificatesInput = {
   instructorEarnings?: Prisma.InstructorEarningCreateNestedManyWithoutInstructorInput
   instructorPayouts?: Prisma.PayoutCreateNestedManyWithoutInstructorInput
   payoutsCreated?: Prisma.PayoutCreateNestedManyWithoutCreatedByInput
+  sentMessages?: Prisma.DirectMessageCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.DirectMessageCreateNestedManyWithoutRecipientInput
 }
 
 export type UserUncheckedCreateWithoutCertificatesInput = {
   id?: string
   fullName: string
+  firstName?: string | null
+  lastName?: string | null
+  phoneNumber?: string | null
   email: string
   passwordHash?: string | null
   avatarUrl?: string | null
@@ -4631,6 +5523,8 @@ export type UserUncheckedCreateWithoutCertificatesInput = {
   instructorEarnings?: Prisma.InstructorEarningUncheckedCreateNestedManyWithoutInstructorInput
   instructorPayouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutInstructorInput
   payoutsCreated?: Prisma.PayoutUncheckedCreateNestedManyWithoutCreatedByInput
+  sentMessages?: Prisma.DirectMessageUncheckedCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.DirectMessageUncheckedCreateNestedManyWithoutRecipientInput
 }
 
 export type UserCreateOrConnectWithoutCertificatesInput = {
@@ -4652,6 +5546,9 @@ export type UserUpdateToOneWithWhereWithoutCertificatesInput = {
 export type UserUpdateWithoutCertificatesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4690,11 +5587,16 @@ export type UserUpdateWithoutCertificatesInput = {
   instructorEarnings?: Prisma.InstructorEarningUpdateManyWithoutInstructorNestedInput
   instructorPayouts?: Prisma.PayoutUpdateManyWithoutInstructorNestedInput
   payoutsCreated?: Prisma.PayoutUpdateManyWithoutCreatedByNestedInput
+  sentMessages?: Prisma.DirectMessageUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.DirectMessageUpdateManyWithoutRecipientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCertificatesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4733,11 +5635,16 @@ export type UserUncheckedUpdateWithoutCertificatesInput = {
   instructorEarnings?: Prisma.InstructorEarningUncheckedUpdateManyWithoutInstructorNestedInput
   instructorPayouts?: Prisma.PayoutUncheckedUpdateManyWithoutInstructorNestedInput
   payoutsCreated?: Prisma.PayoutUncheckedUpdateManyWithoutCreatedByNestedInput
+  sentMessages?: Prisma.DirectMessageUncheckedUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.DirectMessageUncheckedUpdateManyWithoutRecipientNestedInput
 }
 
 export type UserCreateWithoutCouponsCreatedInput = {
   id?: string
   fullName: string
+  firstName?: string | null
+  lastName?: string | null
+  phoneNumber?: string | null
   email: string
   passwordHash?: string | null
   avatarUrl?: string | null
@@ -4776,11 +5683,16 @@ export type UserCreateWithoutCouponsCreatedInput = {
   instructorEarnings?: Prisma.InstructorEarningCreateNestedManyWithoutInstructorInput
   instructorPayouts?: Prisma.PayoutCreateNestedManyWithoutInstructorInput
   payoutsCreated?: Prisma.PayoutCreateNestedManyWithoutCreatedByInput
+  sentMessages?: Prisma.DirectMessageCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.DirectMessageCreateNestedManyWithoutRecipientInput
 }
 
 export type UserUncheckedCreateWithoutCouponsCreatedInput = {
   id?: string
   fullName: string
+  firstName?: string | null
+  lastName?: string | null
+  phoneNumber?: string | null
   email: string
   passwordHash?: string | null
   avatarUrl?: string | null
@@ -4819,6 +5731,8 @@ export type UserUncheckedCreateWithoutCouponsCreatedInput = {
   instructorEarnings?: Prisma.InstructorEarningUncheckedCreateNestedManyWithoutInstructorInput
   instructorPayouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutInstructorInput
   payoutsCreated?: Prisma.PayoutUncheckedCreateNestedManyWithoutCreatedByInput
+  sentMessages?: Prisma.DirectMessageUncheckedCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.DirectMessageUncheckedCreateNestedManyWithoutRecipientInput
 }
 
 export type UserCreateOrConnectWithoutCouponsCreatedInput = {
@@ -4840,6 +5754,9 @@ export type UserUpdateToOneWithWhereWithoutCouponsCreatedInput = {
 export type UserUpdateWithoutCouponsCreatedInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4878,11 +5795,16 @@ export type UserUpdateWithoutCouponsCreatedInput = {
   instructorEarnings?: Prisma.InstructorEarningUpdateManyWithoutInstructorNestedInput
   instructorPayouts?: Prisma.PayoutUpdateManyWithoutInstructorNestedInput
   payoutsCreated?: Prisma.PayoutUpdateManyWithoutCreatedByNestedInput
+  sentMessages?: Prisma.DirectMessageUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.DirectMessageUpdateManyWithoutRecipientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCouponsCreatedInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4921,11 +5843,16 @@ export type UserUncheckedUpdateWithoutCouponsCreatedInput = {
   instructorEarnings?: Prisma.InstructorEarningUncheckedUpdateManyWithoutInstructorNestedInput
   instructorPayouts?: Prisma.PayoutUncheckedUpdateManyWithoutInstructorNestedInput
   payoutsCreated?: Prisma.PayoutUncheckedUpdateManyWithoutCreatedByNestedInput
+  sentMessages?: Prisma.DirectMessageUncheckedUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.DirectMessageUncheckedUpdateManyWithoutRecipientNestedInput
 }
 
 export type UserCreateWithoutCouponUsagesInput = {
   id?: string
   fullName: string
+  firstName?: string | null
+  lastName?: string | null
+  phoneNumber?: string | null
   email: string
   passwordHash?: string | null
   avatarUrl?: string | null
@@ -4964,11 +5891,16 @@ export type UserCreateWithoutCouponUsagesInput = {
   instructorEarnings?: Prisma.InstructorEarningCreateNestedManyWithoutInstructorInput
   instructorPayouts?: Prisma.PayoutCreateNestedManyWithoutInstructorInput
   payoutsCreated?: Prisma.PayoutCreateNestedManyWithoutCreatedByInput
+  sentMessages?: Prisma.DirectMessageCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.DirectMessageCreateNestedManyWithoutRecipientInput
 }
 
 export type UserUncheckedCreateWithoutCouponUsagesInput = {
   id?: string
   fullName: string
+  firstName?: string | null
+  lastName?: string | null
+  phoneNumber?: string | null
   email: string
   passwordHash?: string | null
   avatarUrl?: string | null
@@ -5007,6 +5939,8 @@ export type UserUncheckedCreateWithoutCouponUsagesInput = {
   instructorEarnings?: Prisma.InstructorEarningUncheckedCreateNestedManyWithoutInstructorInput
   instructorPayouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutInstructorInput
   payoutsCreated?: Prisma.PayoutUncheckedCreateNestedManyWithoutCreatedByInput
+  sentMessages?: Prisma.DirectMessageUncheckedCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.DirectMessageUncheckedCreateNestedManyWithoutRecipientInput
 }
 
 export type UserCreateOrConnectWithoutCouponUsagesInput = {
@@ -5028,6 +5962,9 @@ export type UserUpdateToOneWithWhereWithoutCouponUsagesInput = {
 export type UserUpdateWithoutCouponUsagesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5066,11 +6003,16 @@ export type UserUpdateWithoutCouponUsagesInput = {
   instructorEarnings?: Prisma.InstructorEarningUpdateManyWithoutInstructorNestedInput
   instructorPayouts?: Prisma.PayoutUpdateManyWithoutInstructorNestedInput
   payoutsCreated?: Prisma.PayoutUpdateManyWithoutCreatedByNestedInput
+  sentMessages?: Prisma.DirectMessageUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.DirectMessageUpdateManyWithoutRecipientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCouponUsagesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5109,11 +6051,16 @@ export type UserUncheckedUpdateWithoutCouponUsagesInput = {
   instructorEarnings?: Prisma.InstructorEarningUncheckedUpdateManyWithoutInstructorNestedInput
   instructorPayouts?: Prisma.PayoutUncheckedUpdateManyWithoutInstructorNestedInput
   payoutsCreated?: Prisma.PayoutUncheckedUpdateManyWithoutCreatedByNestedInput
+  sentMessages?: Prisma.DirectMessageUncheckedUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.DirectMessageUncheckedUpdateManyWithoutRecipientNestedInput
 }
 
 export type UserCreateWithoutRefundRequestsInput = {
   id?: string
   fullName: string
+  firstName?: string | null
+  lastName?: string | null
+  phoneNumber?: string | null
   email: string
   passwordHash?: string | null
   avatarUrl?: string | null
@@ -5152,11 +6099,16 @@ export type UserCreateWithoutRefundRequestsInput = {
   instructorEarnings?: Prisma.InstructorEarningCreateNestedManyWithoutInstructorInput
   instructorPayouts?: Prisma.PayoutCreateNestedManyWithoutInstructorInput
   payoutsCreated?: Prisma.PayoutCreateNestedManyWithoutCreatedByInput
+  sentMessages?: Prisma.DirectMessageCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.DirectMessageCreateNestedManyWithoutRecipientInput
 }
 
 export type UserUncheckedCreateWithoutRefundRequestsInput = {
   id?: string
   fullName: string
+  firstName?: string | null
+  lastName?: string | null
+  phoneNumber?: string | null
   email: string
   passwordHash?: string | null
   avatarUrl?: string | null
@@ -5195,6 +6147,8 @@ export type UserUncheckedCreateWithoutRefundRequestsInput = {
   instructorEarnings?: Prisma.InstructorEarningUncheckedCreateNestedManyWithoutInstructorInput
   instructorPayouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutInstructorInput
   payoutsCreated?: Prisma.PayoutUncheckedCreateNestedManyWithoutCreatedByInput
+  sentMessages?: Prisma.DirectMessageUncheckedCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.DirectMessageUncheckedCreateNestedManyWithoutRecipientInput
 }
 
 export type UserCreateOrConnectWithoutRefundRequestsInput = {
@@ -5205,6 +6159,9 @@ export type UserCreateOrConnectWithoutRefundRequestsInput = {
 export type UserCreateWithoutRefundReviewsInput = {
   id?: string
   fullName: string
+  firstName?: string | null
+  lastName?: string | null
+  phoneNumber?: string | null
   email: string
   passwordHash?: string | null
   avatarUrl?: string | null
@@ -5243,11 +6200,16 @@ export type UserCreateWithoutRefundReviewsInput = {
   instructorEarnings?: Prisma.InstructorEarningCreateNestedManyWithoutInstructorInput
   instructorPayouts?: Prisma.PayoutCreateNestedManyWithoutInstructorInput
   payoutsCreated?: Prisma.PayoutCreateNestedManyWithoutCreatedByInput
+  sentMessages?: Prisma.DirectMessageCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.DirectMessageCreateNestedManyWithoutRecipientInput
 }
 
 export type UserUncheckedCreateWithoutRefundReviewsInput = {
   id?: string
   fullName: string
+  firstName?: string | null
+  lastName?: string | null
+  phoneNumber?: string | null
   email: string
   passwordHash?: string | null
   avatarUrl?: string | null
@@ -5286,6 +6248,8 @@ export type UserUncheckedCreateWithoutRefundReviewsInput = {
   instructorEarnings?: Prisma.InstructorEarningUncheckedCreateNestedManyWithoutInstructorInput
   instructorPayouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutInstructorInput
   payoutsCreated?: Prisma.PayoutUncheckedCreateNestedManyWithoutCreatedByInput
+  sentMessages?: Prisma.DirectMessageUncheckedCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.DirectMessageUncheckedCreateNestedManyWithoutRecipientInput
 }
 
 export type UserCreateOrConnectWithoutRefundReviewsInput = {
@@ -5307,6 +6271,9 @@ export type UserUpdateToOneWithWhereWithoutRefundRequestsInput = {
 export type UserUpdateWithoutRefundRequestsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5345,11 +6312,16 @@ export type UserUpdateWithoutRefundRequestsInput = {
   instructorEarnings?: Prisma.InstructorEarningUpdateManyWithoutInstructorNestedInput
   instructorPayouts?: Prisma.PayoutUpdateManyWithoutInstructorNestedInput
   payoutsCreated?: Prisma.PayoutUpdateManyWithoutCreatedByNestedInput
+  sentMessages?: Prisma.DirectMessageUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.DirectMessageUpdateManyWithoutRecipientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutRefundRequestsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5388,6 +6360,8 @@ export type UserUncheckedUpdateWithoutRefundRequestsInput = {
   instructorEarnings?: Prisma.InstructorEarningUncheckedUpdateManyWithoutInstructorNestedInput
   instructorPayouts?: Prisma.PayoutUncheckedUpdateManyWithoutInstructorNestedInput
   payoutsCreated?: Prisma.PayoutUncheckedUpdateManyWithoutCreatedByNestedInput
+  sentMessages?: Prisma.DirectMessageUncheckedUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.DirectMessageUncheckedUpdateManyWithoutRecipientNestedInput
 }
 
 export type UserUpsertWithoutRefundReviewsInput = {
@@ -5404,6 +6378,9 @@ export type UserUpdateToOneWithWhereWithoutRefundReviewsInput = {
 export type UserUpdateWithoutRefundReviewsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5442,11 +6419,16 @@ export type UserUpdateWithoutRefundReviewsInput = {
   instructorEarnings?: Prisma.InstructorEarningUpdateManyWithoutInstructorNestedInput
   instructorPayouts?: Prisma.PayoutUpdateManyWithoutInstructorNestedInput
   payoutsCreated?: Prisma.PayoutUpdateManyWithoutCreatedByNestedInput
+  sentMessages?: Prisma.DirectMessageUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.DirectMessageUpdateManyWithoutRecipientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutRefundReviewsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5485,11 +6467,16 @@ export type UserUncheckedUpdateWithoutRefundReviewsInput = {
   instructorEarnings?: Prisma.InstructorEarningUncheckedUpdateManyWithoutInstructorNestedInput
   instructorPayouts?: Prisma.PayoutUncheckedUpdateManyWithoutInstructorNestedInput
   payoutsCreated?: Prisma.PayoutUncheckedUpdateManyWithoutCreatedByNestedInput
+  sentMessages?: Prisma.DirectMessageUncheckedUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.DirectMessageUncheckedUpdateManyWithoutRecipientNestedInput
 }
 
 export type UserCreateWithoutInstructorEarningsInput = {
   id?: string
   fullName: string
+  firstName?: string | null
+  lastName?: string | null
+  phoneNumber?: string | null
   email: string
   passwordHash?: string | null
   avatarUrl?: string | null
@@ -5528,11 +6515,16 @@ export type UserCreateWithoutInstructorEarningsInput = {
   refundReviews?: Prisma.RefundRequestCreateNestedManyWithoutReviewerInput
   instructorPayouts?: Prisma.PayoutCreateNestedManyWithoutInstructorInput
   payoutsCreated?: Prisma.PayoutCreateNestedManyWithoutCreatedByInput
+  sentMessages?: Prisma.DirectMessageCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.DirectMessageCreateNestedManyWithoutRecipientInput
 }
 
 export type UserUncheckedCreateWithoutInstructorEarningsInput = {
   id?: string
   fullName: string
+  firstName?: string | null
+  lastName?: string | null
+  phoneNumber?: string | null
   email: string
   passwordHash?: string | null
   avatarUrl?: string | null
@@ -5571,6 +6563,8 @@ export type UserUncheckedCreateWithoutInstructorEarningsInput = {
   refundReviews?: Prisma.RefundRequestUncheckedCreateNestedManyWithoutReviewerInput
   instructorPayouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutInstructorInput
   payoutsCreated?: Prisma.PayoutUncheckedCreateNestedManyWithoutCreatedByInput
+  sentMessages?: Prisma.DirectMessageUncheckedCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.DirectMessageUncheckedCreateNestedManyWithoutRecipientInput
 }
 
 export type UserCreateOrConnectWithoutInstructorEarningsInput = {
@@ -5592,6 +6586,9 @@ export type UserUpdateToOneWithWhereWithoutInstructorEarningsInput = {
 export type UserUpdateWithoutInstructorEarningsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5630,11 +6627,16 @@ export type UserUpdateWithoutInstructorEarningsInput = {
   refundReviews?: Prisma.RefundRequestUpdateManyWithoutReviewerNestedInput
   instructorPayouts?: Prisma.PayoutUpdateManyWithoutInstructorNestedInput
   payoutsCreated?: Prisma.PayoutUpdateManyWithoutCreatedByNestedInput
+  sentMessages?: Prisma.DirectMessageUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.DirectMessageUpdateManyWithoutRecipientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutInstructorEarningsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5673,11 +6675,16 @@ export type UserUncheckedUpdateWithoutInstructorEarningsInput = {
   refundReviews?: Prisma.RefundRequestUncheckedUpdateManyWithoutReviewerNestedInput
   instructorPayouts?: Prisma.PayoutUncheckedUpdateManyWithoutInstructorNestedInput
   payoutsCreated?: Prisma.PayoutUncheckedUpdateManyWithoutCreatedByNestedInput
+  sentMessages?: Prisma.DirectMessageUncheckedUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.DirectMessageUncheckedUpdateManyWithoutRecipientNestedInput
 }
 
 export type UserCreateWithoutInstructorPayoutsInput = {
   id?: string
   fullName: string
+  firstName?: string | null
+  lastName?: string | null
+  phoneNumber?: string | null
   email: string
   passwordHash?: string | null
   avatarUrl?: string | null
@@ -5716,11 +6723,16 @@ export type UserCreateWithoutInstructorPayoutsInput = {
   refundReviews?: Prisma.RefundRequestCreateNestedManyWithoutReviewerInput
   instructorEarnings?: Prisma.InstructorEarningCreateNestedManyWithoutInstructorInput
   payoutsCreated?: Prisma.PayoutCreateNestedManyWithoutCreatedByInput
+  sentMessages?: Prisma.DirectMessageCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.DirectMessageCreateNestedManyWithoutRecipientInput
 }
 
 export type UserUncheckedCreateWithoutInstructorPayoutsInput = {
   id?: string
   fullName: string
+  firstName?: string | null
+  lastName?: string | null
+  phoneNumber?: string | null
   email: string
   passwordHash?: string | null
   avatarUrl?: string | null
@@ -5759,6 +6771,8 @@ export type UserUncheckedCreateWithoutInstructorPayoutsInput = {
   refundReviews?: Prisma.RefundRequestUncheckedCreateNestedManyWithoutReviewerInput
   instructorEarnings?: Prisma.InstructorEarningUncheckedCreateNestedManyWithoutInstructorInput
   payoutsCreated?: Prisma.PayoutUncheckedCreateNestedManyWithoutCreatedByInput
+  sentMessages?: Prisma.DirectMessageUncheckedCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.DirectMessageUncheckedCreateNestedManyWithoutRecipientInput
 }
 
 export type UserCreateOrConnectWithoutInstructorPayoutsInput = {
@@ -5769,6 +6783,9 @@ export type UserCreateOrConnectWithoutInstructorPayoutsInput = {
 export type UserCreateWithoutPayoutsCreatedInput = {
   id?: string
   fullName: string
+  firstName?: string | null
+  lastName?: string | null
+  phoneNumber?: string | null
   email: string
   passwordHash?: string | null
   avatarUrl?: string | null
@@ -5807,11 +6824,16 @@ export type UserCreateWithoutPayoutsCreatedInput = {
   refundReviews?: Prisma.RefundRequestCreateNestedManyWithoutReviewerInput
   instructorEarnings?: Prisma.InstructorEarningCreateNestedManyWithoutInstructorInput
   instructorPayouts?: Prisma.PayoutCreateNestedManyWithoutInstructorInput
+  sentMessages?: Prisma.DirectMessageCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.DirectMessageCreateNestedManyWithoutRecipientInput
 }
 
 export type UserUncheckedCreateWithoutPayoutsCreatedInput = {
   id?: string
   fullName: string
+  firstName?: string | null
+  lastName?: string | null
+  phoneNumber?: string | null
   email: string
   passwordHash?: string | null
   avatarUrl?: string | null
@@ -5850,6 +6872,8 @@ export type UserUncheckedCreateWithoutPayoutsCreatedInput = {
   refundReviews?: Prisma.RefundRequestUncheckedCreateNestedManyWithoutReviewerInput
   instructorEarnings?: Prisma.InstructorEarningUncheckedCreateNestedManyWithoutInstructorInput
   instructorPayouts?: Prisma.PayoutUncheckedCreateNestedManyWithoutInstructorInput
+  sentMessages?: Prisma.DirectMessageUncheckedCreateNestedManyWithoutSenderInput
+  receivedMessages?: Prisma.DirectMessageUncheckedCreateNestedManyWithoutRecipientInput
 }
 
 export type UserCreateOrConnectWithoutPayoutsCreatedInput = {
@@ -5871,6 +6895,9 @@ export type UserUpdateToOneWithWhereWithoutInstructorPayoutsInput = {
 export type UserUpdateWithoutInstructorPayoutsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5909,11 +6936,16 @@ export type UserUpdateWithoutInstructorPayoutsInput = {
   refundReviews?: Prisma.RefundRequestUpdateManyWithoutReviewerNestedInput
   instructorEarnings?: Prisma.InstructorEarningUpdateManyWithoutInstructorNestedInput
   payoutsCreated?: Prisma.PayoutUpdateManyWithoutCreatedByNestedInput
+  sentMessages?: Prisma.DirectMessageUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.DirectMessageUpdateManyWithoutRecipientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutInstructorPayoutsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -5952,6 +6984,8 @@ export type UserUncheckedUpdateWithoutInstructorPayoutsInput = {
   refundReviews?: Prisma.RefundRequestUncheckedUpdateManyWithoutReviewerNestedInput
   instructorEarnings?: Prisma.InstructorEarningUncheckedUpdateManyWithoutInstructorNestedInput
   payoutsCreated?: Prisma.PayoutUncheckedUpdateManyWithoutCreatedByNestedInput
+  sentMessages?: Prisma.DirectMessageUncheckedUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.DirectMessageUncheckedUpdateManyWithoutRecipientNestedInput
 }
 
 export type UserUpsertWithoutPayoutsCreatedInput = {
@@ -5968,6 +7002,9 @@ export type UserUpdateToOneWithWhereWithoutPayoutsCreatedInput = {
 export type UserUpdateWithoutPayoutsCreatedInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -6006,11 +7043,16 @@ export type UserUpdateWithoutPayoutsCreatedInput = {
   refundReviews?: Prisma.RefundRequestUpdateManyWithoutReviewerNestedInput
   instructorEarnings?: Prisma.InstructorEarningUpdateManyWithoutInstructorNestedInput
   instructorPayouts?: Prisma.PayoutUpdateManyWithoutInstructorNestedInput
+  sentMessages?: Prisma.DirectMessageUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.DirectMessageUpdateManyWithoutRecipientNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPayoutsCreatedInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   avatarUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -6049,6 +7091,8 @@ export type UserUncheckedUpdateWithoutPayoutsCreatedInput = {
   refundReviews?: Prisma.RefundRequestUncheckedUpdateManyWithoutReviewerNestedInput
   instructorEarnings?: Prisma.InstructorEarningUncheckedUpdateManyWithoutInstructorNestedInput
   instructorPayouts?: Prisma.PayoutUncheckedUpdateManyWithoutInstructorNestedInput
+  sentMessages?: Prisma.DirectMessageUncheckedUpdateManyWithoutSenderNestedInput
+  receivedMessages?: Prisma.DirectMessageUncheckedUpdateManyWithoutRecipientNestedInput
 }
 
 
@@ -6082,6 +7126,8 @@ export type UserCountOutputType = {
   instructorEarnings: number
   instructorPayouts: number
   payoutsCreated: number
+  sentMessages: number
+  receivedMessages: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -6110,6 +7156,8 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   instructorEarnings?: boolean | UserCountOutputTypeCountInstructorEarningsArgs
   instructorPayouts?: boolean | UserCountOutputTypeCountInstructorPayoutsArgs
   payoutsCreated?: boolean | UserCountOutputTypeCountPayoutsCreatedArgs
+  sentMessages?: boolean | UserCountOutputTypeCountSentMessagesArgs
+  receivedMessages?: boolean | UserCountOutputTypeCountReceivedMessagesArgs
 }
 
 /**
@@ -6297,10 +7345,27 @@ export type UserCountOutputTypeCountPayoutsCreatedArgs<ExtArgs extends runtime.T
   where?: Prisma.PayoutWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountSentMessagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.DirectMessageWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountReceivedMessagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.DirectMessageWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   fullName?: boolean
+  firstName?: boolean
+  lastName?: boolean
+  phoneNumber?: boolean
   email?: boolean
   passwordHash?: boolean
   avatarUrl?: boolean
@@ -6340,12 +7405,17 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   instructorEarnings?: boolean | Prisma.User$instructorEarningsArgs<ExtArgs>
   instructorPayouts?: boolean | Prisma.User$instructorPayoutsArgs<ExtArgs>
   payoutsCreated?: boolean | Prisma.User$payoutsCreatedArgs<ExtArgs>
+  sentMessages?: boolean | Prisma.User$sentMessagesArgs<ExtArgs>
+  receivedMessages?: boolean | Prisma.User$receivedMessagesArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   fullName?: boolean
+  firstName?: boolean
+  lastName?: boolean
+  phoneNumber?: boolean
   email?: boolean
   passwordHash?: boolean
   avatarUrl?: boolean
@@ -6364,6 +7434,9 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
 export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   fullName?: boolean
+  firstName?: boolean
+  lastName?: boolean
+  phoneNumber?: boolean
   email?: boolean
   passwordHash?: boolean
   avatarUrl?: boolean
@@ -6382,6 +7455,9 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
 export type UserSelectScalar = {
   id?: boolean
   fullName?: boolean
+  firstName?: boolean
+  lastName?: boolean
+  phoneNumber?: boolean
   email?: boolean
   passwordHash?: boolean
   avatarUrl?: boolean
@@ -6397,7 +7473,7 @@ export type UserSelectScalar = {
   updatedAt?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "fullName" | "email" | "passwordHash" | "avatarUrl" | "googleId" | "githubId" | "emailVerifiedAt" | "failedLoginAttempts" | "lockedUntil" | "lastLoginAt" | "role" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "fullName" | "firstName" | "lastName" | "phoneNumber" | "email" | "passwordHash" | "avatarUrl" | "googleId" | "githubId" | "emailVerifiedAt" | "failedLoginAttempts" | "lockedUntil" | "lastLoginAt" | "role" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   courses?: boolean | Prisma.User$coursesArgs<ExtArgs>
   enrollments?: boolean | Prisma.User$enrollmentsArgs<ExtArgs>
@@ -6425,6 +7501,8 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   instructorEarnings?: boolean | Prisma.User$instructorEarningsArgs<ExtArgs>
   instructorPayouts?: boolean | Prisma.User$instructorPayoutsArgs<ExtArgs>
   payoutsCreated?: boolean | Prisma.User$payoutsCreatedArgs<ExtArgs>
+  sentMessages?: boolean | Prisma.User$sentMessagesArgs<ExtArgs>
+  receivedMessages?: boolean | Prisma.User$receivedMessagesArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -6459,10 +7537,15 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     instructorEarnings: Prisma.$InstructorEarningPayload<ExtArgs>[]
     instructorPayouts: Prisma.$PayoutPayload<ExtArgs>[]
     payoutsCreated: Prisma.$PayoutPayload<ExtArgs>[]
+    sentMessages: Prisma.$DirectMessagePayload<ExtArgs>[]
+    receivedMessages: Prisma.$DirectMessagePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     fullName: string
+    firstName: string | null
+    lastName: string | null
+    phoneNumber: string | null
     email: string
     passwordHash: string | null
     avatarUrl: string | null
@@ -6896,6 +7979,8 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   instructorEarnings<T extends Prisma.User$instructorEarningsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$instructorEarningsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InstructorEarningPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   instructorPayouts<T extends Prisma.User$instructorPayoutsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$instructorPayoutsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PayoutPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   payoutsCreated<T extends Prisma.User$payoutsCreatedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$payoutsCreatedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PayoutPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  sentMessages<T extends Prisma.User$sentMessagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$sentMessagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DirectMessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  receivedMessages<T extends Prisma.User$receivedMessagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$receivedMessagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DirectMessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -6927,6 +8012,9 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
 export interface UserFieldRefs {
   readonly id: Prisma.FieldRef<"User", 'String'>
   readonly fullName: Prisma.FieldRef<"User", 'String'>
+  readonly firstName: Prisma.FieldRef<"User", 'String'>
+  readonly lastName: Prisma.FieldRef<"User", 'String'>
+  readonly phoneNumber: Prisma.FieldRef<"User", 'String'>
   readonly email: Prisma.FieldRef<"User", 'String'>
   readonly passwordHash: Prisma.FieldRef<"User", 'String'>
   readonly avatarUrl: Prisma.FieldRef<"User", 'String'>
@@ -7949,6 +9037,54 @@ export type User$payoutsCreatedArgs<ExtArgs extends runtime.Types.Extensions.Int
   take?: number
   skip?: number
   distinct?: Prisma.PayoutScalarFieldEnum | Prisma.PayoutScalarFieldEnum[]
+}
+
+/**
+ * User.sentMessages
+ */
+export type User$sentMessagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the DirectMessage
+   */
+  select?: Prisma.DirectMessageSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the DirectMessage
+   */
+  omit?: Prisma.DirectMessageOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DirectMessageInclude<ExtArgs> | null
+  where?: Prisma.DirectMessageWhereInput
+  orderBy?: Prisma.DirectMessageOrderByWithRelationInput | Prisma.DirectMessageOrderByWithRelationInput[]
+  cursor?: Prisma.DirectMessageWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.DirectMessageScalarFieldEnum | Prisma.DirectMessageScalarFieldEnum[]
+}
+
+/**
+ * User.receivedMessages
+ */
+export type User$receivedMessagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the DirectMessage
+   */
+  select?: Prisma.DirectMessageSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the DirectMessage
+   */
+  omit?: Prisma.DirectMessageOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DirectMessageInclude<ExtArgs> | null
+  where?: Prisma.DirectMessageWhereInput
+  orderBy?: Prisma.DirectMessageOrderByWithRelationInput | Prisma.DirectMessageOrderByWithRelationInput[]
+  cursor?: Prisma.DirectMessageWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.DirectMessageScalarFieldEnum | Prisma.DirectMessageScalarFieldEnum[]
 }
 
 /**

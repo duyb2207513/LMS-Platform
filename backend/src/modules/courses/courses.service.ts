@@ -356,6 +356,19 @@ export async function unpublishCourse(courseId: string, actor: AuthTokenPayload)
   });
 }
 
+export async function archiveCourse(courseId: string, actor: AuthTokenPayload) {
+  ensureValidCourseId(courseId);
+  const course = await prisma.course.findUnique({ where: { id: courseId } });
+  if (!course) throw new AppError(404, "Course not found");
+  assertCanManageCourse(course, actor);
+  if (course.status === "ARCHIVED") throw new AppError(409, "Course is already archived");
+  return prisma.course.update({
+    where: { id: courseId },
+    data: { status: "ARCHIVED" },
+    select: { id: true, status: true, publishedAt: true }
+  });
+}
+
 export async function deleteOrArchiveCourse(
   courseId: string,
   actor: AuthTokenPayload

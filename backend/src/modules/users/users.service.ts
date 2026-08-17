@@ -11,14 +11,17 @@ export async function getProfile(userId: string) {
     select: {
       id: true,
       fullName: true,
+      firstName: true,
+      lastName: true,
+      phoneNumber: true,
       email: true,
       avatarUrl: true,
       role: true,
       status: true,
       emailVerifiedAt: true,
       createdAt: true,
-      updatedAt: true
-    }
+      updatedAt: true,
+    },
   });
 
   if (!user) {
@@ -30,20 +33,48 @@ export async function getProfile(userId: string) {
 
 export async function updateProfile(userId: string, input: UpdateProfileInput) {
   try {
+    const current = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { firstName: true, lastName: true, fullName: true },
+    });
+    if (!current) throw new AppError(404, "User not found");
+    const firstName =
+      input.firstName === undefined ? current.firstName : input.firstName;
+    const lastName =
+      input.lastName === undefined ? current.lastName : input.lastName;
+    const fullName =
+      input.fullName ??
+      ([lastName, firstName].filter(Boolean).join(" ") || current.fullName);
     return await prisma.user.update({
       where: { id: userId },
-      data: input,
+      data: { ...input, fullName },
       select: {
         id: true,
         fullName: true,
+        firstName: true,
+        lastName: true,
+        phoneNumber: true,
         email: true,
         avatarUrl: true,
         role: true,
-        status: true
-        ,emailVerifiedAt: true
-      }
+        status: true,
+        emailVerifiedAt: true,
+        createdAt: true,
+        updatedAt: true,
+      },
     });
   } catch (error) {
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "code" in error &&
+      error.code === "P2002"
+    ) {
+      throw new AppError(
+        409,
+        "Phone number is already used by another account",
+      );
+    }
     if (
       typeof error === "object" &&
       error !== null &&
@@ -65,14 +96,17 @@ export async function setAvatar(userId: string, avatarUrl: string | null) {
       select: {
         id: true,
         fullName: true,
+        firstName: true,
+        lastName: true,
+        phoneNumber: true,
         email: true,
         avatarUrl: true,
         role: true,
         status: true,
         emailVerifiedAt: true,
         createdAt: true,
-        updatedAt: true
-      }
+        updatedAt: true,
+      },
     });
   } catch (error) {
     if (
@@ -87,10 +121,13 @@ export async function setAvatar(userId: string, avatarUrl: string | null) {
   }
 }
 
-export async function changePassword(userId: string, input: ChangePasswordInput): Promise<void> {
+export async function changePassword(
+  userId: string,
+  input: ChangePasswordInput,
+): Promise<void> {
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { passwordHash: true }
+    select: { passwordHash: true },
   });
 
   if (!user) {
@@ -98,12 +135,15 @@ export async function changePassword(userId: string, input: ChangePasswordInput)
   }
 
   if (!user.passwordHash) {
-    throw new AppError(400, "This account uses Google sign-in and does not have a password yet");
+    throw new AppError(
+      400,
+      "This account uses Google sign-in and does not have a password yet",
+    );
   }
 
   const currentPasswordMatches = await bcrypt.compare(
     input.currentPassword,
-    user.passwordHash
+    user.passwordHash,
   );
 
   if (!currentPasswordMatches) {
@@ -112,17 +152,26 @@ export async function changePassword(userId: string, input: ChangePasswordInput)
 
   const newPasswordMatchesCurrent = await bcrypt.compare(
     input.newPassword,
-    user.passwordHash
+    user.passwordHash,
   );
 
   if (newPasswordMatchesCurrent) {
-    throw new AppError(400, "New password must be different from current password");
+    throw new AppError(
+      400,
+      "New password must be different from current password",
+    );
   }
 
-  const passwordHash = await bcrypt.hash(input.newPassword, PASSWORD_SALT_ROUNDS);
+  const passwordHash = await bcrypt.hash(
+    input.newPassword,
+    PASSWORD_SALT_ROUNDS,
+  );
 
   await prisma.$transaction([
     prisma.user.update({ where: { id: userId }, data: { passwordHash } }),
-    prisma.authSession.updateMany({ where: { userId, revokedAt: null }, data: { revokedAt: new Date() } })
+    prisma.authSession.updateMany({
+      where: { userId, revokedAt: null },
+      data: { revokedAt: new Date() },
+    }),
   ]);
 }

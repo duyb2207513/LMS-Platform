@@ -17,10 +17,33 @@ const uniqueViolation = (error: unknown) => Boolean(error && typeof error === "o
 
 export async function balances() {
   await releasePendingEarnings();
-  const rows = await prisma.instructorEarning.groupBy({ by: ["instructorId", "currency"], where: { status: "AVAILABLE", payoutId: null }, _sum: { netAmount: true }, _count: { id: true } });
-  const users = await prisma.user.findMany({ where: { id: { in: rows.map(row => row.instructorId) } }, select: { id: true, fullName: true, email: true } });
+  const earnings = await prisma.instructorEarning.findMany({
+    where: { status: { in: ["PENDING", "AVAILABLE"] }, payoutId: null },
+    select: { id: true, instructorId: true, netAmount: true, currency: true, status: true }
+  });
+  const users = await prisma.user.findMany({
+    where: { id: { in: [...new Set(earnings.map(row => row.instructorId))] } },
+    select: { id: true, fullName: true, email: true }
+  });
   const byId = new Map(users.map(user => [user.id, user]));
-  return rows.map(row => ({ instructor: byId.get(row.instructorId), availableAmount: Number(row._sum.netAmount ?? 0), earningCount: row._count.id, currency: row.currency }));
+  const grouped = new Map<string, { instructorId: string; currency: string; pendingBalance: number; availableBalance: number; earningIds: string[] }>();
+  for (const earning of earnings) {
+    const key = `${earning.instructorId}:${earning.currency}`;
+    const row = grouped.get(key) ?? { instructorId: earning.instructorId, currency: earning.currency, pendingBalance: 0, availableBalance: 0, earningIds: [] };
+    if (earning.status === "AVAILABLE") {
+      row.availableBalance += Number(earning.netAmount);
+      row.earningIds.push(earning.id);
+    } else row.pendingBalance += Number(earning.netAmount);
+    grouped.set(key, row);
+  }
+  return [...grouped.values()].map(row => {
+    const instructor = byId.get(row.instructorId);
+    return {
+      ...row,
+      instructorName: instructor?.fullName ?? "Giảng viên không tồn tại",
+      email: instructor?.email ?? ""
+    };
+  });
 }
 
 export async function listPayouts(query: Record<string, unknown>) {

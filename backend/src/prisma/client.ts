@@ -47,6 +47,11 @@ export { Prisma }
  */
 export type User = Prisma.UserModel
 /**
+ * Model DirectMessage
+ *
+ */
+export type DirectMessage = Prisma.DirectMessageModel
+/**
  * Model AuthSession
  * 
  */

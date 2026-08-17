@@ -10,7 +10,9 @@ import type { ApiResponse, User } from '@/types'
 
 const auth = useAuthStore()
 const api = useApi()
-const fullName = ref('')
+const firstName = ref('')
+const lastName = ref('')
+const phoneNumber = ref('')
 const avatarFile = ref<File | null>(null)
 const pickerKey = ref(0)
 const message = ref('')
@@ -20,7 +22,12 @@ const saving = ref(false)
 onMounted(async () => {
   try {
     const user = await auth.fetchCurrentUser()
-    if (user) fullName.value = user.fullName
+    if (user) {
+      const parts = user.fullName.trim().split(/\s+/)
+      firstName.value = user.firstName || parts.pop() || ''
+      lastName.value = user.lastName || parts.join(' ')
+      phoneNumber.value = user.phoneNumber || ''
+    }
   } catch (cause) {
     error.value = cause instanceof Error ? cause.message : 'Không thể tải hồ sơ'
   }
@@ -37,7 +44,9 @@ async function save() {
   saving.value = true
   try {
     const profileResponse = await api.patch<ApiResponse<User>>('/users/me', {
-      fullName: fullName.value.trim(),
+      firstName: firstName.value.trim(),
+      lastName: lastName.value.trim(),
+      phoneNumber: phoneNumber.value.trim() || null,
     })
     if (profileResponse.data) auth.updateUser(profileResponse.data)
 
@@ -83,7 +92,11 @@ async function removeAvatar() {
       <p class="mb-7 mt-2 text-slate-500">Cập nhật tên và tải ảnh đại diện từ thiết bị</p>
 
       <form class="space-y-5 rounded-2xl border bg-white p-6 dark:border-slate-800 dark:bg-slate-900" @submit.prevent="save">
-        <BaseInput id="profile-name" v-model="fullName" label="Họ và tên" required />
+        <div class="grid gap-4 sm:grid-cols-2">
+          <BaseInput id="profile-last-name" v-model="lastName" label="Họ và tên đệm" placeholder="Trần Minh" required />
+          <BaseInput id="profile-first-name" v-model="firstName" label="Tên" placeholder="Duy" required />
+        </div>
+        <BaseInput id="profile-phone" v-model="phoneNumber" type="tel" label="Số điện thoại" placeholder="0901234567" />
         <BaseInput id="profile-email" :model-value="auth.user?.email || ''" label="Email" disabled />
         <ImageFilePicker
           :key="pickerKey"
