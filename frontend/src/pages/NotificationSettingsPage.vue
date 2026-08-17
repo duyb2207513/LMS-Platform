@@ -33,7 +33,7 @@ async function loadPreferences() {
       form.quizResults = prefs.quizResults ?? true
       form.certificateUpdates = prefs.certificateUpdates ?? true
     }
-  } catch (e) {
+  } catch {
     errorMessage.value = 'Không thể tải cài đặt thông báo.'
   } finally {
     loading.value = false

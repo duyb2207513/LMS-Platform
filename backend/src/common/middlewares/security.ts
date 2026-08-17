@@ -27,6 +27,16 @@ export const authRateLimiter: RequestHandler = rateLimit({
   limit: env.authRateLimitMax,
   standardHeaders: "draft-7",
   legacyHeaders: false,
+  skip: (request) => {
+    const url = request.originalUrl || request.url || "";
+    return (
+      url.includes("/auth/github") ||
+      url.includes("/auth/google") ||
+      url.includes("/auth/refresh") ||
+      url.includes("/auth/me") ||
+      url.includes("/auth/sessions")
+    );
+  },
   handler: (_request, res) => {
     res
       .status(429)

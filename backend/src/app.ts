@@ -15,7 +15,7 @@ import { logger } from "./config/logger.js";
 import "./config/monitoring.js";
 
 const app = express();
-app.set("trust proxy", env.nodeEnv === "production" ? 1 : false);
+app.set("trust proxy", 1);
 app.disable("x-powered-by");
 app.use(securityHeaders);
 app.use(pinoHttp({
@@ -31,8 +31,8 @@ app.use(
   })
 );
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: "750mb" }));
+app.use(express.urlencoded({ limit: "750mb", extended: true }));
 app.use(cookieParser());
 app.use("/uploads/course-thumbnails", express.static(path.resolve("uploads", "course-thumbnails")));
 app.use("/uploads/avatars", express.static(path.resolve("uploads", "avatars")));

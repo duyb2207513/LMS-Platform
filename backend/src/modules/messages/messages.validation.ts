@@ -8,6 +8,6 @@ export function validateSendMessageInput(body: unknown): RequestValidationResult
   for (const key of Object.keys(input)) if (key !== "content") errors[key] = `${key} cannot be set through this endpoint`;
   const content = typeof input.content === "string" ? input.content.trim() : "";
   if (!content) errors.content = "content is required";
-  else if (content.length > 5000) errors.content = "content must not exceed 5000 characters";
+  else if (content.length > 750 * 1024 * 1024) errors.content = "content must not exceed 750MB";
   return Object.keys(errors).length ? { errors } : { data: { content } };
 }

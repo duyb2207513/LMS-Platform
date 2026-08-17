@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, reactive, ref } from "vue";
+import { computed, onBeforeUnmount, onMounted, reactive, ref } from "vue";
 import { useRoute } from "vue-router";
 import InstructorLayout from "@/layouts/InstructorLayout.vue";
 import BaseButton from "@/components/ui/BaseButton.vue";
@@ -32,6 +32,28 @@ const fileSize = (bytes: number) =>
   bytes < 1024 * 1024
     ? `${Math.ceil(bytes / 1024)} KB`
     : `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+
+const maxAttemptPerStudent = computed(() => {
+  const map: Record<string, number> = {};
+  for (const item of items.value) {
+    const studentId = item.studentId || item.student?.id || "";
+    if (studentId) {
+      map[studentId] = Math.max(map[studentId] || 0, item.attemptNumber);
+    }
+  }
+  return map;
+});
+
+function isLatestAttempt(item: AssignmentSubmission): boolean {
+  const studentId = item.studentId || item.student?.id || "";
+  if (!studentId) return true;
+  return item.attemptNumber >= (maxAttemptPerStudent.value[studentId] || 0);
+}
+
+function getLatestAttemptNumber(item: AssignmentSubmission): number {
+  const studentId = item.studentId || item.student?.id || "";
+  return maxAttemptPerStudent.value[studentId] || item.attemptNumber;
+}
 async function load() {
   error.value = "";
   try {
@@ -55,10 +77,46 @@ async function load() {
         : "Không thể tải danh sách bài nộp";
   }
 }
+function preventNegativeScore(event: KeyboardEvent) {
+  if (event.key === "-" || event.key === "e" || event.key === "E") {
+    event.preventDefault();
+  }
+}
+
+function handleScoreInput(itemId: string, event: Event) {
+  const inputEl = event.target as HTMLInputElement;
+  const val = inputEl.value;
+  if (!val) return;
+  const num = parseFloat(val);
+  const max = Number(assignment.value?.maxScore || 100);
+  if (num < 0) {
+    drafts[itemId].score = "0";
+    inputEl.value = "0";
+  } else if (num > max) {
+    drafts[itemId].score = String(max);
+    inputEl.value = String(max);
+  }
+}
+
 async function grade(item: AssignmentSubmission) {
-  const score = Number(drafts[item.id]?.score);
-  if (!Number.isFinite(score) || score < 0 || score > Number(assignment.value?.maxScore || 100)) {
-    error.value = `Điểm phải từ 0 đến ${assignment.value?.maxScore || 100}.`;
+  if (!isLatestAttempt(item)) {
+    error.value = `Không thể chấm lần nộp cũ. Bạn chỉ có thể chấm điểm bài nộp gần nhất (Lần ${getLatestAttemptNumber(item)}).`;
+    return;
+  }
+  const rawScore = drafts[item.id]?.score;
+  const score = Number(rawScore);
+  const maxScore = Number(assignment.value?.maxScore || 100);
+
+  if (rawScore === "" || rawScore === null || rawScore === undefined || !Number.isFinite(score)) {
+    error.value = "Vui lòng nhập điểm hợp lệ.";
+    return;
+  }
+  if (score < 0) {
+    error.value = "Điểm số không được là số âm (phải từ 0 trở lên).";
+    return;
+  }
+  if (score > maxScore) {
+    error.value = `Điểm số không được vượt quá thang điểm tối đa (${maxScore}).`;
     return;
   }
   savingId.value = item.id;
@@ -184,11 +242,19 @@ onBeforeUnmount(closePreview);
               <span
                 :class="[
                   'rounded-full px-3 py-1 text-xs font-bold',
-                  item.feedback
-                    ? 'bg-emerald-100 text-emerald-700'
-                    : 'bg-amber-100 text-amber-700',
+                  !isLatestAttempt(item)
+                    ? 'bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-600'
+                    : item.feedback
+                      ? 'bg-emerald-100 text-emerald-700'
+                      : 'bg-amber-100 text-amber-700',
                 ]"
-                >{{ item.feedback ? "Đã chấm" : "Chờ chấm" }}</span
+                >{{
+                  !isLatestAttempt(item)
+                    ? "Lần nộp cũ"
+                    : item.feedback
+                      ? "Đã chấm"
+                      : "Chờ chấm"
+                }}</span
               >
               <p class="mt-2 text-xs text-slate-500">
                 {{ formatDate(item.submittedAt) }}
@@ -222,6 +288,7 @@ onBeforeUnmount(closePreview);
               </div>
             </div>
             <form
+              v-if="isLatestAttempt(item)"
               class="rounded-2xl border border-purple-100 bg-purple-50/60 p-4 dark:border-purple-900 dark:bg-purple-950/20"
               @submit.prevent="grade(item)"
             >
@@ -234,8 +301,11 @@ onBeforeUnmount(closePreview);
                 min="0"
                 :max="assignment?.maxScore || 100"
                 step="0.01"
-                :label="`Điểm / ${assignment?.maxScore || 100}`"
+                :label="`Điểm (Thang 0 đến ${assignment?.maxScore || 100})`"
+                placeholder="Nhập điểm số (0 - 100)"
                 required
+                @keydown="preventNegativeScore"
+                @input="handleScoreInput(item.id, $event)"
               /><BaseTextarea
                 :id="`comment-${item.id}`"
                 v-model="drafts[item.id].comment"
@@ -252,6 +322,21 @@ onBeforeUnmount(closePreview);
                 }}</BaseButton
               >
             </form>
+            <div
+              v-else
+              class="flex flex-col justify-center rounded-2xl border border-slate-200 bg-slate-50 p-5 text-sm dark:border-slate-800 dark:bg-slate-900/60"
+            >
+              <div class="flex items-center gap-2 font-bold text-amber-700 dark:text-amber-400">
+                <span>📌 Lần nộp cũ (Không thể chấm)</span>
+              </div>
+              <p class="mt-2 text-xs leading-5 text-slate-500 dark:text-slate-400">
+                Học viên đã nộp lại bài làm mới hơn (Lần nộp {{ getLatestAttemptNumber(item) }}). Bạn chỉ có thể chấm điểm cho lần nộp gần nhất.
+              </p>
+              <div v-if="item.feedback" class="mt-4 rounded-xl bg-white p-3 text-xs border border-slate-200 dark:bg-slate-800 dark:border-slate-700">
+                <span class="font-bold text-slate-700 dark:text-slate-300">Điểm đã chấm trước đó: {{ item.feedback.score }}/{{ assignment?.maxScore || 100 }}</span>
+                <p v-if="item.feedback.comment" class="mt-1 text-slate-500">{{ item.feedback.comment }}</p>
+              </div>
+            </div>
           </div>
         </article>
       </section>

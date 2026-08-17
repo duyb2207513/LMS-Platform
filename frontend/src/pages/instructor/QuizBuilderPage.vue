@@ -6,7 +6,7 @@ import BaseButton from '@/components/ui/BaseButton.vue'
 import BaseInput from '@/components/ui/BaseInput.vue'
 import BaseModal from '@/components/ui/BaseModal.vue'
 import { useApi } from '@/composables/useApi'
-import type { ApiResponse, Quiz, QuizOption, QuizQuestion } from '@/types'
+import type { ApiResponse, Quiz, QuizQuestion } from '@/types'
 
 type DraftOption = { id?: string; text: string; isCorrect: boolean }
 const route = useRoute()

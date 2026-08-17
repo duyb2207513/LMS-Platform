@@ -27,6 +27,8 @@ export const useCourseStore = defineStore('courses', () => {
       if (filters?.categoryId) params.categoryId = filters.categoryId
       if (filters?.level) params.level = filters.level
       if (filters?.isFree !== undefined) params.isFree = filters.isFree
+      if (filters?.sortBy) params.sortBy = filters.sortBy
+      if (filters?.sortOrder) params.sortOrder = filters.sortOrder
       if (filters?.page) params.page = filters.page
       if (filters?.limit) params.limit = filters.limit
 

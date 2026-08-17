@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import BaseModal from '@/components/ui/BaseModal.vue'
 import { useRefundApi } from '@/api/refund.api'
@@ -20,6 +20,12 @@ const refundApi = useRefundApi()
 const reason = ref('')
 const error = ref('')
 
+const isOverOneDay = computed(() => {
+  if (!props.order) return false
+  const purchaseTime = new Date(props.order.createdAt).getTime()
+  return Date.now() > purchaseTime + 24 * 60 * 60 * 1000
+})
+
 async function handleSubmit() {
   if (!props.order) return
   if (!reason.value.trim()) {
@@ -33,8 +39,8 @@ async function handleSubmit() {
     reason.value = ''
     emit('submitted')
     emit('close')
-  } catch (err: any) {
-    error.value = err?.message || 'Gửi yêu cầu hoàn tiền thất bại'
+  } catch (err: unknown) {
+    error.value = (err instanceof Error ? err.message : null) || 'Gửi yêu cầu hoàn tiền thất bại'
   }
 }
 </script>
@@ -51,13 +57,23 @@ async function handleSubmit() {
       <div class="rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-900">
         <div class="flex items-center justify-between text-xs font-bold text-slate-500">
           <span>Đơn hàng: {{ order.orderNumber }}</span>
-          <span class="text-purple-600 dark:text-purple-400 font-mono">{{ formatMoney(order.total) }}</span>
+          <span class="font-mono text-purple-600 dark:text-purple-400">{{ formatMoney(order.total) }}</span>
         </div>
         <div class="mt-2 text-sm font-semibold text-slate-800 dark:text-slate-200">
           <p v-for="item in order.items" :key="item.id" class="truncate">
             • {{ item.courseTitleSnapshot }}
           </p>
         </div>
+      </div>
+
+      <div class="rounded-xl border border-purple-100 bg-purple-50/70 p-3.5 text-xs text-purple-800 dark:border-purple-900/50 dark:bg-purple-950/30 dark:text-purple-300">
+        <p class="font-bold">ℹ️ Chính sách hoàn tiền:</p>
+        <p class="mt-1">Yêu cầu hoàn tiền chỉ hợp lệ trong vòng <b>1 ngày (24 giờ)</b> kể từ thời điểm thanh toán mua khóa học.</p>
+      </div>
+
+      <div v-if="isOverOneDay" class="rounded-xl border border-amber-200 bg-amber-50 p-3.5 text-xs text-amber-800 dark:border-amber-900/50 dark:bg-amber-950/30 dark:text-amber-300">
+        <p class="font-bold">⚠️ Thông báo từ chối:</p>
+        <p class="mt-1">Đơn hàng này đã được mua hơn 1 ngày (24 giờ). Khi bạn gửi yêu cầu, hệ thống sẽ <b>từ chối ngay lập tức</b> theo điều khoản hoàn tiền.</p>
       </div>
 
       <div>

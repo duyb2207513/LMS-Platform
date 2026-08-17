@@ -32,7 +32,7 @@ async function loadData() {
 
     const resPayouts = await revenueApi.getInstructorPayouts()
     payouts.value = resPayouts.data || []
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error(err)
   }
 }

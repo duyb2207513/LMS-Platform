@@ -1,5 +1,75 @@
 <script setup lang="ts">
-import{ref}from'vue';import{useRouter}from'vue-router';import AuthLayout from'@/layouts/AuthLayout.vue';import BaseInput from'@/components/ui/BaseInput.vue';import BaseButton from'@/components/ui/BaseButton.vue';import{useAuthStore}from'@/stores/auth';
-const auth=useAuthStore(),router=useRouter(),fullName=ref(''),email=ref(''),password=ref(''),confirmPassword=ref(''),loading=ref(false),error=ref('');async function submit(){const name=fullName.value.trim(),mail=email.value.trim().toLowerCase();error.value='';if(name.length<2||name.length>100){error.value='Họ tên phải từ 2 đến 100 ký tự';return}if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)){error.value='Email không hợp lệ';return}if(password.value.length<8||!/[A-Z]/.test(password.value)||!/[a-z]/.test(password.value)||!/[0-9]/.test(password.value)){error.value='Mật khẩu tối thiểu 8 ký tự, có chữ hoa, chữ thường và số';return}if(password.value!==confirmPassword.value){error.value='Mật khẩu xác nhận không khớp';return}loading.value=true;try{await auth.register({fullName:name,email:mail,password:password.value,confirmPassword:confirmPassword.value});await router.push({path:'/login',query:{registered:'1'}})}catch(e){error.value=e instanceof Error?e.message:'Đăng ký thất bại'}finally{loading.value=false}}
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import AuthLayout from '@/layouts/AuthLayout.vue'
+import BaseInput from '@/components/ui/BaseInput.vue'
+import BaseButton from '@/components/ui/BaseButton.vue'
+import GoogleSignInButton from '@/components/auth/GoogleSignInButton.vue'
+import GitHubSignInButton from '@/components/auth/GitHubSignInButton.vue'
+import { useAuthStore } from '@/stores/auth'
+
+const auth = useAuthStore(), router = useRouter()
+const fullName = ref(''), email = ref(''), password = ref(''), confirmPassword = ref('')
+const loading = ref(false), error = ref('')
+
+async function finishLogin() {
+  await router.push(auth.isAdmin ? '/admin' : auth.isInstructor ? '/instructor/courses' : '/dashboard')
+}
+
+async function loginWithGoogle(idToken: string) {
+  loading.value = true; error.value = ''
+  try { await auth.googleLogin(idToken); await finishLogin() }
+  catch (cause) { error.value = cause instanceof Error ? cause.message : 'Đăng nhập Google thất bại' }
+  finally { loading.value = false }
+}
+
+async function submit() {
+  const name = fullName.value.trim(), mail = email.value.trim().toLowerCase()
+  error.value = ''
+  if (name.length < 2 || name.length > 100) { error.value = 'Họ tên phải từ 2 đến 100 ký tự'; return }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)) { error.value = 'Email không hợp lệ'; return }
+  if (password.value.length < 8 || !/[A-Z]/.test(password.value) || !/[a-z]/.test(password.value) || !/[0-9]/.test(password.value)) {
+    error.value = 'Mật khẩu tối thiểu 8 ký tự, có chữ hoa, chữ thường và số'; return
+  }
+  if (password.value !== confirmPassword.value) { error.value = 'Mật khẩu xác nhận không khớp'; return }
+  loading.value = true
+  try {
+    await auth.register({ fullName: name, email: mail, password: password.value, confirmPassword: confirmPassword.value })
+    await router.push({ path: '/login', query: { registered: '1' } })
+  } catch (e) {
+    error.value = e instanceof Error ? e.message : 'Đăng ký thất bại'
+  } finally {
+    loading.value = false
+  }
+}
 </script>
-<template><AuthLayout><div class="space-y-6"><div class="text-center"><h1 class="text-2xl font-extrabold">Tạo tài khoản học viên</h1><p class="mt-2 text-sm text-slate-500">Bắt đầu hành trình học tập của bạn</p></div><form class="space-y-4" @submit.prevent="submit"><BaseInput id="full-name" v-model="fullName" label="Họ và tên" required/><BaseInput id="register-email" v-model="email" type="email" label="Email" required/><BaseInput id="register-password" v-model="password" type="password" label="Mật khẩu" required/><BaseInput id="confirm-password" v-model="confirmPassword" type="password" label="Xác nhận mật khẩu" required/><p class="text-xs text-slate-500">Tài khoản đăng ký luôn có vai trò STUDENT. Role không được gửi từ frontend.</p><p v-if="error" class="rounded-xl bg-red-50 p-3 text-sm text-red-700">{{error}}</p><BaseButton type="submit" :loading="loading" :full-width="true">Đăng ký</BaseButton></form><p class="text-center text-sm">Đã có tài khoản? <RouterLink to="/login" class="font-bold text-purple-600">Đăng nhập</RouterLink></p></div></AuthLayout></template>
+
+<template>
+  <AuthLayout>
+    <div class="space-y-6">
+      <div class="text-center">
+        <h1 class="text-2xl font-extrabold">Tạo tài khoản học viên</h1>
+        <p class="mt-2 text-sm text-slate-500">Bắt đầu hành trình học tập của bạn</p>
+      </div>
+
+      <GitHubSignInButton />
+      <GoogleSignInButton @credential="loginWithGoogle" @error="error = $event" />
+
+      <div class="flex items-center gap-3">
+        <span class="h-px flex-1 bg-slate-200 dark:bg-slate-700" />
+        <span class="text-xs text-slate-400">hoặc đăng ký bằng email</span>
+        <span class="h-px flex-1 bg-slate-200 dark:bg-slate-700" />
+      </div>
+
+      <form class="space-y-4" @submit.prevent="submit">
+        <BaseInput id="full-name" v-model="fullName" label="Họ và tên" required />
+        <BaseInput id="register-email" v-model="email" type="email" label="Email" required />
+        <BaseInput id="register-password" v-model="password" type="password" label="Mật khẩu" required />
+        <BaseInput id="confirm-password" v-model="confirmPassword" type="password" label="Xác nhận mật khẩu" required />
+        <p v-if="error" class="rounded-xl bg-red-50 p-3 text-sm text-red-700 dark:bg-red-950/30 dark:text-red-300">{{ error }}</p>
+        <BaseButton type="submit" :loading="loading" :full-width="true">Đăng ký</BaseButton>
+      </form>
+      <p class="text-center text-sm">Đã có tài khoản? <RouterLink to="/login" class="font-bold text-purple-600">Đăng nhập</RouterLink></p>
+    </div>
+  </AuthLayout>
+</template>

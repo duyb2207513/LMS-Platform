@@ -2,7 +2,6 @@
 import { onMounted, ref } from 'vue'
 import AdminLayout from '@/layouts/AdminLayout.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
-import BaseModal from '@/components/ui/BaseModal.vue'
 import PayoutHistoryTable from '@/components/revenue/PayoutHistoryTable.vue'
 import { usePayoutApi, type InstructorBalance } from '@/api/payout.api'
 import type { Payout } from '@/types/commerce'
@@ -24,7 +23,7 @@ async function loadData() {
     balances.value = resB.data || []
     const resP = await payoutApi.getAdminPayouts()
     payouts.value = resP.data || []
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error(err)
   }
 }
@@ -39,8 +38,8 @@ async function handleCreatePayout(inst: InstructorBalance) {
       await processPayout(res.data.id)
     }
     await loadData()
-  } catch (err: any) {
-    error.value = err?.message || 'Tạo payout thất bại'
+  } catch (err: unknown) {
+    error.value = (err instanceof Error ? err.message : null) || 'Tạo payout thất bại'
   } finally {
     creatingPayout.value = false
     selectedInstructor.value = null
@@ -52,8 +51,8 @@ async function processPayout(id: string) {
   try {
     await payoutApi.processPayoutSandbox(id)
     await loadData()
-  } catch (err: any) {
-    alert(err?.message || 'Xử lý payout thất bại')
+  } catch (err: unknown) {
+    alert((err instanceof Error ? err.message : null) || 'Xử lý payout thất bại')
   } finally {
     processingPayoutId.value = null
   }

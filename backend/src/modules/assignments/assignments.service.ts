@@ -85,7 +85,7 @@ export async function createAssignment(courseId: string, actor: AuthTokenPayload
   await managedCourse(courseId, actor);
   if (input.dueAt <= new Date()) throw new AppError(400, "dueAt must be in the future");
   const allowResubmission = input.allowResubmission ?? false;
-  const maxSubmissions = allowResubmission ? Math.max(2, input.maxSubmissions ?? 2) : 1;
+  const maxSubmissions = allowResubmission ? Math.max(2, input.maxSubmissions ?? 3) : 1;
   const assignment = await prisma.assignment.create({ data: { ...input, courseId, allowResubmission, maxSubmissions } });
   return serializeAssignment(assignment);
 }
@@ -165,6 +165,17 @@ export async function gradeSubmission(submissionId: string, actor: AuthTokenPayl
   const submission = await prisma.assignmentSubmission.findUnique({ where: { id: submissionId }, include: { assignment: { include: { course: { select: { id: true, title: true, instructorId: true } } } } } });
   if (!submission) throw new AppError(404, "Submission not found");
   if (!canManageCourse(submission.assignment.course.instructorId, actor)) throw new AppError(403, "You do not have permission to grade this submission");
+
+  const latestSubmission = await prisma.assignmentSubmission.findFirst({
+    where: { assignmentId: submission.assignmentId, studentId: submission.studentId },
+    orderBy: { attemptNumber: "desc" },
+    select: { id: true, attemptNumber: true }
+  });
+  if (latestSubmission && latestSubmission.id !== submissionId) {
+    throw new AppError(400, `Only the latest submission attempt (Attempt ${latestSubmission.attemptNumber}) can be graded`);
+  }
+
+  if (input.score < 0) throw new AppError(400, "score must not be negative (minimum score is 0)");
   if (input.score > decimal(submission.assignment.maxScore)) throw new AppError(400, `score must not exceed ${decimal(submission.assignment.maxScore)}`);
   const [, feedback] = await prisma.$transaction([
     prisma.assignmentSubmission.update({ where: { id: submissionId }, data: { status: "GRADED" } }),

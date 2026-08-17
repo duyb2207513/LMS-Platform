@@ -172,11 +172,13 @@ export interface CourseFilters {
   categoryId?: string
   level?: CourseLevel
   isFree?: boolean
+  sortBy?: string
+  sortOrder?: string
   page?: number
   limit?: number
 }
 
-export interface AdminListResponse<T> extends ApiResponse<{ items: T[]; meta: { page: number; limit: number; totalItems: number; totalPages: number } }> {}
+export type AdminListResponse<T> = ApiResponse<{ items: T[]; meta: { page: number; limit: number; totalItems: number; totalPages: number } }>
 export interface AdminDashboardStats {
   users: { total: number; byRole: Record<string, number> }
   courses: { total: number; byStatus: Record<string, number> }

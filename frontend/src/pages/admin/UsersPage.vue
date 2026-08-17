@@ -17,7 +17,6 @@ const error = ref('')
 const message = ref('')
 const updatingId = ref('')
 
-const activeCount = computed(() => users.value.filter((u) => u.status === 'ACTIVE').length)
 const googleCount = computed(() => users.value.filter((u) => u.googleId).length)
 const githubCount = computed(() => users.value.filter((u) => u.githubId).length)
 const emailCount = computed(() => users.value.filter((u) => !u.googleId && !u.githubId).length)

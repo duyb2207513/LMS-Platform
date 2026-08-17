@@ -80,11 +80,6 @@ async function loadData(range?: { from: string; to: string; groupBy?: 'day' | 'm
   }
 }
 
-async function onCourseChange(courseId: string) {
-  selectedCourseId.value = courseId
-  await loadData()
-}
-
 onMounted(() => {
   loadData()
 })

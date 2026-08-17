@@ -88,18 +88,85 @@ export async function mobileGoogleLoginController(request: Request, response: Re
   const result = await googleLogin(request.body as GoogleLoginInput, clientContext(request));
   sendSuccess(response, 200, "Google login successful", { accessToken: result.accessToken, refreshToken: result.refreshToken, user: result.user });
 }
-
 export async function startGitHubLoginController(request: Request, response: Response) {
   if (!env.githubClientId || !env.githubClientSecret) throw new AppError(503, "GitHub login is not configured");
   const state = randomBytes(32).toString("hex");
+  response.cookie("githubOAuthState", state, { ...githubStateCookieOptions(), maxAge: 10 * 60 * 1000 });
+
+  const accountParam = typeof request.query.account === "string" ? request.query.account.trim() : "";
+
+  if (env.nodeEnv === "development" && (env.githubClientId.startsWith("dev_") || env.githubClientId.startsWith("mock_"))) {
+    if (accountParam) {
+      const mockCallbackUrl = new URL("/api/v1/auth/github/callback", `http://localhost:${env.port}`);
+      mockCallbackUrl.searchParams.set("code", `mock_github_code_${accountParam}`);
+      mockCallbackUrl.searchParams.set("state", state);
+      response.redirect(mockCallbackUrl.toString());
+      return;
+    }
+
+    response.type("html").send(`<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đăng nhập GitHub Sandbox (Localhost Test)</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #0d1117; color: #c9d1d9; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+    .card { background: #161b22; width: 100%; max-width: 420px; border-radius: 16px; border: 1px solid #30363d; padding: 32px 28px; box-shadow: 0 15px 35px rgba(0,0,0,0.5); text-align: center; }
+    .logo { width: 48px; height: 48px; fill: #f0f6fc; margin: 0 auto 16px; }
+    h1 { font-size: 20px; font-weight: 700; color: #f0f6fc; margin-bottom: 8px; }
+    p { font-size: 13px; color: #8b949e; margin-bottom: 24px; line-height: 1.5; }
+    form { text-align: left; }
+    label { display: block; font-size: 13px; font-weight: 600; color: #c9d1d9; margin-bottom: 8px; }
+    input[type="text"] { width: 100%; padding: 12px 14px; border-radius: 8px; border: 1px solid #30363d; background: #0d1117; color: #f0f6fc; font-size: 14px; margin-bottom: 16px; outline: none; }
+    input[type="text"]:focus { border-color: #58a6ff; box-shadow: 0 0 0 3px rgba(88,166,255,0.15); }
+    .btn { width: 100%; background: #238636; color: white; border: none; padding: 12px; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; transition: background 0.2s; }
+    .btn:hover { background: #2ea043; }
+    .presets { margin-top: 20px; border-top: 1px solid #21262d; padding-top: 16px; text-align: left; }
+    .presets-title { font-size: 12px; color: #8b949e; font-weight: 600; margin-bottom: 10px; }
+    .preset-btns { display: flex; flex-wrap: wrap; gap: 8px; }
+    .preset-btn { background: #21262d; border: 1px solid #30363d; color: #c9d1d9; padding: 8px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; text-decoration: none; display: inline-block; }
+    .preset-btn:hover { background: #30363d; border-color: #8b949e; color: #fff; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <svg class="logo" viewBox="0 0 24 24"><path d="M12 .7a11.5 11.5 0 0 0-3.64 22.41c.58.11.79-.25.79-.56v-2.23c-3.22.7-3.9-1.37-3.9-1.37-.52-1.34-1.28-1.7-1.28-1.7-1.05-.72.08-.71.08-.71 1.16.08 1.77 1.2 1.77 1.2 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.57-.3-5.27-1.29-5.27-5.69 0-1.26.45-2.29 1.19-3.1-.12-.3-.52-1.47.11-3.06 0 0 .97-.31 3.17 1.18a10.9 10.9 0 0 1 5.78 0c2.2-1.5 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.06.74.81 1.19 1.84 1.19 3.1 0 4.41-2.71 5.39-5.29 5.68.42.36.79 1.07.79 2.16v3.2c0 .31.21.68.8.56A11.5 11.5 0 0 0 12 .7Z" /></svg>
+    <h1>Đăng nhập GitHub (Localhost Test)</h1>
+    <p>Nhập tên hoặc email tài khoản bất kỳ để kiểm thử đăng nhập trên Localhost mà không bị lưu cố định:</p>
+    <form method="get" action="/api/v1/auth/github">
+      <label for="account-input">Email hoặc Username GitHub:</label>
+      <input type="text" id="account-input" name="account" placeholder="Ví dụ: dat.ma@example.com hoặc user2" required autofocus />
+      <button type="submit" class="btn">Tiếp tục đăng nhập với tài khoản này</button>
+    </form>
+    <div class="presets">
+      <div class="presets-title">Hoặc chọn nhanh tài khoản mẫu:</div>
+      <div class="preset-btns">
+        <a href="/api/v1/auth/github?account=maquocdat" class="preset-btn">👤 Ma Quoc Dat</a>
+        <a href="/api/v1/auth/github?account=student1" class="preset-btn">👤 Học viên 1</a>
+        <a href="/api/v1/auth/github?account=student2" class="preset-btn">👤 Học viên 2</a>
+        <a href="/api/v1/auth/github?account=instructor" class="preset-btn">👨‍🏫 Giảng viên</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>`);
+    return;
+  }
+
   const authorizationUrl = new URL("https://github.com/login/oauth/authorize");
   authorizationUrl.searchParams.set("client_id", env.githubClientId);
   authorizationUrl.searchParams.set("redirect_uri", env.githubCallbackUrl);
   authorizationUrl.searchParams.set("scope", "read:user user:email");
   authorizationUrl.searchParams.set("state", state);
+<<<<<<< HEAD
+  authorizationUrl.searchParams.set("prompt", "select_account");
+=======
   response.cookie("githubOAuthState", state, { ...githubStateCookieOptions(), maxAge: 10 * 60 * 1000 });
   const mobileRedirect = allowedMobileRedirect(request.query.redirectUri);
   if (mobileRedirect) response.cookie("githubOAuthReturn", mobileRedirect, { ...githubStateCookieOptions(), maxAge: 10 * 60 * 1000 });
+>>>>>>> eafc848099839065b472ad23fce0bce07a47ca2f
   response.redirect(authorizationUrl.toString());
 }
 
