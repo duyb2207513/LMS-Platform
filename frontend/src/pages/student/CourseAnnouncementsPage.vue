@@ -5,13 +5,13 @@ import DefaultLayout from '@/layouts/DefaultLayout.vue'
 import LoadingSpinner from '@/components/ui/LoadingSpinner.vue'
 import AnnouncementCard from '@/components/announcements/AnnouncementCard.vue'
 import { useApi } from '@/composables/useApi'
-import type { ApiResponse, Course, CourseAnnouncement } from '@/types'
+import type { ApiResponse, CourseContent, CourseAnnouncement } from '@/types'
 
 const route = useRoute()
 const api = useApi()
 
 const courseId = String(route.params.courseId)
-const course = ref<Course | null>(null)
+const course = ref<CourseContent['course'] | null>(null)
 const announcements = ref<CourseAnnouncement[]>([])
 const loading = ref(false)
 const error = ref('')
@@ -21,10 +21,10 @@ async function loadAnnouncements() {
   error.value = ''
   try {
     const [courseRes, announcementsRes] = await Promise.all([
-      api.get<ApiResponse<Course>>(`/courses/${courseId}`),
+      api.get<ApiResponse<CourseContent>>(`/courses/${courseId}/content`),
       api.get<ApiResponse<CourseAnnouncement[]>>(`/courses/${courseId}/announcements`),
     ])
-    course.value = courseRes.data || null
+    course.value = courseRes.data?.course || null
     announcements.value = announcementsRes.data || []
   } catch (e) {
     error.value = e instanceof Error ? e.message : 'Không thể tải thông báo khóa học'

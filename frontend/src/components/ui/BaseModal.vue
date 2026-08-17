@@ -5,7 +5,7 @@ const props = withDefaults(defineProps<{
   show: boolean
   title?: string
   description?: string
-  size?: 'sm' | 'md' | 'lg'
+  size?: 'sm' | 'md' | 'lg' | 'xl'
   closeOnBackdrop?: boolean
 }>(), {
   size: 'md',
@@ -53,6 +53,7 @@ onBeforeUnmount(() => {
             size === 'sm' ? 'max-w-md' : '',
             size === 'md' ? 'max-w-lg' : '',
             size === 'lg' ? 'max-w-2xl' : '',
+            size === 'xl' ? 'max-w-6xl' : '',
           ]"
         >
           <header v-if="title || $slots.header" class="flex shrink-0 items-start justify-between gap-5 border-b border-slate-100 px-5 py-4 dark:border-slate-800 sm:px-6 sm:py-5">

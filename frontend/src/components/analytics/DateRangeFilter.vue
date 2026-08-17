@@ -7,10 +7,10 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  change: [range: { from: string; to: string }]
+  change: [range: { from: string; to: string; groupBy?: 'day' | 'month' }]
 }>()
 
-const selectedPreset = ref<'7d' | '30d' | '90d' | 'custom'>('30d')
+const selectedPreset = ref<'7d' | '30d' | '365d' | 'custom'>('30d')
 const customFrom = ref(props.from || getPresetDate(30))
 const customTo = ref(props.to || getPresetDate(0))
 
@@ -20,14 +20,14 @@ function getPresetDate(daysAgo: number): string {
   return d.toISOString().split('T')[0]
 }
 
-function selectPreset(preset: '7d' | '30d' | '90d') {
+function selectPreset(preset: '7d' | '30d' | '365d') {
   selectedPreset.value = preset
-  const days = preset === '7d' ? 7 : preset === '30d' ? 30 : 90
+  const days = preset === '7d' ? 6 : preset === '30d' ? 29 : 364
   const from = getPresetDate(days)
   const to = getPresetDate(0)
   customFrom.value = from
   customTo.value = to
-  emit('change', { from, to })
+  emit('change', { from, to, groupBy: preset === '365d' ? 'month' : 'day' })
 }
 
 function applyCustom() {
@@ -69,13 +69,13 @@ function applyCustom() {
         type="button"
         :class="[
           'rounded-lg px-3 py-1.5 text-xs font-bold transition-all',
-          selectedPreset === '90d'
+          selectedPreset === '365d'
             ? 'bg-white text-purple-700 shadow-sm dark:bg-slate-900 dark:text-purple-300'
             : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white',
         ]"
-        @click="selectPreset('90d')"
+        @click="selectPreset('365d')"
       >
-        90 ngày
+        1 năm
       </button>
     </div>
 

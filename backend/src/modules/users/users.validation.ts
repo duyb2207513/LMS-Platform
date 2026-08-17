@@ -1,7 +1,7 @@
 import type { RequestValidationResult } from "../../common/middlewares/validateRequest.js";
 import type { ChangePasswordInput, UpdateProfileInput } from "./users.types.js";
 
-const ALLOWED_FIELDS = new Set(["fullName", "avatarUrl"]);
+const ALLOWED_FIELDS = new Set(["fullName", "firstName", "lastName", "phoneNumber", "avatarUrl"]);
 
 function isHttpUrl(value: string): boolean {
   try {
@@ -39,6 +39,20 @@ export function validateUpdateProfileInput(
     }
   }
 
+  for (const field of ["firstName", "lastName"] as const) {
+    if (!Object.prototype.hasOwnProperty.call(input, field)) continue;
+    const value = typeof input[field] === "string" ? input[field].trim() : "";
+    if (value.length > 50) errors[field] = `${field} must not exceed 50 characters`;
+    else data[field] = value || null;
+  }
+
+  if (Object.prototype.hasOwnProperty.call(input, "phoneNumber")) {
+    const phoneNumber = typeof input.phoneNumber === "string" ? input.phoneNumber.replace(/[\s.-]/g, "") : "";
+    if (!phoneNumber) data.phoneNumber = null;
+    else if (!/^\+?[0-9]{9,15}$/.test(phoneNumber)) errors.phoneNumber = "Phone number must contain 9 to 15 digits and may start with +";
+    else data.phoneNumber = phoneNumber;
+  }
+
   if (Object.prototype.hasOwnProperty.call(input, "avatarUrl")) {
     if (input.avatarUrl === null) {
       data.avatarUrl = null;
@@ -56,6 +70,9 @@ export function validateUpdateProfileInput(
   if (Object.keys(input).length === 0) {
     errors.body = "At least one profile field is required";
   }
+
+  const namePartsWereProvided = Object.hasOwn(input, "firstName") || Object.hasOwn(input, "lastName");
+  if (namePartsWereProvided && !data.fullName && !data.firstName && !data.lastName) errors.fullName = "At least one name field is required";
 
   if (Object.keys(errors).length > 0) {
     return { errors };

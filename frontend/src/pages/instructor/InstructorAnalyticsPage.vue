@@ -38,7 +38,7 @@ function goBack() {
   }
 }
 
-async function loadData(range?: { from: string; to: string }) {
+async function loadData(range?: { from: string; to: string; groupBy?: 'day' | 'month' }) {
   loading.value = true
   error.value = null
   try {

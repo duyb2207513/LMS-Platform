@@ -6,6 +6,7 @@ import { validateRequest } from "../../common/middlewares/validateRequest.js";
 import { asyncHandler } from "../../common/utils/asyncHandler.js";
 import { uploadCourseThumbnail } from "../../config/upload.js";
 import {
+  archiveCourseController,
   createCourseController,
   deleteCourseController,
   getPublicCourseController,
@@ -13,13 +14,13 @@ import {
   publishCourseController,
   unpublishCourseController,
   updateCourseController,
-  uploadCourseThumbnailController
+  uploadCourseThumbnailController,
 } from "./courses.controller.js";
 import { ensureCourseManagePermission } from "./courses.middleware.js";
 import {
   validateCreateCourseInput,
   validatePublicCourseQuery,
-  validateUpdateCourseInput
+  validateUpdateCourseInput,
 } from "./courses.validation.js";
 
 const coursesRouter = Router();
@@ -72,18 +73,19 @@ const courseManagers = [authenticate, authorize("INSTRUCTOR", "ADMIN")];
  *             schema: { $ref: '#/components/schemas/CourseResponse' }
  *       400: { description: Invalid course data }
  *       401: { description: Authentication required }
- *       403: { description: Instructor or Admin role required }
+ *       403: { description: Instructor role required }
  */
 coursesRouter.get(
   "/",
   validateQuery(validatePublicCourseQuery),
-  asyncHandler(listPublicCoursesController)
+  asyncHandler(listPublicCoursesController),
 );
 coursesRouter.post(
   "/",
-  ...courseManagers,
+  authenticate,
+  authorize("INSTRUCTOR"),
   validateRequest(validateCreateCourseInput),
-  asyncHandler(createCourseController)
+  asyncHandler(createCourseController),
 );
 
 /**
@@ -129,12 +131,12 @@ coursesRouter.patch(
   "/:courseId",
   ...courseManagers,
   validateRequest(validateUpdateCourseInput),
-  asyncHandler(updateCourseController)
+  asyncHandler(updateCourseController),
 );
 coursesRouter.delete(
   "/:courseId",
   ...courseManagers,
-  asyncHandler(deleteCourseController)
+  asyncHandler(deleteCourseController),
 );
 
 /**
@@ -171,7 +173,7 @@ coursesRouter.post(
   ...courseManagers,
   asyncHandler(ensureCourseManagePermission),
   uploadCourseThumbnail,
-  asyncHandler(uploadCourseThumbnailController)
+  asyncHandler(uploadCourseThumbnailController),
 );
 
 /**
@@ -215,12 +217,33 @@ coursesRouter.post(
 coursesRouter.post(
   "/:courseId/publish",
   ...courseManagers,
-  asyncHandler(publishCourseController)
+  asyncHandler(publishCourseController),
 );
 coursesRouter.post(
   "/:courseId/unpublish",
   ...courseManagers,
-  asyncHandler(unpublishCourseController)
+  asyncHandler(unpublishCourseController),
+);
+/**
+ * @openapi
+ * /courses/{courseId}/archive:
+ *   post:
+ *     operationId: archiveCourse
+ *     summary: Archive a course without deleting its content
+ *     tags: [Courses]
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - { in: path, name: courseId, required: true, schema: { type: string, format: uuid } }
+ *     responses:
+ *       200: { description: Course archived successfully }
+ *       403: { description: Course ownership required }
+ *       404: { description: Course not found }
+ *       409: { description: Course is already archived }
+ */
+coursesRouter.post(
+  "/:courseId/archive",
+  ...courseManagers,
+  asyncHandler(archiveCourseController),
 );
 
 /**

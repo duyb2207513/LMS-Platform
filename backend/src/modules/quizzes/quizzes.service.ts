@@ -49,13 +49,13 @@ export async function createQuiz(lessonId: string, actor: AuthTokenPayload, inpu
 }
 export async function getQuiz(quizId: string, actor: AuthTokenPayload) {
   if (!UUID.test(quizId)) throw new AppError(404, "Quiz not found");
-  const quiz = await prisma.quiz.findUnique({ where: { id: quizId }, include: { lesson: { include: { section: { include: { course: { select: { instructorId: true } } } } } }, ...quizTree } });
+  const quiz = await prisma.quiz.findUnique({ where: { id: quizId }, include: { lesson: { include: { section: { include: { course: { select: { id: true, instructorId: true } } } } } }, ...quizTree } });
   if (!quiz) throw new AppError(404, "Quiz not found");
   const manager = canManageCourse(quiz.lesson.section.course.instructorId, actor);
   if (!manager) { await assertLessonAccess(quiz.lessonId, actor); if (!quiz.isPublished) throw new AppError(404, "Published quiz not found"); }
   const { lesson, ...base } = quiz;
-  if (manager) return base;
-  return { ...base, questions: base.questions.map(({ explanation: _explanation, options, ...question }) => ({ ...question, options: options.map(({ isCorrect: _isCorrect, ...option }) => option) })) };
+  if (manager) return { ...base, courseId: lesson.section.course.id };
+  return { ...base, courseId: lesson.section.course.id, questions: base.questions.map(({ explanation: _explanation, options, ...question }) => ({ ...question, options: options.map(({ isCorrect: _isCorrect, ...option }) => option) })) };
 }
 export async function updateQuiz(quizId: string, actor: AuthTokenPayload, input: UpdateQuizInput) {
   await managedQuiz(quizId, actor); await assertMutable(quizId); if (input.isPublished) await assertReady(quizId);

@@ -15,11 +15,12 @@ export async function getInstructorOverview(instructorId: string, query: Instruc
     meta: { from: query.from, to: query.to, timezone: "Asia/Ho_Chi_Minh" }
   };
   const time = timeWhere(query);
-  const enrollmentWhere = { courseId: { in: courseIds }, status: { in: ["ACTIVE" as const, "COMPLETED" as const] }, enrolledAt: time };
+  const allEnrollmentWhere = { courseId: { in: courseIds }, status: { in: ["ACTIVE" as const, "COMPLETED" as const] } };
+  const enrollmentWhere = { ...allEnrollmentWhere, enrolledAt: time };
   const [students, newEnrollments, completedEnrollments, quiz, ratings, revenue] = await Promise.all([
-    prisma.enrollment.findMany({ where: enrollmentWhere, distinct: ["studentId"], select: { studentId: true } }),
+    prisma.enrollment.findMany({ where: allEnrollmentWhere, distinct: ["studentId"], select: { studentId: true } }),
     prisma.enrollment.count({ where: enrollmentWhere }),
-    prisma.enrollment.count({ where: { ...enrollmentWhere, OR: [{ status: "COMPLETED" }, { completedAt: { not: null } }, { progressPercent: { gte: 100 } }] } }),
+    prisma.enrollment.count({ where: { ...allEnrollmentWhere, OR: [{ status: "COMPLETED" }, { completedAt: { not: null } }, { progressPercent: { gte: 100 } }] } }),
     prisma.quizAttempt.aggregate({ where: { status: "SUBMITTED", score: { not: null }, submittedAt: time, quiz: { lesson: { section: { courseId: { in: courseIds } } } } }, _avg: { score: true } }),
     prisma.review.aggregate({ where: { courseId: { in: courseIds }, createdAt: time }, _avg: { rating: true }, _count: { rating: true } }),
     prisma.orderItem.aggregate({ where: { courseId: { in: courseIds }, order: { status: "PAID", payments: { some: { status: "SUCCEEDED", paidAt: time } } } }, _sum: { priceSnapshot: true } })
@@ -28,7 +29,7 @@ export async function getInstructorOverview(instructorId: string, query: Instruc
     data: {
       uniqueStudents: students.length,
       newEnrollments,
-      completionRate: newEnrollments ? round(completedEnrollments / newEnrollments * 100) : 0,
+      completionRate: students.length ? round(completedEnrollments / students.length * 100) : 0,
       averageQuizScore: quiz._avg.score === null ? null : round(decimal(quiz._avg.score)),
       averageRating: ratings._avg.rating === null ? null : round(ratings._avg.rating),
       ratingCount: ratings._count.rating,

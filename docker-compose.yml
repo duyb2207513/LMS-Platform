@@ -16,7 +16,11 @@ services:
       - postgres_data:/var/lib/postgresql/data
 
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-lms_db}"]
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-lms_db}",
+        ]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -94,7 +98,8 @@ services:
     command: npm run dev -- --host 0.0.0.0
 
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
 
   mobile:
     build:
@@ -123,7 +128,8 @@ services:
     command: npm run start -- --lan --clear
 
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
 
 volumes:
   postgres_data:

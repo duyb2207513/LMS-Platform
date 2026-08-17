@@ -27,6 +27,7 @@ import { adminCouponRouter, couponRouter } from "../modules/coupons/coupon.route
 import { adminRefundRouter, refundRouter } from "../modules/refunds/refund.routes.js";
 import instructorCommerceRouter from "../modules/earnings/earning.routes.js";
 import adminPayoutRouter from "../modules/payouts/payout.routes.js";
+import messagesRouter from "../modules/messages/messages.routes.js";
 
 const router = Router();
 
@@ -75,6 +76,7 @@ router.use("/enrollments", enrollmentsRouter);
 router.use("/instructor", instructorCoursesRouter);
 router.use("/instructor", instructorCommerceRouter);
 router.use("/users", usersRouter);
+router.use("/messages", messagesRouter);
 
 /**
  * @openapi

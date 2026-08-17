@@ -110,10 +110,10 @@ export const useCourseStore = defineStore('courses', () => {
     if (response.data) {
       const index = myCourses.value.findIndex((c) => c.id === id)
       if (index !== -1) {
-        myCourses.value[index] = response.data
+        myCourses.value[index] = { ...myCourses.value[index], ...response.data }
       }
       if (currentCourse.value?.id === id) {
-        currentCourse.value = response.data
+        currentCourse.value = { ...currentCourse.value, ...response.data }
       }
     }
     return response
@@ -137,7 +137,11 @@ export const useCourseStore = defineStore('courses', () => {
 
   async function updateCourseStatus(id: string, status: CourseStatus) {
     const api = useApi()
-    const response = status === CourseStatus.PUBLISHED ? await api.post<ApiResponse<Course>>(`/courses/${id}/publish`) : status === CourseStatus.DRAFT ? await api.post<ApiResponse<Course>>(`/courses/${id}/unpublish`) : await api.patch<ApiResponse<Course>>(`/courses/${id}`, { status } as any)
+    const response = status === CourseStatus.PUBLISHED
+      ? await api.post<ApiResponse<Course>>(`/courses/${id}/publish`)
+      : status === CourseStatus.DRAFT
+        ? await api.post<ApiResponse<Course>>(`/courses/${id}/unpublish`)
+        : await api.post<ApiResponse<Course>>(`/courses/${id}/archive`)
     if (response.data) {
       const index = myCourses.value.findIndex((c) => c.id === id)
       if (index !== -1) {

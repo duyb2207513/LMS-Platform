@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
 import CourseThumbnail from '@/components/course/CourseThumbnail.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
@@ -13,6 +13,7 @@ import type { ApiResponse, Order } from '@/types'
 import type { CouponValidationResult } from '@/types/commerce'
 
 const route = useRoute()
+const router = useRouter()
 const api = useApi()
 const order = ref<Order | null>(null)
 const error = ref('')
@@ -22,6 +23,7 @@ const appliedCouponCode = ref<string>('')
 const selectedPaymentMethod = ref<'MOMO' | 'MOCK'>('MOMO')
 
 async function load() {
+  error.value = ''
   try {
     const response = await api.get<ApiResponse<Order>>(`/orders/${route.params.orderId}`)
     order.value = response.data || null
@@ -43,6 +45,10 @@ function handleCouponRemoved() {
 }
 
 async function pay() {
+  if (order.value?.status !== 'PENDING') {
+    await router.push(`/payment-result/${route.params.orderId}`)
+    return
+  }
   paying.value = true
   error.value = ''
   try {
@@ -59,12 +65,16 @@ async function pay() {
     }
   } catch (cause) {
     error.value = cause instanceof Error ? cause.message : 'Không tạo được phiên thanh toán'
+    if ((cause as Error & { status?: number })?.status === 409) {
+      await load()
+    }
   } finally {
     paying.value = false
   }
 }
 
-onMounted(load)
+onMounted(() => { void load(); window.addEventListener('focus', load) })
+onBeforeUnmount(() => window.removeEventListener('focus', load))
 </script>
 
 <template>
@@ -96,8 +106,8 @@ onMounted(load)
             </header>
 
             <div class="divide-y divide-slate-100 p-5 dark:divide-slate-800">
-              <article v-for="item in order.items" :key="item.id" class="flex gap-4 py-4 first:pt-0 last:pb-0">
-                <CourseThumbnail :src="item.course?.thumbnailUrl" :alt="item.courseTitleSnapshot" compact class="h-20 w-32 shrink-0" />
+              <article v-for="item in order.items" :key="item.id" class="grid min-w-0 gap-4 overflow-hidden py-4 first:pt-0 last:pb-0 sm:grid-cols-[8rem_minmax(0,1fr)]">
+                <CourseThumbnail :src="item.course?.thumbnailUrl" :alt="item.courseTitleSnapshot" compact class="h-20 w-full shrink-0 sm:w-32" />
                 <div class="min-w-0 flex-1">
                   <h3 class="line-clamp-2 font-bold">{{ item.courseTitleSnapshot }}</h3>
                   <p class="mt-1 text-xs text-slate-500">Truy cập trọn đời · Học theo tốc độ cá nhân</p>
@@ -167,7 +177,7 @@ onMounted(load)
           </div>
 
           <!-- Coupon Input Section -->
-          <CouponInput
+          <CouponInput v-if="order.status === 'PENDING'"
             :course-id="order.items?.[0]?.courseId"
             :applied-coupon-code="appliedCouponCode"
             @apply="handleCouponApplied"
@@ -197,10 +207,9 @@ onMounted(load)
             size="lg"
             :full-width="true"
             :loading="paying"
-            :disabled="order.status !== 'PENDING'"
             @click="pay"
           >
-            {{ order.status === 'PENDING' ? (selectedPaymentMethod === 'MOMO' ? 'Thanh toán qua Ví MoMo' : 'Tiếp tục thanh toán') : 'Đơn hàng đã xử lý' }} →
+            {{ order.status === 'PENDING' ? (selectedPaymentMethod === 'MOMO' ? 'Thanh toán qua Ví MoMo' : 'Tiếp tục thanh toán') : 'Xem kết quả thanh toán' }} →
           </BaseButton>
 
           <RouterLink :to="`/payment-result/${order.id}`" class="mt-4 block text-center text-sm font-bold text-purple-700 dark:text-purple-300">
