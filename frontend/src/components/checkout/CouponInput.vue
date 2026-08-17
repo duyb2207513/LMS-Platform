@@ -36,12 +36,12 @@ async function handleApply() {
     } else {
       errorMessage.value = 'Mã giảm giá không hợp lệ hoặc đã hết hạn'
     }
-  } catch (err: any) {
-    if (err?.errors && typeof err.errors === 'object') {
-      const firstErr = Object.values(err.errors)[0]
+  } catch (err: unknown) {
+    if (err && typeof err === 'object' && 'errors' in err && typeof (err as Record<string, unknown>).errors === 'object') {
+      const firstErr = Object.values((err as Record<string, unknown>).errors as Record<string, unknown>)[0]
       errorMessage.value = String(firstErr)
     } else {
-      errorMessage.value = err?.message || 'Mã giảm giá không khả dụng'
+      errorMessage.value = (err instanceof Error ? err.message : null) || 'Mã giảm giá không khả dụng'
     }
     successResult.value = null
   }

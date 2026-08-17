@@ -33,8 +33,8 @@ async function handleSubmit() {
     reason.value = ''
     emit('submitted')
     emit('close')
-  } catch (err: any) {
-    error.value = err?.message || 'Gửi yêu cầu hoàn tiền thất bại'
+  } catch (err: unknown) {
+    error.value = (err instanceof Error ? err.message : null) || 'Gửi yêu cầu hoàn tiền thất bại'
   }
 }
 </script>

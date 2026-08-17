@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 import InstructorLayout from '@/layouts/InstructorLayout.vue'
 import BaseInput from '@/components/ui/BaseInput.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
@@ -12,7 +12,6 @@ import { CourseLevel, CourseStatus } from '@/types'
 import type { CourseFormData } from '@/types'
 
 const route = useRoute()
-const router = useRouter()
 const courseStore = useCourseStore()
 const categoryStore = useCategoryStore()
 
@@ -107,7 +106,7 @@ onMounted(async () => {
     }
     currentThumbnailUrl.value = course.thumbnailUrl || null
     currentStatus.value = course.status
-  } catch (e) {
+  } catch {
     error.value = 'Tải dữ liệu thất bại'
   } finally {
     pageLoading.value = false

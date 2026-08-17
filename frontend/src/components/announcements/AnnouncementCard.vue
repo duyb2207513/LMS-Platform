@@ -8,7 +8,7 @@ const props = defineProps<{
   canManage?: boolean
 }>()
 
-const emit = defineEmits<{
+defineEmits<{
   edit: [announcement: CourseAnnouncement]
   publish: [announcement: CourseAnnouncement]
   delete: [announcement: CourseAnnouncement]

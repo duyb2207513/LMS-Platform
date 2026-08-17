@@ -137,7 +137,7 @@ export const useCourseStore = defineStore('courses', () => {
 
   async function updateCourseStatus(id: string, status: CourseStatus) {
     const api = useApi()
-    const response = status === CourseStatus.PUBLISHED ? await api.post<ApiResponse<Course>>(`/courses/${id}/publish`) : status === CourseStatus.DRAFT ? await api.post<ApiResponse<Course>>(`/courses/${id}/unpublish`) : await api.patch<ApiResponse<Course>>(`/courses/${id}`, { status } as any)
+    const response = status === CourseStatus.PUBLISHED ? await api.post<ApiResponse<Course>>(`/courses/${id}/publish`) : status === CourseStatus.DRAFT ? await api.post<ApiResponse<Course>>(`/courses/${id}/unpublish`) : await api.patch<ApiResponse<Course>>(`/courses/${id}`, { status } as Partial<CourseFormData>)
     if (response.data) {
       const index = myCourses.value.findIndex((c) => c.id === id)
       if (index !== -1) {

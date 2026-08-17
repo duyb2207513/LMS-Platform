@@ -27,7 +27,7 @@ async function loadRequests() {
       status: filterStatus.value === 'ALL' ? undefined : filterStatus.value,
     })
     refundRequests.value = res.data || []
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error(err)
   }
 }
@@ -54,8 +54,8 @@ async function handleApprove() {
     showApproveModal.value = false
     selectedRequest.value = null
     await loadRequests()
-  } catch (err: any) {
-    error.value = err?.message || 'Duyệt hoàn tiền thất bại'
+  } catch (err: unknown) {
+    error.value = (err instanceof Error ? err.message : null) || 'Duyệt hoàn tiền thất bại'
   }
 }
 
@@ -71,8 +71,8 @@ async function handleReject() {
     showRejectModal.value = false
     selectedRequest.value = null
     await loadRequests()
-  } catch (err: any) {
-    error.value = err?.message || 'Từ chối hoàn tiền thất bại'
+  } catch (err: unknown) {
+    error.value = (err instanceof Error ? err.message : null) || 'Từ chối hoàn tiền thất bại'
   }
 }
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
 import NotificationItem from '@/components/notifications/NotificationItem.vue'
 import LoadingSpinner from '@/components/ui/LoadingSpinner.vue'

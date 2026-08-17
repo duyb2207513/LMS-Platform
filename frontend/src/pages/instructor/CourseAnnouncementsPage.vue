@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 import InstructorLayout from '@/layouts/InstructorLayout.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import LoadingSpinner from '@/components/ui/LoadingSpinner.vue'
@@ -10,7 +10,6 @@ import { useApi } from '@/composables/useApi'
 import type { ApiResponse, Course, CourseAnnouncement, AnnouncementFormData } from '@/types'
 
 const route = useRoute()
-const router = useRouter()
 const api = useApi()
 
 const courseId = String(route.params.courseId)

@@ -46,7 +46,7 @@ async function pay() {
   paying.value = true
   error.value = ''
   try {
-    const body: Record<string, any> = {}
+    const body: Record<string, unknown> = {}
     if (appliedCouponCode.value) {
       body.couponCode = appliedCouponCode.value
     }

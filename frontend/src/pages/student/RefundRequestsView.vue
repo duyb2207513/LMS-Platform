@@ -21,8 +21,8 @@ async function loadRequests() {
   try {
     const res = await refundApi.getMyRefundRequests()
     requests.value = res.data || []
-  } catch (err: any) {
-    error.value = err?.message || 'Không tải được danh sách hoàn tiền'
+  } catch (err: unknown) {
+    error.value = (err instanceof Error ? err.message : null) || 'Không tải được danh sách hoàn tiền'
   }
 }
 
@@ -34,8 +34,8 @@ async function cancelRequest(id: string) {
     if (selectedRefund.value?.id === id) {
       selectedRefund.value = null
     }
-  } catch (err: any) {
-    error.value = err?.message || 'Hủy yêu cầu hoàn tiền thất bại'
+  } catch (err: unknown) {
+    error.value = (err instanceof Error ? err.message : null) || 'Hủy yêu cầu hoàn tiền thất bại'
   } finally {
     cancellingId.value = null
   }
