@@ -1,26 +1,22 @@
-import type { RequestHandler } from "express";
+import type { Request, Response, NextFunction, RequestHandler } from "express";
+import { AppError } from "../errors/AppError.js";
 
 export interface RequestValidationResult<T> {
   data?: T;
   errors?: Record<string, string>;
 }
 
-type RequestValidator<T> = (body: unknown) => RequestValidationResult<T>;
-
-export function validateRequest<T>(validator: RequestValidator<T>): RequestHandler {
-  return (request, response, next) => {
-    const result = validator(request.body);
-
-    if (!result.data) {
-      response.status(400).json({
-        success: false,
-        message: "Validation failed",
-        errors: result.errors
-      });
-      return;
+export function validateRequest<T>(
+  validator: (body: unknown) => RequestValidationResult<T>
+): RequestHandler {
+  return (req: Request, _res: Response, next: NextFunction) => {
+    const result = validator(req.body);
+    if (result.errors && Object.keys(result.errors).length > 0) {
+      throw new AppError(400, "Validation failed", result.errors);
     }
-
-    request.body = result.data;
+    if (result.data !== undefined) {
+      req.body = result.data;
+    }
     next();
   };
 }

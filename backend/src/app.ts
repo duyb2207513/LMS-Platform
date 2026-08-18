@@ -4,15 +4,14 @@ import express from "express";
 import path from "node:path";
 import swaggerUi from "swagger-ui-express";
 import pinoHttp from "pino-http";
-import { errorHandler } from "./common/middlewares/errorHandler.js";
-import { notFound } from "./common/middlewares/notFound.js";
-import { env } from "./config/env.js";
 import { swaggerSpec } from "./config/swagger.js";
 import apiRouter from "./routes/index.js";
 import { apiRateLimiter, authRateLimiter, securityHeaders } from "./common/middlewares/security.js";
 import { auditTrail } from "./common/middlewares/auditTrail.js";
 import { logger } from "./config/logger.js";
 import "./config/monitoring.js";
+
+import { errorHandler } from "./common/middlewares/errorHandler.js";
 
 const app = express();
 app.set("trust proxy", 1);
@@ -24,14 +23,26 @@ app.use(pinoHttp({
   customLogLevel: (_request, response, error) => error || response.statusCode >= 500 ? "error" : response.statusCode >= 400 ? "warn" : "info"
 }));
 
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  "http://localhost:5173",
+  "http://localhost:3000",
+  "https://lms-platform-lemon-theta.vercel.app"
+].filter(Boolean) as string[];
+
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin || origin === env.frontendUrl || origin.endsWith(".vercel.app") || origin.includes("localhost")) {
-        callback(null, true);
-      } else {
-        callback(null, true);
+      // Cho phép requests không có origin (ví dụ Mobile apps, Curl, Postman)
+      if (!origin) return callback(null, true);
+      if (
+        allowedOrigins.includes(origin) ||
+        origin.endsWith(".vercel.app") ||
+        origin.includes("localhost")
+      ) {
+        return callback(null, true);
       }
+      return callback(null, true);
     },
     credentials: true
   })
@@ -55,7 +66,13 @@ app.use("/api/v1/auth", authRateLimiter);
 app.use("/api/v1", auditTrail);
 app.use("/api/v1", apiRouter);
 
-app.use(notFound);
+app.use((_request, response) => {
+  response.status(404).json({
+    success: false,
+    message: "API endpoint not found"
+  });
+});
+
 app.use(errorHandler);
 
 export default app;

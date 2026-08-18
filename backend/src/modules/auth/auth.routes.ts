@@ -3,6 +3,7 @@ import { authenticate } from "../../common/middlewares/authenticate.js";
 import { validateRequest } from "../../common/middlewares/validateRequest.js";
 import { asyncHandler } from "../../common/utils/asyncHandler.js";
 import {
+  checkEmailExistsController,
   confirmEmailChangeController, forgotPasswordController, githubCallbackController, googleLoginController, listSessionsController,
   loginController, logoutController, mobileGoogleLoginController, mobileLoginController, mobileLogoutController,
   mobileOAuthExchangeController, mobileRefreshTokenController, refreshTokenController, registerController, resendVerificationController,
@@ -15,6 +16,17 @@ import {
 } from "./auth.validation.js";
 
 const authRouter = Router();
+
+/** @openapi
+ * /auth/check-email:
+ *   get:
+ *     tags: [Auth]
+ *     summary: Check if email exists in database
+ *     security: []
+ *     parameters: [{ in: query, name: email, required: true, schema: { type: string } }]
+ *     responses: { 200: { description: Email availability checked } }
+ */
+authRouter.get("/check-email", asyncHandler(checkEmailExistsController));
 
 /** @openapi
  * /auth/register:

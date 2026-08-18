@@ -13,11 +13,30 @@ const items = ref<Enrollment[]>([])
 const error = ref('')
 const filter = ref<Filter>('ALL')
 const issuingId = ref('')
+const page = ref(1)
+const PAGE_SIZE = 8
 
 const completed = computed(() => items.value.filter((item) => item.status === 'COMPLETED').length)
 const inProgress = computed(() => items.value.filter((item) => item.status !== 'COMPLETED').length)
 const averageProgress = computed(() => items.value.length ? Math.round(items.value.reduce((sum, item) => sum + item.progressPercent, 0) / items.value.length) : 0)
 const visibleItems = computed(() => items.value.filter((item) => filter.value === 'ALL' || (filter.value === 'COMPLETED' ? item.status === 'COMPLETED' : item.status !== 'COMPLETED')))
+const totalPages = computed(() => Math.max(1, Math.ceil(visibleItems.value.length / PAGE_SIZE)))
+const paginatedItems = computed(() => {
+  const start = (page.value - 1) * PAGE_SIZE
+  return visibleItems.value.slice(start, start + PAGE_SIZE)
+})
+
+function setFilter(f: Filter) {
+  filter.value = f
+  page.value = 1
+}
+
+function goToPage(p: number) {
+  if (p >= 1 && p <= totalPages.value) {
+    page.value = p
+    window.scrollTo({ top: 300, behavior: 'smooth' })
+  }
+}
 
 async function load() {
   try {
@@ -59,7 +78,7 @@ onMounted(load)
 
       <div class="mt-10 flex flex-wrap items-center justify-between gap-4">
         <div class="inline-flex rounded-xl border border-slate-200 bg-white p-1 dark:border-slate-700 dark:bg-slate-900">
-          <button v-for="item in ([['ALL','Tất cả'],['LEARNING','Đang học'],['COMPLETED','Hoàn thành']] as const)" :key="item[0]" :class="['rounded-lg px-3.5 py-2 text-sm font-semibold transition', filter === item[0] ? 'bg-purple-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-950 dark:hover:text-white']" @click="filter = item[0]">{{ item[1] }}</button>
+          <button v-for="item in ([['ALL','Tất cả'],['LEARNING','Đang học'],['COMPLETED','Hoàn thành']] as const)" :key="item[0]" :class="['rounded-lg px-3.5 py-2 text-sm font-semibold transition', filter === item[0] ? 'bg-purple-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-950 dark:hover:text-white']" @click="setFilter(item[0])">{{ item[1] }}</button>
         </div>
         <RouterLink to="/orders" class="text-sm font-bold text-purple-700 hover:underline dark:text-purple-300">Xem lịch sử đơn hàng →</RouterLink>
       </div>
@@ -67,8 +86,8 @@ onMounted(load)
       <LoadingSpinner v-if="api.loading.value && !items.length" class="py-20" />
       <p v-if="error" class="mt-5 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700 dark:border-red-900 dark:bg-red-950/30 dark:text-red-300">{{ error }}</p>
       <section v-if="!api.loading.value && !items.length" class="surface-card mt-6 grid min-h-80 place-items-center p-8 text-center"><div><span class="mx-auto grid h-16 w-16 place-items-center rounded-2xl bg-purple-50 text-3xl dark:bg-purple-950/40">♢</span><h2 class="mt-5 text-xl font-extrabold">Bắt đầu khóa học đầu tiên</h2><p class="mt-2 max-w-sm text-sm leading-6 text-slate-500">Bạn chưa đăng ký khóa học nào. Khám phá danh mục và chọn kỹ năng bạn muốn phát triển.</p><RouterLink to="/courses"><BaseButton class="mt-5">Khám phá ngay</BaseButton></RouterLink></div></section>
-      <section v-else-if="visibleItems.length" class="mt-6 grid gap-5 lg:grid-cols-2">
-        <article v-for="item in visibleItems" :key="item.id" class="learning-card">
+      <section v-else-if="paginatedItems.length" class="mt-6 grid gap-5 lg:grid-cols-2">
+        <article v-for="item in paginatedItems" :key="item.id" class="learning-card">
           <CourseThumbnail :src="item.course.thumbnailUrl" :alt="item.course.title" class="learning-card__media" />
           <div class="flex min-w-0 flex-1 flex-col p-5">
             <div class="flex items-start justify-between gap-3"><div class="min-w-0"><p class="text-xs font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400">{{ item.course.category?.name || 'Khóa học' }}</p><h2 class="mt-2 line-clamp-2 text-xl font-extrabold tracking-tight">{{ item.course.title }}</h2></div><span :class="['shrink-0 rounded-full px-2.5 py-1 text-xs font-bold', item.status === 'COMPLETED' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300' : 'bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300']">{{ item.status === 'COMPLETED' ? 'Hoàn thành' : 'Đang học' }}</span></div>
@@ -77,6 +96,36 @@ onMounted(load)
         </article>
       </section>
       <section v-else-if="items.length" class="surface-card mt-6 p-10 text-center text-sm text-slate-500">Không có khóa học trong nhóm này.</section>
+
+      <nav v-if="paginatedItems.length > 0" class="mt-10 flex items-center justify-center gap-2" aria-label="Phân trang">
+        <button
+          :disabled="page <= 1"
+          class="flex h-10 items-center justify-center rounded-xl border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-600 transition hover:border-purple-300 hover:text-purple-700 disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"
+          @click="goToPage(page - 1)"
+        >
+          ← Trước
+        </button>
+        <button
+          v-for="p in totalPages"
+          :key="p"
+          :class="[
+            'grid h-10 w-10 place-items-center rounded-xl border text-sm font-bold transition',
+            p === page
+              ? 'border-purple-600 bg-purple-600 text-white shadow-lg shadow-purple-500/20'
+              : 'border-slate-200 bg-white text-slate-600 hover:border-purple-300 hover:text-purple-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300',
+          ]"
+          @click="goToPage(p)"
+        >
+          {{ p }}
+        </button>
+        <button
+          :disabled="page >= totalPages"
+          class="flex h-10 items-center justify-center rounded-xl border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-600 transition hover:border-purple-300 hover:text-purple-700 disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"
+          @click="goToPage(page + 1)"
+        >
+          Sau →
+        </button>
+      </nav>
     </main>
   </DefaultLayout>
 </template>

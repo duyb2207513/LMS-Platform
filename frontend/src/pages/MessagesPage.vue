@@ -114,7 +114,7 @@ async function scrollToLatest(behavior: ScrollBehavior = 'auto') {
   await nextTick()
   setTimeout(() => {
     if (messageList.value) {
-      messageList.value.scrollTop = messageList.value.scrollHeight
+      messageList.value.scrollTo({ top: messageList.value.scrollHeight, behavior })
     }
   }, 50)
 }

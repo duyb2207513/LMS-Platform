@@ -7,10 +7,58 @@ import BaseButton from '@/components/ui/BaseButton.vue'
 import GoogleSignInButton from '@/components/auth/GoogleSignInButton.vue'
 import GitHubSignInButton from '@/components/auth/GitHubSignInButton.vue'
 import { useAuthStore } from '@/stores/auth'
+import { useApi } from '@/composables/useApi'
 
-const auth = useAuthStore(), router = useRouter()
+const auth = useAuthStore(), router = useRouter(), api = useApi()
 const fullName = ref(''), email = ref(''), password = ref(''), confirmPassword = ref('')
-const loading = ref(false), error = ref('')
+const loading = ref(false), error = ref(''), emailError = ref('')
+let checkEmailTimer: ReturnType<typeof setTimeout> | null = null
+
+async function validateEmail(checkRemote = false) {
+  const mail = email.value.trim().toLowerCase()
+  if (!mail) {
+    emailError.value = ''
+    return false
+  }
+  if (mail.endsWith('@example.com')) {
+    emailError.value = 'Không được sử dụng email có đuôi @example.com'
+    return false
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)) {
+    emailError.value = 'Email không hợp lệ'
+    return false
+  }
+  emailError.value = ''
+
+  if (checkRemote) {
+    try {
+      const res = await api.get<{ data: { exists: boolean } }>(`/auth/check-email?email=${encodeURIComponent(mail)}`)
+      if (res && res.data?.exists) {
+        emailError.value = 'Email đã tồn tại'
+        return false
+      }
+    } catch {
+      // Bỏ qua nếu lỗi mạng trong lúc gõ
+    }
+  }
+  return true
+}
+
+function onEmailInput() {
+  validateEmail(false)
+  if (checkEmailTimer) clearTimeout(checkEmailTimer)
+  const mail = email.value.trim().toLowerCase()
+  if (mail && !mail.endsWith('@example.com') && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)) {
+    checkEmailTimer = setTimeout(() => {
+      validateEmail(true)
+    }, 400)
+  }
+}
+
+function onEmailBlur() {
+  if (checkEmailTimer) clearTimeout(checkEmailTimer)
+  validateEmail(true)
+}
 
 async function finishLogin() {
   await router.push(auth.isAdmin ? '/admin' : auth.isInstructor ? '/instructor/courses' : '/dashboard')
@@ -26,8 +74,10 @@ async function loginWithGoogle(idToken: string) {
 async function submit() {
   const name = fullName.value.trim(), mail = email.value.trim().toLowerCase()
   error.value = ''
+  validateEmail()
+  if (emailError.value) return
   if (name.length < 2 || name.length > 100) { error.value = 'Họ tên phải từ 2 đến 100 ký tự'; return }
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)) { error.value = 'Email không hợp lệ'; return }
+  if (!mail) { error.value = 'Email là bắt buộc'; return }
   if (password.value.length < 8 || !/[A-Z]/.test(password.value) || !/[a-z]/.test(password.value) || !/[0-9]/.test(password.value)) {
     error.value = 'Mật khẩu tối thiểu 8 ký tự, có chữ hoa, chữ thường và số'; return
   }
@@ -37,7 +87,11 @@ async function submit() {
     await auth.register({ fullName: name, email: mail, password: password.value, confirmPassword: confirmPassword.value })
     await router.push({ path: '/login', query: { registered: '1' } })
   } catch (e) {
-    error.value = e instanceof Error ? e.message : 'Đăng ký thất bại'
+    if (e instanceof Error && (e.message.includes('409') || e.message.toLowerCase().includes('already exists'))) {
+      error.value = 'Email đã tồn tại'
+    } else {
+      error.value = e instanceof Error ? e.message : 'Đăng ký thất bại'
+    }
   } finally {
     loading.value = false
   }
@@ -63,7 +117,17 @@ async function submit() {
 
       <form class="space-y-4" @submit.prevent="submit">
         <BaseInput id="full-name" v-model="fullName" label="Họ và tên" required />
-        <BaseInput id="register-email" v-model="email" type="email" label="Email" required />
+        <BaseInput
+          id="register-email"
+          v-model="email"
+          type="email"
+          label="Email"
+          placeholder="ban@gmail.com"
+          :error="emailError"
+          required
+          @blur="onEmailBlur"
+          @input="onEmailInput"
+        />
         <BaseInput id="register-password" v-model="password" type="password" label="Mật khẩu" required />
         <BaseInput id="confirm-password" v-model="confirmPassword" type="password" label="Xác nhận mật khẩu" required />
         <p v-if="error" class="rounded-xl bg-red-50 p-3 text-sm text-red-700 dark:bg-red-950/30 dark:text-red-300">{{ error }}</p>

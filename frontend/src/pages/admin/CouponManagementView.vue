@@ -51,7 +51,7 @@ async function loadCoupons() {
           : filterStatus.value === "ACTIVE",
     });
     coupons.value = res.data || [];
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error(err);
   }
 }
@@ -122,8 +122,8 @@ async function handleSaveCoupon() {
     }
     showModal.value = false;
     await loadCoupons();
-  } catch (err: any) {
-    formError.value = err?.message || "Không lưu được coupon";
+  } catch (err: unknown) {
+    formError.value = err instanceof Error ? err.message : "Không lưu được coupon";
   }
 }
 
@@ -131,8 +131,8 @@ async function toggleStatus(coupon: Coupon) {
   try {
     await couponApi.toggleCouponStatus(coupon.id, !coupon.isActive);
     await loadCoupons();
-  } catch (err: any) {
-    alert(err?.message || "Không thể đổi trạng thái");
+  } catch (err: unknown) {
+    alert(err instanceof Error ? err.message : "Không thể đổi trạng thái");
   }
 }
 
@@ -143,7 +143,7 @@ async function viewUsages(coupon: Coupon) {
   try {
     const res = await couponApi.getCouponUsages(coupon.id);
     selectedCouponUsages.value = res.data || [];
-  } catch (err) {
+  } catch {
     selectedCouponUsages.value = [];
   } finally {
     loadingUsages.value = false;

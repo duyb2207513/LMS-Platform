@@ -6,6 +6,7 @@ import { env } from "../../config/env.js";
 import { logger } from "../../config/logger.js";
 import { REFRESH_TOKEN_EXPIRES_IN_SECONDS } from "./auth.tokens.js";
 import {
+  checkEmailExists,
   confirmEmailChange, createMobileOAuthHandoff, exchangeMobileOAuthCode, forgotPassword, githubLogin, googleLogin,
   listSessions, login, refreshSession, register, requestEmailChange, requestEmailVerificationByEmail, resetPassword,
   revokeOtherSessions, revokeRefreshToken, revokeSession, verifyEmail
@@ -62,6 +63,12 @@ const stateMatches = (received: string, stored: string) => {
   const right = Buffer.from(stored);
   return left.length === right.length && timingSafeEqual(left, right);
 };
+
+export async function checkEmailExistsController(request: Request, response: Response) {
+  const email = typeof request.query.email === "string" ? request.query.email : "";
+  const result = await checkEmailExists(email);
+  sendSuccess(response, 200, "Email availability checked", result);
+}
 
 export async function registerController(request: Request, response: Response) {
   const user = await register(request.body as RegisterInput, clientContext(request));
