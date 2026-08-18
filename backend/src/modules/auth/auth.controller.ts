@@ -18,7 +18,7 @@ import type {
 const cookieOptions = () => ({
   httpOnly: true,
   secure: process.env.NODE_ENV === "production",
-  sameSite: "lax" as const,
+  sameSite: (process.env.NODE_ENV === "production" ? "none" : "lax") as "none" | "lax",
   maxAge: REFRESH_TOKEN_EXPIRES_IN_SECONDS * 1000,
   path: "/api/v1/auth"
 });
@@ -33,12 +33,13 @@ const clearRefreshCookie = (response: Response) => response.clearCookie("refresh
 const githubStateCookieOptions = () => ({
   httpOnly: true,
   secure: process.env.NODE_ENV === "production",
-  sameSite: "lax" as const,
+  sameSite: (process.env.NODE_ENV === "production" ? "none" : "lax") as "none" | "lax",
   path: "/api/v1/auth/github"
 });
-const githubCallbackPage = (error?: string) => {
+const githubCallbackPage = (options?: { error?: string; accessToken?: string }) => {
   const url = new URL("/auth/github/callback", env.frontendUrl);
-  if (error) url.searchParams.set("error", error);
+  if (options?.error) url.searchParams.set("error", options.error);
+  if (options?.accessToken) url.searchParams.set("accessToken", options.accessToken);
   return url.toString();
 };
 const githubMobileCallbackPage = (redirectUri: string, input: { code?: string; error?: string }) => {
@@ -177,7 +178,7 @@ export async function githubCallbackController(request: Request, response: Respo
 
   if (request.query.error || !code || !state || !storedState || !stateMatches(state, storedState)) {
     const message = "Phiên đăng nhập GitHub không hợp lệ hoặc đã hết hạn";
-    response.redirect(mobileRedirect ? githubMobileCallbackPage(mobileRedirect, { error: message }) : githubCallbackPage(message));
+    response.redirect(mobileRedirect ? githubMobileCallbackPage(mobileRedirect, { error: message }) : githubCallbackPage({ error: message }));
     return;
   }
 
@@ -190,12 +191,12 @@ export async function githubCallbackController(request: Request, response: Respo
       return;
     }
     setRefreshCookie(response, result.refreshToken);
-    response.redirect(githubCallbackPage());
+    response.redirect(githubCallbackPage({ accessToken: result.accessToken }));
   } catch (error) {
     if (error instanceof AppError) logger.warn({ statusCode: error.statusCode }, "GitHub login was rejected");
     else logger.error({ err: error }, "Unexpected GitHub login error");
     const message = error instanceof AppError ? error.message : "Đăng nhập GitHub thất bại";
-    response.redirect(mobileRedirect ? githubMobileCallbackPage(mobileRedirect, { error: message }) : githubCallbackPage(message));
+    response.redirect(mobileRedirect ? githubMobileCallbackPage(mobileRedirect, { error: message }) : githubCallbackPage({ error: message }));
   }
 }
 

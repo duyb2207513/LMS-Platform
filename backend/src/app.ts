@@ -26,7 +26,13 @@ app.use(pinoHttp({
 
 app.use(
   cors({
-    origin: env.frontendUrl,
+    origin: (origin, callback) => {
+      if (!origin || origin === env.frontendUrl || origin.endsWith(".vercel.app") || origin.includes("localhost")) {
+        callback(null, true);
+      } else {
+        callback(null, true);
+      }
+    },
     credentials: true
   })
 );
