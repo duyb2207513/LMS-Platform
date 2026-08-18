@@ -74,7 +74,15 @@ export async function assertCourseManagePermission(
   assertCanManageCourse(course, actor);
 }
 
-export async function listPublicCourses(query: PublicCourseQuery) {
+export async function listPublicCourses(query: Partial<PublicCourseQuery>) {
+  const page = Math.max(1, Number(query.page) || 1);
+  const limit = Math.min(50, Math.max(1, Number(query.limit) || 12));
+  const sortBy = query.sortBy && ["createdAt", "title", "price", "publishedAt"].includes(query.sortBy) ? query.sortBy : "createdAt";
+  const sortOrder = query.sortOrder === "asc" ? "asc" : "desc";
+
+  const minPrice = query.minPrice !== undefined && !Number.isNaN(Number(query.minPrice)) ? Number(query.minPrice) : undefined;
+  const maxPrice = query.maxPrice !== undefined && !Number.isNaN(Number(query.maxPrice)) ? Number(query.maxPrice) : undefined;
+
   const where = {
     status: "PUBLISHED" as const,
     ...(query.search
@@ -82,11 +90,11 @@ export async function listPublicCourses(query: PublicCourseQuery) {
       : {}),
     ...(query.categoryId ? { categoryId: query.categoryId } : {}),
     ...(query.level ? { level: query.level } : {}),
-    ...(query.minPrice !== undefined || query.maxPrice !== undefined
+    ...(minPrice !== undefined || maxPrice !== undefined
       ? {
           price: {
-            ...(query.minPrice === undefined ? {} : { gte: query.minPrice }),
-            ...(query.maxPrice === undefined ? {} : { lte: query.maxPrice })
+            ...(minPrice === undefined ? {} : { gte: minPrice }),
+            ...(maxPrice === undefined ? {} : { lte: maxPrice })
           }
         }
       : {})
@@ -95,9 +103,9 @@ export async function listPublicCourses(query: PublicCourseQuery) {
   const [courses, totalItems] = await Promise.all([
     prisma.course.findMany({
       where,
-      skip: (query.page - 1) * query.limit,
-      take: query.limit,
-      orderBy: { [query.sortBy]: query.sortOrder },
+      skip: (page - 1) * limit,
+      take: limit,
+      orderBy: { [sortBy]: sortOrder },
       select: {
         id: true,
         title: true,
@@ -119,10 +127,10 @@ export async function listPublicCourses(query: PublicCourseQuery) {
   return {
     data: courses.map(serializeCourse),
     meta: {
-      page: query.page,
-      limit: query.limit,
+      page,
+      limit,
       totalItems,
-      totalPages: Math.ceil(totalItems / query.limit)
+      totalPages: Math.ceil(totalItems / limit)
     }
   };
 }

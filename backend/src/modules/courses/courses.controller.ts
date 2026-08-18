@@ -52,7 +52,7 @@ export async function listPublicCoursesController(
   request: Request,
   response: Response
 ): Promise<void> {
-  const result = await listPublicCourses(request.query as any);
+  const result = await listPublicCourses((response.locals.validatedQuery ?? request.query) as any);
   sendSuccess(response, 200, "Courses retrieved successfully", result);
 }
 
