@@ -1,4 +1,5 @@
 import { env } from "../../config/env.js";
+import { logger } from "../../config/logger.js";
 import { executeAiTool } from "./ai.tools.js";
 import type { AiChatMessage, AiChatResponse } from "./ai.types.js";
 
@@ -257,8 +258,12 @@ export async function askGeminiAgent(
   courseId?: string,
   currentUserId?: string
 ): Promise<AiChatResponse> {
+  const startTime = Date.now();
+  logger.info({ userMessage: message, historyCount: history.length, userId: currentUserId || "guest", courseId }, "[AI Multi-Agent] 🚀 Received chat request");
+
   const apiKey = env.geminiApiKey;
   if (!apiKey) {
+    logger.warn("[AI Multi-Agent] GEMINI_API_KEY is not configured in env");
     return {
       reply: "Hệ thống chưa cấu hình `GEMINI_API_KEY`. Vui lòng khai báo API Key trong file `.env` của Backend để kích hoạt Trợ lý AI.",
       suggestions: ["Tìm khóa học lập trình", "Chính sách hoàn tiền 24 giờ", "Cách nhận chứng chỉ"],
@@ -267,20 +272,27 @@ export async function askGeminiAgent(
 
   try {
     // 1. Tác tử phân tích ý định có liên kết ngữ cảnh lịch sử
+    logger.info("[AI Multi-Agent] 🧭 Step 1: Running Intent Classifier Agent...");
     const intent = await runIntentClassifierAgent(message, history);
+    logger.info({ intent }, `[AI Multi-Agent] ✅ Step 1 Intent Result: ${intent.category}`);
 
     // 2. Tác tử chuyên môn thực thi tra cứu dữ liệu
+    logger.info(`[AI Multi-Agent] ⚙️ Step 2: Executing Specialist Agent for category: ${intent.category}...`);
     const specialistData = await runSpecialistAgent(intent, message, currentUserId, courseId);
+    logger.info("[AI Multi-Agent] ✅ Step 2 Specialist Data retrieved");
 
     // 3. Tác tử tổng hợp câu trả lời sâu sắc & liền mạch
+    logger.info("[AI Multi-Agent] ✍️ Step 3: Running Synthesis & Editorial Agent...");
     const reply = await runSynthesisAgent(message, intent, specialistData, history);
+    const duration = Date.now() - startTime;
+    logger.info({ durationMs: duration, replyLength: reply.length }, `[AI Multi-Agent] 🎉 Step 3 Completed in ${duration}ms`);
 
     return {
       reply: reply.trim(),
       suggestions: generateContextSuggestions(intent.category),
     };
   } catch (error) {
-    console.error("Multi-Agent execution error:", error);
+    logger.error({ error, message, userId: currentUserId }, "[AI Multi-Agent] ❌ Error executing Multi-Agent pipeline");
     throw error;
   }
 }

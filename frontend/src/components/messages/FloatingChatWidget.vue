@@ -304,6 +304,7 @@ async function sendQuickPrompt(prompt: string) {
 }
 
 async function getBotAnswer(userText: string, historyPayload: Array<{ role: "user" | "model"; content: string }> = []): Promise<string> {
+  console.info("[AI Widget] 💬 Sending query to /api/v1/ai/chat:", { message: userText, historyLength: historyPayload.length });
   try {
     const response = await api.post<ApiResponse<{ reply: string; suggestions?: string[] }>>("/ai/chat", {
       message: userText,
@@ -311,16 +312,18 @@ async function getBotAnswer(userText: string, historyPayload: Array<{ role: "use
     });
 
     if (response.data?.reply) {
+      console.info("[AI Widget] 🎯 Received AI response successfully:", response.data);
       if (response.data.suggestions?.length) {
         botSuggestions.value = response.data.suggestions;
       }
       return response.data.reply;
     }
   } catch (error) {
-    console.warn("AI Backend API offline/error, falling back to local assistant:", error);
+    console.error("[AI Widget] ⚠️ AI Backend API call failed:", error);
   }
 
   // Graceful fallback to local course knowledge
+  console.warn("[AI Widget] 🔄 Fallback to local course catalog helper");
   let courseList = courseStore.courses;
   if (!courseList.length) {
     try {
