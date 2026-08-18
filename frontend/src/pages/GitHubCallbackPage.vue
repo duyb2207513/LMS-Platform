@@ -17,8 +17,17 @@ onMounted(async () => {
     return
   }
 
+  const queryAccessToken = typeof route.query.accessToken === 'string' ? route.query.accessToken : ''
+
   try {
-    await auth.completeOAuthLogin()
+    if (queryAccessToken) {
+      auth.token = queryAccessToken
+      localStorage.setItem('accessToken', queryAccessToken)
+      await auth.fetchCurrentUser()
+    } else {
+      await auth.completeOAuthLogin()
+    }
+
     if (window.opener && !window.opener.closed) {
       window.opener.postMessage({ type: 'lms:oauth-success' }, window.location.origin)
       window.close()
