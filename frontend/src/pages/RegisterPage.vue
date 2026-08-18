@@ -10,7 +10,20 @@ import { useAuthStore } from '@/stores/auth'
 
 const auth = useAuthStore(), router = useRouter()
 const fullName = ref(''), email = ref(''), password = ref(''), confirmPassword = ref('')
-const loading = ref(false), error = ref('')
+const loading = ref(false), error = ref(''), emailError = ref('')
+
+function validateEmail() {
+  const mail = email.value.trim().toLowerCase()
+  if (!mail) {
+    emailError.value = ''
+  } else if (mail.endsWith('@example.com')) {
+    emailError.value = 'Không được sử dụng email có đuôi @example.com'
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)) {
+    emailError.value = 'Email không hợp lệ'
+  } else {
+    emailError.value = ''
+  }
+}
 
 async function finishLogin() {
   await router.push(auth.isAdmin ? '/admin' : auth.isInstructor ? '/instructor/courses' : '/dashboard')
@@ -26,8 +39,10 @@ async function loginWithGoogle(idToken: string) {
 async function submit() {
   const name = fullName.value.trim(), mail = email.value.trim().toLowerCase()
   error.value = ''
+  validateEmail()
+  if (emailError.value) return
   if (name.length < 2 || name.length > 100) { error.value = 'Họ tên phải từ 2 đến 100 ký tự'; return }
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)) { error.value = 'Email không hợp lệ'; return }
+  if (!mail) { error.value = 'Email là bắt buộc'; return }
   if (password.value.length < 8 || !/[A-Z]/.test(password.value) || !/[a-z]/.test(password.value) || !/[0-9]/.test(password.value)) {
     error.value = 'Mật khẩu tối thiểu 8 ký tự, có chữ hoa, chữ thường và số'; return
   }
@@ -63,7 +78,17 @@ async function submit() {
 
       <form class="space-y-4" @submit.prevent="submit">
         <BaseInput id="full-name" v-model="fullName" label="Họ và tên" required />
-        <BaseInput id="register-email" v-model="email" type="email" label="Email" required />
+        <BaseInput
+          id="register-email"
+          v-model="email"
+          type="email"
+          label="Email"
+          placeholder="ban@gmail.com"
+          :error="emailError"
+          required
+          @blur="validateEmail"
+          @input="validateEmail"
+        />
         <BaseInput id="register-password" v-model="password" type="password" label="Mật khẩu" required />
         <BaseInput id="confirm-password" v-model="confirmPassword" type="password" label="Xác nhận mật khẩu" required />
         <p v-if="error" class="rounded-xl bg-red-50 p-3 text-sm text-red-700 dark:bg-red-950/30 dark:text-red-300">{{ error }}</p>
