@@ -16,10 +16,28 @@ import certificatesRouter, { courseCertificatesRouter } from "../modules/certifi
 import ordersRouter from "../modules/orders/orders.routes.js";
 import { orderPaymentsRouter, paymentsRouter } from "../modules/payments/payments.routes.js";
 import adminRouter from "../modules/admin/admin.routes.js";
+import analyticsRouter from "../modules/analytics/analytics.routes.js";
+import { adminCouponRouter, couponRouter } from "../modules/coupons/coupon.routes.js";
+import { adminRefundRouter, refundRouter } from "../modules/refunds/refund.routes.js";
+import instructorCommerceRouter from "../modules/earnings/earning.routes.js";
+import adminPayoutRouter from "../modules/payouts/payout.routes.js";
+import messagesRouter from "../modules/messages/messages.routes.js";
+import { courseAssignmentsRouter, assignmentsRouter, submissionsRouter, submissionFilesRouter } from "../modules/assignments/assignment.routes.js";
+import { courseAnnouncementsRouter, announcementsRouter } from "../modules/announcements/announcement.routes.js";
+import { notificationsRouter, preferencesRouter } from "../modules/notifications/notification.routes.js";
+import { courseGradesRouter } from "../modules/grades/grade.routes.js";
+import aiRouter from "../modules/ai/ai.routes.js";
 
 const router = Router();
 
+router.use("/ai", aiRouter);
 router.use("/auth", authRouter);
+router.use("/analytics", analyticsRouter);
+router.use("/coupons", couponRouter);
+router.use("/admin/coupons", adminCouponRouter);
+router.use("/refund-requests", refundRouter);
+router.use("/admin/refund-requests", adminRefundRouter);
+router.use("/admin/payouts", adminPayoutRouter);
 router.use("/admin", adminRouter);
 router.use("/categories", categoriesRouter);
 router.use("/courses/:courseId/sections", courseSectionsRouter);
@@ -28,6 +46,9 @@ router.use("/courses/:courseId/content", courseLearningRouter);
 router.use("/courses/:courseId/progress", courseProgressRouter);
 router.use("/courses/:courseId/reviews", courseReviewsRouter);
 router.use("/courses/:courseId/certificates", courseCertificatesRouter);
+router.use("/courses/:courseId/assignments", courseAssignmentsRouter);
+router.use("/courses/:courseId/grades", courseGradesRouter);
+router.use("/courses/:courseId/announcements", courseAnnouncementsRouter);
 router.use("/courses", coursesRouter);
 router.use("/sections/:sectionId/lessons", sectionLessonsRouter);
 router.use("/sections", sectionsRouter);
@@ -39,6 +60,12 @@ router.use("/quizzes", quizzesRouter);
 router.use("/questions", questionsRouter);
 router.use("/options", optionsRouter);
 router.use("/quiz-attempts", quizAttemptsRouter);
+router.use("/assignments", assignmentsRouter);
+router.use("/submissions", submissionsRouter);
+router.use("/submission-files", submissionFilesRouter);
+router.use("/announcements", announcementsRouter);
+router.use("/notifications", notificationsRouter);
+router.use("/notification-preferences", preferencesRouter);
 router.use("/reviews", reviewsRouter);
 router.use("/comments", commentsRouter);
 router.use("/orders/:orderId/payments/mock", orderPaymentsRouter);
@@ -47,40 +74,33 @@ router.use("/payments", paymentsRouter);
 router.use("/certificates", certificatesRouter);
 router.use("/enrollments", enrollmentsRouter);
 router.use("/instructor", instructorCoursesRouter);
+router.use("/instructor", instructorCommerceRouter);
 router.use("/users", usersRouter);
+router.use("/messages", messagesRouter);
 
 /**
  * @openapi
  * /health:
  *   get:
+ *     operationId: checkHealth
  *     summary: Check API health
- *     tags:
- *       - System
+ *     tags: [System]
+ *     security: []
  *     responses:
  *       200:
- *         description: API is running
+ *         description: API is healthy
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 success:
- *                   type: boolean
- *                   example: true
- *                 message:
- *                   type: string
- *                   example: LMS API is running
- *                 data:
- *                   type: object
+ *                 status: { type: string, example: ok }
+ *                 timestamp: { type: string, format: date-time }
  */
 router.get("/health", (_request, response) => {
   response.status(200).json({
-    success: true,
-    message: "LMS API is running",
-    data: {
-      environment: process.env.NODE_ENV ?? "development",
-      timestamp: new Date().toISOString()
-    }
+    status: "ok",
+    timestamp: new Date().toISOString()
   });
 });
 

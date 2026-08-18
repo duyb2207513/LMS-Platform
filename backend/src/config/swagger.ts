@@ -27,8 +27,6 @@ const swaggerDefinition = {
         type: "apiKey",
         in: "cookie",
         name: "refreshToken",
-        description: "Secure HttpOnly refresh token cookie set by login"
-      }
     },
     schemas: {
       RegisterRequest: {

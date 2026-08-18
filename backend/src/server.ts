@@ -1,8 +1,9 @@
+import "dotenv/config";
 import app from "./app.js";
-import { env } from "./config/env.js";
 
+const PORT = Number(process.env.PORT ?? 3000);
 const HOST = "0.0.0.0";
 
-app.listen(env.port, HOST, () => {
-  console.log(`LMS API is running at http://localhost:${env.port}`);
+app.listen(PORT, HOST, () => {
+  console.log(`LMS API is running at http://localhost:${PORT}`);
 });
