@@ -166,6 +166,8 @@ export async function listInstructorCourses(
   actor: AuthTokenPayload,
   query: InstructorCourseQuery
 ) {
+  const page = Math.max(1, Number(query.page) || 1);
+  const limit = Math.min(50, Math.max(1, Number(query.limit) || 10));
   const where = {
     ...(actor.role === "ADMIN" ? {} : { instructorId: actor.userId }),
     ...(query.status ? { status: query.status } : {}),
@@ -176,8 +178,8 @@ export async function listInstructorCourses(
   const [courses, totalItems] = await Promise.all([
     prisma.course.findMany({
       where,
-      skip: (query.page - 1) * query.limit,
-      take: query.limit,
+      skip: (page - 1) * limit,
+      take: limit,
       orderBy: { createdAt: "desc" },
       select: {
         id: true,
@@ -206,10 +208,10 @@ export async function listInstructorCourses(
   return {
     data: courses.map(serializeCourse),
     meta: {
-      page: query.page,
-      limit: query.limit,
+      page,
+      limit,
       totalItems,
-      totalPages: Math.ceil(totalItems / query.limit)
+      totalPages: Math.ceil(totalItems / limit)
     }
   };
 }
