@@ -146,7 +146,7 @@ export interface AssignmentSubmission { id:string;assignmentId:string;studentId:
 export interface Assignment { id:string;courseId:string;title:string;description:string|null;instructions:string|null;dueAt:string;maxScore:number;allowResubmission:boolean;maxSubmissions:number;allowLateSubmissions:boolean;isPublished:boolean;createdAt:string;updatedAt:string;isOverdue?:boolean;remainingSubmissions?:number;submissions?:AssignmentSubmission[];_count?:{submissions:number};course?:Pick<Course,'id'|'title'|'slug'> }
 export interface CourseGradeRule { courseId:string;assignmentWeight:number;quizWeight:number;passingScore:number }
 export interface CourseGrade { courseId:string;studentId:string;finalScore:number;passed:boolean;rule:CourseGradeRule;assignment:{percent:number;earned:number;maximum:number;total:number;graded:number};quiz:{percent:number;total:number;attempted:number};student?:Pick<User,'id'|'fullName'|'email'|'avatarUrl'> }
-export interface MessageContact extends Pick<User, 'id' | 'fullName' | 'email' | 'avatarUrl' | 'role' | 'status'> {}
+export type MessageContact = Pick<User, 'id' | 'fullName' | 'email' | 'avatarUrl' | 'role' | 'status'>
 export interface DirectMessage { id:string;senderId:string;recipientId:string;content:string;readAt:string|null;createdAt:string;updatedAt:string;sender:MessageContact;recipient:MessageContact }
 export interface MessageConversation { contact:MessageContact;lastMessage:DirectMessage;unreadCount:number }
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import InstructorLayout from "@/layouts/InstructorLayout.vue";
 import LoadingSpinner from "@/components/ui/LoadingSpinner.vue";
 import BaseButton from "@/components/ui/BaseButton.vue";
@@ -40,9 +40,9 @@ function goToPage(p: number) {
   }
 }
 
-function resetPage() {
+watch([search, status, level], () => {
   page.value = 1;
-}
+});
 
 function getStatusBadge(status: CourseStatus) {
   switch (status) {
