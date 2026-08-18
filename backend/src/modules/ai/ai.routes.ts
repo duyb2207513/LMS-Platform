@@ -1,9 +1,10 @@
+import type { RequestHandler } from "express";
 import { Router } from "express";
 import { asyncHandler } from "../../common/utils/asyncHandler.js";
 import { verifyAccessToken } from "../auth/auth.tokens.js";
 import { chatWithAiController } from "./ai.controller.js";
 
-const optionalAuthenticate = (req: any, _res: any, next: any) => {
+const optionalAuthenticate: RequestHandler = (req, _res, next) => {
   const authorization = req.headers.authorization;
   if (authorization?.startsWith("Bearer ")) {
     const token = authorization.slice("Bearer ".length).trim();
