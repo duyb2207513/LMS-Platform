@@ -50,7 +50,7 @@ services:
       NODE_ENV: development
       PORT: 3000
       MOBILE_APP_URL: lmsplatform://
-      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-lms_db}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}@postgres:5432/${POSTGRES_DB:-lms_db}
       JWT_ACCESS_SECRET: local-development-access-secret-change-me
       JWT_REFRESH_SECRET: local-development-refresh-secret-change-me
       MOCK_PAYMENT_WEBHOOK_SECRET: local-mock-payment-webhook-secret
@@ -77,6 +77,12 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/v1/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
     command: npm run dev
 

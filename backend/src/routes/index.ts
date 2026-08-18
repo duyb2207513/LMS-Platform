@@ -1,3 +1,4 @@
+import type { Request, Response } from "express";
 import { Router } from "express";
 import { prisma } from "../config/database.js";
 import { asyncHandler } from "../common/utils/asyncHandler.js";
@@ -118,7 +119,7 @@ router.get("/health", (_request, response) => {
  *       503:
  *         description: A required dependency is unavailable
  */
-router.get("/health/ready", asyncHandler(async (_request, response) => {
+router.get("/health/ready", asyncHandler(async (_request: Request, response: Response) => {
   const startedAt = Date.now();
   await prisma.$queryRaw`SELECT 1`;
   response.status(200).json({
