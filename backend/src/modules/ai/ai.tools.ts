@@ -1,4 +1,5 @@
 import { prisma } from "../../config/database.js";
+import { logger } from "../../config/logger.js";
 
 export const aiToolDeclarations = [
   {
@@ -81,11 +82,13 @@ export const aiToolDeclarations = [
 ];
 
 export async function executeAiTool(name: string, args: Record<string, any>, currentUserId?: string): Promise<any> {
+  logger.info({ tool: name, args, userId: currentUserId || "guest" }, `[AI Tool] Executing tool: ${name}`);
   try {
     switch (name) {
       case "searchLearningContent": {
         const query = String(args.query || "").trim();
         const courseId = args.courseId ? String(args.courseId) : undefined;
+        logger.info(`[AI Tool: searchLearningContent] Searching lessons with query="${query}", courseId=${courseId || "all"}`);
 
         const lessons = await prisma.lesson.findMany({
           where: {
@@ -117,6 +120,8 @@ export async function executeAiTool(name: string, args: Record<string, any>, cur
           },
         });
 
+        logger.info(`[AI Tool: searchLearningContent] Found ${lessons.length} matched lessons in DB`);
+
         if (!lessons.length) {
           return {
             found: false,
@@ -142,6 +147,7 @@ export async function executeAiTool(name: string, args: Record<string, any>, cur
         const keyword = args.keyword ? String(args.keyword).trim() : undefined;
         const level = args.level ? String(args.level) : undefined;
         const isFree = typeof args.isFree === "boolean" ? args.isFree : undefined;
+        logger.info({ keyword, level, isFree }, `[AI Tool: searchCourses] Querying courses`);
 
         const courses = await prisma.course.findMany({
           where: {
@@ -173,6 +179,8 @@ export async function executeAiTool(name: string, args: Record<string, any>, cur
           },
         });
 
+        logger.info(`[AI Tool: searchCourses] Found ${courses.length} courses`);
+
         return {
           total: courses.length,
           courses: courses.map((c) => ({
@@ -190,6 +198,7 @@ export async function executeAiTool(name: string, args: Record<string, any>, cur
 
       case "getCourseDetails": {
         const identifier = String(args.courseIdentifier || "").trim();
+        logger.info(`[AI Tool: getCourseDetails] Fetching details for identifier="${identifier}"`);
 
         const course = await prisma.course.findFirst({
           where: {
@@ -226,11 +235,13 @@ export async function executeAiTool(name: string, args: Record<string, any>, cur
         });
 
         if (!course) {
+          logger.warn(`[AI Tool: getCourseDetails] Course not found for "${identifier}"`);
           return { found: false, message: `Không tìm thấy khóa học phù hợp với từ khóa "${identifier}".` };
         }
 
         const sections = course.sections || [];
         const totalLessons = sections.reduce((sum: number, s) => sum + (s.lessons?.length || 0), 0);
+        logger.info(`[AI Tool: getCourseDetails] Found course "${course.title}" with ${sections.length} sections, ${totalLessons} lessons`);
 
         return {
           found: true,
@@ -255,6 +266,7 @@ export async function executeAiTool(name: string, args: Record<string, any>, cur
       }
 
       case "getStudentLearningSummary": {
+        logger.info(`[AI Tool: getStudentLearningSummary] Looking up student progress for userId=${currentUserId || "none"}`);
         if (!currentUserId) {
           return {
             isLoggedIn: false,

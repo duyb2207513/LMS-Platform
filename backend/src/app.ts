@@ -34,7 +34,6 @@ app.use(cookieParser());
 app.use("/uploads/course-thumbnails", express.static(path.resolve("uploads", "course-thumbnails")));
 app.use("/uploads/avatars", express.static(path.resolve("uploads", "avatars")));
 app.use("/uploads/lesson-files", express.static(path.resolve("uploads", "lesson-files")));
-app.use("/uploads/submissions", express.static(path.resolve("uploads", "submissions")));
 
 app.use(
   "/api-docs",
