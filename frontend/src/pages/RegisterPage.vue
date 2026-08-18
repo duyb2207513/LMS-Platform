@@ -7,22 +7,57 @@ import BaseButton from '@/components/ui/BaseButton.vue'
 import GoogleSignInButton from '@/components/auth/GoogleSignInButton.vue'
 import GitHubSignInButton from '@/components/auth/GitHubSignInButton.vue'
 import { useAuthStore } from '@/stores/auth'
+import { useApi } from '@/composables/useApi'
 
-const auth = useAuthStore(), router = useRouter()
+const auth = useAuthStore(), router = useRouter(), api = useApi()
 const fullName = ref(''), email = ref(''), password = ref(''), confirmPassword = ref('')
 const loading = ref(false), error = ref(''), emailError = ref('')
+let checkEmailTimer: ReturnType<typeof setTimeout> | null = null
 
-function validateEmail() {
+async function validateEmail(checkRemote = false) {
   const mail = email.value.trim().toLowerCase()
   if (!mail) {
     emailError.value = ''
-  } else if (mail.endsWith('@example.com')) {
-    emailError.value = 'Không được sử dụng email có đuôi @example.com'
-  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)) {
-    emailError.value = 'Email không hợp lệ'
-  } else {
-    emailError.value = ''
+    return false
   }
+  if (mail.endsWith('@example.com')) {
+    emailError.value = 'Không được sử dụng email có đuôi @example.com'
+    return false
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)) {
+    emailError.value = 'Email không hợp lệ'
+    return false
+  }
+  emailError.value = ''
+
+  if (checkRemote) {
+    try {
+      const res = await api.get<{ data: { exists: boolean } }>(`/auth/check-email?email=${encodeURIComponent(mail)}`)
+      if (res && res.data?.exists) {
+        emailError.value = 'Email đã tồn tại'
+        return false
+      }
+    } catch {
+      // Bỏ qua nếu lỗi mạng trong lúc gõ
+    }
+  }
+  return true
+}
+
+function onEmailInput() {
+  validateEmail(false)
+  if (checkEmailTimer) clearTimeout(checkEmailTimer)
+  const mail = email.value.trim().toLowerCase()
+  if (mail && !mail.endsWith('@example.com') && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)) {
+    checkEmailTimer = setTimeout(() => {
+      validateEmail(true)
+    }, 400)
+  }
+}
+
+function onEmailBlur() {
+  if (checkEmailTimer) clearTimeout(checkEmailTimer)
+  validateEmail(true)
 }
 
 async function finishLogin() {
@@ -52,7 +87,11 @@ async function submit() {
     await auth.register({ fullName: name, email: mail, password: password.value, confirmPassword: confirmPassword.value })
     await router.push({ path: '/login', query: { registered: '1' } })
   } catch (e) {
-    error.value = e instanceof Error ? e.message : 'Đăng ký thất bại'
+    if (e instanceof Error && (e.message.includes('409') || e.message.toLowerCase().includes('already exists'))) {
+      error.value = 'Email đã tồn tại'
+    } else {
+      error.value = e instanceof Error ? e.message : 'Đăng ký thất bại'
+    }
   } finally {
     loading.value = false
   }
@@ -86,8 +125,8 @@ async function submit() {
           placeholder="ban@gmail.com"
           :error="emailError"
           required
-          @blur="validateEmail"
-          @input="validateEmail"
+          @blur="onEmailBlur"
+          @input="onEmailInput"
         />
         <BaseInput id="register-password" v-model="password" type="password" label="Mật khẩu" required />
         <BaseInput id="confirm-password" v-model="confirmPassword" type="password" label="Xác nhận mật khẩu" required />

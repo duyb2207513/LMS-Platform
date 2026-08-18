@@ -13,7 +13,7 @@ export const useCourseStore = defineStore('courses', () => {
   const meta = ref({
     total: 0,
     page: 1,
-    limit: 12,
+    limit: 8,
     totalPages: 1,
   })
 

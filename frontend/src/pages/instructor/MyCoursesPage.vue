@@ -10,6 +10,9 @@ const courseStore = useCourseStore();
 const search = ref("");
 const status = ref<"ALL" | CourseStatus>("ALL");
 const level = ref<"ALL" | CourseLevel>("ALL");
+const page = ref(1);
+const PAGE_SIZE = 8;
+
 const filteredCourses = computed(() =>
   courseStore.myCourses.filter((course) => {
     const keyword = search.value.trim().toLocaleLowerCase("vi");
@@ -23,6 +26,23 @@ const filteredCourses = computed(() =>
     );
   }),
 );
+
+const totalPages = computed(() => Math.max(1, Math.ceil(filteredCourses.value.length / PAGE_SIZE)));
+const paginatedCourses = computed(() => {
+  const start = (page.value - 1) * PAGE_SIZE;
+  return filteredCourses.value.slice(start, start + PAGE_SIZE);
+});
+
+function goToPage(p: number) {
+  if (p >= 1 && p <= totalPages.value) {
+    page.value = p;
+    window.scrollTo({ top: 300, behavior: "smooth" });
+  }
+}
+
+function resetPage() {
+  page.value = 1;
+}
 
 function getStatusBadge(status: CourseStatus) {
   switch (status) {
@@ -184,7 +204,7 @@ onMounted(async () => {
       <!-- Course List -->
       <div v-else class="space-y-4">
         <div
-          v-for="course in filteredCourses"
+          v-for="course in paginatedCourses"
           :key="course.id"
           class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden hover:shadow-md transition-shadow duration-300"
         >
@@ -291,6 +311,40 @@ onMounted(async () => {
             </div>
           </div>
         </div>
+
+        <nav
+          v-if="paginatedCourses.length > 0"
+          class="mt-10 flex items-center justify-center gap-2 pt-4"
+          aria-label="Phân trang"
+        >
+          <button
+            :disabled="page <= 1"
+            class="flex h-10 items-center justify-center rounded-xl border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-600 transition hover:border-purple-300 hover:text-purple-700 disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"
+            @click="goToPage(page - 1)"
+          >
+            ← Trước
+          </button>
+          <button
+            v-for="p in totalPages"
+            :key="p"
+            :class="[
+              'grid h-10 w-10 place-items-center rounded-xl border text-sm font-bold transition',
+              p === page
+                ? 'border-purple-600 bg-purple-600 text-white shadow-lg shadow-purple-500/20'
+                : 'border-slate-200 bg-white text-slate-600 hover:border-purple-300 hover:text-purple-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300',
+            ]"
+            @click="goToPage(p)"
+          >
+            {{ p }}
+          </button>
+          <button
+            :disabled="page >= totalPages"
+            class="flex h-10 items-center justify-center rounded-xl border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-600 transition hover:border-purple-300 hover:text-purple-700 disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"
+            @click="goToPage(page + 1)"
+          >
+            Sau →
+          </button>
+        </nav>
       </div>
     </div>
   </InstructorLayout>

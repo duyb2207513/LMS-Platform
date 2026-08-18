@@ -29,7 +29,7 @@ export const env = {
   googleClientId: process.env.GOOGLE_CLIENT_ID ?? "",
   githubClientId: process.env.GITHUB_CLIENT_ID || "dev_github_client_id",
   githubClientSecret: process.env.GITHUB_CLIENT_SECRET || "dev_github_client_secret",
-  githubCallbackUrl: process.env.GITHUB_CALLBACK_URL || `http://localhost:${process.env.PORT ?? 3000}/api/v1/auth/github/callback`,
+  githubCallbackUrl: process.env.GITHUB_CALLBACK_URL || (process.env.NODE_ENV === "production" ? "https://lms-platform-5rwf.onrender.com/api/v1/auth/github/callback" : `http://localhost:${process.env.PORT ?? 3000}/api/v1/auth/github/callback`),
   smtpHost: process.env.SMTP_HOST ?? "",
   smtpPort: Number(process.env.SMTP_PORT ?? 587),
   smtpSecure: process.env.SMTP_SECURE === "true",
