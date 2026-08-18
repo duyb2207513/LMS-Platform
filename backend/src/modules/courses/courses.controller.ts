@@ -8,6 +8,11 @@ import {
   isValidStoredImage
 } from "../../config/upload.js";
 import {
+  deleteFromCloudinary,
+  isCloudinaryConfigured,
+  uploadFileToCloudinary
+} from "../../config/cloudinary.js";
+import {
   archiveCourse,
   createCourse,
   deleteOrArchiveCourse,
@@ -22,52 +27,17 @@ import {
 import type {
   CreateCourseInput,
   InstructorCourseQuery,
-  PublicCourseQuery,
   UpdateCourseInput
 } from "./courses.types.js";
 
 export function routeParameter(request: Request, name: string): string {
   const value = request.params[name];
-  return Array.isArray(value) ? (value[0] ?? "") : value;
-}
 
-export async function listPublicCoursesController(
-  _request: Request,
-  response: Response
-): Promise<void> {
-  const result = await listPublicCourses(
-    response.locals.validatedQuery as PublicCourseQuery
-  );
-  response.status(200).json({
-    success: true,
-    message: "Courses retrieved successfully",
-    data: result.data,
-    meta: result.meta
-  });
-}
+  if (!value || typeof value !== "string") {
+    throw new AppError(400, `Missing required parameter ${name}`);
+  }
 
-export async function getPublicCourseController(
-  request: Request,
-  response: Response
-): Promise<void> {
-  const course = await getPublicCourse(routeParameter(request, "slug"));
-  sendSuccess(response, 200, "Course retrieved successfully", course);
-}
-
-export async function listInstructorCoursesController(
-  request: Request,
-  response: Response
-): Promise<void> {
-  const result = await listInstructorCourses(
-    request.auth,
-    response.locals.validatedQuery as InstructorCourseQuery
-  );
-  response.status(200).json({
-    success: true,
-    message: "Instructor courses retrieved successfully",
-    data: result.data,
-    meta: result.meta
-  });
+  return value;
 }
 
 export async function createCourseController(
@@ -76,6 +46,36 @@ export async function createCourseController(
 ): Promise<void> {
   const course = await createCourse(request.auth, request.body as CreateCourseInput);
   sendSuccess(response, 201, "Course created successfully", course);
+}
+
+export async function listPublicCoursesController(
+  request: Request,
+  response: Response
+): Promise<void> {
+  const result = await listPublicCourses(request.query as any);
+  sendSuccess(response, 200, "Courses retrieved successfully", result);
+}
+
+export async function getPublicCourseController(
+  request: Request,
+  response: Response
+): Promise<void> {
+  const course = await getPublicCourse(routeParameter(request, "courseId"));
+  sendSuccess(response, 200, "Course retrieved successfully", course);
+}
+
+export async function listInstructorCoursesController(
+  request: Request,
+  response: Response
+): Promise<void> {
+  const query: InstructorCourseQuery = {
+    page: Number(request.query.page ?? 1),
+    limit: Number(request.query.limit ?? 10),
+    status: typeof request.query.status === "string" ? (request.query.status as any) : undefined,
+    search: typeof request.query.search === "string" ? request.query.search : undefined
+  };
+  const result = await listInstructorCourses(request.auth, query);
+  sendSuccess(response, 200, "Instructor courses retrieved successfully", result);
 }
 
 export async function updateCourseController(
@@ -91,6 +91,11 @@ export async function updateCourseController(
 }
 
 async function removeUploadedFile(filenameOrUrl: string): Promise<void> {
+  if (!filenameOrUrl) return;
+  if (filenameOrUrl.includes("cloudinary.com")) {
+    await deleteFromCloudinary(filenameOrUrl, "image");
+    return;
+  }
   await unlink(path.join(COURSE_THUMBNAIL_DIRECTORY, path.basename(filenameOrUrl))).catch(() => undefined);
 }
 
@@ -105,21 +110,37 @@ export async function uploadCourseThumbnailController(
     throw new AppError(400, "Thumbnail file content is invalid");
   }
 
-  const thumbnailUrl = `${request.protocol}://${request.get("host")}/uploads/course-thumbnails/${request.file.filename}`;
+  let thumbnailUrl: string;
+  if (isCloudinaryConfigured()) {
+    try {
+      const cloudinaryResult = await uploadFileToCloudinary(request.file.path, {
+        folder: "lms/thumbnails",
+        resourceType: "image"
+      });
+      thumbnailUrl = cloudinaryResult.secure_url;
+    } finally {
+      await unlink(request.file.path).catch(() => undefined);
+    }
+  } else {
+    thumbnailUrl = `${request.protocol}://${request.get("host")}/uploads/course-thumbnails/${request.file.filename}`;
+  }
+
   try {
     const result = await setCourseThumbnail(
       routeParameter(request, "courseId"),
       request.auth,
       thumbnailUrl
     );
-    if (result.previousThumbnailUrl?.includes("/uploads/course-thumbnails/")) {
+    if (result.previousThumbnailUrl) {
       await removeUploadedFile(result.previousThumbnailUrl);
     }
     sendSuccess(response, 200, "Thumbnail uploaded successfully", {
       thumbnailUrl: result.thumbnailUrl
     });
   } catch (error) {
-    await removeUploadedFile(request.file.filename);
+    if (!isCloudinaryConfigured()) {
+      await removeUploadedFile(request.file.filename);
+    }
     throw error;
   }
 }
@@ -153,5 +174,5 @@ export async function deleteCourseController(
   response: Response
 ): Promise<void> {
   await deleteOrArchiveCourse(routeParameter(request, "courseId"), request.auth);
-  response.status(204).send();
+  sendSuccess(response, 200, "Course deleted successfully", null);
 }

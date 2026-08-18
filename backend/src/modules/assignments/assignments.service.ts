@@ -4,6 +4,7 @@ import path from "node:path";
 import { AppError } from "../../common/errors/AppError.js";
 import { prisma } from "../../config/database.js";
 import { isValidStoredSubmissionFile, SUBMISSION_FILE_DIRECTORY, SUBMISSION_TOTAL_MAX_SIZE } from "../../config/upload.js";
+import { isCloudinaryConfigured, uploadFileToCloudinary } from "../../config/cloudinary.js";
 import type { AuthTokenPayload } from "../auth/auth.types.js";
 import { assertCourseEnrollment, canManageCourse, UUID } from "../interactions/access.js";
 import type { AssignmentInput, CourseGradeRuleInput, GradeSubmissionInput, UpdateAssignmentInput } from "./assignments.types.js";
@@ -126,10 +127,19 @@ export async function submitAssignment(assignmentId: string, studentId: string, 
     const previousCount = await prisma.assignmentSubmission.count({ where: { assignmentId, studentId } });
     if (previousCount > 0 && !assignment.allowResubmission) throw new AppError(409, "This assignment does not allow resubmission");
     if (previousCount >= assignment.maxSubmissions) throw new AppError(409, "Submission attempt limit reached");
-    const fileRows = files.map(file => {
+    const fileRows = await Promise.all(files.map(async file => {
       const id = randomUUID();
-      return { id, originalName: path.basename(file.originalname).slice(0, 255), storedName: file.filename, fileUrl: `${baseUrl}/api/v1/submission-files/${id}/download`, mimeType: file.mimetype, sizeBytes: file.size };
-    });
+      let storedName = file.filename;
+      if (isCloudinaryConfigured()) {
+        const cloudinaryResult = await uploadFileToCloudinary(file.path, {
+          folder: "lms/submissions",
+          resourceType: "auto"
+        });
+        storedName = cloudinaryResult.secure_url;
+        await unlink(file.path).catch(() => undefined);
+      }
+      return { id, originalName: path.basename(file.originalname).slice(0, 255), storedName, fileUrl: `${baseUrl}/api/v1/submission-files/${id}/download`, mimeType: file.mimetype, sizeBytes: file.size };
+    }));
     const submission = await prisma.assignmentSubmission.create({
       data: { assignmentId, studentId, attemptNumber: previousCount + 1, textContent: text || null, files: { create: fileRows } }, include: submissionInclude
     });
@@ -201,7 +211,8 @@ export async function getSubmissionFile(fileId: string, actor: AuthTokenPayload)
   const file = await prisma.submissionFile.findUnique({ where: { id: fileId }, include: { submission: { include: { assignment: { include: { course: { select: { instructorId: true } } } } } } } });
   if (!file) throw new AppError(404, "Submission file not found");
   if (file.submission.studentId !== actor.userId && !canManageCourse(file.submission.assignment.course.instructorId, actor)) throw new AppError(403, "You do not have permission to download this file");
-  return { path: path.join(SUBMISSION_FILE_DIRECTORY, file.storedName), name: file.originalName, mimeType: file.mimeType };
+  const filePath = file.storedName.startsWith("http://") || file.storedName.startsWith("https://") ? file.storedName : path.join(SUBMISSION_FILE_DIRECTORY, file.storedName);
+  return { path: filePath, name: file.originalName, mimeType: file.mimeType };
 }
 
 async function gradeRule(courseId: string) {

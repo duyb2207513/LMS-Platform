@@ -25,6 +25,10 @@ export async function getSubmissionController(request: Request, response: Respon
 export async function gradeSubmissionController(request: Request, response: Response) { sendSuccess(response, 200, "Submission graded successfully", await gradeSubmission(p(request, "submissionId"), request.auth!, request.body as GradeSubmissionInput)); }
 export async function downloadSubmissionFileController(request: Request, response: Response) {
   const file = await getSubmissionFile(p(request, "fileId"), request.auth!);
+  if (file.path.startsWith("http://") || file.path.startsWith("https://")) {
+    response.redirect(file.path);
+    return;
+  }
   response.type(file.mimeType).download(file.path, file.name);
 }
 export async function getCourseGradeRuleController(request: Request, response: Response) { sendSuccess(response, 200, "Course grade rule retrieved successfully", await getCourseGradeRule(p(request, "courseId"), request.auth!)); }
