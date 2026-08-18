@@ -42,5 +42,7 @@ export const env = {
   commerceRefundMaxProgressPercent: Number(process.env.COMMERCE_REFUND_MAX_PROGRESS_PERCENT ?? 20),
   commerceEarningReleaseIntervalMinutes: Number(process.env.COMMERCE_EARNING_RELEASE_INTERVAL_MINUTES ?? 60),
   sentryDsn: process.env.SENTRY_DSN ?? "",
-  logLevel: process.env.LOG_LEVEL ?? (process.env.NODE_ENV === "production" ? "info" : "debug")
+  logLevel: process.env.LOG_LEVEL ?? (process.env.NODE_ENV === "production" ? "info" : "debug"),
+  geminiApiKey: process.env.GEMINI_API_KEY ?? "",
+  geminiModel: process.env.GEMINI_MODEL ?? "gemini-2.0-flash"
 } as const;
