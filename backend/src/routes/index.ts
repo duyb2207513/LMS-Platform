@@ -28,9 +28,11 @@ import { adminRefundRouter, refundRouter } from "../modules/refunds/refund.route
 import instructorCommerceRouter from "../modules/earnings/earning.routes.js";
 import adminPayoutRouter from "../modules/payouts/payout.routes.js";
 import messagesRouter from "../modules/messages/messages.routes.js";
+import aiRouter from "../modules/ai/ai.routes.js";
 
 const router = Router();
 
+router.use("/ai", aiRouter);
 router.use("/auth", authRouter);
 router.use("/analytics", analyticsRouter);
 router.use("/coupons", couponRouter);

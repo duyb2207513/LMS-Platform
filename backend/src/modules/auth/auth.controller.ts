@@ -160,13 +160,10 @@ export async function startGitHubLoginController(request: Request, response: Res
   authorizationUrl.searchParams.set("redirect_uri", env.githubCallbackUrl);
   authorizationUrl.searchParams.set("scope", "read:user user:email");
   authorizationUrl.searchParams.set("state", state);
-<<<<<<< HEAD
   authorizationUrl.searchParams.set("prompt", "select_account");
-=======
   response.cookie("githubOAuthState", state, { ...githubStateCookieOptions(), maxAge: 10 * 60 * 1000 });
   const mobileRedirect = allowedMobileRedirect(request.query.redirectUri);
   if (mobileRedirect) response.cookie("githubOAuthReturn", mobileRedirect, { ...githubStateCookieOptions(), maxAge: 10 * 60 * 1000 });
->>>>>>> eafc848099839065b472ad23fce0bce07a47ca2f
   response.redirect(authorizationUrl.toString());
 }
 

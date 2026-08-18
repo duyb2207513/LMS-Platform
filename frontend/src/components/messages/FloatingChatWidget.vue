@@ -234,8 +234,93 @@ async function searchContacts() {
   }
 }
 
-async function getBotAnswer(userText: string): Promise<string> {
-  // Load real courses from database if not loaded
+const botSuggestions = ref<string[]>([
+  "Khám phá các khóa học nổi bật",
+  "Khóa học nào đang miễn phí?",
+  "Chính sách hoàn tiền 24 giờ",
+  "Điều kiện nhận chứng chỉ LMS",
+]);
+
+function loadAiChatHistory(): DirectMessage[] {
+  const userId = auth.user?.id;
+  if (!userId) {
+    // Khách vãng lai: không lưu và không load từ localStorage
+    return [
+      createMockDirectMessage(
+        "bot-init",
+        AI_BOT_CONTACT.id,
+        "guest",
+        "Xin chào, tôi là Trợ lý Học tập AI của LMS Platform. Bạn cần giải đáp thắc mắc gì về bài giảng, khóa học, làm bài tập hay chính sách hoàn tiền 24 giờ không?",
+      ),
+    ];
+  }
+
+  try {
+    const raw = localStorage.getItem(`lms_ai_chat_history_${userId}`);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+  } catch {}
+
+  return [
+    createMockDirectMessage(
+      "bot-init",
+      AI_BOT_CONTACT.id,
+      userId,
+      "Xin chào, tôi là Trợ lý Học tập AI của LMS Platform. Bạn cần giải đáp thắc mắc gì về bài giảng, khóa học, làm bài tập hay chính sách hoàn tiền 24 giờ không?",
+    ),
+  ];
+}
+
+function saveAiChatHistory(msgs: DirectMessage[]) {
+  const userId = auth.user?.id;
+  if (!userId) return; // Khách vãng lai: bỏ qua không lưu
+
+  try {
+    localStorage.setItem(`lms_ai_chat_history_${userId}`, JSON.stringify(msgs.slice(-20)));
+  } catch {}
+}
+
+function clearAiChat() {
+  const userId = auth.user?.id;
+  const resetMsgs = [
+    createMockDirectMessage(
+      "bot-init",
+      AI_BOT_CONTACT.id,
+      userId || "guest",
+      "Tôi đã làm mới đoạn hội thoại. Bạn có thể bắt đầu đặt câu hỏi hoặc chủ đề mới cần trợ giúp.",
+    ),
+  ];
+  messages.value = resetMsgs;
+  if (userId) {
+    saveAiChatHistory(resetMsgs);
+  }
+}
+
+async function sendQuickPrompt(prompt: string) {
+  draft.value = prompt;
+  await sendMessage();
+}
+
+async function getBotAnswer(userText: string, historyPayload: Array<{ role: "user" | "model"; content: string }> = []): Promise<string> {
+  try {
+    const response = await api.post<ApiResponse<{ reply: string; suggestions?: string[] }>>("/ai/chat", {
+      message: userText,
+      history: historyPayload,
+    });
+
+    if (response.data?.reply) {
+      if (response.data.suggestions?.length) {
+        botSuggestions.value = response.data.suggestions;
+      }
+      return response.data.reply;
+    }
+  } catch (error) {
+    console.warn("AI Backend API offline/error, falling back to local assistant:", error);
+  }
+
+  // Graceful fallback to local course knowledge
   let courseList = courseStore.courses;
   if (!courseList.length) {
     try {
@@ -254,14 +339,7 @@ async function openConversation(contact: MessageContact) {
   pendingAttachment.value = null;
 
   if (contact.id === AI_BOT_CONTACT.id) {
-    messages.value = [
-      createMockDirectMessage(
-        "bot-init",
-        AI_BOT_CONTACT.id,
-        auth.user?.id || "user",
-        "👋 Xin chào! Tôi là Trợ lý AI LMS. Bạn cần hỏi thông tin gì về các khóa học, học phí, bài tập, chứng chỉ hay chính sách hoàn tiền 24h không?",
-      ),
-    ];
+    messages.value = loadAiChatHistory();
     loadingChat.value = false;
     await scrollToLatest();
     return;
@@ -314,6 +392,14 @@ async function sendMessage() {
   pendingAttachment.value = null;
 
   if (contact.id === AI_BOT_CONTACT.id) {
+    const historyPayload = messages.value
+      .filter((m) => m.content && !m.content.startsWith("[attachment:"))
+      .slice(-8)
+      .map((m) => ({
+        role: m.senderId === AI_BOT_CONTACT.id ? ("model" as const) : ("user" as const),
+        content: m.content,
+      }));
+
     const userMsg = createMockDirectMessage(
       `usr-${Date.now()}`,
       auth.user?.id || "user",
@@ -321,23 +407,23 @@ async function sendMessage() {
       fullContent,
     );
     messages.value.push(userMsg);
+    saveAiChatHistory(messages.value);
     await scrollToLatest("smooth");
     sending.value = false;
 
     isBotTyping.value = true;
-    const botAnswer = await getBotAnswer(rawText);
-    setTimeout(async () => {
-      isBotTyping.value = false;
-      messages.value.push(
-        createMockDirectMessage(
-          `bot-${Date.now()}`,
-          AI_BOT_CONTACT.id,
-          auth.user?.id || "user",
-          botAnswer,
-        ),
-      );
-      await scrollToLatest("smooth");
-    }, 700);
+    const botAnswer = await getBotAnswer(rawText, historyPayload);
+    isBotTyping.value = false;
+    messages.value.push(
+      createMockDirectMessage(
+        `bot-${Date.now()}`,
+        AI_BOT_CONTACT.id,
+        auth.user?.id || "user",
+        botAnswer,
+      ),
+    );
+    saveAiChatHistory(messages.value);
+    await scrollToLatest("smooth");
     return;
   }
 
@@ -581,6 +667,23 @@ onBeforeUnmount(() => {
                 {{ activeContact.id === AI_BOT_CONTACT.id ? 'Hỗ trợ 24/7' : 'Đang hoạt động' }}
               </p>
             </div>
+
+            <!-- New Chat / Clear Session Button for AI Bot -->
+            <button
+              v-if="activeContact.id === AI_BOT_CONTACT.id"
+              type="button"
+              class="flex items-center gap-1 rounded-xl border border-purple-200 bg-purple-50/80 px-2.5 py-1 text-xs font-bold text-purple-700 transition hover:bg-purple-100 dark:border-purple-800 dark:bg-purple-950/40 dark:text-purple-300 dark:hover:bg-purple-900/60"
+              title="Làm mới đoạn hội thoại AI"
+              @click="clearAiChat"
+            >
+              <svg viewBox="0 0 24 24" class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" stroke-linecap="round" stroke-linejoin="round" />
+                <path d="M21 3v5h-5" stroke-linecap="round" stroke-linejoin="round" />
+                <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" stroke-linecap="round" stroke-linejoin="round" />
+                <path d="M3 21v-5h5" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+              <span>Chat mới</span>
+            </button>
           </template>
 
           <template v-else>
@@ -784,6 +887,23 @@ onBeforeUnmount(() => {
             </div>
             <button type="button" class="text-xs font-bold text-red-600 hover:underline" @click="pendingAttachment = null">
               Hủy
+            </button>
+          </div>
+
+          <!-- Quick Suggestion Chips for AI Bot -->
+          <div
+            v-if="activeContact.id === AI_BOT_CONTACT.id && botSuggestions.length"
+            class="flex items-center gap-1.5 overflow-x-auto border-t border-slate-100 bg-slate-50/80 px-3 py-2 no-scrollbar dark:border-slate-800 dark:bg-slate-900/60"
+          >
+            <span class="shrink-0 text-[11px] font-bold text-purple-600 dark:text-purple-400">💡 Gợi ý:</span>
+            <button
+              v-for="(suggestion, idx) in botSuggestions"
+              :key="idx"
+              type="button"
+              class="shrink-0 rounded-full border border-purple-200/80 bg-white px-2.5 py-1 text-xs font-semibold text-slate-700 shadow-xs transition hover:border-purple-400 hover:bg-purple-50 hover:text-purple-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:border-purple-500 dark:hover:bg-purple-950/40 dark:hover:text-purple-300"
+              @click="sendQuickPrompt(suggestion)"
+            >
+              {{ suggestion }}
             </button>
           </div>
 

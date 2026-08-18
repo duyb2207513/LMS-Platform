@@ -1,14 +1,14 @@
 import type { Course } from '@/types'
 
 function formatVnd(amount?: number | null): string {
-  if (!amount || amount === 0) return 'Miễn phí 🎁'
+  if (!amount || amount === 0) return 'Miễn phí'
   return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount)
 }
 
 function formatLevel(level?: string): string {
-  if (level === 'BEGINNER') return '🌱 Cơ bản (Cho người mới)'
-  if (level === 'INTERMEDIATE') return '🌿 Trung cấp'
-  if (level === 'ADVANCED') return '🌳 Nâng cao'
+  if (level === 'BEGINNER') return 'Cơ bản'
+  if (level === 'INTERMEDIATE') return 'Trung cấp'
+  if (level === 'ADVANCED') return 'Nâng cao'
   return 'Tất cả trình độ'
 }
 
@@ -24,17 +24,16 @@ export function generateAiBotResponse(userText: string, courses: Course[] = []):
     q.includes('giúp') ||
     q.includes('tro ly')
   ) {
-    return `👋 **Xin chào! Tôi là Trợ lý AI LMS Platform 🤖**
+    return `Xin chào, tôi là Trợ lý Học tập AI của LMS Platform.
 
-Tôi có thể hỗ trợ bạn tư vấn thông tin 24/7 về hệ thống:
-1. 📚 **Khám phá khóa học**: Tìm kiếm theo chủ đề, cấp độ, miễn phí/có phí
-2. 💳 **Thanh toán & Mã giảm giá**: Hướng dẫn mua khóa học, nhập Coupon ưu đãi
-3. 🔄 **Chính sách hoàn tiền 24H**: Điều kiện & quy trình gửi yêu cầu hoàn tiền
-4. 📝 **Học tập & Bài tập**: Hướng dẫn làm Quiz, nộp Assignment, xem điểm tổng kết
-5. 🎓 **Chứng chỉ hoàn thành**: Điều kiện nhận & cách xác thực chứng chỉ online
-6. 👨‍🏫 **Góc Giảng viên**: Hướng dẫn tạo khóa học, chấm điểm & rút doanh thu
+Tôi có thể hỗ trợ bạn các vấn đề sau:
+1. Khám phá và gợi ý khóa học theo chủ đề hoặc trình độ.
+2. Hướng dẫn quy chế hoàn tiền trong vòng 24 giờ.
+3. Hướng dẫn làm bài tập Quiz và nộp Assignment có giảng viên chấm.
+4. Điều kiện nhận và xác thực chứng chỉ hoàn thành khóa học.
+5. Giải đáp các thắc mắc kiến thức chuyên môn trong bài học.
 
-Bạn cần hỗ trợ về chủ đề nào? Hãy thử gõ *"danh sách khóa học"*, *"hoàn tiền"*, *"mã giảm giá"* hoặc từ khóa bạn quan tâm nhé!`
+Bạn có câu hỏi nào cần được giải đáp không?`
   }
 
   // 2. LIST ALL COURSES / HOT COURSES
@@ -52,9 +51,9 @@ Bạn cần hỗ trợ về chủ đề nào? Hãy thử gõ *"danh sách khóa 
       const top = courses.slice(0, 5)
       const lines = top.map(
         (c, i) =>
-          `${i + 1}. 📖 **${c.title}**\n   • Danh mục: ${c.category?.name || 'Khóa học LMS'}\n   • Trình độ: ${formatLevel(c.level)}\n   • Học phí: **${formatVnd(c.price)}**`,
+          `${i + 1}. **${c.title}**\n   - Danh mục: ${c.category?.name || 'Khóa học LMS'}\n   - Trình độ: ${formatLevel(c.level)}\n   - Học phí: ${formatVnd(c.price)}`,
       )
-      return `📚 **Danh sách các khóa học nổi bật hiện có trên LMS Platform:**\n\n${lines.join('\n\n')}\n\n💡 *Mẹo: Bạn có thể tìm khóa học theo chủ đề bằng cách gõ: "lập trình", "python", "web", "thiết kế", "miễn phí"...*`
+      return `Dưới đây là danh sách các khóa học hiện có trên hệ thống:\n\n${lines.join('\n\n')}\n\nBạn có thể tìm kiếm theo chủ đề cụ thể như: "lập trình Web", "Python", "DevOps", "Database" hoặc "miễn phí".`
     }
   }
 
@@ -64,11 +63,11 @@ Bạn cần hỗ trợ về chủ đề nào? Hãy thử gõ *"danh sách khóa 
     if (freeCourses.length > 0) {
       const lines = freeCourses.slice(0, 5).map(
         (c, i) =>
-          `${i + 1}. 🎁 **${c.title}**\n   • Danh mục: ${c.category?.name || 'Tổng hợp'}\n   • Trình độ: ${formatLevel(c.level)}`,
+          `${i + 1}. **${c.title}**\n   - Danh mục: ${c.category?.name || 'Tổng hợp'}\n   - Trình độ: ${formatLevel(c.level)}\n   - Học phí: Miễn phí`,
       )
-      return `🎉 **Các khóa học MIỄN PHÍ hiện có dành cho bạn:**\n\n${lines.join('\n\n')}\n\n👉 Bạn có thể bấm Đăng ký ngay tại trang **Khám phá khóa học** để bắt đầu học hoàn toàn miễn phí!`
+      return `Danh sách các khóa học miễn phí hiện có trên hệ thống:\n\n${lines.join('\n\n')}\n\nBạn có thể nhấn vào trang Khám phá khóa học để đăng ký và bắt đầu học ngay.`
     }
-    return `🎁 Hiện tại hệ thống đang áp dụng nhiều chương trình ưu đãi học phí hấp dẫn. Bạn có thể sử dụng mã **Coupon** ở bước thanh toán để nhận giảm giá cực tốt!`
+    return `Hiện tại hệ thống đang áp dụng nhiều chương trình ưu đãi học phí. Bạn có thể sử dụng mã Coupon ở bước thanh toán để nhận giảm giá.`
   }
 
   // 4. PRICING & PAYMENT & COUPONS
@@ -83,18 +82,18 @@ Bạn cần hỗ trợ về chủ đề nào? Hãy thử gõ *"danh sách khóa 
     q.includes('voucher') ||
     q.includes('khuyến mãi')
   ) {
-    return `💳 **Hướng dẫn Thanh toán & Nhập Mã giảm giá (Coupon):**
+    return `Hướng dẫn Thanh toán và áp dụng Mã giảm giá (Coupon):
 
-1. 🛍️ **Cách mua khóa học**:
-   • Vào chi tiết khóa học -> Bấm nút **"Đăng ký ngay"** hoặc **"Mua ngay"**.
-   • Tại trang Thanh toán, bạn có thể chọn phương thức thanh toán cổng **VNPay** hoặc **Thử nghiệm Mock Payment**.
+1. Mua khóa học:
+   - Truy cập trang chi tiết khóa học -> Nhấn "Đăng ký ngay" hoặc "Mua ngay".
+   - Tại trang thanh toán, chọn cổng VNPay hoặc phương thức Mock Payment thử nghiệm.
 
-2. 🏷️ **Sử dụng Mã giảm giá (Coupon)**:
-   • Tại ô **"Mã giảm giá"** ở trang thanh toán, nhập mã coupon của bạn -> Bấm **"Áp dụng"**.
-   • Hệ thống sẽ tự động giảm trừ trực tiếp vào tổng tiền đơn hàng.
+2. Áp dụng Coupon:
+   - Nhập mã ưu đãi vào ô "Mã giảm giá" tại bước thanh toán và nhấn "Áp dụng".
+   - Hệ thống sẽ tự động trừ trực tiếp vào tổng tiền đơn hàng.
 
-3. 🧾 **Hóa đơn & Lịch sử đơn hàng**:
-   • Xem lại toàn bộ đơn hàng đã mua tại trang **Lịch sử đơn hàng** trong Menu tài khoản.`
+3. Xem lại hóa đơn:
+   - Toàn bộ giao dịch được lưu tại mục "Lịch sử đơn hàng" trong menu tài khoản.`
   }
 
   // 5. REFUND POLICY (24H RULE)
@@ -105,19 +104,19 @@ Bạn cần hỗ trợ về chủ đề nào? Hãy thử gõ *"danh sách khóa 
     q.includes('trả khóa học') ||
     q.includes('lấy lại tiền')
   ) {
-    return `🔄 **Chính sách & Quy trình Hoàn tiền (24 Hours Refund):**
+    return `Chính sách Hoàn tiền (24-Hour Refund Policy):
 
-1. ⏳ **Điều kiện hoàn tiền**:
-   • Yêu cầu hoàn tiền phải được gửi trong vòng **24 giờ (1 ngày)** kể từ thời điểm thanh toán thành công.
-   • Sau 24 giờ, hệ thống sẽ tự động đóng tính năng hoàn tiền cho đơn hàng đó.
+1. Điều kiện hoàn tiền:
+   - Yêu cầu hoàn tiền phải được gửi trong vòng 24 giờ kể từ thời điểm thanh toán thành công.
+   - Tiến độ học của khóa học chưa vượt quá 20% tổng số bài giảng.
 
-2. 📝 **Các bước gửi yêu cầu**:
-   • **Bước 1**: Vào trang **Lịch sử đơn hàng** (Order History).
-   • **Bước 2**: Tìm đơn hàng cần hoàn tiền -> Bấm **"Yêu cầu hoàn tiền"**.
-   • **Bước 3**: Nhập lý do gửi hoàn tiền -> Bấm **Gửi yêu cầu**.
+2. Quy trình thực hiện:
+   - Bước 1: Vào menu tài khoản -> chọn "Lịch sử đơn hàng".
+   - Bước 2: Chọn đơn hàng cần hoàn -> nhấn "Yêu cầu hoàn tiền".
+   - Bước 3: Điền lý do và gửi yêu cầu.
 
-3. ⏱️ **Xử lý & Nhận lại tiền**:
-   • Quản trị viên (Admin) sẽ xét duyệt trong vòng 24h-48h. Khi được duyệt, tiền sẽ được hoàn trả lại về phương thức thanh toán ban đầu.`
+3. Thời gian xử lý:
+   - Quản trị viên sẽ xét duyệt trong vòng 24 đến 48 giờ. Sau khi được duyệt, tiền sẽ được hoàn về phương thức thanh toán ban đầu.`
   }
 
   // 6. ASSIGNMENTS, QUIZZES & GRADES
@@ -131,19 +130,19 @@ Bạn cần hỗ trợ về chủ đề nào? Hãy thử gõ *"danh sách khóa 
     q.includes('trắc nghiệm') ||
     q.includes('qua môn')
   ) {
-    return `📝 **Hướng dẫn Bài tập, Quiz & Điểm tổng kết:**
+    return `Quy chế Bài tập, Quiz và Điểm tổng kết:
 
-1. ✍️ **Bài tập trắc nghiệm (Quiz)**:
-   • Nằm trực tiếp trong danh sách bài học. Có quy định thời gian & số lần làm tối đa.
-   • Bạn cần đạt từ điểm đỗ (**Passing Score**) trở lên để tính hoàn thành.
+1. Bài tập trắc nghiệm (Quiz):
+   - Nằm trực tiếp trong bài học, có chấm điểm tự động ngay khi hoàn thành.
+   - Cần đạt từ điểm chuẩn (Passing Score) trở lên để tính hoàn thành.
 
-2. 📤 **Bài tập tự luận (Assignment)**:
-   • Bạn có thể soạn nội dung chữ hoặc tải file đính kèm (PDF, DOCX, ZIP...).
-   • Giảng viên sẽ chấm điểm và để lại lời nhận xét trực tiếp cho bài nộp của bạn.
+2. Bài tập tự luận (Assignment):
+   - Học viên có thể nộp nội dung văn bản hoặc đính kèm tối đa 5 file (PDF, DOCX, ZIP...).
+   - Giảng viên sẽ chấm điểm và để lại lời nhận xét trực tiếp.
+   - Học viên có thể chỉnh sửa bài nộp khi bài đang ở trạng thái chờ chấm điểm.
 
-3. 📊 **Điểm tổng kết khóa học**:
-   • Điểm trung bình môn được tính dựa trên tỷ trọng giữa **Bài tập Assignment (vd: 60%)** và **Quiz (vd: 40%)** do Giảng viên thiết lập.
-   • Xem chi tiết bảng điểm tại trang học bài ở phần **"Bài tập & Điểm số"**.`
+3. Điểm tổng kết môn học:
+   - Được tính theo tỷ trọng cấu hình của từng khóa học (ví dụ: 60% Assignment + 40% Quiz).`
   }
 
   // 7. CERTIFICATES & VERIFICATION
@@ -154,81 +153,21 @@ Bạn cần hỗ trợ về chủ đề nào? Hãy thử gõ *"danh sách khóa 
     q.includes('xác thực') ||
     q.includes('mã xác thực')
   ) {
-    return `🎓 **Chính sách & Xác thực Chứng chỉ LMS:**
+    return `Quy định Cấp và Xác thực Chứng chỉ LMS:
 
-1. 📜 **Điều kiện nhận chứng chỉ**:
-   • Hoàn thành **100%** bài học trong khóa học.
-   • Điểm tổng kết đạt từ mốc điểm đạt (**Passing Score**) của khóa học trở lên.
+1. Điều kiện nhận chứng chỉ:
+   - Hoàn thành 100% các bài học trong khóa học.
+   - Điểm tổng kết đạt từ điểm chuẩn (Passing Score) trở lên.
 
-2. 📥 **Tải chứng chỉ PDF**:
-   • Sau khi đủ điều kiện, nút **"Cấp chứng chỉ"** hoặc **"Tải chứng chỉ"** sẽ xuất hiện tại trang **Khóa học của tôi**.
+2. Nhận chứng chỉ:
+   - Sau khi đủ điều kiện, nút cấp chứng chỉ sẽ xuất hiện tại trang "Khóa học của tôi" hoặc trang "Chứng chỉ".
 
-3. 🔍 **Tra cứu & Xác thực công khai**:
-   • Mọi chứng chỉ LMS đều có một **Mã xác thực duy nhất (Verification Code)**.
-   • Bất kỳ ai (nhà tuyển dụng, người học) cũng có thể vào trang **Xác thực chứng chỉ** (\`/verify-certificate\`) nhập mã để kiểm tra tính hợp lệ trực tuyến.`
+3. Xác thực trực tuyến:
+   - Mỗi chứng chỉ được cấp một mã xác thực (Certificate Code) duy nhất.
+   - Bất kỳ ai cũng có thể truy cập trang /verify-certificate nhập mã để tra cứu tính hợp lệ.`
   }
 
-  // 8. REVIEWS & COMMENTS
-  if (
-    q.includes('đánh giá') ||
-    q.includes('review') ||
-    q.includes('chấm sao') ||
-    q.includes('bình luận') ||
-    q.includes('hỏi đáp') ||
-    q.includes('thảo luận')
-  ) {
-    return `💬 **Đánh giá & Thảo luận:**
-
-1. ⭐ **Đánh giá khóa học**:
-   • Sau khi tham gia học, bạn có thể chấm điểm 1-5 sao và để lại nhận xét tại trang chi tiết khóa học.
-
-2. ❓ **Thảo luận ở từng bài học**:
-   • Ngay dưới video/tài liệu bài học có khu vực Bình luận. Bạn có thể gửi câu hỏi để Giảng viên và các học viên khác cùng trao đổi.`
-  }
-
-  // 9. ACCOUNT & PROFILE
-  if (
-    q.includes('tài khoản') ||
-    q.includes('mật khẩu') ||
-    q.includes('đổi mật khẩu') ||
-    q.includes('quên mật khẩu') ||
-    q.includes('avatar') ||
-    q.includes('ảnh đại diện')
-  ) {
-    return `👤 **Quản lý Tài khoản & Bảo mật:**
-
-1. ✏️ **Cập nhật thông tin cá nhân**:
-   • Vào **Hồ sơ cá nhân** (Profile) để đổi Họ tên, Số điện thoại và Ảnh đại diện Avatar.
-
-2. 🔑 **Đổi & Khôi phục mật khẩu**:
-   • Đổi mật khẩu trong mục cài đặt tài khoản.
-   • Nếu quên mật khẩu, bấm **"Quên mật khẩu?"** ở màn hình Đăng nhập để nhận link khôi phục qua Email.`
-  }
-
-  // 10. INSTRUCTOR FEATURES
-  if (
-    q.includes('giảng viên') ||
-    q.includes('tạo khóa học') ||
-    q.includes('rút tiền') ||
-    q.includes('payout') ||
-    q.includes('doanh thu') ||
-    q.includes('chấm điểm')
-  ) {
-    return `👨‍🏫 **Tính năng dành cho Giảng viên (Instructor):**
-
-1. 🛠️ **Công cụ Soạn khóa học (Course Builder)**:
-   • Tạo Chương (Section) và Bài học (Video MP4/WebM, Tài liệu PDF/DOCX, Bài viết Text).
-   • Tạo Bài tập Assignment & Đề thi Quiz trắc nghiệm.
-
-2. 📈 **Doanh thu & Rút tiền**:
-   • Theo dõi tỷ lệ chia sẻ doanh thu tự động từ mỗi đơn hàng.
-   • Gửi yêu cầu Rút tiền (Payout) về tài khoản ngân hàng khi số dư khả dụng đạt định mức.
-
-3. 📑 **Chấm bài & Phản hồi**:
-   • Quản lý danh sách bài nộp của học viên, nhập điểm và ghi lời nhận xét chi tiết.`
-  }
-
-  // 11. SPECIFIC TOPIC / KEYWORD SEARCH MATCH
+  // 8. SPECIFIC TOPIC / KEYWORD SEARCH MATCH
   if (q.length >= 2) {
     const matched = courses.filter(
       (c) =>
@@ -240,22 +179,18 @@ Bạn cần hỗ trợ về chủ đề nào? Hãy thử gõ *"danh sách khóa 
     if (matched.length > 0) {
       const lines = matched.slice(0, 4).map(
         (c) =>
-          `📖 **${c.title}**\n   • Danh mục: ${c.category?.name || 'LMS Course'}\n   • Cấp độ: ${formatLevel(c.level)}\n   • Học phí: **${formatVnd(c.price)}**\n   • Mô tả: ${c.description ? c.description.slice(0, 95) + '...' : 'Khóa học chất lượng cao trên hệ thống.'}`,
+          `- **${c.title}** (${c.category?.name || 'Khóa học LMS'})\n  Trình độ: ${formatLevel(c.level)} | Học phí: ${formatVnd(c.price)}\n  ${c.description ? c.description.slice(0, 100) + '...' : ''}`,
       )
-      return `🔍 **Tìm thấy ${matched.length} khóa học phù hợp với từ khóa "${userText}":**\n\n${lines.join('\n\n')}\n\n👉 Bạn có thể vào trang **Khám phá khóa học** để xem thông tin chi tiết và đăng ký!`
+      return `Tìm thấy ${matched.length} khóa học phù hợp với từ khóa "${userText}":\n\n${lines.join('\n\n')}\n\nBạn có thể vào trang Khám phá khóa học để xem thông tin chi tiết.`
     }
   }
 
-  // 12. SMART FALLBACK
-  return `🤖 **Trợ lý AI LMS chưa tìm thấy kết quả chính xác cho câu hỏi của bạn.**
+  // 9. SMART FALLBACK
+  return `Tôi chưa tìm thấy kết quả chính xác cho câu hỏi của bạn.
 
-Bạn có thể thử tra cứu theo các chủ đề phổ biến sau:
-• 📚 *"Các khóa học lập trình Web / Python / AI"*
-• 🎁 *"Khóa học miễn phí"*
-• 💳 *"Hướng dẫn thanh toán & nhập Coupon"*
-• 🔄 *"Quy định hoàn tiền 24 giờ"*
-• 📝 *"Cách nộp bài tập & xem điểm số"*
-• 🎓 *"Điều kiện cấp & xác thực chứng chỉ"*
-
-Bạn muốn tìm hiểu thêm thông tin nào?`
+Bạn có thể tham khảo một số nội dung sau:
+- Tìm kiếm khóa học theo chủ đề (Lập trình Web, Python, AI, DevOps, Cơ sở dữ liệu).
+- Quy định hoàn tiền trong vòng 24 giờ.
+- Hướng dẫn nộp bài tập Assignment và làm Quiz.
+- Điều kiện nhận và xác thực chứng chỉ hoàn thành khóa học.`
 }
