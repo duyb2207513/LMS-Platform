@@ -1,4 +1,6 @@
 import { Router } from "express";
+import { prisma } from "../config/database.js";
+import { asyncHandler } from "../common/utils/asyncHandler.js";
 import authRouter from "../modules/auth/auth.routes.js";
 import categoriesRouter from "../modules/categories/categories.routes.js";
 import coursesRouter from "../modules/courses/courses.routes.js";
@@ -22,10 +24,10 @@ import { adminRefundRouter, refundRouter } from "../modules/refunds/refund.route
 import instructorCommerceRouter from "../modules/earnings/earning.routes.js";
 import adminPayoutRouter from "../modules/payouts/payout.routes.js";
 import messagesRouter from "../modules/messages/messages.routes.js";
-import { courseAssignmentsRouter, assignmentsRouter, submissionsRouter, submissionFilesRouter } from "../modules/assignments/assignment.routes.js";
-import { courseAnnouncementsRouter, announcementsRouter } from "../modules/announcements/announcement.routes.js";
-import { notificationsRouter, preferencesRouter } from "../modules/notifications/notification.routes.js";
-import { courseGradesRouter } from "../modules/grades/grade.routes.js";
+import { assignmentsRouter, courseAssignmentsRouter, courseGradesRouter, submissionFilesRouter, submissionsRouter } from "../modules/assignments/assignments.routes.js";
+import { announcementsRouter, courseAnnouncementsRouter } from "../modules/announcements/announcement.routes.js";
+import notificationsRouter from "../modules/notifications/notification.routes.js";
+import preferencesRouter from "../modules/notification-preferences/preference.routes.js";
 import aiRouter from "../modules/ai/ai.routes.js";
 
 const router = Router();
@@ -103,5 +105,27 @@ router.get("/health", (_request, response) => {
     timestamp: new Date().toISOString()
   });
 });
+
+/**
+ * @openapi
+ * /health/ready:
+ *   get:
+ *     summary: Check API and database readiness
+ *     tags: [System]
+ *     responses:
+ *       200:
+ *         description: API and database are ready
+ *       503:
+ *         description: A required dependency is unavailable
+ */
+router.get("/health/ready", asyncHandler(async (_request, response) => {
+  const startedAt = Date.now();
+  await prisma.$queryRaw`SELECT 1`;
+  response.status(200).json({
+    success: true,
+    message: "LMS API is ready",
+    data: { database: "connected", responseTimeMs: Date.now() - startedAt, timestamp: new Date().toISOString() }
+  });
+}));
 
 export default router;

@@ -6,14 +6,14 @@ const swaggerDefinition = {
   info: {
     title: "LMS Platform API",
     version: "1.0.0",
-    description: "REST API documentation for the LMS Platform"
+    description: "REST API documentation for the LMS Platform",
   },
 
   servers: [
     {
       url: "http://localhost:3000/api/v1",
-      description: "Local development server"
-    }
+      description: "Local development server",
+    },
   ],
 
   components: {
@@ -21,12 +21,14 @@ const swaggerDefinition = {
       bearerAuth: {
         type: "http",
         scheme: "bearer",
-        bearerFormat: "JWT"
+        bearerFormat: "JWT",
       },
       refreshTokenCookie: {
         type: "apiKey",
         in: "cookie",
         name: "refreshToken",
+        description: "Secure HttpOnly refresh token cookie set by login",
+      },
     },
     schemas: {
       RegisterRequest: {
@@ -38,28 +40,28 @@ const swaggerDefinition = {
             type: "string",
             minLength: 2,
             maxLength: 100,
-            example: "Trần Minh Duy"
+            example: "Trần Minh Duy",
           },
           email: {
             type: "string",
             format: "email",
             maxLength: 255,
-            example: "duy@example.com"
+            example: "duy@example.com",
           },
           password: {
             type: "string",
             format: "password",
             minLength: 8,
             pattern: "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$",
-            example: "Password123"
+            example: "Password123",
           },
           confirmPassword: {
             type: "string",
             format: "password",
             minLength: 8,
-            example: "Password123"
-          }
-        }
+            example: "Password123",
+          },
+        },
       },
       UserResponse: {
         type: "object",
@@ -71,18 +73,39 @@ const swaggerDefinition = {
           "role",
           "status",
           "createdAt",
-          "updatedAt"
+          "updatedAt",
         ],
         properties: {
-          id: { type: "string", format: "uuid", example: "550e8400-e29b-41d4-a716-446655440000" },
+          id: {
+            type: "string",
+            format: "uuid",
+            example: "550e8400-e29b-41d4-a716-446655440000",
+          },
           fullName: { type: "string", example: "Trần Minh Duy" },
-          email: { type: "string", format: "email", example: "duy@example.com" },
-          avatarUrl: { type: "string", format: "uri", nullable: true, example: null },
+          email: {
+            type: "string",
+            format: "email",
+            example: "duy@example.com",
+          },
+          avatarUrl: {
+            type: "string",
+            format: "uri",
+            nullable: true,
+            example: null,
+          },
           role: { type: "string", enum: ["STUDENT"], example: "STUDENT" },
           status: { type: "string", enum: ["ACTIVE"], example: "ACTIVE" },
-          createdAt: { type: "string", format: "date-time", example: "2026-08-07T08:00:00.000Z" },
-          updatedAt: { type: "string", format: "date-time", example: "2026-08-07T08:00:00.000Z" }
-        }
+          createdAt: {
+            type: "string",
+            format: "date-time",
+            example: "2026-08-07T08:00:00.000Z",
+          },
+          updatedAt: {
+            type: "string",
+            format: "date-time",
+            example: "2026-08-07T08:00:00.000Z",
+          },
+        },
       },
       LoginRequest: {
         type: "object",
@@ -93,30 +116,43 @@ const swaggerDefinition = {
             type: "string",
             format: "email",
             maxLength: 255,
-            example: "duy@example.com"
+            example: "duy@example.com",
           },
           password: {
             type: "string",
             format: "password",
-            example: "Password123"
-          }
-        }
+            example: "Password123",
+          },
+        },
       },
       LoginUserResponse: {
         type: "object",
         required: ["id", "fullName", "email", "avatarUrl", "role", "status"],
         properties: {
-          id: { type: "string", format: "uuid", example: "550e8400-e29b-41d4-a716-446655440000" },
+          id: {
+            type: "string",
+            format: "uuid",
+            example: "550e8400-e29b-41d4-a716-446655440000",
+          },
           fullName: { type: "string", example: "Trần Minh Duy" },
-          email: { type: "string", format: "email", example: "duy@example.com" },
-          avatarUrl: { type: "string", format: "uri", nullable: true, example: null },
+          email: {
+            type: "string",
+            format: "email",
+            example: "duy@example.com",
+          },
+          avatarUrl: {
+            type: "string",
+            format: "uri",
+            nullable: true,
+            example: null,
+          },
           role: {
             type: "string",
             enum: ["STUDENT", "INSTRUCTOR", "ADMIN"],
-            example: "STUDENT"
+            example: "STUDENT",
           },
-          status: { type: "string", enum: ["ACTIVE"], example: "ACTIVE" }
-        }
+          status: { type: "string", enum: ["ACTIVE"], example: "ACTIVE" },
+        },
       },
       LoginResponse: {
         type: "object",
@@ -131,12 +167,12 @@ const swaggerDefinition = {
               accessToken: {
                 type: "string",
                 description: "JWT access token valid for 15 minutes",
-                example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
               },
-              user: { $ref: "#/components/schemas/LoginUserResponse" }
-            }
-          }
-        }
+              user: { $ref: "#/components/schemas/LoginUserResponse" },
+            },
+          },
+        },
       },
       RefreshTokenResponse: {
         type: "object",
@@ -151,11 +187,11 @@ const swaggerDefinition = {
               accessToken: {
                 type: "string",
                 description: "New JWT access token valid for 15 minutes",
-                example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-              }
-            }
-          }
-        }
+                example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+              },
+            },
+          },
+        },
       },
       LogoutResponse: {
         type: "object",
@@ -163,15 +199,18 @@ const swaggerDefinition = {
         properties: {
           success: { type: "boolean", enum: [true], example: true },
           message: { type: "string", example: "Logout successful" },
-          data: { nullable: true, example: null }
-        }
+          data: { nullable: true, example: null },
+        },
       },
       ProfileResponse: {
         type: "object",
         required: ["success", "message", "data"],
         properties: {
           success: { type: "boolean", enum: [true], example: true },
-          message: { type: "string", example: "Profile retrieved successfully" },
+          message: {
+            type: "string",
+            example: "Profile retrieved successfully",
+          },
           data: {
             type: "object",
             required: [
@@ -182,28 +221,60 @@ const swaggerDefinition = {
               "role",
               "status",
               "createdAt",
-              "updatedAt"
+              "updatedAt",
             ],
             properties: {
-              id: { type: "string", format: "uuid", example: "550e8400-e29b-41d4-a716-446655440000" },
+              id: {
+                type: "string",
+                format: "uuid",
+                example: "550e8400-e29b-41d4-a716-446655440000",
+              },
               fullName: { type: "string", example: "Trần Minh Duy" },
-              email: { type: "string", format: "email", example: "duy@example.com" },
-              avatarUrl: { type: "string", format: "uri", nullable: true, example: null },
+              firstName: { type: "string", nullable: true, example: "Duy" },
+              lastName: {
+                type: "string",
+                nullable: true,
+                example: "Trần Minh",
+              },
+              phoneNumber: {
+                type: "string",
+                nullable: true,
+                example: "0901234567",
+              },
+              email: {
+                type: "string",
+                format: "email",
+                example: "duy@example.com",
+              },
+              avatarUrl: {
+                type: "string",
+                format: "uri",
+                nullable: true,
+                example: null,
+              },
               role: {
                 type: "string",
                 enum: ["STUDENT", "INSTRUCTOR", "ADMIN"],
-                example: "STUDENT"
+                example: "STUDENT",
               },
               status: {
                 type: "string",
                 enum: ["ACTIVE", "BLOCKED"],
-                example: "ACTIVE"
+                example: "ACTIVE",
               },
-              createdAt: { type: "string", format: "date-time", example: "2026-08-07T08:00:00.000Z" },
-              updatedAt: { type: "string", format: "date-time", example: "2026-08-07T08:00:00.000Z" }
-            }
-          }
-        }
+              createdAt: {
+                type: "string",
+                format: "date-time",
+                example: "2026-08-07T08:00:00.000Z",
+              },
+              updatedAt: {
+                type: "string",
+                format: "date-time",
+                example: "2026-08-07T08:00:00.000Z",
+              },
+            },
+          },
+        },
       },
       UpdateProfileRequest: {
         type: "object",
@@ -214,15 +285,35 @@ const swaggerDefinition = {
             type: "string",
             minLength: 2,
             maxLength: 100,
-            example: "Trần Minh Duy Updated"
+            example: "Trần Minh Duy Updated",
+          },
+          firstName: {
+            type: "string",
+            minLength: 1,
+            maxLength: 50,
+            nullable: true,
+            example: "Duy",
+          },
+          lastName: {
+            type: "string",
+            minLength: 1,
+            maxLength: 50,
+            nullable: true,
+            example: "Trần Minh",
+          },
+          phoneNumber: {
+            type: "string",
+            nullable: true,
+            pattern: "^\\+?[0-9]{9,15}$",
+            example: "0901234567",
           },
           avatarUrl: {
             type: "string",
             format: "uri",
             nullable: true,
-            example: "https://example.com/avatar.jpg"
-          }
-        }
+            example: "https://example.com/avatar.jpg",
+          },
+        },
       },
       UpdateProfileResponse: {
         type: "object",
@@ -232,30 +323,56 @@ const swaggerDefinition = {
           message: { type: "string", example: "Profile updated successfully" },
           data: {
             type: "object",
-            required: ["id", "fullName", "email", "avatarUrl", "role", "status"],
+            required: [
+              "id",
+              "fullName",
+              "email",
+              "avatarUrl",
+              "role",
+              "status",
+            ],
             properties: {
-              id: { type: "string", format: "uuid", example: "550e8400-e29b-41d4-a716-446655440000" },
+              id: {
+                type: "string",
+                format: "uuid",
+                example: "550e8400-e29b-41d4-a716-446655440000",
+              },
               fullName: { type: "string", example: "Trần Minh Duy Updated" },
-              email: { type: "string", format: "email", example: "duy@example.com" },
+              firstName: { type: "string", nullable: true, example: "Duy" },
+              lastName: {
+                type: "string",
+                nullable: true,
+                example: "Trần Minh",
+              },
+              phoneNumber: {
+                type: "string",
+                nullable: true,
+                example: "0901234567",
+              },
+              email: {
+                type: "string",
+                format: "email",
+                example: "duy@example.com",
+              },
               avatarUrl: {
                 type: "string",
                 format: "uri",
                 nullable: true,
-                example: "https://example.com/avatar.jpg"
+                example: "https://example.com/avatar.jpg",
               },
               role: {
                 type: "string",
                 enum: ["STUDENT", "INSTRUCTOR", "ADMIN"],
-                example: "STUDENT"
+                example: "STUDENT",
               },
               status: {
                 type: "string",
                 enum: ["ACTIVE", "BLOCKED"],
-                example: "ACTIVE"
-              }
-            }
-          }
-        }
+                example: "ACTIVE",
+              },
+            },
+          },
+        },
       },
       ChangePasswordRequest: {
         type: "object",
@@ -265,22 +382,22 @@ const swaggerDefinition = {
           currentPassword: {
             type: "string",
             format: "password",
-            example: "Password123"
+            example: "Password123",
           },
           newPassword: {
             type: "string",
             format: "password",
             minLength: 8,
             pattern: "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$",
-            example: "NewPassword456"
+            example: "NewPassword456",
           },
           confirmNewPassword: {
             type: "string",
             format: "password",
             minLength: 8,
-            example: "NewPassword456"
-          }
-        }
+            example: "NewPassword456",
+          },
+        },
       },
       ChangePasswordResponse: {
         type: "object",
@@ -288,44 +405,62 @@ const swaggerDefinition = {
         properties: {
           success: { type: "boolean", enum: [true], example: true },
           message: { type: "string", example: "Password changed successfully" },
-          data: { nullable: true, example: null }
-        }
+          data: { nullable: true, example: null },
+        },
       },
       Category: {
         type: "object",
         required: ["id", "name", "slug", "description"],
         properties: {
-          id: { type: "string", format: "uuid", example: "550e8400-e29b-41d4-a716-446655440000" },
+          id: {
+            type: "string",
+            format: "uuid",
+            example: "550e8400-e29b-41d4-a716-446655440000",
+          },
           name: { type: "string", example: "Lập trình Web" },
           slug: { type: "string", example: "lap-trinh-web" },
           description: {
             type: "string",
             nullable: true,
-            example: "Các khóa học phát triển website"
-          }
-        }
+            example: "Các khóa học phát triển website",
+          },
+        },
       },
       CreateCategoryRequest: {
         type: "object",
         additionalProperties: false,
         required: ["name"],
         properties: {
-          name: { type: "string", minLength: 1, maxLength: 100, example: "Lập trình Web" },
+          name: {
+            type: "string",
+            minLength: 1,
+            maxLength: 100,
+            example: "Lập trình Web",
+          },
           description: {
             type: "string",
             nullable: true,
-            example: "Các khóa học phát triển website"
-          }
-        }
+            example: "Các khóa học phát triển website",
+          },
+        },
       },
       UpdateCategoryRequest: {
         type: "object",
         additionalProperties: false,
         minProperties: 1,
         properties: {
-          name: { type: "string", minLength: 1, maxLength: 100, example: "Phát triển Web" },
-          description: { type: "string", nullable: true, example: "Frontend và Backend" }
-        }
+          name: {
+            type: "string",
+            minLength: 1,
+            maxLength: 100,
+            example: "Phát triển Web",
+          },
+          description: {
+            type: "string",
+            nullable: true,
+            example: "Frontend và Backend",
+          },
+        },
       },
       CategoryResponse: {
         type: "object",
@@ -333,32 +468,44 @@ const swaggerDefinition = {
         properties: {
           success: { type: "boolean", enum: [true], example: true },
           message: { type: "string", example: "Category created successfully" },
-          data: { $ref: "#/components/schemas/Category" }
-        }
+          data: { $ref: "#/components/schemas/Category" },
+        },
       },
       CategoryListResponse: {
         type: "object",
         required: ["success", "message", "data"],
         properties: {
           success: { type: "boolean", enum: [true], example: true },
-          message: { type: "string", example: "Categories retrieved successfully" },
+          message: {
+            type: "string",
+            example: "Categories retrieved successfully",
+          },
           data: {
             type: "array",
-            items: { $ref: "#/components/schemas/Category" }
-          }
-        }
+            items: { $ref: "#/components/schemas/Category" },
+          },
+        },
       },
       CourseLevel: {
         type: "string",
-        enum: ["BEGINNER", "INTERMEDIATE", "ADVANCED"]
+        enum: ["BEGINNER", "INTERMEDIATE", "ADVANCED"],
       },
       CourseStatus: {
         type: "string",
-        enum: ["DRAFT", "PUBLISHED", "ARCHIVED"]
+        enum: ["DRAFT", "PUBLISHED", "ARCHIVED"],
       },
       Course: {
         type: "object",
-        required: ["id", "title", "slug", "description", "level", "price", "isFree", "status"],
+        required: [
+          "id",
+          "title",
+          "slug",
+          "description",
+          "level",
+          "price",
+          "isFree",
+          "status",
+        ],
         properties: {
           id: { type: "string", format: "uuid" },
           title: { type: "string", example: "ExpressJS cơ bản" },
@@ -378,11 +525,11 @@ const swaggerDefinition = {
             properties: {
               id: { type: "string", format: "uuid" },
               fullName: { type: "string" },
-              avatarUrl: { type: "string", nullable: true }
-            }
+              avatarUrl: { type: "string", nullable: true },
+            },
           },
-          category: { $ref: "#/components/schemas/Category" }
-        }
+          category: { $ref: "#/components/schemas/Category" },
+        },
       },
       CreateCourseRequest: {
         type: "object",
@@ -397,14 +544,15 @@ const swaggerDefinition = {
           isFree: { type: "boolean", default: false },
           language: { type: "string", maxLength: 50, default: "Vietnamese" },
           requirements: { type: "string", nullable: true },
-          learningOutcomes: { type: "string", nullable: true }
-        }
+          learningOutcomes: { type: "string", nullable: true },
+        },
       },
       UpdateCourseRequest: {
         type: "object",
         additionalProperties: false,
         minProperties: 1,
-        description: "All fields are optional. instructorId, status, slug, and thumbnailUrl are not accepted.",
+        description:
+          "All fields are optional. instructorId, status, slug, and thumbnailUrl are not accepted.",
         properties: {
           title: { type: "string", maxLength: 255 },
           description: { type: "string" },
@@ -414,8 +562,8 @@ const swaggerDefinition = {
           isFree: { type: "boolean" },
           language: { type: "string", maxLength: 50 },
           requirements: { type: "string", nullable: true },
-          learningOutcomes: { type: "string", nullable: true }
-        }
+          learningOutcomes: { type: "string", nullable: true },
+        },
       },
       CourseResponse: {
         type: "object",
@@ -423,16 +571,22 @@ const swaggerDefinition = {
         properties: {
           success: { type: "boolean", enum: [true], example: true },
           message: { type: "string" },
-          data: { $ref: "#/components/schemas/Course" }
-        }
+          data: { $ref: "#/components/schemas/Course" },
+        },
       },
       CourseListResponse: {
         type: "object",
         required: ["success", "message", "data", "meta"],
         properties: {
           success: { type: "boolean", enum: [true], example: true },
-          message: { type: "string", example: "Courses retrieved successfully" },
-          data: { type: "array", items: { $ref: "#/components/schemas/Course" } },
+          message: {
+            type: "string",
+            example: "Courses retrieved successfully",
+          },
+          data: {
+            type: "array",
+            items: { $ref: "#/components/schemas/Course" },
+          },
           meta: {
             type: "object",
             required: ["page", "limit", "totalItems", "totalPages"],
@@ -440,21 +594,24 @@ const swaggerDefinition = {
               page: { type: "integer", example: 1 },
               limit: { type: "integer", example: 12 },
               totalItems: { type: "integer", example: 25 },
-              totalPages: { type: "integer", example: 3 }
-            }
-          }
-        }
+              totalPages: { type: "integer", example: 3 },
+            },
+          },
+        },
       },
       ThumbnailResponse: {
         type: "object",
         properties: {
           success: { type: "boolean", enum: [true] },
-          message: { type: "string", example: "Thumbnail uploaded successfully" },
+          message: {
+            type: "string",
+            example: "Thumbnail uploaded successfully",
+          },
           data: {
             type: "object",
-            properties: { thumbnailUrl: { type: "string", format: "uri" } }
-          }
-        }
+            properties: { thumbnailUrl: { type: "string", format: "uri" } },
+          },
+        },
       },
       CourseStatusResponse: {
         type: "object",
@@ -466,14 +623,18 @@ const swaggerDefinition = {
             properties: {
               id: { type: "string", format: "uuid" },
               status: { $ref: "#/components/schemas/CourseStatus" },
-              publishedAt: { type: "string", format: "date-time", nullable: true }
-            }
-          }
-        }
+              publishedAt: {
+                type: "string",
+                format: "date-time",
+                nullable: true,
+              },
+            },
+          },
+        },
       },
       LessonType: {
         type: "string",
-        enum: ["VIDEO", "TEXT", "DOCUMENT"]
+        enum: ["VIDEO", "TEXT", "DOCUMENT"],
       },
       Section: {
         type: "object",
@@ -483,16 +644,32 @@ const swaggerDefinition = {
           courseId: { type: "string", format: "uuid" },
           title: { type: "string", maxLength: 255, example: "Giới thiệu" },
           position: { type: "integer", minimum: 1, example: 1 },
-          lessons: { type: "array", items: { $ref: "#/components/schemas/Lesson" } }
-        }
+          lessons: {
+            type: "array",
+            items: { $ref: "#/components/schemas/Lesson" },
+          },
+        },
       },
       Lesson: {
         type: "object",
-        required: ["id", "sectionId", "title", "lessonType", "position", "isPreview", "isRequired", "isPublished"],
+        required: [
+          "id",
+          "sectionId",
+          "title",
+          "lessonType",
+          "position",
+          "isPreview",
+          "isRequired",
+          "isPublished",
+        ],
         properties: {
           id: { type: "string", format: "uuid" },
           sectionId: { type: "string", format: "uuid" },
-          title: { type: "string", maxLength: 255, example: "Cài đặt môi trường" },
+          title: {
+            type: "string",
+            maxLength: 255,
+            example: "Cài đặt môi trường",
+          },
           lessonType: { $ref: "#/components/schemas/LessonType" },
           content: { type: "string", nullable: true },
           videoUrl: { type: "string", format: "uri", nullable: true },
@@ -502,135 +679,576 @@ const swaggerDefinition = {
           isPreview: { type: "boolean" },
           isRequired: { type: "boolean" },
           isPublished: { type: "boolean" },
-          quiz: { type: "object", nullable: true, description: "Quiz metadata (full questions/options are returned on instructor management endpoints)" }
-        }
+          quiz: {
+            type: "object",
+            nullable: true,
+            description:
+              "Quiz metadata (full questions/options are returned on instructor management endpoints)",
+          },
+        },
       },
       CreateSectionRequest: {
-        type: "object", additionalProperties: false, required: ["title"],
-        properties: { title: { type: "string", maxLength: 255 }, position: { type: "integer", minimum: 1 } }
+        type: "object",
+        additionalProperties: false,
+        required: ["title"],
+        properties: {
+          title: { type: "string", maxLength: 255 },
+          position: { type: "integer", minimum: 1 },
+        },
       },
       UpdateSectionRequest: {
-        type: "object", additionalProperties: false, minProperties: 1,
-        properties: { title: { type: "string", maxLength: 255 }, position: { type: "integer", minimum: 1 } }
+        type: "object",
+        additionalProperties: false,
+        minProperties: 1,
+        properties: {
+          title: { type: "string", maxLength: 255 },
+          position: { type: "integer", minimum: 1 },
+        },
       },
       CreateLessonRequest: {
-        type: "object", additionalProperties: false, required: ["title", "lessonType"],
+        type: "object",
+        additionalProperties: false,
+        required: ["title", "lessonType"],
         properties: {
-          title: { type: "string", maxLength: 255 }, lessonType: { $ref: "#/components/schemas/LessonType" },
-          content: { type: "string", nullable: true }, durationSeconds: { type: "integer", minimum: 0, nullable: true },
-          position: { type: "integer", minimum: 1 }, isPreview: { type: "boolean", default: false },
-          isRequired: { type: "boolean", default: true }, isPublished: { type: "boolean", default: false }
-        }
+          title: { type: "string", maxLength: 255 },
+          lessonType: { $ref: "#/components/schemas/LessonType" },
+          content: { type: "string", nullable: true },
+          durationSeconds: { type: "integer", minimum: 0, nullable: true },
+          position: { type: "integer", minimum: 1 },
+          isPreview: { type: "boolean", default: false },
+          isRequired: { type: "boolean", default: true },
+          isPublished: { type: "boolean", default: false },
+        },
       },
       UpdateLessonRequest: {
-        type: "object", additionalProperties: false, minProperties: 1,
+        type: "object",
+        additionalProperties: false,
+        minProperties: 1,
         properties: {
-          title: { type: "string", maxLength: 255 }, lessonType: { $ref: "#/components/schemas/LessonType" },
-          content: { type: "string", nullable: true }, durationSeconds: { type: "integer", minimum: 0, nullable: true },
-          position: { type: "integer", minimum: 1 }, isPreview: { type: "boolean" }, isRequired: { type: "boolean" }, isPublished: { type: "boolean" }
-        }
+          title: { type: "string", maxLength: 255 },
+          lessonType: { $ref: "#/components/schemas/LessonType" },
+          content: { type: "string", nullable: true },
+          durationSeconds: { type: "integer", minimum: 0, nullable: true },
+          position: { type: "integer", minimum: 1 },
+          isPreview: { type: "boolean" },
+          isRequired: { type: "boolean" },
+          isPublished: { type: "boolean" },
+        },
       },
       EnrollmentResponse: {
         type: "object",
         properties: {
-          success: { type: "boolean", enum: [true] }, message: { type: "string", example: "Course enrolled successfully" },
-          data: { type: "object", properties: { id: { type: "string", format: "uuid" }, courseId: { type: "string", format: "uuid" }, progressPercent: { type: "number", example: 0 }, status: { type: "string", enum: ["ACTIVE", "COMPLETED", "CANCELLED"] } } }
-        }
+          success: { type: "boolean", enum: [true] },
+          message: { type: "string", example: "Course enrolled successfully" },
+          data: {
+            type: "object",
+            properties: {
+              id: { type: "string", format: "uuid" },
+              courseId: { type: "string", format: "uuid" },
+              progressPercent: { type: "number", example: 0 },
+              status: {
+                type: "string",
+                enum: ["ACTIVE", "COMPLETED", "CANCELLED"],
+              },
+            },
+          },
+        },
       },
       CourseContentResponse: {
         type: "object",
         properties: {
-          success: { type: "boolean", enum: [true] }, message: { type: "string" },
-          data: { type: "object", properties: { course: { type: "object", properties: { id: { type: "string", format: "uuid" }, title: { type: "string" } } }, sections: { type: "array", items: { $ref: "#/components/schemas/Section" } } } }
-        }
+          success: { type: "boolean", enum: [true] },
+          message: { type: "string" },
+          data: {
+            type: "object",
+            properties: {
+              course: {
+                type: "object",
+                properties: {
+                  id: { type: "string", format: "uuid" },
+                  title: { type: "string" },
+                },
+              },
+              sections: {
+                type: "array",
+                items: { $ref: "#/components/schemas/Section" },
+              },
+            },
+          },
+        },
       },
       UpdateLessonProgressRequest: {
-        type: "object", additionalProperties: false, minProperties: 1,
-        properties: { lastWatchedSecond: { type: "integer", minimum: 0, example: 120 }, isCompleted: { type: "boolean", example: true } }
+        type: "object",
+        additionalProperties: false,
+        minProperties: 1,
+        properties: {
+          lastWatchedSecond: { type: "integer", minimum: 0, example: 120 },
+          isCompleted: { type: "boolean", example: true },
+        },
       },
       ProgressSummary: {
-        type: "object", required: ["totalLessons", "completedLessons", "progressPercent"],
-        properties: { totalLessons: { type: "integer", example: 10 }, completedLessons: { type: "integer", example: 4 }, progressPercent: { type: "number", format: "float", example: 40 } }
+        type: "object",
+        required: ["totalLessons", "completedLessons", "progressPercent"],
+        properties: {
+          totalLessons: { type: "integer", example: 10 },
+          completedLessons: { type: "integer", example: 4 },
+          progressPercent: { type: "number", format: "float", example: 40 },
+        },
       },
       LessonProgressResponse: {
         type: "object",
-        properties: { success: { type: "boolean", enum: [true] }, message: { type: "string" }, data: { type: "object", properties: { lessonProgress: { type: "object" }, courseProgress: { $ref: "#/components/schemas/ProgressSummary" } } } }
+        properties: {
+          success: { type: "boolean", enum: [true] },
+          message: { type: "string" },
+          data: {
+            type: "object",
+            properties: {
+              lessonProgress: { type: "object" },
+              courseProgress: { $ref: "#/components/schemas/ProgressSummary" },
+            },
+          },
+        },
       },
       CourseProgressResponse: {
         type: "object",
-        properties: { success: { type: "boolean", enum: [true] }, message: { type: "string" }, data: { $ref: "#/components/schemas/ProgressSummary" } }
+        properties: {
+          success: { type: "boolean", enum: [true] },
+          message: { type: "string" },
+          data: { $ref: "#/components/schemas/ProgressSummary" },
+        },
       },
       CreateQuizRequest: {
-        type: "object", additionalProperties: false, required: ["title"],
-        properties: { title: { type: "string", maxLength: 255 }, description: { type: "string", nullable: true }, passingScore: { type: "integer", minimum: 0, maximum: 100, default: 70 }, maxAttempts: { type: "integer", minimum: 1, maximum: 20, default: 3 }, timeLimitMinutes: { type: "integer", minimum: 1, maximum: 300, nullable: true }, isPublished: { type: "boolean", default: false } }
+        type: "object",
+        additionalProperties: false,
+        required: ["title"],
+        properties: {
+          title: { type: "string", maxLength: 255 },
+          description: { type: "string", nullable: true },
+          passingScore: {
+            type: "integer",
+            minimum: 0,
+            maximum: 100,
+            default: 70,
+          },
+          maxAttempts: { type: "integer", minimum: 1, maximum: 20, default: 3 },
+          timeLimitMinutes: {
+            type: "integer",
+            minimum: 1,
+            maximum: 300,
+            nullable: true,
+          },
+          isPublished: { type: "boolean", default: false },
+        },
       },
       UpdateQuizRequest: {
-        type: "object", additionalProperties: false, minProperties: 1,
-        properties: { title: { type: "string", maxLength: 255 }, description: { type: "string", nullable: true }, passingScore: { type: "integer", minimum: 0, maximum: 100 }, maxAttempts: { type: "integer", minimum: 1, maximum: 20 }, timeLimitMinutes: { type: "integer", minimum: 1, maximum: 300, nullable: true }, isPublished: { type: "boolean" } }
+        type: "object",
+        additionalProperties: false,
+        minProperties: 1,
+        properties: {
+          title: { type: "string", maxLength: 255 },
+          description: { type: "string", nullable: true },
+          passingScore: { type: "integer", minimum: 0, maximum: 100 },
+          maxAttempts: { type: "integer", minimum: 1, maximum: 20 },
+          timeLimitMinutes: {
+            type: "integer",
+            minimum: 1,
+            maximum: 300,
+            nullable: true,
+          },
+          isPublished: { type: "boolean" },
+        },
       },
       CreateQuestionRequest: {
-        type: "object", additionalProperties: false, required: ["text"],
-        properties: { text: { type: "string", maxLength: 5000 }, explanation: { type: "string", nullable: true }, points: { type: "integer", minimum: 1, maximum: 100, default: 1 }, position: { type: "integer", minimum: 1 } }
+        type: "object",
+        additionalProperties: false,
+        required: ["text"],
+        properties: {
+          text: { type: "string", maxLength: 5000 },
+          explanation: { type: "string", nullable: true },
+          points: { type: "integer", minimum: 1, maximum: 100, default: 1 },
+          position: { type: "integer", minimum: 1 },
+        },
       },
       UpdateQuestionRequest: {
-        type: "object", additionalProperties: false, minProperties: 1,
-        properties: { text: { type: "string", maxLength: 5000 }, explanation: { type: "string", nullable: true }, points: { type: "integer", minimum: 1, maximum: 100 }, position: { type: "integer", minimum: 1 } }
+        type: "object",
+        additionalProperties: false,
+        minProperties: 1,
+        properties: {
+          text: { type: "string", maxLength: 5000 },
+          explanation: { type: "string", nullable: true },
+          points: { type: "integer", minimum: 1, maximum: 100 },
+          position: { type: "integer", minimum: 1 },
+        },
       },
       CreateQuizOptionRequest: {
-        type: "object", additionalProperties: false, required: ["text"],
-        properties: { text: { type: "string", maxLength: 2000 }, isCorrect: { type: "boolean", default: false }, position: { type: "integer", minimum: 1 } }
+        type: "object",
+        additionalProperties: false,
+        required: ["text"],
+        properties: {
+          text: { type: "string", maxLength: 2000 },
+          isCorrect: { type: "boolean", default: false },
+          position: { type: "integer", minimum: 1 },
+        },
       },
       UpdateQuizOptionRequest: {
-        type: "object", additionalProperties: false, minProperties: 1,
-        properties: { text: { type: "string", maxLength: 2000 }, isCorrect: { type: "boolean" }, position: { type: "integer", minimum: 1 } }
+        type: "object",
+        additionalProperties: false,
+        minProperties: 1,
+        properties: {
+          text: { type: "string", maxLength: 2000 },
+          isCorrect: { type: "boolean" },
+          position: { type: "integer", minimum: 1 },
+        },
       },
       SubmitQuizAttemptRequest: {
-        type: "object", additionalProperties: false, required: ["answers"],
-        properties: { answers: { type: "array", items: { type: "object", required: ["questionId", "optionId"], properties: { questionId: { type: "string", format: "uuid" }, optionId: { type: "string", format: "uuid" } } } } }
+        type: "object",
+        additionalProperties: false,
+        required: ["answers"],
+        properties: {
+          answers: {
+            type: "array",
+            items: {
+              type: "object",
+              required: ["questionId", "optionId"],
+              properties: {
+                questionId: { type: "string", format: "uuid" },
+                optionId: { type: "string", format: "uuid" },
+              },
+            },
+          },
+        },
       },
       CreateReviewRequest: {
-        type: "object", additionalProperties: false, required: ["rating"],
-        properties: { rating: { type: "integer", minimum: 1, maximum: 5 }, content: { type: "string", maxLength: 2000, nullable: true } }
+        type: "object",
+        additionalProperties: false,
+        required: ["rating"],
+        properties: {
+          rating: { type: "integer", minimum: 1, maximum: 5 },
+          content: { type: "string", maxLength: 2000, nullable: true },
+        },
       },
       UpdateReviewRequest: {
-        type: "object", additionalProperties: false, minProperties: 1,
-        properties: { rating: { type: "integer", minimum: 1, maximum: 5 }, content: { type: "string", maxLength: 2000, nullable: true } }
+        type: "object",
+        additionalProperties: false,
+        minProperties: 1,
+        properties: {
+          rating: { type: "integer", minimum: 1, maximum: 5 },
+          content: { type: "string", maxLength: 2000, nullable: true },
+        },
       },
       CreateCommentRequest: {
-        type: "object", additionalProperties: false, required: ["content"],
-        properties: { content: { type: "string", maxLength: 5000 }, parentId: { type: "string", format: "uuid", nullable: true, description: "Top-level comment ID when creating a reply" } }
+        type: "object",
+        additionalProperties: false,
+        required: ["content"],
+        properties: {
+          content: { type: "string", maxLength: 5000 },
+          parentId: {
+            type: "string",
+            format: "uuid",
+            nullable: true,
+            description: "Top-level comment ID when creating a reply",
+          },
+        },
       },
       UpdateCommentRequest: {
-        type: "object", additionalProperties: false, required: ["content"],
-        properties: { content: { type: "string", maxLength: 5000 } }
+        type: "object",
+        additionalProperties: false,
+        required: ["content"],
+        properties: { content: { type: "string", maxLength: 5000 } },
       },
       CreateOrderRequest: {
-        type: "object", additionalProperties: false, required: ["courseIds"],
-        properties: { courseIds: { type: "array", minItems: 1, maxItems: 20, uniqueItems: true, items: { type: "string", format: "uuid" } } }
+        type: "object",
+        additionalProperties: false,
+        required: ["courseIds"],
+        properties: {
+          courseIds: {
+            type: "array",
+            minItems: 1,
+            maxItems: 20,
+            uniqueItems: true,
+            items: { type: "string", format: "uuid" },
+          },
+        },
       },
       OrderItem: {
-        type: "object", required: ["courseId", "courseTitleSnapshot", "priceSnapshot"],
-        properties: { id: { type: "string", format: "uuid" }, courseId: { type: "string", format: "uuid" }, courseTitleSnapshot: { type: "string" }, priceSnapshot: { type: "number", example: 299000 } }
+        type: "object",
+        required: ["courseId", "courseTitleSnapshot", "priceSnapshot"],
+        properties: {
+          id: { type: "string", format: "uuid" },
+          courseId: { type: "string", format: "uuid" },
+          courseTitleSnapshot: { type: "string" },
+          priceSnapshot: { type: "number", example: 299000 },
+        },
       },
       Order: {
-        type: "object", required: ["id", "orderNumber", "status", "subtotal", "total", "currency", "items"],
-        properties: { id: { type: "string", format: "uuid" }, orderNumber: { type: "string", example: "ORD-20260810-ABC123" }, status: { type: "string", enum: ["PENDING", "PAID", "CANCELLED"] }, subtotal: { type: "number" }, total: { type: "number" }, currency: { type: "string", enum: ["VND"] }, paidAt: { type: "string", format: "date-time", nullable: true }, items: { type: "array", items: { $ref: "#/components/schemas/OrderItem" } } }
+        type: "object",
+        required: [
+          "id",
+          "orderNumber",
+          "status",
+          "subtotal",
+          "total",
+          "currency",
+          "items",
+        ],
+        properties: {
+          id: { type: "string", format: "uuid" },
+          orderNumber: { type: "string", example: "ORD-20260810-ABC123" },
+          status: { type: "string", enum: ["PENDING", "PAID", "CANCELLED"] },
+          subtotal: { type: "number" },
+          total: { type: "number" },
+          currency: { type: "string", enum: ["VND"] },
+          paidAt: { type: "string", format: "date-time", nullable: true },
+          items: {
+            type: "array",
+            items: { $ref: "#/components/schemas/OrderItem" },
+          },
+        },
       },
       MockPaymentCallbackRequest: {
-        type: "object", required: ["token", "status"],
-        properties: { token: { type: "string", description: "Opaque token embedded in mockPaymentUrl" }, status: { type: "string", enum: ["SUCCEEDED", "FAILED"] } }
+        type: "object",
+        required: ["token", "status"],
+        properties: {
+          token: {
+            type: "string",
+            description: "Opaque token embedded in mockPaymentUrl",
+          },
+          status: { type: "string", enum: ["SUCCEEDED", "FAILED"] },
+        },
       },
       MockPaymentWebhookRequest: {
-        type: "object", additionalProperties: false, required: ["eventId", "paymentId", "status", "providerTransactionId", "amount", "currency"],
-        properties: { eventId: { type: "string" }, paymentId: { type: "string", format: "uuid" }, status: { type: "string", enum: ["SUCCEEDED", "FAILED"] }, providerTransactionId: { type: "string" }, amount: { type: "number" }, currency: { type: "string", enum: ["VND"] } }
+        type: "object",
+        additionalProperties: false,
+        required: [
+          "eventId",
+          "paymentId",
+          "status",
+          "providerTransactionId",
+          "amount",
+          "currency",
+        ],
+        properties: {
+          eventId: { type: "string" },
+          paymentId: { type: "string", format: "uuid" },
+          status: { type: "string", enum: ["SUCCEEDED", "FAILED"] },
+          providerTransactionId: { type: "string" },
+          amount: { type: "number" },
+          currency: { type: "string", enum: ["VND"] },
+        },
       },
       Certificate: {
-        type: "object", required: ["id", "certificateNumber", "verificationCode", "studentNameSnapshot", "courseTitleSnapshot", "instructorNameSnapshot", "issuedAt"],
-        properties: { id: { type: "string", format: "uuid" }, certificateNumber: { type: "string", example: "LMS-2026-A1B2C3D4" }, verificationCode: { type: "string" }, studentNameSnapshot: { type: "string" }, courseTitleSnapshot: { type: "string" }, instructorNameSnapshot: { type: "string" }, issuedAt: { type: "string", format: "date-time" }, revokedAt: { type: "string", format: "date-time", nullable: true } }
+        type: "object",
+        required: [
+          "id",
+          "certificateNumber",
+          "verificationCode",
+          "studentNameSnapshot",
+          "courseTitleSnapshot",
+          "instructorNameSnapshot",
+          "issuedAt",
+        ],
+        properties: {
+          id: { type: "string", format: "uuid" },
+          certificateNumber: { type: "string", example: "LMS-2026-A1B2C3D4" },
+          verificationCode: { type: "string" },
+          studentNameSnapshot: { type: "string" },
+          courseTitleSnapshot: { type: "string" },
+          instructorNameSnapshot: { type: "string" },
+          issuedAt: { type: "string", format: "date-time" },
+          revokedAt: { type: "string", format: "date-time", nullable: true },
+        },
+      },
+      AssignmentRequest: {
+        type: "object",
+        additionalProperties: false,
+        required: ["title", "dueAt"],
+        properties: {
+          title: {
+            type: "string",
+            maxLength: 255,
+            example: "Thiết kế REST API cho LMS",
+          },
+          description: { type: "string", nullable: true, maxLength: 10000 },
+          instructions: { type: "string", nullable: true, maxLength: 30000 },
+          dueAt: {
+            type: "string",
+            format: "date-time",
+            example: "2026-09-01T16:59:59.000Z",
+          },
+          maxScore: {
+            type: "number",
+            minimum: 0.01,
+            maximum: 100000,
+            default: 100,
+          },
+          allowResubmission: { type: "boolean", default: false },
+          maxSubmissions: {
+            type: "integer",
+            minimum: 1,
+            maximum: 20,
+            default: 1,
+          },
+          allowLateSubmissions: { type: "boolean", default: false },
+          isPublished: { type: "boolean", default: false },
+        },
+      },
+      GradeSubmissionRequest: {
+        type: "object",
+        additionalProperties: false,
+        required: ["score"],
+        properties: {
+          score: { type: "number", minimum: 0, example: 85 },
+          comment: {
+            type: "string",
+            nullable: true,
+            maxLength: 10000,
+            example: "Bài làm tốt, cần bổ sung kiểm thử.",
+          },
+        },
+      },
+      CourseGradeRuleRequest: {
+        type: "object",
+        additionalProperties: false,
+        required: ["assignmentWeight", "quizWeight", "passingScore"],
+        properties: {
+          assignmentWeight: {
+            type: "number",
+            minimum: 0,
+            maximum: 100,
+            example: 60,
+          },
+          quizWeight: { type: "number", minimum: 0, maximum: 100, example: 40 },
+          passingScore: {
+            type: "number",
+            minimum: 0,
+            maximum: 100,
+            example: 70,
+          },
+        },
+        description: "assignmentWeight and quizWeight must total 100",
+      },
+      NotificationPreferenceRequest: {
+        type: "object",
+        additionalProperties: false,
+        minProperties: 1,
+        properties: {
+          inAppEnabled: { type: "boolean" },
+          emailEnabled: { type: "boolean" },
+          pushEnabled: { type: "boolean" },
+          courseUpdates: { type: "boolean" },
+          assignmentReminders: { type: "boolean" },
+          quizResults: { type: "boolean" },
+          certificateUpdates: { type: "boolean" },
+        },
+      },
+      AnnouncementRequest: {
+        type: "object",
+        additionalProperties: false,
+        required: ["title", "content"],
+        properties: {
+          title: {
+            type: "string",
+            maxLength: 255,
+            example: "Thay đổi lịch học",
+          },
+          content: {
+            type: "string",
+            maxLength: 50000,
+            example: "Buổi học ngày mai bắt đầu lúc 08:00.",
+          },
+        },
+      },
+      UpdateAnnouncementRequest: {
+        type: "object",
+        additionalProperties: false,
+        minProperties: 1,
+        properties: {
+          title: { type: "string", maxLength: 255 },
+          content: { type: "string", maxLength: 50000 },
+        },
+      },
+      Notification: {
+        type: "object",
+        required: ["id", "type", "title", "message", "isRead", "createdAt"],
+        properties: {
+          id: { type: "string", format: "uuid" },
+          type: {
+            type: "string",
+            enum: [
+              "WELCOME",
+              "COURSE_ENROLLED",
+              "NEW_LESSON",
+              "ASSIGNMENT_DUE",
+              "QUIZ_RESULT",
+              "CERTIFICATE_ISSUED",
+              "COURSE_ANNOUNCEMENT",
+            ],
+          },
+          title: { type: "string" },
+          message: { type: "string" },
+          data: { type: "object", nullable: true, additionalProperties: true },
+          isRead: { type: "boolean" },
+          readAt: { type: "string", format: "date-time", nullable: true },
+          createdAt: { type: "string", format: "date-time" },
+        },
+      },
+      NotificationPreference: {
+        allOf: [
+          { $ref: "#/components/schemas/NotificationPreferenceRequest" },
+          {
+            type: "object",
+            required: [
+              "id",
+              "userId",
+              "inAppEnabled",
+              "emailEnabled",
+              "courseUpdates",
+              "assignmentReminders",
+              "quizResults",
+              "certificateUpdates",
+              "createdAt",
+              "updatedAt",
+            ],
+            properties: {
+              id: { type: "string", format: "uuid" },
+              userId: { type: "string", format: "uuid" },
+              createdAt: { type: "string", format: "date-time" },
+              updatedAt: { type: "string", format: "date-time" },
+            },
+          },
+        ],
+      },
+      CourseAnnouncement: {
+        type: "object",
+        required: [
+          "id",
+          "courseId",
+          "authorId",
+          "title",
+          "content",
+          "status",
+          "createdAt",
+          "updatedAt",
+        ],
+        properties: {
+          id: { type: "string", format: "uuid" },
+          courseId: { type: "string", format: "uuid" },
+          authorId: { type: "string", format: "uuid" },
+          title: { type: "string" },
+          content: { type: "string" },
+          status: { type: "string", enum: ["DRAFT", "PUBLISHED"] },
+          publishedAt: { type: "string", format: "date-time", nullable: true },
+          createdAt: { type: "string", format: "date-time" },
+          updatedAt: { type: "string", format: "date-time" },
+        },
       },
       AdminUserUpdateRequest: {
-        type: "object", additionalProperties: false,
-        properties: { role: { type: "string", enum: ["STUDENT", "INSTRUCTOR", "ADMIN"] }, status: { type: "string", enum: ["ACTIVE", "BLOCKED"] } }
+        type: "object",
+        additionalProperties: false,
+        properties: {
+          role: { type: "string", enum: ["STUDENT", "INSTRUCTOR", "ADMIN"] },
+          status: { type: "string", enum: ["ACTIVE", "BLOCKED"] },
+        },
       },
       ErrorResponse: {
         type: "object",
@@ -640,18 +1258,15 @@ const swaggerDefinition = {
           message: { type: "string" },
           errors: {
             type: "object",
-            additionalProperties: { type: "string" }
-          }
-        }
-      }
-    }
-  }
+            additionalProperties: { type: "string" },
+          },
+        },
+      },
+    },
+  },
 };
 
 export const swaggerSpec = swaggerJsdoc({
   definition: swaggerDefinition,
-  apis: [
-    "./src/routes/*.ts",
-    "./src/modules/**/*.routes.ts"
-  ]
+  apis: ["./src/routes/*.ts", "./src/modules/**/*.routes.ts"],
 });

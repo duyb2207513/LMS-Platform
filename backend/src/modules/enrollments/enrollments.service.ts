@@ -1,5 +1,6 @@
 import { AppError } from "../../common/errors/AppError.js";
 import { prisma } from "../../config/database.js";
+import { safelyRunCommunication, sendEnrollmentCommunication } from "../../services/communication/communication.service.js";
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const serialize = <T extends { progressPercent: unknown }>(value: T) => ({ ...value, progressPercent: Number(value.progressPercent) });
@@ -11,10 +12,12 @@ export async function enrollFreeCourse(courseId: string, studentId: string) {
   if (!course.isFree) throw new AppError(409, "This course requires payment");
   const existing = await prisma.enrollment.findUnique({ where: { studentId_courseId: { studentId, courseId } } });
   if (existing) throw new AppError(409, "You are already enrolled in this course");
-  return serialize(await prisma.enrollment.create({
+  const enrollment = await prisma.enrollment.create({
     data: { studentId, courseId },
     include: { course: { select: { id: true, title: true, slug: true, thumbnailUrl: true } } }
-  }));
+  });
+  await safelyRunCommunication(() => sendEnrollmentCommunication(studentId, courseId));
+  return serialize(enrollment);
 }
 
 export async function listMyEnrollments(studentId: string) {

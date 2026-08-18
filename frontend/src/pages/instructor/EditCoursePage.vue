@@ -1,17 +1,17 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 import InstructorLayout from '@/layouts/InstructorLayout.vue'
 import BaseInput from '@/components/ui/BaseInput.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import LoadingSpinner from '@/components/ui/LoadingSpinner.vue'
+import ImageFilePicker from '@/components/ui/ImageFilePicker.vue'
 import { useCourseStore } from '@/stores/courses'
 import { useCategoryStore } from '@/stores/categories'
 import { CourseLevel, CourseStatus } from '@/types'
 import type { CourseFormData } from '@/types'
 
 const route = useRoute()
-const router = useRouter()
 const courseStore = useCourseStore()
 const categoryStore = useCategoryStore()
 
@@ -19,12 +19,14 @@ const loading = ref(false)
 const pageLoading = ref(true)
 const error = ref('')
 const success = ref('')
+const thumbnailFile = ref<File | null>(null)
+const currentThumbnailUrl = ref<string | null>(null)
+const pickerKey = ref(0)
 
 const form = ref<CourseFormData>({
   categoryId: '',
   title: '',
   description: '',
-  thumbnailUrl: '',
   level: CourseLevel.BEGINNER,
   price: 0,
   isFree: true,
@@ -46,11 +48,36 @@ async function handleSubmit() {
   success.value = ''
   if (!form.value.categoryId) { error.value = 'Vui lòng chọn danh mục'; return }
   if (!form.value.title.trim()) { error.value = 'Vui lòng nhập tên khóa học'; return }
-  if (!form.value.description.trim()) { error.value = 'Vui lòng nhập mô tả'; return }
+  if (form.value.title.trim().length > 255) { error.value = 'Tên khóa học không được vượt quá 255 ký tự'; return }
+  if (!form.value.description.trim()) { error.value = 'Vui lòng nhập mô tả chi tiết'; return }
+
+  const priceNum = form.value.isFree ? 0 : Number(form.value.price)
+  if (!form.value.isFree && (isNaN(priceNum) || priceNum <= 0)) {
+    error.value = 'Vui lòng nhập học phí hợp lệ (lớn hơn 0 VND) khi không chọn Miễn phí'
+    return
+  }
+
+  const payload: CourseFormData = {
+    ...form.value,
+    title: form.value.title.trim(),
+    description: form.value.description.trim(),
+    price: priceNum,
+    isFree: form.value.isFree,
+    language: form.value.language.trim() || 'Vietnamese',
+    requirements: form.value.requirements?.trim() || '',
+    learningOutcomes: form.value.learningOutcomes?.trim() || '',
+  }
 
   loading.value = true
   try {
-    await courseStore.updateCourse(route.params.id as string, form.value)
+    const courseId = route.params.id as string
+    await courseStore.updateCourse(courseId, payload)
+    if (thumbnailFile.value) {
+      const uploadResponse = await courseStore.uploadCourseThumbnail(courseId, thumbnailFile.value)
+      currentThumbnailUrl.value = uploadResponse.data?.thumbnailUrl || currentThumbnailUrl.value
+      thumbnailFile.value = null
+      pickerKey.value += 1
+    }
     success.value = 'Cập nhật khóa học thành công!'
   } catch (e) {
     error.value = e instanceof Error ? e.message : 'Cập nhật thất bại'
@@ -88,7 +115,6 @@ onMounted(async () => {
       categoryId: course.categoryId,
       title: course.title,
       description: course.description,
-      thumbnailUrl: course.thumbnailUrl || '',
       level: course.level,
       price: course.price,
       isFree: course.isFree,
@@ -96,8 +122,9 @@ onMounted(async () => {
       requirements: course.requirements || '',
       learningOutcomes: course.learningOutcomes || '',
     }
+    currentThumbnailUrl.value = course.thumbnailUrl || null
     currentStatus.value = course.status
-  } catch (e) {
+  } catch {
     error.value = 'Tải dữ liệu thất bại'
   } finally {
     pageLoading.value = false
@@ -203,7 +230,15 @@ onMounted(async () => {
             <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Yêu cầu</label>
             <textarea v-model="form.requirements" rows="3" placeholder="Yêu cầu trước khi học..." class="w-full rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:border-purple-500 dark:focus:border-purple-400 focus:outline-none resize-none transition-colors duration-200" />
           </div>
-          <BaseInput id="edit-thumb" v-model="form.thumbnailUrl" label="URL hình ảnh đại diện" placeholder="https://example.com/image.jpg" />
+          <ImageFilePicker
+            :key="pickerKey"
+            id="edit-thumb"
+            label="Ảnh đại diện khóa học"
+            :current-url="currentThumbnailUrl"
+            :disabled="loading"
+            @change="thumbnailFile = $event"
+            @error="error = $event"
+          />
         </div>
 
         <div class="flex justify-end gap-4">

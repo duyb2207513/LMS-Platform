@@ -47,10 +47,11 @@ async function seedUsers(passwordHash: string) {
       update: {
         fullName: user.fullName,
         passwordHash,
+        emailVerifiedAt: new Date(),
         role: user.role,
         status: user.status
       },
-      create: { ...user, passwordHash }
+      create: { ...user, passwordHash, emailVerifiedAt: new Date() }
     }));
   }
   return result;
@@ -77,6 +78,11 @@ async function seedCategories() {
       name: "DevOps",
       slug: "devops",
       description: "Docker, triển khai và vận hành phần mềm"
+    },
+    {
+      name: "Khoa học dữ liệu & AI",
+      slug: "khoa-hoc-du-lieu-ai",
+      description: "Các khóa học về Trí tuệ nhân tạo, Machine Learning và Khoa học dữ liệu"
     }
   ];
 
@@ -101,6 +107,7 @@ async function seedCourses(instructorId: string, categories: Map<string, { id: s
   const mobileCategory = categories.get("lap-trinh-mobile")!;
   const databaseCategory = categories.get("co-so-du-lieu")!;
   const devopsCategory = categories.get("devops")!;
+  const aiCategory = categories.get("khoa-hoc-du-lieu-ai")!;
 
   const courses = [
     {
@@ -156,8 +163,36 @@ async function seedCourses(instructorId: string, categories: Map<string, { id: s
       language: "Vietnamese",
       requirements: "Biết sử dụng terminal cơ bản",
       learningOutcomes: "Viết Dockerfile; sử dụng Docker Compose; quản lý container",
-      status: "DRAFT" as const,
-      publishedAt: null
+      status: "PUBLISHED" as const,
+      publishedAt: new Date("2026-08-04T08:00:00.000Z")
+    },
+    {
+      slug: "decision-tree-sieu-de-hieu",
+      title: "Mô hình Cây Quyết Định (Decision Tree) siêu dễ hiểu",
+      description: "Học cách máy tính ra quyết định thông qua ví dụ thực tế về việc 'Hôm nay có nên đi chơi hay không?' mà không cần bất kỳ công thức toán phức tạp nào.",
+      categoryId: aiCategory.id,
+      level: "BEGINNER" as const,
+      price: 0,
+      isFree: true,
+      language: "Vietnamese",
+      requirements: "Không cần kiến thức lập trình trước đó",
+      learningOutcomes: "Hiểu mô hình Cây quyết định; biết vẽ và giải thích cây; hiểu khái niệm cơ bản về AI/Machine Learning",
+      status: "PUBLISHED" as const,
+      publishedAt: new Date("2026-08-05T08:00:00.000Z")
+    },
+    {
+      slug: "nhap-mon-mang-no-ron-nhan-tao",
+      title: "Nhập môn Mạng Nơ-ron Nhân tạo (Neural Network)",
+      description: "Khóa học nhập môn giúp bạn hiểu nguyên lý hoạt động của Mạng Nơ-ron Nhân tạo (ANN) - nền tảng của Deep Learning và Trí tuệ Nhân tạo hiện đại.",
+      categoryId: aiCategory.id,
+      level: "BEGINNER" as const,
+      price: 0,
+      isFree: true,
+      language: "Vietnamese",
+      requirements: "Kiến thức toán học cơ bản",
+      learningOutcomes: "Hiểu cấu trúc của một Neuron nhân tạo; nắm vững cơ chế lan truyền xuôi và lan truyền ngược; hiểu cách mạng học từ dữ liệu",
+      status: "PUBLISHED" as const,
+      publishedAt: new Date("2026-08-06T08:00:00.000Z")
     }
   ];
 
@@ -284,16 +319,271 @@ async function seedSprint4(studentId: string) {
   });
 }
 
+async function seedAdditionalLearningContent(studentId: string) {
+  const definitions = [
+    {
+      slug: "expressjs-rest-api-tu-co-ban",
+      section: { id: "11000000-0000-4000-8000-000000000001", title: "Xây dựng REST API với ExpressJS" },
+      lessons: [
+        { id: "21000000-0000-4000-8000-000000000001", title: "REST API và cấu trúc dự án", lessonType: "TEXT" as const, content: "Tìm hiểu REST, HTTP method, status code và cách tổ chức backend ExpressJS theo module.", position: 1 },
+        { id: "21000000-0000-4000-8000-000000000002", title: "Middleware và xử lý lỗi", lessonType: "VIDEO" as const, videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4", durationSeconds: 600, position: 2 },
+        { id: "21000000-0000-4000-8000-000000000003", title: "Tài liệu HTTP status code", lessonType: "DOCUMENT" as const, documentUrl: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf", position: 3 }
+      ],
+      completedLessons: 3,
+      status: "COMPLETED" as const
+    },
+    {
+      slug: "postgresql-thiet-ke-database",
+      section: { id: "12000000-0000-4000-8000-000000000001", title: "Nền tảng PostgreSQL" },
+      lessons: [
+        { id: "22000000-0000-4000-8000-000000000001", title: "Thiết kế bảng và quan hệ", lessonType: "TEXT" as const, content: "Thiết kế bảng, khóa chính, khóa ngoại và các quan hệ one-to-one, one-to-many, many-to-many.", position: 1 },
+        { id: "22000000-0000-4000-8000-000000000002", title: "Index và tối ưu truy vấn", lessonType: "VIDEO" as const, videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4", durationSeconds: 720, position: 2 },
+        { id: "22000000-0000-4000-8000-000000000003", title: "Tài liệu thiết kế database", lessonType: "DOCUMENT" as const, documentUrl: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf", position: 3 }
+      ],
+      completedLessons: 1,
+      status: "ACTIVE" as const
+    },
+    {
+      slug: "decision-tree-sieu-de-hieu",
+      section: { id: "14000000-0000-4000-8000-000000000001", title: "Cơ bản về Cây quyết định" },
+      lessons: [
+        {
+          id: "24000000-0000-4000-8000-000000000001",
+          title: "Giới thiệu giải thuật Cây Quyết Định (Decision Tree)",
+          lessonType: "TEXT" as const,
+          content: "Cây Quyết Định (Decision Tree) là một thuật toán học máy có giám sát (Supervised Learning) phổ biến nhất hiện nay. Nó có thể dùng cho cả bài toán phân lớp (Classification) lẫn bài toán hồi quy (Regression).\n\nMô hình hoạt động bằng cách phân chia dữ liệu thành các nhóm nhỏ hơn dựa trên các đặc trưng (features) đầu vào.\n\nCÁC GIẢI THUẬT XÂY DỰNG CÂY PHỔ BIẾN:\n1. ID3 (Iterative Dichotomiser 3): Sử dụng Entropy và Information Gain (độ tăng thông tin) để chọn các đặc trưng phân chia.\n2. C4.5: Bản nâng cấp của ID3, hỗ trợ dữ liệu liên tục và xử lý các giá trị bị thiếu.\n3. CART (Classification and Regression Trees): Sử dụng chỉ số Gini Impurity (độ vẩn đục Gini) để phân chia dữ liệu.\n\nNGUYÊN LÝ CỐT LÕI:\nThuật toán bắt đầu ở nút gốc (Root Node) chứa toàn bộ dữ liệu, sau đó tìm câu hỏi phân chia tốt nhất dựa trên một trong các tiêu chí đo lường (như Entropy hay Gini). Quá trình này lặp lại cho các nút con (Internal Nodes) cho đến khi đạt được các nút lá (Leaf Nodes) là kết quả phân lớp cuối cùng, không thể phân chia thêm.",
+          position: 1
+        },
+        {
+          id: "24000000-0000-4000-8000-000000000002",
+          title: "Bài toán cụ thể: Dự đoán khách hàng mua laptop",
+          lessonType: "TEXT" as const,
+          content: "Để hiểu rõ hơn về giải thuật, hãy cùng xem xét một bài toán thực tế: Dự đoán xem một người có mua máy tính xách tay (Laptop) hay không dựa trên 3 thông tin:\n- Độ tuổi (Trẻ / Trung niên / Già)\n- Thu nhập (Cao / Trung bình / Thấp)\n- Là học sinh/sinh viên? (Có / Không)\n\nDưới đây là bảng dữ liệu lịch sử gồm 8 khách hàng:\n\n┌────┬───────────┬───────────┬───────────┬─────────────┐\n│ ID │  Độ tuổi  │ Thu nhập  │ Học sinh? │ Mua Laptop? │\n├────┼───────────┼───────────┼───────────┼─────────────┤\n│ 1  │ Trẻ       │ Cao       │ Không     │ KHÔNG       │\n│ 2  │ Trẻ       │ Cao       │ Có        │ CÓ          │\n│ 3  │ Trung niên│ Cao       │ Không     │ CÓ          │\n│ 4  │ Già       │ Trung bình│ Không     │ CÓ          │\n│ 5  │ Già       │ Thấp      │ Có        │ KHÔNG       │\n│ 6  │ Trẻ       │ Trung bình│ Không     │ KHÔNG       │\n│ 7  │ Trung niên│ Thấp      │ Có        │ CÓ          │\n│ 8  │ Già       │ Trung bình│ Có        │ CÓ          │\n└────┴───────────┴───────────┴───────────┴─────────────┘\n\nMục tiêu của chúng ta là xây dựng một Cây Quyết Định từ bảng dữ liệu này để tự động dự đoán cho một khách hàng mới.",
+          position: 2
+        },
+        {
+          id: "24000000-0000-4000-8000-000000000003",
+          title: "Cách tính Entropy và xây dựng cây quyết định",
+          lessonType: "TEXT" as const,
+          content: "Bây giờ chúng ta sẽ cùng tính toán để xem máy tính chọn đặc trưng nào làm Nút gốc (Root Node) bằng giải thuật ID3:\n\nBƯỚC 1: TÍNH ENTROPY CỦA TOÀN BỘ DỮ LIỆU BAN ĐẦU\n- Tổng số mẫu: 8 (5 mẫu CÓ mua, 3 mẫu KHÔNG mua).\n- Công thức Entropy: H(S) = - (p_yes * log2(p_yes) + p_no * log2(p_no))\n- H(S) = - (5/8 * log2(5/8) + 3/8 * log2(3/8)) ≈ 0.954 (Độ hỗn loạn cao vì tỷ lệ mua/không mua khá cân bằng).\n\nBƯỚC 2: TÍNH ENTROPY SAU KHI PHÂN CHIA THEO THUỘC TÍNH\nHãy thử phân chia dữ liệu theo đặc trưng Độ tuổi:\n1. Nhóm Trẻ (3 mẫu: ID 1, 2, 6): có 1 người mua (CÓ) và 2 người không mua (KHÔNG).\n   - Entropy(Trẻ) = - (1/3 * log2(1/3) + 2/3 * log2(2/3)) ≈ 0.918\n2. Nhóm Trung niên (2 mẫu: ID 3, 7): cả 2 đều mua (CÓ).\n   - Entropy(Trung niên) = 0 (Độ tinh khiết tuyệt đối, phân lớp hoàn toàn).\n3. Nhóm Già (3 mẫu: ID 4, 5, 8): có 2 người mua (CÓ) và 1 người không mua (KHÔNG).\n   - Entropy(Già) = - (2/3 * log2(2/3) + 1/3 * log2(1/3)) ≈ 0.918\n\nEntropy trung bình khi chia theo Độ tuổi:\n- H(S, Độ tuổi) = (3/8 * 0.918) + (2/8 * 0) + (3/8 * 0.918) ≈ 0.688\n\nBƯỚC 3: TÍNH ĐỘ TĂNG THÔNG TIN (INFORMATION GAIN - IG)\n- IG(Độ tuổi) = H(S) - H(S, Độ tuổi) = 0.954 - 0.688 = 0.266\n\nThực hiện tương tự cho Thu nhập và Học sinh?, ta được:\n- IG(Học sinh?) ≈ 0.311 (Lớn nhất!)\n- IG(Thu nhập) ≈ 0.048\n\nKẾT LUẬN:\nVì Học sinh? có Information Gain lớn nhất (0.311), thuật toán ID3 sẽ chọn đặc trưng này làm Nút gốc để chia nhánh đầu tiên!",
+          position: 3
+        }
+      ],
+      completedLessons: 1,
+      status: "ACTIVE" as const
+    },
+    {
+      slug: "nhap-mon-mang-no-ron-nhan-tao",
+      section: { id: "2f0f5ef2-33ef-4352-bc85-87be958085b7", title: "Chương 1: Giới thiệu về các giải thuật máy học" },
+      lessons: [
+        {
+          id: "1fb4a708-78db-4e1d-bbc2-4c6f024246d6",
+          title: "Mạng nơ-ron nhân tạo",
+          lessonType: "DOCUMENT" as const,
+          documentUrl: "http://localhost:3000/uploads/lesson-files/5996132d-d94e-4d3a-91d2-5b890269644e.pdf",
+          position: 1
+        }
+      ],
+      completedLessons: 0,
+      status: "ACTIVE" as const
+    }
+  ];
+
+  for (const definition of definitions) {
+    const course = await prisma.course.findUniqueOrThrow({ where: { slug: definition.slug } });
+    const section = await prisma.section.upsert({
+      where: { id: definition.section.id },
+      update: { courseId: course.id, title: definition.section.title, position: 1 },
+      create: { ...definition.section, courseId: course.id, position: 1 }
+    });
+
+    for (const lesson of definition.lessons) {
+      await prisma.lesson.upsert({
+        where: { id: lesson.id },
+        update: { ...lesson, sectionId: section.id, isPreview: lesson.position === 1, isRequired: true, isPublished: true },
+        create: { ...lesson, sectionId: section.id, isPreview: lesson.position === 1, isRequired: true, isPublished: true }
+      });
+      const isCompleted = lesson.position <= definition.completedLessons;
+      await prisma.lessonProgress.upsert({
+        where: { studentId_lessonId: { studentId, lessonId: lesson.id } },
+        update: { isCompleted, completedAt: isCompleted ? new Date("2026-08-06T08:00:00.000Z") : null, lastWatchedSecond: isCompleted ? (lesson.durationSeconds ?? 0) : 0 },
+        create: { studentId, lessonId: lesson.id, isCompleted, completedAt: isCompleted ? new Date("2026-08-06T08:00:00.000Z") : null, lastWatchedSecond: isCompleted ? (lesson.durationSeconds ?? 0) : 0 }
+      });
+    }
+
+    const progressPercent = Math.round((definition.completedLessons / definition.lessons.length) * 10000) / 100;
+    await prisma.enrollment.upsert({
+      where: { studentId_courseId: { studentId, courseId: course.id } },
+      update: { status: definition.status, progressPercent, completedAt: definition.status === "COMPLETED" ? new Date("2026-08-06T08:00:00.000Z") : null },
+      create: { studentId, courseId: course.id, status: definition.status, progressPercent, completedAt: definition.status === "COMPLETED" ? new Date("2026-08-06T08:00:00.000Z") : null }
+    });
+  }
+
+  const dockerCourse = await prisma.course.findUniqueOrThrow({ where: { slug: "docker-trien-khai-ung-dung" } });
+  const dockerSection = await prisma.section.upsert({
+    where: { id: "13000000-0000-4000-8000-000000000001" },
+    update: { courseId: dockerCourse.id, title: "Docker từ cơ bản đến triển khai", position: 1 },
+    create: { id: "13000000-0000-4000-8000-000000000001", courseId: dockerCourse.id, title: "Docker từ cơ bản đến triển khai", position: 1 }
+  });
+  const dockerLessons = [
+    { id: "23000000-0000-4000-8000-000000000001", title: "Container và image", lessonType: "TEXT" as const, content: "Tìm hiểu image, container, registry và vòng đời của một container Docker.", position: 1 },
+    { id: "23000000-0000-4000-8000-000000000002", title: "Triển khai với Docker Compose", lessonType: "VIDEO" as const, videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4", durationSeconds: 800, position: 2 }
+  ];
+  for (const lesson of dockerLessons) {
+    await prisma.lesson.upsert({
+      where: { id: lesson.id },
+      update: { ...lesson, sectionId: dockerSection.id, isPreview: lesson.position === 1, isRequired: true, isPublished: true },
+      create: { ...lesson, sectionId: dockerSection.id, isPreview: lesson.position === 1, isRequired: true, isPublished: true }
+    });
+  }
+}
+
+async function seedSprint7(studentId: string, instructorId: string) {
+  const course = await prisma.course.findUniqueOrThrow({ where: { slug: "react-native-cho-nguoi-moi" } });
+  const assignments = [
+    {
+      id: "70000000-0000-4000-8000-000000000001",
+      title: "Xây dựng màn hình đăng nhập React Native",
+      description: "Tạo giao diện đăng nhập, validation và kết nối REST API của LMS.",
+      instructions: "Nộp phần mô tả giải pháp hoặc file PDF/Word/ZIP. Giao diện cần xử lý loading và hiển thị lỗi từ API.",
+      dueAt: new Date("2026-09-01T16:59:59.000Z"),
+      maxScore: 100,
+      allowResubmission: true,
+      maxSubmissions: 3,
+      allowLateSubmissions: false,
+      isPublished: true
+    },
+    {
+      id: "70000000-0000-4000-8000-000000000002",
+      title: "Thiết kế luồng refresh token trên mobile",
+      description: "Mô tả interceptor và cách lưu token an toàn trên thiết bị.",
+      instructions: "Trình bày bằng văn bản hoặc sơ đồ. Nêu rõ cách xử lý khi refresh token hết hạn.",
+      dueAt: new Date("2026-09-10T16:59:59.000Z"),
+      maxScore: 50,
+      allowResubmission: false,
+      maxSubmissions: 1,
+      allowLateSubmissions: true,
+      isPublished: true
+    }
+  ];
+  for (const assignment of assignments) {
+    await prisma.assignment.upsert({ where: { id: assignment.id }, update: { ...assignment, courseId: course.id }, create: { ...assignment, courseId: course.id } });
+  }
+  const submission = await prisma.assignmentSubmission.upsert({
+    where: { id: "71000000-0000-4000-8000-000000000001" },
+    update: { assignmentId: assignments[0].id, studentId, attemptNumber: 1, textContent: "Em đã hoàn thành form đăng nhập, validation email và xử lý trạng thái loading.", status: "GRADED", submittedAt: new Date("2026-08-13T08:00:00.000Z") },
+    create: { id: "71000000-0000-4000-8000-000000000001", assignmentId: assignments[0].id, studentId, attemptNumber: 1, textContent: "Em đã hoàn thành form đăng nhập, validation email và xử lý trạng thái loading.", status: "GRADED", submittedAt: new Date("2026-08-13T08:00:00.000Z") }
+  });
+  await prisma.submissionFeedback.upsert({
+    where: { submissionId: submission.id },
+    update: { graderId: instructorId, score: 88, comment: "Giao diện rõ ràng và xử lý lỗi tốt. Cần bổ sung kiểm thử khi mất mạng." },
+    create: { submissionId: submission.id, graderId: instructorId, score: 88, comment: "Giao diện rõ ràng và xử lý lỗi tốt. Cần bổ sung kiểm thử khi mất mạng." }
+  });
+  await prisma.courseGradeRule.upsert({
+    where: { courseId: course.id },
+    update: { assignmentWeight: 60, quizWeight: 40, passingScore: 70 },
+    create: { courseId: course.id, assignmentWeight: 60, quizWeight: 40, passingScore: 70 }
+  });
+}
+
+async function seedSprint8(studentId: string, instructorId: string) {
+  const course = await prisma.course.findUniqueOrThrow({ where: { slug: "react-native-cho-nguoi-moi" } });
+  await prisma.notificationPreference.upsert({
+    where: { userId: studentId },
+    update: { inAppEnabled: true, emailEnabled: true, courseUpdates: true, assignmentReminders: true, quizResults: true, certificateUpdates: true },
+    create: { userId: studentId }
+  });
+  const announcement = await prisma.courseAnnouncement.upsert({
+    where: { id: "80000000-0000-4000-8000-000000000001" },
+    update: { courseId: course.id, authorId: instructorId, title: "Chào mừng đến Sprint 8", content: "Kênh thông báo khóa học đã sẵn sàng. Hãy kiểm tra bài tập sắp đến hạn.", status: "PUBLISHED", publishedAt: new Date("2026-08-14T08:00:00.000Z") },
+    create: { id: "80000000-0000-4000-8000-000000000001", courseId: course.id, authorId: instructorId, title: "Chào mừng đến Sprint 8", content: "Kênh thông báo khóa học đã sẵn sàng. Hãy kiểm tra bài tập sắp đến hạn.", status: "PUBLISHED", publishedAt: new Date("2026-08-14T08:00:00.000Z") }
+  });
+  await prisma.notification.upsert({
+    where: { id: "81000000-0000-4000-8000-000000000001" },
+    update: { userId: studentId, type: "COURSE_ANNOUNCEMENT", title: `Thông báo mới từ ${course.title}`, message: announcement.title, data: { url: `/courses/${course.id}/announcements/${announcement.id}`, courseId: course.id, announcementId: announcement.id }, isRead: false, readAt: null },
+    create: { id: "81000000-0000-4000-8000-000000000001", userId: studentId, type: "COURSE_ANNOUNCEMENT", title: `Thông báo mới từ ${course.title}`, message: announcement.title, data: { url: `/courses/${course.id}/announcements/${announcement.id}`, courseId: course.id, announcementId: announcement.id } }
+  });
+  await prisma.emailLog.upsert({
+    where: { id: "82000000-0000-4000-8000-000000000001" },
+    update: { userId: studentId, toEmail: "student@lms.test", subject: "Chào mừng đến LMS Platform", template: "WELCOME", status: "SENT", errorMessage: null, sentAt: new Date("2026-08-14T08:00:00.000Z") },
+    create: { id: "82000000-0000-4000-8000-000000000001", userId: studentId, toEmail: "student@lms.test", subject: "Chào mừng đến LMS Platform", template: "WELCOME", status: "SENT", sentAt: new Date("2026-08-14T08:00:00.000Z") }
+  });
+}
+
+async function seedSprint9(studentId: string) {
+  const course = await prisma.course.findUniqueOrThrow({ where: { slug: "react-native-cho-nguoi-moi" } });
+  const textLessonId = "20000000-0000-4000-8000-000000000001";
+  const videoLessonId = "20000000-0000-4000-8000-000000000002";
+  const events = [
+    { sessionId: "90000000-0000-4000-8000-000000000001", lessonId: textLessonId, eventType: "LESSON_STARTED" as const, durationSeconds: null, occurredAt: new Date("2026-08-10T02:00:00.000Z") },
+    { sessionId: "90000000-0000-4000-8000-000000000002", lessonId: textLessonId, eventType: "STUDY_SESSION" as const, durationSeconds: 300, occurredAt: new Date("2026-08-10T02:01:00.000Z") },
+    { sessionId: "90000000-0000-4000-8000-000000000003", lessonId: textLessonId, eventType: "LESSON_COMPLETED" as const, durationSeconds: null, occurredAt: new Date("2026-08-10T02:21:00.000Z") },
+    { sessionId: "90000000-0000-4000-8000-000000000004", lessonId: videoLessonId, eventType: "LESSON_STARTED" as const, durationSeconds: null, occurredAt: new Date("2026-08-11T03:00:00.000Z") },
+    { sessionId: "90000000-0000-4000-8000-000000000005", lessonId: videoLessonId, eventType: "STUDY_SESSION" as const, durationSeconds: 300, occurredAt: new Date("2026-08-12T03:00:00.000Z") },
+    { sessionId: "90000000-0000-4000-8000-000000000006", lessonId: videoLessonId, eventType: "STUDY_SESSION" as const, durationSeconds: 300, occurredAt: new Date("2026-08-13T03:00:00.000Z") },
+    { sessionId: "90000000-0000-4000-8000-000000000007", lessonId: videoLessonId, eventType: "STUDY_SESSION" as const, durationSeconds: 300, occurredAt: new Date("2026-08-14T03:00:00.000Z") }
+  ];
+  for (const event of events) {
+    await prisma.learningEvent.upsert({
+      where: { userId_sessionId_eventType_occurredAt: { userId: studentId, sessionId: event.sessionId, eventType: event.eventType, occurredAt: event.occurredAt } },
+      update: { courseId: course.id, lessonId: event.lessonId, durationSeconds: event.durationSeconds },
+      create: { ...event, userId: studentId, courseId: course.id }
+    });
+  }
+  await prisma.videoWatchEvent.upsert({
+    where: { userId_sessionId_startedAt: { userId: studentId, sessionId: "91000000-0000-4000-8000-000000000001", startedAt: new Date("2026-08-14T03:10:00.000Z") } },
+    update: { watchedSeconds: 180, endPositionSeconds: 180 },
+    create: {
+      userId: studentId,
+      courseId: course.id,
+      lessonId: videoLessonId,
+      sessionId: "91000000-0000-4000-8000-000000000001",
+      startedAt: new Date("2026-08-14T03:10:00.000Z"),
+      endedAt: new Date("2026-08-14T03:13:00.000Z"),
+      startPositionSeconds: 0,
+      endPositionSeconds: 180,
+      watchedSeconds: 180,
+      completed: false
+    }
+  });
+}
+
+async function seedSprint10(studentId: string, instructorId: string, adminId: string) {
+  const course = await prisma.course.findUniqueOrThrow({ where: { slug: "expressjs-rest-api-tu-co-ban" } });
+  const couponDefinitions = [
+    { code: "WELCOME20", name: "Welcome 20%", discountType: "PERCENTAGE" as const, discountValue: 20, maxDiscountAmount: 300000, minOrderAmount: 100000, startsAt: new Date("2026-01-01T00:00:00.000Z"), expiresAt: new Date("2030-12-31T23:59:59.000Z"), maxRedemptions: 100, appliesToAllCourses: true, isActive: true },
+    { code: "SAVE100K", name: "Save 100,000 VND", discountType: "FIXED_AMOUNT" as const, discountValue: 100000, maxDiscountAmount: null, minOrderAmount: 200000, startsAt: new Date("2026-01-01T00:00:00.000Z"), expiresAt: new Date("2030-12-31T23:59:59.000Z"), maxRedemptions: 50, appliesToAllCourses: true, isActive: true },
+    { code: "EXP2025", name: "Expired coupon", discountType: "PERCENTAGE" as const, discountValue: 10, maxDiscountAmount: null, minOrderAmount: null, startsAt: new Date("2025-01-01T00:00:00.000Z"), expiresAt: new Date("2025-12-31T23:59:59.000Z"), maxRedemptions: null, appliesToAllCourses: true, isActive: true },
+    { code: "INACTIVE15", name: "Inactive coupon", discountType: "PERCENTAGE" as const, discountValue: 15, maxDiscountAmount: null, minOrderAmount: null, startsAt: new Date("2026-01-01T00:00:00.000Z"), expiresAt: new Date("2030-12-31T23:59:59.000Z"), maxRedemptions: null, appliesToAllCourses: true, isActive: false }
+  ];
+  for (const coupon of couponDefinitions) await prisma.coupon.upsert({ where: { code: coupon.code }, update: { ...coupon, createdById: adminId }, create: { ...coupon, createdById: adminId } });
+  const scoped = await prisma.coupon.upsert({ where: { code: "EXPRESS25" }, update: { name: "ExpressJS course 25%", discountType: "PERCENTAGE", discountValue: 25, startsAt: new Date("2026-01-01T00:00:00.000Z"), expiresAt: new Date("2030-12-31T23:59:59.000Z"), appliesToAllCourses: false, isActive: true, createdById: adminId }, create: { code: "EXPRESS25", name: "ExpressJS course 25%", discountType: "PERCENTAGE", discountValue: 25, startsAt: new Date("2026-01-01T00:00:00.000Z"), expiresAt: new Date("2030-12-31T23:59:59.000Z"), appliesToAllCourses: false, isActive: true, createdById: adminId } });
+  await prisma.couponCourse.upsert({ where: { couponId_courseId: { couponId: scoped.id, courseId: course.id } }, update: {}, create: { couponId: scoped.id, courseId: course.id } });
+
+  const order = await prisma.order.findUniqueOrThrow({ where: { id: "60000000-0000-4000-8000-000000000001" } });
+  const item = await prisma.orderItem.findUniqueOrThrow({ where: { orderId_courseId: { orderId: order.id, courseId: course.id } } });
+  const payment = await prisma.payment.findUniqueOrThrow({ where: { idempotencyKey: "seed-demo-payment-001" } });
+  await prisma.instructorEarning.upsert({ where: { orderItemId: item.id }, update: { instructorId, courseId: course.id, orderId: order.id, paymentId: payment.id, grossAmount: 299000, platformFeeRate: 20, platformFeeAmount: 59800, netAmount: 239200, status: "AVAILABLE", availableAt: new Date("2026-08-12T08:00:00.000Z"), payoutId: null, reversedAt: null }, create: { instructorId, courseId: course.id, orderId: order.id, orderItemId: item.id, paymentId: payment.id, grossAmount: 299000, platformFeeRate: 20, platformFeeAmount: 59800, netAmount: 239200, status: "AVAILABLE", availableAt: new Date("2026-08-12T08:00:00.000Z") } });
+  await prisma.refundRequest.upsert({ where: { id: "a0000000-0000-4000-8000-000000000001" }, update: { userId: studentId, orderId: order.id, paymentId: payment.id, reason: "Demo refund request outside the policy.", status: "REJECTED", requestedAmount: 299000, adminNote: "Demo rejected request", reviewedById: adminId, reviewedAt: new Date("2026-08-13T08:00:00.000Z") }, create: { id: "a0000000-0000-4000-8000-000000000001", userId: studentId, orderId: order.id, paymentId: payment.id, reason: "Demo refund request outside the policy.", status: "REJECTED", requestedAmount: 299000, adminNote: "Demo rejected request", reviewedById: adminId, reviewedAt: new Date("2026-08-13T08:00:00.000Z") } });
+  await prisma.payout.upsert({ where: { idempotencyKey: "seed-demo-payout-failed" }, update: { instructorId, amount: 239200, status: "FAILED", failureReason: "Sandbox payout failure", createdById: adminId, processedAt: new Date("2026-08-14T08:00:00.000Z") }, create: { instructorId, amount: 239200, status: "FAILED", failureReason: "Sandbox payout failure", createdById: adminId, idempotencyKey: "seed-demo-payout-failed", processedAt: new Date("2026-08-14T08:00:00.000Z") } });
+}
+
 async function main() {
   const passwordHash = await bcrypt.hash(TEST_PASSWORD, 12);
   const users = await seedUsers(passwordHash);
   const instructor = users.find(user => user.role === "INSTRUCTOR")!;
   const student = users.find(user => user.role === "STUDENT" && user.status === "ACTIVE")!;
+  const admin = users.find(user => user.role === "ADMIN")!;
   const categories = await seedCategories();
   await seedCourses(instructor.id, categories);
   await seedLearningContent(student.id);
   await seedSprint3(student.id, instructor.id);
   await seedSprint4(student.id);
+  await seedAdditionalLearningContent(student.id);
+  await seedSprint7(student.id, instructor.id);
+  await seedSprint8(student.id, instructor.id);
+  await seedSprint9(student.id);
+  await seedSprint10(student.id, instructor.id, admin.id);
 
   console.log("Seed completed successfully");
   console.log("Test password for every seeded account: Password123");

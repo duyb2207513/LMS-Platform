@@ -3,8 +3,17 @@ on: [push, pull_request]
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      POSTGRES_DB: lms_test
+      AUTH_RATE_LIMIT_MAX: 10000
+      RATE_LIMIT_MAX: 10000
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: mobile/package-lock.json
       - name: Start development stack
         run: docker compose up -d --build postgres backend frontend
       - name: Wait for API
@@ -12,10 +21,34 @@ jobs:
       - name: Migrate and seed
         run: docker compose exec -T backend npm run db:deploy && docker compose exec -T backend npm run db:seed
       - name: Backend tests
-        run: docker compose exec -T backend npm test && docker compose exec -T backend npm run test:integration
+        run: docker compose exec -T backend npm run lint && docker compose exec -T backend npm run type-check && docker compose exec -T backend npm test && docker compose exec -T backend npm run test:integration
       - name: Frontend build
         run: docker compose exec -T frontend npm run build
+      - name: Mobile checks
+        working-directory: mobile
+        run: npm ci && npm run check
       - name: Install E2E browser
         run: docker compose exec -T frontend npx playwright install --with-deps chromium
       - name: Critical E2E journeys
         run: docker compose exec -T frontend npm run test:e2e
+
+  deploy:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.AUTO_DEPLOY_ENABLED == 'true'
+    needs: test
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Deploy production stack over SSH
+        uses: appleboy/ssh-action@v1.2.2
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script_stop: true
+          script: |
+            cd "${{ secrets.DEPLOY_PATH }}"
+            git fetch origin main
+            git checkout main
+            git pull --ff-only origin main
+            docker compose --env-file .env.production -f docker-compose.prod.yml up -d --build
+            docker image prune -f

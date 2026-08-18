@@ -7,7 +7,7 @@ const router = Router();
  *     summary: Create an order with immutable course price snapshots
  *     tags: [Orders]
  *     security: [{ bearerAuth: [] }]
- *     requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/CreateOrderRequest' } } } }
+ *     requestBody: { required: true, content: { application/json: { schema: { type: object, required: [courseIds], properties: { courseIds: { type: array, items: { type: string, format: uuid } }, couponCode: { type: string, example: WELCOME20 } } } } } }
  *     responses: { 201: { description: Order created successfully }, 404: { description: Published course not found }, 409: { description: Free or already-enrolled course } }
  * /orders/me:
  *   get:

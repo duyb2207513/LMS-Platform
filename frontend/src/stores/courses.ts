@@ -27,6 +27,8 @@ export const useCourseStore = defineStore('courses', () => {
       if (filters?.categoryId) params.categoryId = filters.categoryId
       if (filters?.level) params.level = filters.level
       if (filters?.isFree !== undefined) params.isFree = filters.isFree
+      if (filters?.sortBy) params.sortBy = filters.sortBy
+      if (filters?.sortOrder) params.sortOrder = filters.sortOrder
       if (filters?.page) params.page = filters.page
       if (filters?.limit) params.limit = filters.limit
 
@@ -71,8 +73,22 @@ export const useCourseStore = defineStore('courses', () => {
     error.value = null
     try {
       const api = useApi()
-      const response = await api.get<PaginatedResponse<Course>>('/instructor/courses', { limit: 100 })
-      myCourses.value = response.data || []
+      // Backend giới hạn tối đa 50 bản ghi cho mỗi trang. Lấy trang đầu
+      // rồi ghép các trang còn lại để màn hình vẫn hiển thị đủ khóa học.
+      const firstPage = await api.get<PaginatedResponse<Course>>('/instructor/courses', { page: 1, limit: 50 })
+      const allCourses = [...(firstPage.data || [])]
+      const totalPages = firstPage.meta?.totalPages || 1
+
+      if (totalPages > 1) {
+        const remainingPages = await Promise.all(
+          Array.from({ length: totalPages - 1 }, (_, index) =>
+            api.get<PaginatedResponse<Course>>('/instructor/courses', { page: index + 2, limit: 50 }),
+          ),
+        )
+        remainingPages.forEach((response) => allCourses.push(...(response.data || [])))
+      }
+
+      myCourses.value = allCourses
     } catch (e) {
       error.value = e instanceof Error ? e.message : 'Failed to fetch my courses'
       myCourses.value = []
@@ -96,11 +112,23 @@ export const useCourseStore = defineStore('courses', () => {
     if (response.data) {
       const index = myCourses.value.findIndex((c) => c.id === id)
       if (index !== -1) {
-        myCourses.value[index] = response.data
+        myCourses.value[index] = { ...myCourses.value[index], ...response.data }
       }
       if (currentCourse.value?.id === id) {
-        currentCourse.value = response.data
+        currentCourse.value = { ...currentCourse.value, ...response.data }
       }
+    }
+    return response
+  }
+
+  async function uploadCourseThumbnail(id: string, file: File) {
+    const body = new FormData()
+    body.append('thumbnail', file)
+    const response = await useApi().post<ApiResponse<{ thumbnailUrl: string }>>(`/courses/${id}/thumbnail`, body)
+    if (response.data) {
+      const course = myCourses.value.find((item) => item.id === id)
+      if (course) course.thumbnailUrl = response.data.thumbnailUrl
+      if (currentCourse.value?.id === id) currentCourse.value.thumbnailUrl = response.data.thumbnailUrl
     }
     return response
   }
@@ -111,7 +139,11 @@ export const useCourseStore = defineStore('courses', () => {
 
   async function updateCourseStatus(id: string, status: CourseStatus) {
     const api = useApi()
-    const response = status === CourseStatus.PUBLISHED ? await api.post<ApiResponse<Course>>(`/courses/${id}/publish`) : status === CourseStatus.DRAFT ? await api.post<ApiResponse<Course>>(`/courses/${id}/unpublish`) : await api.patch<ApiResponse<Course>>(`/courses/${id}`, { status } as any)
+    const response = status === CourseStatus.PUBLISHED
+      ? await api.post<ApiResponse<Course>>(`/courses/${id}/publish`)
+      : status === CourseStatus.DRAFT
+        ? await api.post<ApiResponse<Course>>(`/courses/${id}/unpublish`)
+        : await api.post<ApiResponse<Course>>(`/courses/${id}/archive`)
     if (response.data) {
       const index = myCourses.value.findIndex((c) => c.id === id)
       if (index !== -1) {
@@ -136,6 +168,7 @@ export const useCourseStore = defineStore('courses', () => {
     fetchMyCourses,
     createCourse,
     updateCourse,
+    uploadCourseThumbnail,
     publishCourse,
     updateCourseStatus,
   }

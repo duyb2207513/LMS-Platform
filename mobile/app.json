@@ -2,15 +2,20 @@
   "expo": {
     "name": "LMS Platform",
     "slug": "lms-platform-mobile",
+    "scheme": "lmsplatform",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.lmsplatform.mobile"
+      "bundleIdentifier": "com.lmsplatform.mobile",
+      "buildNumber": "1"
     },
     "android": {
+      "blockedPermissions": [
+        "android.permission.RECORD_AUDIO"
+      ],
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/android-icon-foreground.png",
@@ -18,14 +23,32 @@
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "com.lmsplatform.mobile"
+      "package": "com.lmsplatform.mobile",
+      "versionCode": 1
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
       "expo-secure-store",
-      "expo-video"
+      "expo-video",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Cho phép LMS Platform truy cập thư viện ảnh để tải ảnh đại diện và thumbnail khóa học."
+        }
+      ],
+      "expo-font",
+      "expo-web-browser",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/android-icon-monochrome.png",
+          "color": "#6D28D9",
+          "defaultChannel": "lms-updates"
+        }
+      ],
+      "@sentry/react-native"
     ]
   }
 }

@@ -26,6 +26,9 @@ Thumbs.db
 # Uploads
 uploads/
 
+# Local database backups
+backups/
+
 # Playwright
 playwright-report/
 test-results/

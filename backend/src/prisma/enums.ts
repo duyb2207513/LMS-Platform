@@ -56,7 +56,8 @@ export type LessonType = (typeof LessonType)[keyof typeof LessonType]
 export const EnrollmentStatus = {
   ACTIVE: 'ACTIVE',
   COMPLETED: 'COMPLETED',
-  CANCELLED: 'CANCELLED'
+  CANCELLED: 'CANCELLED',
+  REFUNDED: 'REFUNDED'
 } as const
 
 export type EnrollmentStatus = (typeof EnrollmentStatus)[keyof typeof EnrollmentStatus]
@@ -73,7 +74,8 @@ export type QuizAttemptStatus = (typeof QuizAttemptStatus)[keyof typeof QuizAtte
 export const OrderStatus = {
   PENDING: 'PENDING',
   PAID: 'PAID',
-  CANCELLED: 'CANCELLED'
+  CANCELLED: 'CANCELLED',
+  REFUNDED: 'REFUNDED'
 } as const
 
 export type OrderStatus = (typeof OrderStatus)[keyof typeof OrderStatus]
@@ -90,7 +92,131 @@ export type PaymentProvider = (typeof PaymentProvider)[keyof typeof PaymentProvi
 export const PaymentStatus = {
   PENDING: 'PENDING',
   SUCCEEDED: 'SUCCEEDED',
-  FAILED: 'FAILED'
+  FAILED: 'FAILED',
+  REFUNDED: 'REFUNDED'
 } as const
 
 export type PaymentStatus = (typeof PaymentStatus)[keyof typeof PaymentStatus]
+
+
+export const CouponDiscountType = {
+  PERCENTAGE: 'PERCENTAGE',
+  FIXED_AMOUNT: 'FIXED_AMOUNT'
+} as const
+
+export type CouponDiscountType = (typeof CouponDiscountType)[keyof typeof CouponDiscountType]
+
+
+export const CouponUsageStatus = {
+  REDEEMED: 'REDEEMED',
+  RELEASED: 'RELEASED'
+} as const
+
+export type CouponUsageStatus = (typeof CouponUsageStatus)[keyof typeof CouponUsageStatus]
+
+
+export const RefundRequestStatus = {
+  PENDING: 'PENDING',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED',
+  PROCESSING: 'PROCESSING',
+  REFUNDED: 'REFUNDED',
+  FAILED: 'FAILED',
+  CANCELLED: 'CANCELLED'
+} as const
+
+export type RefundRequestStatus = (typeof RefundRequestStatus)[keyof typeof RefundRequestStatus]
+
+
+export const PaymentRefundStatus = {
+  PENDING: 'PENDING',
+  PROCESSING: 'PROCESSING',
+  SUCCEEDED: 'SUCCEEDED',
+  FAILED: 'FAILED'
+} as const
+
+export type PaymentRefundStatus = (typeof PaymentRefundStatus)[keyof typeof PaymentRefundStatus]
+
+
+export const EarningStatus = {
+  PENDING: 'PENDING',
+  AVAILABLE: 'AVAILABLE',
+  PAID: 'PAID',
+  REVERSED: 'REVERSED'
+} as const
+
+export type EarningStatus = (typeof EarningStatus)[keyof typeof EarningStatus]
+
+
+export const PayoutStatus = {
+  PENDING: 'PENDING',
+  PROCESSING: 'PROCESSING',
+  PAID: 'PAID',
+  FAILED: 'FAILED',
+  CANCELLED: 'CANCELLED'
+} as const
+
+export type PayoutStatus = (typeof PayoutStatus)[keyof typeof PayoutStatus]
+
+
+export const AuthTokenType = {
+  VERIFY_EMAIL: 'VERIFY_EMAIL',
+  RESET_PASSWORD: 'RESET_PASSWORD',
+  CHANGE_EMAIL: 'CHANGE_EMAIL',
+  MOBILE_OAUTH: 'MOBILE_OAUTH'
+} as const
+
+export type AuthTokenType = (typeof AuthTokenType)[keyof typeof AuthTokenType]
+
+
+export const AssignmentSubmissionStatus = {
+  SUBMITTED: 'SUBMITTED',
+  GRADED: 'GRADED'
+} as const
+
+export type AssignmentSubmissionStatus = (typeof AssignmentSubmissionStatus)[keyof typeof AssignmentSubmissionStatus]
+
+
+export const NotificationType = {
+  WELCOME: 'WELCOME',
+  COURSE_ENROLLED: 'COURSE_ENROLLED',
+  NEW_LESSON: 'NEW_LESSON',
+  ASSIGNMENT_DUE: 'ASSIGNMENT_DUE',
+  QUIZ_RESULT: 'QUIZ_RESULT',
+  CERTIFICATE_ISSUED: 'CERTIFICATE_ISSUED',
+  COURSE_ANNOUNCEMENT: 'COURSE_ANNOUNCEMENT',
+  ASSIGNMENT_GRADED: 'ASSIGNMENT_GRADED',
+  PAYMENT_SUCCEEDED: 'PAYMENT_SUCCEEDED',
+  DIRECT_MESSAGE: 'DIRECT_MESSAGE'
+} as const
+
+export type NotificationType = (typeof NotificationType)[keyof typeof NotificationType]
+
+
+export const EmailStatus = {
+  PENDING: 'PENDING',
+  SENT: 'SENT',
+  FAILED: 'FAILED'
+} as const
+
+export type EmailStatus = (typeof EmailStatus)[keyof typeof EmailStatus]
+
+
+export const AnnouncementStatus = {
+  DRAFT: 'DRAFT',
+  PUBLISHED: 'PUBLISHED'
+} as const
+
+export type AnnouncementStatus = (typeof AnnouncementStatus)[keyof typeof AnnouncementStatus]
+
+
+export const LearningEventType = {
+  COURSE_OPENED: 'COURSE_OPENED',
+  LESSON_STARTED: 'LESSON_STARTED',
+  LESSON_COMPLETED: 'LESSON_COMPLETED',
+  QUIZ_STARTED: 'QUIZ_STARTED',
+  QUIZ_SUBMITTED: 'QUIZ_SUBMITTED',
+  STUDY_SESSION: 'STUDY_SESSION'
+} as const
+
+export type LearningEventType = (typeof LearningEventType)[keyof typeof LearningEventType]

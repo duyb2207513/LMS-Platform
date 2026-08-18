@@ -4,6 +4,8 @@ import type { AuthTokenPayload } from "../auth/auth.types.js";
 import { assertLessonAccess, canManageCourse, UUID } from "../interactions/access.js";
 import { getManagedLesson } from "../lessons/lessons.service.js";
 import type { OptionInput, QuestionInput, QuizInput, SubmitAttemptInput, UpdateOptionInput, UpdateQuestionInput, UpdateQuizInput } from "./quizzes.types.js";
+import { safelyRunCommunication } from "../../services/communication/communication.service.js";
+import { createNotification } from "../notifications/notification.service.js";
 
 const quizTree = { questions: { orderBy: [{ position: "asc" as const }, { createdAt: "asc" as const }], include: { options: { orderBy: [{ position: "asc" as const }, { createdAt: "asc" as const }] } } } };
 
@@ -47,13 +49,13 @@ export async function createQuiz(lessonId: string, actor: AuthTokenPayload, inpu
 }
 export async function getQuiz(quizId: string, actor: AuthTokenPayload) {
   if (!UUID.test(quizId)) throw new AppError(404, "Quiz not found");
-  const quiz = await prisma.quiz.findUnique({ where: { id: quizId }, include: { lesson: { include: { section: { include: { course: { select: { instructorId: true } } } } } }, ...quizTree } });
+  const quiz = await prisma.quiz.findUnique({ where: { id: quizId }, include: { lesson: { include: { section: { include: { course: { select: { id: true, instructorId: true } } } } } }, ...quizTree } });
   if (!quiz) throw new AppError(404, "Quiz not found");
   const manager = canManageCourse(quiz.lesson.section.course.instructorId, actor);
   if (!manager) { await assertLessonAccess(quiz.lessonId, actor); if (!quiz.isPublished) throw new AppError(404, "Published quiz not found"); }
   const { lesson, ...base } = quiz;
-  if (manager) return base;
-  return { ...base, questions: base.questions.map(({ explanation: _explanation, options, ...question }) => ({ ...question, options: options.map(({ isCorrect: _isCorrect, ...option }) => option) })) };
+  if (manager) return { ...base, courseId: lesson.section.course.id };
+  return { ...base, courseId: lesson.section.course.id, questions: base.questions.map(({ explanation: _explanation, options, ...question }) => ({ ...question, options: options.map(({ isCorrect: _isCorrect, ...option }) => option) })) };
 }
 export async function updateQuiz(quizId: string, actor: AuthTokenPayload, input: UpdateQuizInput) {
   await managedQuiz(quizId, actor); await assertMutable(quizId); if (input.isPublished) await assertReady(quizId);
@@ -96,7 +98,7 @@ export async function listMyAttempts(quizId: string, studentId: string) {
 }
 export async function submitAttempt(attemptId: string, studentId: string, input: SubmitAttemptInput) {
   if (!UUID.test(attemptId)) throw new AppError(404, "Quiz attempt not found");
-  const attempt = await prisma.quizAttempt.findUnique({ where: { id: attemptId }, include: { quiz: { include: quizTree } } });
+  const attempt = await prisma.quizAttempt.findUnique({ where: { id: attemptId }, include: { quiz: { include: { ...quizTree, lesson: { select: { id: true, section: { select: { courseId: true } } } } } } } });
   if (!attempt || attempt.studentId !== studentId) throw new AppError(404, "Quiz attempt not found");
   if (attempt.status !== "IN_PROGRESS") throw new AppError(409, "Quiz attempt has already been submitted");
   const questionMap = new Map(attempt.quiz.questions.map(question => [question.id, question]));
@@ -109,10 +111,13 @@ export async function submitAttempt(attemptId: string, studentId: string, input:
   const earnedPoints = answers.reduce((sum, answer) => sum + answer.pointsEarned, 0);
   const score = totalPoints ? Math.round((earnedPoints / totalPoints) * 10000) / 100 : 0;
   const passed = score >= attempt.quiz.passingScore;
+  const submittedAt = new Date();
   await prisma.$transaction(async transaction => {
-    const claimed = await transaction.quizAttempt.updateMany({ where: { id: attemptId, status: "IN_PROGRESS" }, data: { status: "SUBMITTED", score, earnedPoints, totalPoints, passed, submittedAt: new Date() } });
+    const claimed = await transaction.quizAttempt.updateMany({ where: { id: attemptId, status: "IN_PROGRESS" }, data: { status: "SUBMITTED", score, earnedPoints, totalPoints, passed, submittedAt } });
     if (!claimed.count) throw new AppError(409, "Quiz attempt has already been submitted");
     if (answers.length) await transaction.attemptAnswer.createMany({ data: answers.map(answer => ({ ...answer, attemptId })) });
+    await transaction.learningEvent.create({ data: { userId: studentId, courseId: attempt.quiz.lesson.section.courseId, lessonId: attempt.quiz.lesson.id, eventType: "QUIZ_SUBMITTED", sessionId: attempt.id, occurredAt: submittedAt, metadata: { quizId: attempt.quizId, attemptId: attempt.id, score } } });
   });
-  return { id: attempt.id, quizId: attempt.quizId, attemptNumber: attempt.attemptNumber, status: "SUBMITTED" as const, score, earnedPoints, totalPoints, passed, submittedAt: new Date(), answers: attempt.quiz.questions.map(question => { const selected = answers.find(answer => answer.questionId === question.id); return { questionId: question.id, question: question.text, selectedOptionId: selected?.optionId ?? null, correctOptionId: question.options.find(option => option.isCorrect)?.id, isCorrect: selected?.isCorrect ?? false, pointsEarned: selected?.pointsEarned ?? 0, explanation: question.explanation }; }) };
+  await safelyRunCommunication(() => createNotification({ userId: studentId, type: "QUIZ_RESULT", title: `Kết quả quiz: ${attempt.quiz.title}`, message: `Bạn đạt ${score}%${passed ? " và đã vượt qua" : ""}.`, data: { url: `/quizzes/${attempt.quizId}/result/${attempt.id}`, quizId: attempt.quizId, attemptId: attempt.id } }));
+  return { id: attempt.id, quizId: attempt.quizId, attemptNumber: attempt.attemptNumber, status: "SUBMITTED" as const, score, earnedPoints, totalPoints, passed, submittedAt, answers: attempt.quiz.questions.map(question => { const selected = answers.find(answer => answer.questionId === question.id); return { questionId: question.id, question: question.text, selectedOptionId: selected?.optionId ?? null, correctOptionId: question.options.find(option => option.isCorrect)?.id, isCorrect: selected?.isCorrect ?? false, pointsEarned: selected?.pointsEarned ?? 0, explanation: question.explanation }; }) };
 }

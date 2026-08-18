@@ -1,5 +1,123 @@
-import { computed, ref } from 'vue';import { defineStore } from 'pinia';import { useApi } from '@/composables/useApi';import type { ApiResponse, LoginRequest, RegisterRequest, User } from '@/types';import { UserRole } from '@/types'
-export const useAuthStore=defineStore('auth',()=>{const user=ref<User|null>(null),token=ref<string|null>(null);const isLoggedIn=computed(()=>!!user.value&&!!token.value),isStudent=computed(()=>user.value?.role===UserRole.STUDENT),isInstructor=computed(()=>user.value?.role===UserRole.INSTRUCTOR),isAdmin=computed(()=>user.value?.role===UserRole.ADMIN),userInitials=computed(()=>user.value?.fullName.split(' ').map(x=>x[0]).join('').slice(0,2).toUpperCase()||'');
-function setSession(nextUser:User,nextToken:string){user.value=nextUser;token.value=nextToken;localStorage.setItem('user',JSON.stringify(nextUser));localStorage.setItem('accessToken',nextToken)}function initialize(){const raw=localStorage.getItem('user'),access=localStorage.getItem('accessToken');if(raw&&access)try{user.value=JSON.parse(raw);token.value=access}catch{clear()}}function clear(){user.value=null;token.value=null;localStorage.removeItem('user');localStorage.removeItem('accessToken')}
-async function login(input:LoginRequest){const response=await useApi().post<ApiResponse<{accessToken:string;user:User}>>('/auth/login',input);if(response.data)setSession(response.data.user,response.data.accessToken);return response}async function register(input:RegisterRequest){return useApi().post<ApiResponse<{user:User}>>('/auth/register',input)}async function logout(){try{await useApi().post('/auth/logout')}finally{clear()}}async function fetchCurrentUser(){const response=await useApi().get<ApiResponse<User>>('/users/me');if(response.data){user.value=response.data;localStorage.setItem('user',JSON.stringify(response.data))}return response.data}function updateUser(next:User){user.value=next;localStorage.setItem('user',JSON.stringify(next))}
-return{user,token,isLoggedIn,isStudent,isInstructor,isAdmin,userInitials,initialize,login,register,logout,fetchCurrentUser,updateUser}})
+import { computed, ref } from "vue";
+import { defineStore } from "pinia";
+import { useApi } from "@/composables/useApi";
+import type { ApiResponse, LoginRequest, RegisterRequest, User } from "@/types";
+import { UserRole } from "@/types";
+export const useAuthStore = defineStore("auth", () => {
+  const user = ref<User | null>(null),
+    token = ref<string | null>(null);
+  let listenersRegistered = false;
+  const isLoggedIn = computed(() => !!user.value && !!token.value),
+    isStudent = computed(() => user.value?.role === UserRole.STUDENT),
+    isInstructor = computed(() => user.value?.role === UserRole.INSTRUCTOR),
+    isAdmin = computed(() => user.value?.role === UserRole.ADMIN),
+    userInitials = computed(
+      () =>
+        user.value?.fullName
+          .split(" ")
+          .map((x) => x[0])
+          .join("")
+          .slice(0, 2)
+          .toUpperCase() || "",
+    );
+  function setSession(nextUser: User, nextToken: string) {
+    user.value = nextUser;
+    token.value = nextToken;
+    localStorage.setItem("user", JSON.stringify(nextUser));
+    localStorage.setItem("accessToken", nextToken);
+  }
+  function initialize() {
+    const raw = localStorage.getItem("user"),
+      access = localStorage.getItem("accessToken");
+    if (raw && access)
+      try {
+        user.value = JSON.parse(raw);
+        token.value = access;
+      } catch {
+        clear();
+      }
+    if (!listenersRegistered) {
+      window.addEventListener("lms:access-token-refreshed", (event) => {
+        token.value = (event as CustomEvent<string>).detail;
+      });
+      window.addEventListener("lms:session-expired", clear);
+      listenersRegistered = true;
+    }
+  }
+  function clear() {
+    user.value = null;
+    token.value = null;
+    localStorage.removeItem("user");
+    localStorage.removeItem("accessToken");
+  }
+  async function login(input: LoginRequest) {
+    const response = await useApi().post<
+      ApiResponse<{ accessToken: string; user: User }>
+    >("/auth/login", input);
+    if (response.data)
+      setSession(response.data.user, response.data.accessToken);
+    return response;
+  }
+  async function register(input: RegisterRequest) {
+    return useApi().post<ApiResponse<{ user: User }>>("/auth/register", input);
+  }
+  async function logout() {
+    try {
+      await useApi().post("/auth/logout");
+    } finally {
+      clear();
+      const { useNotificationStore } = await import("./notification");
+      useNotificationStore().clear();
+    }
+  }
+  async function fetchCurrentUser() {
+    const response = await useApi().get<ApiResponse<User>>("/users/me");
+    if (response.data) {
+      user.value = response.data;
+      localStorage.setItem("user", JSON.stringify(response.data));
+    }
+    return response.data;
+  }
+  function updateUser(next: User) {
+    user.value = next;
+    localStorage.setItem("user", JSON.stringify(next));
+  }
+  async function googleLogin(idToken: string) {
+    const response = await useApi().post<
+      ApiResponse<{ accessToken: string; user: User }>
+    >("/auth/google", { idToken });
+    if (response.data)
+      setSession(response.data.user, response.data.accessToken);
+    return response;
+  }
+  async function completeOAuthLogin() {
+    const response = await useApi().post<ApiResponse<{ accessToken: string }>>(
+      "/auth/refresh-token",
+    );
+    if (!response.data?.accessToken)
+      throw new Error("Không nhận được phiên đăng nhập");
+    token.value = response.data.accessToken;
+    localStorage.setItem("accessToken", response.data.accessToken);
+    const current = await fetchCurrentUser();
+    if (!current) throw new Error("Không thể tải thông tin tài khoản");
+    return current;
+  }
+  return {
+    user,
+    token,
+    isLoggedIn,
+    isStudent,
+    isInstructor,
+    isAdmin,
+    userInitials,
+    initialize,
+    login,
+    googleLogin,
+    completeOAuthLogin,
+    register,
+    logout,
+    fetchCurrentUser,
+    updateUser,
+    clear,
+  };
+});

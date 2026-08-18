@@ -1,1 +1,1 @@
-export interface CreateOrderInput { courseIds: string[] }
+export interface CreateOrderInput { courseIds: string[]; couponCode?: string }

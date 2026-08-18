@@ -5,9 +5,9 @@ services:
     restart: unless-stopped
 
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: lms_db
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-lms_db}
 
     ports:
       - "5432:5432"
@@ -16,7 +16,11 @@ services:
       - postgres_data:/var/lib/postgresql/data
 
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d lms_db"]
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-lms_db}",
+        ]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -25,7 +29,14 @@ services:
     build:
       context: ./backend
 
+    env_file:
+      - path: ./backend/.env
+        required: false
+
     container_name: lms-backend
+    # Development uses bind mounts and runs generators/tests that write to the host workspace.
+    # The production image still runs as the non-root `node` user.
+    user: root
     restart: unless-stopped
 
     ports:
@@ -38,14 +49,30 @@ services:
     environment:
       NODE_ENV: development
       PORT: 3000
-      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/lms_db
+      MOBILE_APP_URL: lmsplatform://
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-lms_db}
       JWT_ACCESS_SECRET: local-development-access-secret-change-me
       JWT_REFRESH_SECRET: local-development-refresh-secret-change-me
       MOCK_PAYMENT_WEBHOOK_SECRET: local-mock-payment-webhook-secret
       RATE_LIMIT_WINDOW_MS: 900000
-      RATE_LIMIT_MAX: 300
+      RATE_LIMIT_MAX: ${RATE_LIMIT_MAX:-300}
       AUTH_RATE_LIMIT_WINDOW_MS: 900000
-      AUTH_RATE_LIMIT_MAX: 20
+      AUTH_RATE_LIMIT_MAX: ${AUTH_RATE_LIMIT_MAX:-20}
+      LOGIN_MAX_ATTEMPTS: 5
+      LOGIN_LOCK_MINUTES: 15
+      REQUIRE_EMAIL_VERIFICATION: "false"
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-456249048931-5aa460ojovj1qfo7ap3hbv7qauh7avdj.apps.googleusercontent.com}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_SECURE: ${SMTP_SECURE:-false}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      MAIL_FROM: ${MAIL_FROM:-LMS Platform <no-reply@lms.local>}
+      ASSIGNMENT_REMINDER_INTERVAL_MINUTES: ${ASSIGNMENT_REMINDER_INTERVAL_MINUTES:-15}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.0-flash}
+      SENTRY_DSN: ${SENTRY_DSN:-}
+      LOG_LEVEL: ${LOG_LEVEL:-debug}
 
     depends_on:
       postgres:
@@ -69,11 +96,13 @@ services:
 
     environment:
       VITE_API_BASE_URL: http://localhost:3000/api/v1
+      VITE_GOOGLE_CLIENT_ID: ${VITE_GOOGLE_CLIENT_ID:-${GOOGLE_CLIENT_ID:-456249048931-5aa460ojovj1qfo7ap3hbv7qauh7avdj.apps.googleusercontent.com}}
 
     command: npm run dev -- --host 0.0.0.0
 
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
 
   mobile:
     build:
@@ -96,13 +125,19 @@ services:
 
     environment:
       EXPO_PUBLIC_API_URL: ${MOBILE_API_URL:-http://10.0.2.2:3000/api/v1}
+      EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID: ${GOOGLE_CLIENT_ID:-456249048931-5aa460ojovj1qfo7ap3hbv7qauh7avdj.apps.googleusercontent.com}
+      EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID: ${EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID:-}
+      EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID: ${EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID:-}
+      EXPO_PUBLIC_EAS_PROJECT_ID: ${EXPO_PUBLIC_EAS_PROJECT_ID:-}
+      EXPO_PUBLIC_SENTRY_DSN: ${EXPO_PUBLIC_SENTRY_DSN:-}
       REACT_NATIVE_PACKAGER_HOSTNAME: ${MOBILE_HOST_IP:-10.0.2.2}
       WATCHPACK_POLLING: "true"
 
     command: npm run start -- --lan --clear
 
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
 
 volumes:
   postgres_data:
