@@ -82,8 +82,7 @@ coursesRouter.get(
 );
 coursesRouter.post(
   "/",
-  authenticate,
-  authorize("INSTRUCTOR"),
+  ...courseManagers,
   validateRequest(validateCreateCourseInput),
   asyncHandler(createCourseController),
 );

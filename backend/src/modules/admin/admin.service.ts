@@ -57,7 +57,7 @@ export async function listAdminReviews(query: AdminListQuery) {
 export async function removeAdminReview(reviewId: string) { if (!UUID.test(reviewId)) throw new AppError(404, "Review not found"); const result = await prisma.review.deleteMany({ where: { id: reviewId } }); if (!result.count) throw new AppError(404, "Review not found"); }
 
 export async function listAdminComments(query: AdminListQuery) {
-  const where = { ...(query.search ? { OR: [{ content: { contains: query.search, mode: "insensitive" as const } }, { user: { fullName: { contains: query.search, mode: "insensitive" as const } } }, { lesson: { title: { contains: query.search, mode: "insensitive" as const } } }] } : {}) };
+  const where = query.search ? { OR: [{ content: { contains: query.search, mode: "insensitive" as const } }, { user: { fullName: { contains: query.search, mode: "insensitive" as const } } }, { lesson: { title: { contains: query.search, mode: "insensitive" as const } } }] } : {};
   const [items, total] = await Promise.all([prisma.comment.findMany({ where, skip: (query.page - 1) * query.limit, take: query.limit, orderBy: { createdAt: "desc" }, include: { user: { select: { id: true, fullName: true, email: true, role: true } }, lesson: { select: { id: true, title: true, section: { select: { course: { select: { id: true, title: true } } } } } } } }), prisma.comment.count({ where })]);
   return { items: items.map(item => ({ ...item, content: item.deletedAt ? null : item.content, isDeleted: Boolean(item.deletedAt) })), meta: meta(query, total) };
 }
