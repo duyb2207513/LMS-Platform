@@ -377,4 +377,23 @@ router.beforeEach((to) => {
   }
 });
 
+// Auto-reload on deployment chunk changes (stale browser cache)
+router.onError((error, to) => {
+  const message = error?.message || "";
+  if (
+    message.includes("Failed to fetch dynamically imported module") ||
+    message.includes("Importing a module script failed") ||
+    message.includes("Expected a JavaScript-or-Wasm module script")
+  ) {
+    if (!sessionStorage.getItem("chunk_reload_lock")) {
+      sessionStorage.setItem("chunk_reload_lock", "true");
+      window.location.assign(to.fullPath);
+    }
+  }
+});
+
+router.afterEach(() => {
+  sessionStorage.removeItem("chunk_reload_lock");
+});
+
 export default router;
