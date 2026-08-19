@@ -2,7 +2,7 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "build": "tsc",
+    "build": "prisma generate && tsc",
     "type-check": "tsc --noEmit",
     "lint": "oxlint src prisma/seed.ts",
     "test": "npm run build && node tests/unit/auth.validation.test.mjs && node tests/unit/auth.access-token.test.mjs && node tests/unit/users.validation.test.mjs && node tests/unit/categories.validation.test.mjs && node tests/unit/courses.validation.test.mjs && node tests/unit/learning.validation.test.mjs && node tests/unit/sprint3.validation.test.mjs && node tests/unit/sprint4.validation.test.mjs && node tests/unit/sprint5.security.test.mjs && node tests/unit/sprint7.validation.test.mjs && node tests/unit/sprint8.validation.test.mjs && node tests/unit/sprint9.analytics.test.mjs && node tests/unit/sprint10.commerce.test.mjs",

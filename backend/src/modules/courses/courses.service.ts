@@ -135,9 +135,16 @@ export async function listPublicCourses(query: Partial<PublicCourseQuery>) {
   };
 }
 
-export async function getPublicCourse(slug: string) {
+export async function getPublicCourse(slugOrId: string) {
+  const isUUID = UUID_PATTERN.test(slugOrId);
   const course = await prisma.course.findFirst({
-    where: { slug, status: "PUBLISHED" },
+    where: {
+      OR: [
+        { slug: slugOrId },
+        ...(isUUID ? [{ id: slugOrId }] : [])
+      ],
+      status: "PUBLISHED"
+    },
     select: {
       id: true,
       title: true,
@@ -175,45 +182,34 @@ export async function listInstructorCourses(
       ? { title: { contains: query.search, mode: "insensitive" as const } }
       : {})
   };
-  const [courses, totalItems] = await Promise.all([
-    prisma.course.findMany({
-      where,
-      skip: (page - 1) * limit,
-      take: limit,
-      orderBy: { createdAt: "desc" },
-      select: {
-        id: true,
-        instructorId: true,
-        categoryId: true,
-        title: true,
-        slug: true,
-        description: true,
-        thumbnailUrl: true,
-        level: true,
-        price: true,
-        isFree: true,
-        language: true,
-        requirements: true,
-        learningOutcomes: true,
-        status: true,
-        publishedAt: true,
-        createdAt: true,
-        updatedAt: true,
-        category: { select: { id: true, name: true, slug: true } },
-        instructor: { select: { id: true, fullName: true, avatarUrl: true } }
-      }
-    }),
-    prisma.course.count({ where })
-  ]);
-  return {
-    data: courses.map(serializeCourse),
-    meta: {
-      page,
-      limit,
-      totalItems,
-      totalPages: Math.ceil(totalItems / limit)
+  const courses = await prisma.course.findMany({
+    where,
+    skip: (page - 1) * limit,
+    take: limit,
+    orderBy: { createdAt: "desc" },
+    select: {
+      id: true,
+      instructorId: true,
+      categoryId: true,
+      title: true,
+      slug: true,
+      description: true,
+      thumbnailUrl: true,
+      level: true,
+      price: true,
+      isFree: true,
+      language: true,
+      requirements: true,
+      learningOutcomes: true,
+      status: true,
+      publishedAt: true,
+      createdAt: true,
+      updatedAt: true,
+      category: { select: { id: true, name: true, slug: true } },
+      instructor: { select: { id: true, fullName: true, avatarUrl: true } }
     }
-  };
+  });
+  return courses.map(serializeCourse);
 }
 
 export async function createCourse(actor: AuthTokenPayload, input: CreateCourseInput) {
