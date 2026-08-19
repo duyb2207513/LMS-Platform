@@ -8,25 +8,44 @@ type GoogleAccounts = {
     renderButton(parent: HTMLElement, options: Record<string, string | number>): void
   }
 }
-declare global { interface Window { google?: { accounts: GoogleAccounts } } }
+
+declare global {
+  interface Window {
+    google?: { accounts: GoogleAccounts }
+    __googleGsiInitialized?: boolean
+  }
+}
+
+let currentHandler: ((response: GoogleCredentialResponse) => void) | null = null
 
 const emit = defineEmits<{ credential: [token: string]; error: [message: string] }>()
 const clientId = String(import.meta.env.VITE_GOOGLE_CLIENT_ID || '')
 const googleOverlayHost = ref<HTMLElement | null>(null)
 const opening = ref(false)
 
+function ensureGoogleInitialized() {
+  if (!window.google || !clientId) return
+  if (!window.__googleGsiInitialized) {
+    window.google.accounts.id.initialize({
+      client_id: clientId,
+      ux_mode: 'popup',
+      callback: response => {
+        currentHandler?.(response)
+      },
+    })
+    window.__googleGsiInitialized = true
+  }
+}
+
 async function initGoogleButton() {
   await nextTick()
   if (!window.google || !googleOverlayHost.value || !clientId) return
+  currentHandler = response => {
+    opening.value = false
+    emit('credential', response.credential)
+  }
+  ensureGoogleInitialized()
   googleOverlayHost.value.replaceChildren()
-  window.google.accounts.id.initialize({
-    client_id: clientId,
-    ux_mode: 'popup',
-    callback: response => {
-      opening.value = false
-      emit('credential', response.credential)
-    },
-  })
   window.google.accounts.id.renderButton(googleOverlayHost.value, {
     type: 'standard',
     theme: 'outline',
