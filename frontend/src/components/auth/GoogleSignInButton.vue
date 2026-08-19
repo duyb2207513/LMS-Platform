@@ -1,51 +1,53 @@
 <script setup lang="ts">
-import { nextTick, onMounted, ref } from 'vue'
+import { nextTick, onMounted, onUnmounted, ref } from 'vue'
 
 type GoogleCredentialResponse = { credential: string }
 type GoogleAccounts = {
   id: {
-    initialize(options: { client_id: string; callback(response: GoogleCredentialResponse): void; ux_mode?: 'popup' }): void
+    initialize(options: {
+      client_id: string
+      callback(response: GoogleCredentialResponse): void
+      ux_mode?: 'popup' | 'redirect'
+      auto_select?: boolean
+      cancel_on_tap_outside?: boolean
+    }): void
     renderButton(parent: HTMLElement, options: Record<string, string | number>): void
+    prompt?(): void
   }
 }
 
 declare global {
   interface Window {
     google?: { accounts: GoogleAccounts }
-    __googleGsiInitialized?: boolean
   }
 }
-
-let currentHandler: ((response: GoogleCredentialResponse) => void) | null = null
 
 const emit = defineEmits<{ credential: [token: string]; error: [message: string] }>()
 const clientId = String(import.meta.env.VITE_GOOGLE_CLIENT_ID || '')
 const googleOverlayHost = ref<HTMLElement | null>(null)
 const opening = ref(false)
 
-function ensureGoogleInitialized() {
-  if (!window.google || !clientId) return
-  if (!window.__googleGsiInitialized) {
-    window.google.accounts.id.initialize({
-      client_id: clientId,
-      ux_mode: 'popup',
-      callback: response => {
-        currentHandler?.(response)
-      },
-    })
-    window.__googleGsiInitialized = true
-  }
+function handleFocus() {
+  setTimeout(() => {
+    opening.value = false
+  }, 1200)
 }
 
-async function initGoogleButton() {
-  await nextTick()
+function renderGoogle() {
   if (!window.google || !googleOverlayHost.value || !clientId) return
-  currentHandler = response => {
-    opening.value = false
-    emit('credential', response.credential)
-  }
-  ensureGoogleInitialized()
+
   googleOverlayHost.value.replaceChildren()
+
+  window.google.accounts.id.initialize({
+    client_id: clientId,
+    ux_mode: 'popup',
+    cancel_on_tap_outside: true,
+    callback: response => {
+      opening.value = false
+      emit('credential', response.credential)
+    },
+  })
+
   window.google.accounts.id.renderButton(googleOverlayHost.value, {
     type: 'standard',
     theme: 'outline',
@@ -54,7 +56,13 @@ async function initGoogleButton() {
   })
 }
 
+async function initGoogleButton() {
+  await nextTick()
+  renderGoogle()
+}
+
 onMounted(() => {
+  window.addEventListener('focus', handleFocus)
   if (!clientId) {
     emit('error', 'Chưa cấu hình Google Client ID')
     return
@@ -73,7 +81,14 @@ onMounted(() => {
     document.head.appendChild(script)
   }
   script.addEventListener('load', () => void initGoogleButton(), { once: true })
-  script.addEventListener('error', () => emit('error', 'Không thể tải cửa sổ đăng nhập Google'), { once: true })
+  script.addEventListener('error', () => {
+    opening.value = false
+    emit('error', 'Không thể tải cửa sổ đăng nhập Google')
+  }, { once: true })
+})
+
+onUnmounted(() => {
+  window.removeEventListener('focus', handleFocus)
 })
 </script>
 
