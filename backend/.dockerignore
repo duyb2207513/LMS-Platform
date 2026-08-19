@@ -1,8 +1,5 @@
 node_modules
 dist
 .env
-uploads/*
-!uploads/.gitkeep
-test-results
-coverage
-.git
+.env.*
+npm-debug.log
