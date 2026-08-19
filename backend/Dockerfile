@@ -11,7 +11,7 @@ COPY package*.json ./
 RUN npm ci
 
 COPY --chown=node:node . .
-RUN npm run build
+RUN npx prisma generate && npm run build
 
 RUN mkdir -p /app/uploads \
     && chown node:node /app/uploads

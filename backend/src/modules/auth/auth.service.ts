@@ -54,8 +54,15 @@ async function createSession(user: { id: string; role: "STUDENT" | "INSTRUCTOR" 
   return { accessToken: createAccessToken(payload), refreshToken, sessionId };
 }
 
+export async function checkEmailExists(email: string) {
+  const normalized = email.trim().toLowerCase();
+  if (!normalized) return { exists: false };
+  const user = await prisma.user.findUnique({ where: { email: normalized }, select: { id: true } });
+  return { exists: Boolean(user) };
+}
+
 export async function register(input: RegisterInput, context?: ClientContext) {
-  if (await prisma.user.findUnique({ where: { email: input.email }, select: { id: true } })) throw new AppError(409, "Email already exists");
+  if (await prisma.user.findUnique({ where: { email: input.email }, select: { id: true } })) throw new AppError(409, "Email đã tồn tại");
   const passwordHash = await bcrypt.hash(input.password, PASSWORD_SALT_ROUNDS);
   try {
     const user = await prisma.user.create({ data: { fullName: input.fullName, email: input.email, passwordHash, role: "STUDENT" }, select: publicUserSelect });
@@ -65,7 +72,7 @@ export async function register(input: RegisterInput, context?: ClientContext) {
     await writeAuditLog({ actorUserId: user.id, action: "AUTH_REGISTER", entityType: "USER", entityId: user.id, request: context?.request });
     return user;
   } catch (error) {
-    if (isUniqueConstraintError(error)) throw new AppError(409, "Email already exists");
+    if (isUniqueConstraintError(error)) throw new AppError(409, "Email đã tồn tại");
     throw error;
   }
 }
@@ -322,7 +329,7 @@ export async function requestEmailChange(userId: string, input: ChangeEmailInput
     prisma.user.findUnique({ where: { email: input.newEmail }, select: { id: true } })
   ]);
   if (!user) throw new AppError(404, "User not found");
-  if (existing || input.newEmail === user.email) throw new AppError(409, "Email already exists");
+  if (existing || input.newEmail === user.email) throw new AppError(409, "Email đã tồn tại");
   if (user.passwordHash && (!input.currentPassword || !(await bcrypt.compare(input.currentPassword, user.passwordHash)))) throw new AppError(401, "Current password is incorrect");
   const token = await createOneTimeToken(userId, "CHANGE_EMAIL", 30, input.newEmail);
   await safelySend(() => sendEmailChangeEmail(input.newEmail, token, actionBaseUrl));
@@ -337,7 +344,7 @@ export async function confirmEmailChange(token: string) {
       prisma.user.update({ where: { id: record.userId }, data: { email: record.targetEmail, emailVerifiedAt: new Date() } }),
       prisma.authSession.updateMany({ where: { userId: record.userId, revokedAt: null }, data: { revokedAt: new Date() } })
     ]);
-  } catch (error) { if (isUniqueConstraintError(error)) throw new AppError(409, "Email already exists"); throw error; }
+  } catch (error) { if (isUniqueConstraintError(error)) throw new AppError(409, "Email đã tồn tại"); throw error; }
   await writeAuditLog({ actorUserId: record.userId, action: "AUTH_EMAIL_CHANGED", entityType: "USER", entityId: record.userId, metadata: { email: record.targetEmail } });
 }
 

@@ -13,7 +13,7 @@ export const useCourseStore = defineStore('courses', () => {
   const meta = ref({
     total: 0,
     page: 1,
-    limit: 12,
+    limit: 8,
     totalPages: 1,
   })
 
@@ -32,14 +32,23 @@ export const useCourseStore = defineStore('courses', () => {
       if (filters?.page) params.page = filters.page
       if (filters?.limit) params.limit = filters.limit
 
-      const response = await api.get<PaginatedResponse<Course>>('/courses', params)
-      courses.value = response.data || []
-      if (response.meta) {
+      const response = await api.get<ApiResponse<PaginatedResponse<Course> | Course[]> | PaginatedResponse<Course>>('/courses', params)
+      const payload = response.data
+      if (Array.isArray(payload)) {
+        courses.value = payload
+      } else if (payload && 'data' in payload && Array.isArray(payload.data)) {
+        courses.value = payload.data
+      } else {
+        courses.value = []
+      }
+
+      const responseMeta = (payload && 'meta' in payload ? payload.meta : undefined) || ('meta' in response ? response.meta : undefined)
+      if (responseMeta) {
         meta.value = {
-          total: response.meta.totalItems ?? response.meta.total ?? 0,
-          page: response.meta.page,
-          limit: response.meta.limit,
-          totalPages: response.meta.totalPages,
+          total: responseMeta.totalItems ?? responseMeta.total ?? courses.value.length,
+          page: responseMeta.page ?? 1,
+          limit: responseMeta.limit ?? 8,
+          totalPages: responseMeta.totalPages ?? 1,
         }
       }
     } catch (e) {

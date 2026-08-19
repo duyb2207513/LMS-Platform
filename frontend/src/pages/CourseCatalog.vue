@@ -57,7 +57,7 @@ function loadFiltersFromQuery() {
 }
 
 async function fetchWithFilters(page = 1) {
-  const filters: CourseFilters = { page, limit: 12 }
+  const filters: CourseFilters = { page, limit: 8 }
   if (search.value.trim()) filters.search = search.value.trim()
   if (selectedCategory.value) filters.categoryId = selectedCategory.value
   if (selectedLevel.value) filters.level = selectedLevel.value as CourseLevel
@@ -134,7 +134,6 @@ onMounted(async () => {
 
       <div class="mb-5 mt-10 flex items-end justify-between gap-4">
         <div><h2 class="text-xl font-extrabold text-slate-950 dark:text-white">Tất cả khóa học</h2><p class="mt-1 text-sm text-slate-500">{{ courseStore.meta.total }} kết quả được tìm thấy</p></div>
-        <span class="hidden rounded-full bg-purple-50 px-3 py-1.5 text-xs font-bold text-purple-700 dark:bg-purple-950/40 dark:text-purple-300 sm:inline">Trang {{ courseStore.meta.page }}/{{ courseStore.meta.totalPages }}</span>
       </div>
 
       <div v-if="courseStore.loading" class="surface-card grid min-h-72 place-items-center"><LoadingSpinner /></div>
@@ -145,8 +144,34 @@ onMounted(async () => {
         <div><span class="mx-auto grid h-16 w-16 place-items-center rounded-2xl bg-purple-50 text-2xl dark:bg-purple-950/40">⌕</span><h2 class="mt-5 text-xl font-extrabold">Chưa tìm thấy khóa học</h2><p class="mt-2 text-sm text-slate-500">Thử thay đổi từ khóa hoặc bộ lọc để xem thêm kết quả.</p><BaseButton v-if="hasFilters" class="mt-5" variant="secondary" @click="clearFilters">Xóa bộ lọc</BaseButton></div>
       </section>
 
-      <nav v-if="courseStore.meta.totalPages > 1" class="mt-10 flex flex-wrap justify-center gap-2" aria-label="Phân trang">
-        <button v-for="page in courseStore.meta.totalPages" :key="page" :class="['grid h-10 w-10 place-items-center rounded-xl border text-sm font-bold transition', page === courseStore.meta.page ? 'border-purple-600 bg-purple-600 text-white shadow-lg shadow-purple-500/20' : 'border-slate-200 bg-white text-slate-600 hover:border-purple-300 hover:text-purple-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300']" @click="fetchWithFilters(page)">{{ page }}</button>
+      <nav v-if="courseStore.courses.length > 0" class="mt-10 flex items-center justify-center gap-2" aria-label="Phân trang">
+        <button
+          :disabled="courseStore.meta.page <= 1"
+          class="flex h-10 items-center justify-center rounded-xl border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-600 transition hover:border-purple-300 hover:text-purple-700 disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"
+          @click="fetchWithFilters(courseStore.meta.page - 1)"
+        >
+          ← Trước
+        </button>
+        <button
+          v-for="page in (courseStore.meta.totalPages || 1)"
+          :key="page"
+          :class="[
+            'grid h-10 w-10 place-items-center rounded-xl border text-sm font-bold transition',
+            page === courseStore.meta.page
+              ? 'border-purple-600 bg-purple-600 text-white shadow-lg shadow-purple-500/20'
+              : 'border-slate-200 bg-white text-slate-600 hover:border-purple-300 hover:text-purple-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300',
+          ]"
+          @click="fetchWithFilters(page)"
+        >
+          {{ page }}
+        </button>
+        <button
+          :disabled="courseStore.meta.page >= courseStore.meta.totalPages"
+          class="flex h-10 items-center justify-center rounded-xl border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-600 transition hover:border-purple-300 hover:text-purple-700 disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"
+          @click="fetchWithFilters(courseStore.meta.page + 1)"
+        >
+          Sau →
+        </button>
       </nav>
     </main>
   </DefaultLayout>

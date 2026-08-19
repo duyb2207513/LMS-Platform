@@ -13,6 +13,7 @@ const server = createServer(app);
 initializeSocket(server);
 const stopReminderJob = startAssignmentReminderJob(env.assignmentReminderIntervalMinutes);
 const stopEarningReleaseJob = startEarningReleaseJob(env.commerceEarningReleaseIntervalMinutes);
+
 server.listen(env.port, HOST, () => {
   logger.info({ port: env.port, host: HOST }, "LMS API started");
 });

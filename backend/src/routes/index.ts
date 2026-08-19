@@ -1,4 +1,7 @@
+import type { Request, Response } from "express";
 import { Router } from "express";
+import { prisma } from "../config/database.js";
+import { asyncHandler } from "../common/utils/asyncHandler.js";
 import authRouter from "../modules/auth/auth.routes.js";
 import categoriesRouter from "../modules/categories/categories.routes.js";
 import coursesRouter from "../modules/courses/courses.routes.js";
@@ -16,18 +19,16 @@ import certificatesRouter, { courseCertificatesRouter } from "../modules/certifi
 import ordersRouter from "../modules/orders/orders.routes.js";
 import { orderPaymentsRouter, paymentsRouter } from "../modules/payments/payments.routes.js";
 import adminRouter from "../modules/admin/admin.routes.js";
-import { prisma } from "../config/database.js";
-import { asyncHandler } from "../common/utils/asyncHandler.js";
-import { assignmentsRouter, courseAssignmentsRouter, courseGradesRouter, submissionFilesRouter, submissionsRouter } from "../modules/assignments/assignments.routes.js";
-import notificationsRouter from "../modules/notifications/notification.routes.js";
-import preferencesRouter from "../modules/notification-preferences/preference.routes.js";
-import { announcementsRouter, courseAnnouncementsRouter } from "../modules/announcements/announcement.routes.js";
 import analyticsRouter from "../modules/analytics/analytics.routes.js";
 import { adminCouponRouter, couponRouter } from "../modules/coupons/coupon.routes.js";
 import { adminRefundRouter, refundRouter } from "../modules/refunds/refund.routes.js";
 import instructorCommerceRouter from "../modules/earnings/earning.routes.js";
 import adminPayoutRouter from "../modules/payouts/payout.routes.js";
 import messagesRouter from "../modules/messages/messages.routes.js";
+import { assignmentsRouter, courseAssignmentsRouter, courseGradesRouter, submissionFilesRouter, submissionsRouter } from "../modules/assignments/assignments.routes.js";
+import { announcementsRouter, courseAnnouncementsRouter } from "../modules/announcements/announcement.routes.js";
+import notificationsRouter from "../modules/notifications/notification.routes.js";
+import preferencesRouter from "../modules/notification-preferences/preference.routes.js";
 import aiRouter from "../modules/ai/ai.routes.js";
 
 const router = Router();
@@ -84,34 +85,25 @@ router.use("/messages", messagesRouter);
  * @openapi
  * /health:
  *   get:
+ *     operationId: checkHealth
  *     summary: Check API health
- *     tags:
- *       - System
+ *     tags: [System]
+ *     security: []
  *     responses:
  *       200:
- *         description: API is running
+ *         description: API is healthy
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 success:
- *                   type: boolean
- *                   example: true
- *                 message:
- *                   type: string
- *                   example: LMS API is running
- *                 data:
- *                   type: object
+ *                 status: { type: string, example: ok }
+ *                 timestamp: { type: string, format: date-time }
  */
 router.get("/health", (_request, response) => {
   response.status(200).json({
-    success: true,
-    message: "LMS API is running",
-    data: {
-      environment: process.env.NODE_ENV ?? "development",
-      timestamp: new Date().toISOString()
-    }
+    status: "ok",
+    timestamp: new Date().toISOString()
   });
 });
 
@@ -127,7 +119,7 @@ router.get("/health", (_request, response) => {
  *       503:
  *         description: A required dependency is unavailable
  */
-router.get("/health/ready", asyncHandler(async (_request, response) => {
+router.get("/health/ready", asyncHandler(async (_request: Request, response: Response) => {
   const startedAt = Date.now();
   await prisma.$queryRaw`SELECT 1`;
   response.status(200).json({
