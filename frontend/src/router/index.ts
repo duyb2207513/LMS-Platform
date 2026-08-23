@@ -90,7 +90,7 @@ const router = createRouter({
     {
       path: "/change-password",
       name: "change-password",
-      component: () => import("@/pages/student/ChangePasswordPage.vue"),
+      redirect: { path: "/profile", query: { section: "password" } },
       meta: { requiresAuth: true },
     },
     {
@@ -144,7 +144,7 @@ const router = createRouter({
     {
       path: "/refund-requests",
       name: "refund-requests",
-      component: () => import("@/pages/student/RefundRequestsView.vue"),
+      redirect: { path: "/orders", query: { section: "refunds" } },
       meta: { requiresAuth: true, roles: [UserRole.STUDENT] },
     },
     {
@@ -375,6 +375,25 @@ router.beforeEach((to) => {
       return "/403";
     }
   }
+});
+
+// Auto-reload on deployment chunk changes (stale browser cache)
+router.onError((error, to) => {
+  const message = error?.message || "";
+  if (
+    message.includes("Failed to fetch dynamically imported module") ||
+    message.includes("Importing a module script failed") ||
+    message.includes("Expected a JavaScript-or-Wasm module script")
+  ) {
+    if (!sessionStorage.getItem("chunk_reload_lock")) {
+      sessionStorage.setItem("chunk_reload_lock", "true");
+      window.location.assign(to.fullPath);
+    }
+  }
+});
+
+router.afterEach(() => {
+  sessionStorage.removeItem("chunk_reload_lock");
 });
 
 export default router;

@@ -21,16 +21,16 @@ function formatPrice(price: number, isFree: boolean) {
     <div class="relative overflow-hidden">
       <CourseThumbnail :src="course.thumbnailUrl" :alt="course.title" class="transition-transform duration-500 group-hover:scale-[1.025]" />
       <div class="absolute inset-x-0 top-0 flex items-start justify-between gap-2 p-3">
-        <span class="rounded-full border border-white/70 bg-white/90 px-3 py-1 text-xs font-bold text-slate-700 shadow-sm backdrop-blur dark:border-white/10 dark:bg-slate-950/80 dark:text-slate-100">
+        <span class="border border-white/70 bg-white/90 px-2.5 py-1 text-[11px] font-bold text-slate-700 backdrop-blur dark:border-white/10 dark:bg-slate-950/80 dark:text-slate-100">
           {{ levelLabels[course.level] }}
         </span>
-        <span :class="['rounded-full px-3 py-1 text-xs font-extrabold shadow-sm backdrop-blur', course.isFree ? 'bg-emerald-500 text-white' : 'bg-slate-950/80 text-white']">
+        <span :class="['px-2.5 py-1 text-[11px] font-extrabold backdrop-blur', course.isFree ? 'bg-emerald-500 text-white' : 'bg-slate-950/80 text-white']">
           {{ formatPrice(course.price, course.isFree) }}
         </span>
       </div>
     </div>
 
-    <div class="flex flex-1 flex-col p-5">
+    <div class="flex flex-1 flex-col p-4">
       <p class="text-xs font-bold uppercase tracking-[0.12em] text-purple-600 dark:text-purple-400">
         {{ course.category?.name || 'Khóa học' }}
       </p>
@@ -49,7 +49,7 @@ function formatPrice(price: number, isFree: boolean) {
           </span>
           <span class="line-clamp-1 text-sm font-medium text-slate-600 dark:text-slate-300">{{ course.instructor?.fullName || 'LMS Instructor' }}</span>
         </div>
-        <span class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-purple-50 text-purple-700 transition-transform group-hover:translate-x-0.5 dark:bg-purple-950/40 dark:text-purple-300" aria-hidden="true">→</span>
+        <span class="grid h-8 w-8 shrink-0 place-items-center bg-purple-50 text-purple-700 transition-transform group-hover:translate-x-0.5 dark:bg-purple-950/40 dark:text-purple-300" aria-hidden="true">→</span>
       </div>
     </div>
   </RouterLink>
@@ -62,10 +62,8 @@ function formatPrice(price: number, isFree: boolean) {
   flex-direction: column;
   overflow: hidden;
   border: 1px solid var(--border);
-  border-radius: 1.35rem;
   background: var(--surface);
-  box-shadow: var(--shadow-sm);
-  transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
+  transition: border-color 180ms ease, background-color 180ms ease;
 }
-.course-card:hover { transform: translateY(-4px); border-color: rgba(168,85,247,.3); box-shadow: var(--shadow-md); }
+.course-card:hover { border-color: rgba(124,58,237,.5); background: rgba(245,243,255,.35); }
 </style>

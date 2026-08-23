@@ -122,6 +122,48 @@ a {
   background: var(--surface-muted);
 }
 
+/* Compact, edge-aligned workspace for pages opened from the student navbar. */
+.navbar-page {
+  width: 100%;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 1.5rem 0.5rem !important;
+}
+
+.navbar-page .app-page-title,
+.navbar-page > h1 {
+  font-size: 1.5rem;
+  line-height: 1.2;
+}
+
+.navbar-page .app-page-description,
+.navbar-page > h1 + p {
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
+.navbar-page > header > div > p:first-child {
+  font-size: 0.6875rem;
+  letter-spacing: 0.14em;
+}
+
+.navbar-page .surface-card,
+.navbar-page .panel,
+.navbar-page .order-metric,
+.navbar-page .certificate-card {
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+@media (min-width: 640px) {
+  .navbar-page { padding-inline: 0.75rem !important; }
+}
+
+@media (min-width: 1024px) {
+  .navbar-page { padding-inline: 0.5rem !important; }
+}
+
 .panel-title {
   color: var(--text);
   font-size: 1.05rem;

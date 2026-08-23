@@ -5,7 +5,7 @@ export function sendSuccess<T>(
   statusCode = 200,
   message = "Success",
   data?: T,
-  meta?: any
+  meta?: unknown
 ): void {
   response.status(statusCode).json({
     success: true,

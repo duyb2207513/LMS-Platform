@@ -53,14 +53,16 @@ export async function listPublicCoursesController(
   response: Response
 ): Promise<void> {
   const result = await listPublicCourses((response.locals.validatedQuery ?? request.query) as any);
-  sendSuccess(response, 200, "Courses retrieved successfully", result);
+  sendSuccess(response, 200, "Courses retrieved successfully", result.data, result.meta);
 }
 
 export async function getPublicCourseController(
   request: Request,
   response: Response
 ): Promise<void> {
-  const course = await getPublicCourse(routeParameter(request, "courseId"));
+  const param = String(request.params.slug || request.params.courseId || "");
+  if (!param) throw new AppError(400, "Missing course identifier");
+  const course = await getPublicCourse(param);
   sendSuccess(response, 200, "Course retrieved successfully", course);
 }
 
@@ -174,5 +176,5 @@ export async function deleteCourseController(
   response: Response
 ): Promise<void> {
   await deleteOrArchiveCourse(routeParameter(request, "courseId"), request.auth);
-  sendSuccess(response, 200, "Course deleted successfully", null);
+  response.status(204).send();
 }

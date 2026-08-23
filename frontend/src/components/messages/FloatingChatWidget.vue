@@ -627,7 +627,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="floating-chat" aria-live="polite">
+  <div :class="['floating-chat', { 'floating-chat--open': isOpen }]" aria-live="polite">
     <!-- Hidden file inputs -->
     <input ref="pdfInput" type="file" accept="application/pdf" class="hidden" @change="onPdfSelected" />
     <input ref="videoInput" type="file" accept="video/mp4,video/webm,video/ogg,video/quicktime" class="hidden" @change="onVideoSelected" />
@@ -639,34 +639,34 @@ onBeforeUnmount(() => {
         aria-label="Tin nhắn"
       >
         <!-- Header -->
-        <header class="flex min-h-16 items-center gap-3 border-b border-slate-200 px-4 dark:border-slate-700">
+        <header class="flex min-h-12 items-center gap-2 border-b border-slate-200 px-3 dark:border-slate-700">
           <button
             v-if="activeContact"
             type="button"
-            class="grid h-10 w-10 shrink-0 place-items-center rounded-full text-slate-600 transition hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:text-slate-300 dark:hover:bg-slate-800"
+            class="grid h-8 w-8 shrink-0 place-items-center rounded-full text-slate-600 transition hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:text-slate-300 dark:hover:bg-slate-800"
             aria-label="Quay lại danh sách trò chuyện"
             @click="showConversationList"
           >
-            <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2">
+            <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2">
               <path d="m15 18-6-6 6-6" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
           </button>
 
           <template v-if="activeContact">
-            <span v-if="activeContact.id === AI_BOT_CONTACT.id" class="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-lg shadow-md">
+            <span v-if="activeContact.id === AI_BOT_CONTACT.id" class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-sm shadow-md">
               🤖
             </span>
-            <img v-else-if="activeContact.avatarUrl" :src="avatarUrl(activeContact.avatarUrl)" alt="" class="h-10 w-10 shrink-0 rounded-full object-cover" />
-            <span v-else class="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-gradient-to-br from-violet-500 to-purple-700 text-sm font-black text-white">
+            <img v-else-if="activeContact.avatarUrl" :src="avatarUrl(activeContact.avatarUrl)" alt="" class="h-8 w-8 shrink-0 rounded-full object-cover" />
+            <span v-else class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-gradient-to-br from-violet-500 to-purple-700 text-xs font-black text-white">
               {{ initials(activeContact.fullName) }}
             </span>
 
             <div class="min-w-0 flex-1">
               <div class="flex items-center gap-1.5">
-                <h2 class="truncate text-sm font-black">{{ activeContact.fullName }}</h2>
-                <span v-if="activeContact.id === AI_BOT_CONTACT.id" class="rounded-full bg-purple-100 px-2 py-0.5 text-[10px] font-black text-purple-700 dark:bg-purple-950/60 dark:text-purple-300">AI BOT</span>
+                <h2 class="truncate text-xs font-black">{{ activeContact.fullName }}</h2>
+                <span v-if="activeContact.id === AI_BOT_CONTACT.id" class="rounded-full bg-purple-100 px-1.5 py-0.5 text-[8px] font-black text-purple-700 dark:bg-purple-950/60 dark:text-purple-300">AI BOT</span>
               </div>
-              <p :class="['text-xs', activeContact.id === AI_BOT_CONTACT.id ? 'text-purple-600 dark:text-purple-400 font-semibold' : 'text-emerald-600 dark:text-emerald-400']">
+              <p :class="['text-[10px]', activeContact.id === AI_BOT_CONTACT.id ? 'text-purple-600 dark:text-purple-400 font-semibold' : 'text-emerald-600 dark:text-emerald-400']">
                 {{ activeContact.id === AI_BOT_CONTACT.id ? 'Hỗ trợ 24/7' : 'Đang hoạt động' }}
               </p>
             </div>
@@ -675,7 +675,7 @@ onBeforeUnmount(() => {
             <button
               v-if="activeContact.id === AI_BOT_CONTACT.id"
               type="button"
-              class="flex items-center gap-1 rounded-xl border border-purple-200 bg-purple-50/80 px-2.5 py-1 text-xs font-bold text-purple-700 transition hover:bg-purple-100 dark:border-purple-800 dark:bg-purple-950/40 dark:text-purple-300 dark:hover:bg-purple-900/60"
+              class="flex items-center gap-1 rounded-lg border border-purple-200 bg-purple-50/80 px-2 py-1 text-[10px] font-bold text-purple-700 transition hover:bg-purple-100 dark:border-purple-800 dark:bg-purple-950/40 dark:text-purple-300 dark:hover:bg-purple-900/60"
               title="Làm mới đoạn hội thoại AI"
               @click="clearAiChat"
             >
@@ -690,24 +690,24 @@ onBeforeUnmount(() => {
           </template>
 
           <template v-else>
-            <span class="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-violet-600 to-fuchsia-600 text-white shadow-lg shadow-purple-500/20">
-              <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2">
+            <span class="grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-violet-600 to-fuchsia-600 text-white shadow-lg shadow-purple-500/20">
+              <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4Z" stroke-linecap="round" stroke-linejoin="round" />
               </svg>
             </span>
             <div class="min-w-0 flex-1">
-              <h2 class="text-base font-black">Tin nhắn</h2>
-              <p class="text-xs text-slate-500 dark:text-slate-400">
+              <h2 class="text-sm font-black">Tin nhắn</h2>
+              <p class="text-[10px] text-slate-500 dark:text-slate-400">
                 {{ unreadCount ? `${unreadCount} tin chưa đọc` : "Trao đổi cùng mọi người" }}
               </p>
             </div>
-            <RouterLink to="/messages" class="rounded-lg px-2 py-1 text-xs font-bold text-purple-600 hover:bg-purple-50 dark:text-purple-400 dark:hover:bg-purple-950/40" @click="closeWidget">
+            <RouterLink to="/messages" class="rounded-lg px-1.5 py-1 text-[10px] font-bold text-purple-600 hover:bg-purple-50 dark:text-purple-400 dark:hover:bg-purple-950/40" @click="closeWidget">
               Mở rộng
             </RouterLink>
           </template>
 
-          <button type="button" class="grid h-10 w-10 shrink-0 place-items-center rounded-full text-slate-500 transition hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:hover:bg-slate-800" aria-label="Đóng cửa sổ chat" @click="closeWidget">
-            <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2">
+          <button type="button" class="grid h-8 w-8 shrink-0 place-items-center rounded-full text-slate-500 transition hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:hover:bg-slate-800" aria-label="Đóng cửa sổ chat" @click="closeWidget">
+            <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2">
               <path d="m6 6 12 12M18 6 6 18" stroke-linecap="round" />
             </svg>
           </button>
@@ -715,14 +715,14 @@ onBeforeUnmount(() => {
 
         <!-- Conversation / Contact List View -->
         <template v-if="!activeContact">
-          <div class="border-b border-slate-100 p-3 dark:border-slate-800">
+          <div class="border-b border-slate-100 p-2 dark:border-slate-800">
             <label class="relative block">
               <span class="sr-only">Tìm người dùng</span>
-              <svg viewBox="0 0 24 24" class="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" stroke-width="2">
+              <svg viewBox="0 0 24 24" class="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="11" cy="11" r="7" />
                 <path d="m20 20-3.5-3.5" stroke-linecap="round" />
               </svg>
-              <input v-model="search" type="search" class="h-11 w-full rounded-xl border border-transparent bg-slate-100 pl-10 pr-4 text-sm outline-none transition focus:border-purple-400 focus:bg-white focus:ring-2 focus:ring-purple-100 dark:bg-slate-800 dark:focus:bg-slate-850 dark:focus:ring-purple-900/50" placeholder="Tìm người hoặc Trợ lý AI..." />
+              <input v-model="search" type="search" class="h-9 w-full rounded-lg border border-transparent bg-slate-100 pl-8 pr-3 text-xs outline-none transition focus:border-purple-400 focus:bg-white focus:ring-2 focus:ring-purple-100 dark:bg-slate-800 dark:focus:bg-slate-850 dark:focus:ring-purple-900/50" placeholder="Tìm người hoặc Trợ lý AI..." />
             </label>
           </div>
 
@@ -736,32 +736,32 @@ onBeforeUnmount(() => {
               v-else
               :key="row.contact.id"
               type="button"
-              :class="['flex w-full items-center gap-3 rounded-2xl p-3 text-left transition hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-purple-400 dark:hover:bg-slate-800', row.contact.id === AI_BOT_CONTACT.id ? 'border border-purple-200/80 bg-purple-50/40 dark:border-purple-900/40 dark:bg-purple-950/20' : '']"
+              :class="['flex w-full items-center gap-2 rounded-xl p-2 text-left transition hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-purple-400 dark:hover:bg-slate-800', row.contact.id === AI_BOT_CONTACT.id ? 'border border-purple-200/80 bg-purple-50/40 dark:border-purple-900/40 dark:bg-purple-950/20' : '']"
               @click="openConversation(row.contact)"
             >
               <span class="relative shrink-0">
-                <span v-if="row.contact.id === AI_BOT_CONTACT.id" class="grid h-12 w-12 place-items-center rounded-full bg-gradient-to-br from-indigo-500 via-purple-600 to-fuchsia-600 text-xl shadow-md">
+                <span v-if="row.contact.id === AI_BOT_CONTACT.id" class="grid h-9 w-9 place-items-center rounded-full bg-gradient-to-br from-indigo-500 via-purple-600 to-fuchsia-600 text-sm shadow-md">
                   🤖
                 </span>
-                <img v-else-if="row.contact.avatarUrl" :src="avatarUrl(row.contact.avatarUrl)" alt="" class="h-12 w-12 rounded-full object-cover" />
-                <span v-else class="grid h-12 w-12 place-items-center rounded-full bg-gradient-to-br from-violet-500 to-purple-700 text-sm font-black text-white">
+                <img v-else-if="row.contact.avatarUrl" :src="avatarUrl(row.contact.avatarUrl)" alt="" class="h-9 w-9 rounded-full object-cover" />
+                <span v-else class="grid h-9 w-9 place-items-center rounded-full bg-gradient-to-br from-violet-500 to-purple-700 text-xs font-black text-white">
                   {{ initials(row.contact.fullName) }}
                 </span>
-                <span class="absolute bottom-0 right-0 h-3.5 w-3.5 rounded-full border-2 border-white bg-emerald-500 dark:border-slate-900" />
+                <span class="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border border-white bg-emerald-500 dark:border-slate-900" />
               </span>
 
               <span class="min-w-0 flex-1">
                 <span class="flex items-center justify-between gap-2">
-                  <b class="truncate text-sm font-black">{{ row.contact.fullName }}</b>
-                  <time v-if="row.lastMessage" class="shrink-0 text-[11px] text-slate-400">
+                  <b class="truncate text-xs font-black">{{ row.contact.fullName }}</b>
+                  <time v-if="row.lastMessage" class="shrink-0 text-[9px] text-slate-400">
                     {{ formatTime(row.lastMessage.createdAt) }}
                   </time>
                 </span>
                 <span class="mt-0.5 flex items-center gap-2">
-                  <span class="min-w-0 flex-1 truncate text-xs text-slate-500 dark:text-slate-400">
+                  <span class="min-w-0 flex-1 truncate text-[10px] text-slate-500 dark:text-slate-400">
                     {{ row.lastMessage?.content || row.contact.role }}
                   </span>
-                  <span v-if="row.unreadCount" class="grid min-h-5 min-w-5 shrink-0 place-items-center rounded-full bg-purple-600 px-1.5 text-[10px] font-black text-white">
+                  <span v-if="row.unreadCount" class="grid min-h-4 min-w-4 shrink-0 place-items-center rounded-full bg-purple-600 px-1 text-[8px] font-black text-white">
                     {{ row.unreadCount > 99 ? "99+" : row.unreadCount }}
                   </span>
                 </span>
@@ -776,7 +776,7 @@ onBeforeUnmount(() => {
             {{ error }}
           </p>
 
-          <div ref="messageList" class="chat-messages min-h-0 flex-1 space-y-3 overflow-y-auto bg-slate-50/70 p-4 dark:bg-slate-950/30">
+          <div ref="messageList" class="chat-messages min-h-0 flex-1 space-y-2 overflow-y-auto bg-slate-50/70 p-2.5 dark:bg-slate-950/30">
             <div v-if="loadingChat" class="grid h-full place-items-center">
               <span class="h-8 w-8 animate-spin rounded-full border-2 border-purple-200 border-t-purple-600" />
             </div>
@@ -789,7 +789,7 @@ onBeforeUnmount(() => {
               >
                 <div
                   :class="[
-                    'max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-6 shadow-sm',
+                    'max-w-[85%] rounded-xl px-3 py-2 text-xs leading-5 shadow-sm',
                     message.senderId === auth.user?.id
                       ? 'rounded-br-md bg-gradient-to-br from-violet-600 to-purple-700 text-white'
                       : 'rounded-bl-md border border-slate-200 bg-white text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-white',
@@ -896,14 +896,14 @@ onBeforeUnmount(() => {
           <!-- Quick Suggestion Chips for AI Bot -->
           <div
             v-if="activeContact.id === AI_BOT_CONTACT.id && botSuggestions.length"
-            class="flex items-center gap-1.5 overflow-x-auto border-t border-slate-100 bg-slate-50/80 px-3 py-2 no-scrollbar dark:border-slate-800 dark:bg-slate-900/60"
+            class="chat-suggestions no-scrollbar border-t border-slate-100 bg-slate-50/80 dark:border-slate-800 dark:bg-slate-900/60"
           >
-            <span class="shrink-0 text-[11px] font-bold text-purple-600 dark:text-purple-400">💡 Gợi ý:</span>
+            <span class="chat-suggestions__label text-[10px] font-bold text-purple-600 dark:text-purple-400">Gợi ý</span>
             <button
               v-for="(suggestion, idx) in botSuggestions"
               :key="idx"
               type="button"
-              class="shrink-0 rounded-full border border-purple-200/80 bg-white px-2.5 py-1 text-xs font-semibold text-slate-700 shadow-xs transition hover:border-purple-400 hover:bg-purple-50 hover:text-purple-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:border-purple-500 dark:hover:bg-purple-950/40 dark:hover:text-purple-300"
+              class="chat-suggestion-button border border-purple-200 bg-white text-[10px] font-semibold text-slate-700 transition hover:border-purple-400 hover:bg-purple-50 hover:text-purple-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:border-purple-500 dark:hover:bg-purple-950/40 dark:hover:text-purple-300"
               @click="sendQuickPrompt(suggestion)"
             >
               {{ suggestion }}
@@ -911,7 +911,7 @@ onBeforeUnmount(() => {
           </div>
 
           <!-- Composer Toolbar & Form -->
-          <div class="border-t border-slate-200 bg-white p-3 dark:border-slate-800 dark:bg-slate-900">
+          <div class="border-t border-slate-200 bg-white p-2 dark:border-slate-800 dark:bg-slate-900">
             <!-- Voice Recording Active Bar -->
             <div v-if="isRecording" class="flex items-center justify-between rounded-2xl bg-red-50 px-4 py-2.5 dark:bg-red-950/40">
               <div class="flex items-center gap-2 text-xs font-bold text-red-600 dark:text-red-400">
@@ -932,13 +932,13 @@ onBeforeUnmount(() => {
             <form v-else class="flex flex-col gap-2" @submit.prevent="sendMessage">
               <div class="flex items-center gap-2">
                 <!-- Action Tools -->
-                <button type="button" class="grid h-9 w-9 shrink-0 place-items-center rounded-xl text-slate-500 hover:bg-slate-100 hover:text-purple-600 dark:text-slate-400 dark:hover:bg-slate-800" title="Đính kèm file PDF" @click="triggerPdfUpload">
+                <button type="button" class="grid h-7 w-7 shrink-0 place-items-center rounded-lg text-xs text-slate-500 hover:bg-slate-100 hover:text-purple-600 dark:text-slate-400 dark:hover:bg-slate-800" title="Đính kèm file PDF" @click="triggerPdfUpload">
                   📄
                 </button>
-                <button type="button" class="grid h-9 w-9 shrink-0 place-items-center rounded-xl text-slate-500 hover:bg-slate-100 hover:text-purple-600 dark:text-slate-400 dark:hover:bg-slate-800" title="Gửi video" @click="triggerVideoUpload">
+                <button type="button" class="grid h-7 w-7 shrink-0 place-items-center rounded-lg text-xs text-slate-500 hover:bg-slate-100 hover:text-purple-600 dark:text-slate-400 dark:hover:bg-slate-800" title="Gửi video" @click="triggerVideoUpload">
                   🎥
                 </button>
-                <button type="button" class="grid h-9 w-9 shrink-0 place-items-center rounded-xl text-slate-500 hover:bg-slate-100 hover:text-purple-600 dark:text-slate-400 dark:hover:bg-slate-800" title="Ghi âm giọng nói" @click="startRecording">
+                <button type="button" class="grid h-7 w-7 shrink-0 place-items-center rounded-lg text-xs text-slate-500 hover:bg-slate-100 hover:text-purple-600 dark:text-slate-400 dark:hover:bg-slate-800" title="Ghi âm giọng nói" @click="startRecording">
                   🎙️
                 </button>
 
@@ -946,18 +946,18 @@ onBeforeUnmount(() => {
                   v-model="draft"
                   rows="1"
                   maxlength="5000"
-                  class="max-h-28 min-h-10 min-w-0 flex-1 resize-none rounded-2xl border border-slate-200 bg-slate-100 px-3.5 py-2.5 text-sm text-slate-900 outline-none transition focus:border-purple-400 focus:bg-white focus:ring-2 focus:ring-purple-100 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:focus:ring-purple-900/40"
+                  class="max-h-20 min-h-8 min-w-0 flex-1 resize-none rounded-lg border border-slate-200 bg-slate-100 px-2.5 py-1.5 text-xs text-slate-900 outline-none transition focus:border-purple-400 focus:bg-white focus:ring-2 focus:ring-purple-100 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:focus:ring-purple-900/40"
                   placeholder="Nhập tin nhắn..."
                   @keydown.enter.exact.prevent="sendMessage"
                 />
                 <button
                   type="submit"
                   :disabled="(!draft.trim() && !pendingAttachment) || sending"
-                  class="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-gradient-to-br from-violet-600 to-fuchsia-600 text-white shadow-lg shadow-purple-500/20 transition hover:scale-105 disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:scale-100"
+                  class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-gradient-to-br from-violet-600 to-fuchsia-600 text-white shadow-md shadow-purple-500/20 transition hover:scale-105 disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:scale-100"
                   aria-label="Gửi tin nhắn"
                 >
                   <span v-if="sending" class="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
-                  <svg v-else viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2">
+                  <svg v-else viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="m22 2-7 20-4-9-9-4Z" stroke-linecap="round" stroke-linejoin="round" />
                     <path d="M22 2 11 13" stroke-linecap="round" />
                   </svg>
@@ -1016,12 +1016,57 @@ onBeforeUnmount(() => {
 
 .chat-panel {
   width: min(400px, calc(100vw - 1.5rem));
-  height: min(640px, calc(100dvh - 5.5rem));
+  height: min(450px, calc(100dvh - 1rem));
+}
+
+.floating-chat--open {
+  right: 0;
+  bottom: 0;
 }
 
 .chat-messages {
   scrollbar-width: thin;
   scrollbar-color: rgb(196 181 253) transparent;
+}
+
+.chat-suggestions {
+  display: flex;
+  min-height: 2.75rem;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 0.375rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.375rem 0.5rem;
+}
+
+.chat-suggestions__label {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  display: grid;
+  align-self: stretch;
+  flex: 0 0 auto;
+  place-items: center;
+  background: inherit;
+  padding-inline: 0.125rem 0.25rem;
+}
+
+.chat-suggestion-button {
+  display: -webkit-box;
+  width: max-content;
+  min-width: 5rem;
+  max-width: 12rem;
+  min-height: 1.75rem;
+  flex: 0 0 auto;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  line-height: 0.875rem;
+  padding: 0.25rem 0.5rem;
+  text-align: left;
 }
 
 .chat-panel-enter-active,
@@ -1045,8 +1090,13 @@ onBeforeUnmount(() => {
   }
 
   .chat-panel {
-    width: calc(100vw - 1.5rem);
-    height: min(610px, calc(100dvh - 7rem - env(safe-area-inset-bottom)));
+    width: min(400px, 100vw);
+    height: min(450px, calc(100dvh - env(safe-area-inset-bottom)));
+  }
+
+  .floating-chat--open {
+    right: 0;
+    bottom: 0;
   }
 }
 </style>

@@ -47,16 +47,18 @@ async function loginWithGoogle(idToken: string) {
   <AuthLayout>
     <div class="space-y-6">
       <div class="text-center"><h1 class="text-2xl font-extrabold">Chào mừng trở lại</h1><p class="mt-2 text-sm text-slate-500">Đăng nhập để tiếp tục hành trình học tập</p></div>
-      <p v-if="$route.query.registered" class="rounded-xl bg-emerald-50 p-3 text-sm text-emerald-700">Đăng ký thành công. Hãy kiểm tra email để xác minh tài khoản.</p>
-      <p v-if="$route.query.reset" class="rounded-xl bg-emerald-50 p-3 text-sm text-emerald-700">Mật khẩu đã được đặt lại. Bạn có thể đăng nhập.</p>
-      <p v-if="$route.query.expired" class="rounded-xl bg-amber-50 p-3 text-sm text-amber-700">Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại để tiếp tục.</p>
-      <GitHubSignInButton />
-      <GoogleSignInButton @credential="loginWithGoogle" @error="error = $event" />
+      <p v-if="$route.query.registered" class="border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-700">Đăng ký thành công. Hãy kiểm tra email để xác minh tài khoản.</p>
+      <p v-if="$route.query.reset" class="border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-700">Mật khẩu đã được đặt lại. Bạn có thể đăng nhập.</p>
+      <p v-if="$route.query.expired" class="border border-amber-200 bg-amber-50 p-3 text-sm text-amber-700">Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại để tiếp tục.</p>
+      <div class="flex items-center justify-center gap-3" aria-label="Đăng nhập bằng mạng xã hội">
+        <GitHubSignInButton />
+        <GoogleSignInButton @credential="loginWithGoogle" @error="error = $event" />
+      </div>
       <div class="flex items-center gap-3"><span class="h-px flex-1 bg-slate-200 dark:bg-slate-700"/><span class="text-xs text-slate-400">hoặc dùng email</span><span class="h-px flex-1 bg-slate-200 dark:bg-slate-700"/></div>
       <form class="space-y-5" @submit.prevent="submit">
         <BaseInput id="email" v-model="email" type="email" label="Email" placeholder="ban@gmail.com" :error="emailError" required @blur="validateEmail" @input="validateEmail" />
         <div><BaseInput id="password" v-model="password" type="password" label="Mật khẩu" required /><div class="mt-2 text-right"><RouterLink to="/forgot-password" class="text-xs font-bold text-purple-600">Quên mật khẩu?</RouterLink></div></div>
-        <p v-if="error" class="rounded-xl bg-red-50 p-3 text-sm text-red-700 dark:bg-red-950/30 dark:text-red-300">{{ error }}</p>
+        <p v-if="error" class="border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:bg-red-950/30 dark:text-red-300">{{ error }}</p>
         <BaseButton type="submit" :loading="loading" :full-width="true">Đăng nhập</BaseButton>
       </form>
       <p class="text-center text-sm">Chưa có tài khoản? <RouterLink to="/register" class="font-bold text-purple-600">Đăng ký</RouterLink></p>

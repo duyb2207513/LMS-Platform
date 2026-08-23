@@ -29,16 +29,16 @@ const isDraft = computed(() => props.announcement.status === AnnouncementStatus.
 <template>
   <article
     :class="[
-      'rounded-3xl border p-5 sm:p-6 transition-all duration-200',
+      'border-b border-x-0 border-t-0 p-4 transition-colors duration-200 last:border-b-0 sm:p-5',
       isDraft
-        ? 'border-amber-200 bg-amber-50/40 dark:border-amber-900/50 dark:bg-amber-950/20'
-        : 'border-slate-200/80 bg-white shadow-sm hover:shadow-md dark:border-slate-800 dark:bg-slate-900',
+        ? 'border-amber-200 bg-amber-50/30 dark:border-amber-900/50 dark:bg-amber-950/15'
+        : 'border-slate-200 bg-transparent hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-900/50',
     ]"
   >
     <!-- Top info -->
     <div class="flex flex-wrap items-center justify-between gap-3">
       <div class="flex items-center gap-3">
-        <div class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-purple-100 text-sm font-extrabold text-purple-700 dark:bg-purple-950/60 dark:text-purple-300">
+        <div class="grid h-9 w-9 shrink-0 place-items-center bg-purple-100 text-sm font-extrabold text-purple-700 dark:bg-purple-950/60 dark:text-purple-300">
           {{ announcement.author?.fullName ? announcement.author.fullName.charAt(0).toUpperCase() : 'G' }}
         </div>
         <div>
@@ -55,13 +55,13 @@ const isDraft = computed(() => props.announcement.status === AnnouncementStatus.
       <div class="flex items-center gap-2">
         <span
           v-if="isDraft"
-          class="rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-700 dark:bg-amber-950/60 dark:text-amber-400"
+          class="border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs font-bold text-amber-700 dark:border-amber-800 dark:bg-amber-950/60 dark:text-amber-400"
         >
           Bản nháp
         </span>
         <span
           v-else
-          class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400"
+          class="border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-400"
         >
           Đã phát hành
         </span>

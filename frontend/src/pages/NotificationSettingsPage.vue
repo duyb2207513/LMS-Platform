@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref } from 'vue'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
-import BaseButton from '@/components/ui/BaseButton.vue'
 import LoadingSpinner from '@/components/ui/LoadingSpinner.vue'
 import { useNotificationStore } from '@/stores/notification'
 
@@ -19,6 +18,18 @@ const form = reactive({
   quizResults: true,
   certificateUpdates: true,
 })
+
+const channels = [
+  { key: 'inAppEnabled' as const, title: 'Thông báo trên website', description: 'Hiển thị chuông và thông báo theo thời gian thực.' },
+  { key: 'emailEnabled' as const, title: 'Thông báo qua email', description: 'Gửi cập nhật đến địa chỉ email đã đăng ký.' },
+]
+
+const topics = [
+  { key: 'courseUpdates' as const, title: 'Cập nhật khóa học', description: 'Bài học, tài liệu và thông báo mới từ giảng viên.' },
+  { key: 'assignmentReminders' as const, title: 'Nhắc hạn bài tập', description: 'Nhắc khi bài tập sắp đến hạn nộp.' },
+  { key: 'quizResults' as const, title: 'Kết quả Quiz', description: 'Điểm số và kết quả sau khi hoàn thành Quiz.' },
+  { key: 'certificateUpdates' as const, title: 'Chứng chỉ khóa học', description: 'Thông báo khi chứng chỉ mới được phát hành.' },
+]
 
 async function loadPreferences() {
   loading.value = true
@@ -45,20 +56,11 @@ async function save() {
   successMessage.value = ''
   errorMessage.value = ''
   try {
-    await notificationStore.updatePreferences({
-      inAppEnabled: form.inAppEnabled,
-      emailEnabled: form.emailEnabled,
-      courseUpdates: form.courseUpdates,
-      assignmentReminders: form.assignmentReminders,
-      quizResults: form.quizResults,
-      certificateUpdates: form.certificateUpdates,
-    })
-    successMessage.value = 'Đã lưu tùy chọn thông báo thành công!'
-    setTimeout(() => {
-      successMessage.value = ''
-    }, 4000)
-  } catch (e) {
-    errorMessage.value = e instanceof Error ? e.message : 'Lỗi khi lưu cài đặt.'
+    await notificationStore.updatePreferences({ ...form })
+    successMessage.value = 'Đã lưu tùy chọn thông báo.'
+    setTimeout(() => { successMessage.value = '' }, 4000)
+  } catch (caught) {
+    errorMessage.value = caught instanceof Error ? caught.message : 'Không thể lưu cài đặt.'
   } finally {
     saving.value = false
   }
@@ -69,142 +71,55 @@ onMounted(loadPreferences)
 
 <template>
   <DefaultLayout>
-    <main class="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:px-8">
-      <!-- Breadcrumb / Back -->
-      <div class="mb-6">
-        <RouterLink
-          to="/notifications"
-          class="inline-flex items-center gap-2 text-sm font-semibold text-purple-600 hover:text-purple-700 dark:text-purple-400"
-        >
-          ← Quay lại Trung tâm thông báo
-        </RouterLink>
-      </div>
-
-      <div class="rounded-3xl border border-slate-200/80 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900 sm:p-8">
+    <main class="w-full px-2 py-6 sm:px-3 lg:px-2">
+      <header class="flex flex-wrap items-end justify-between gap-3 border-b border-slate-200 pb-4 dark:border-slate-800">
         <div>
-          <h1 class="text-2xl font-extrabold text-slate-950 dark:text-white">Cài đặt thông báo</h1>
-          <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
-            Tùy chỉnh kênh và loại thông báo bạn muốn nhận từ LMS Platform
-          </p>
+          <RouterLink to="/notifications" class="inline-flex items-center gap-1 text-xs font-bold text-violet-600 hover:text-violet-800">
+            Trung tâm thông báo
+          </RouterLink>
+          <h1 class="mt-2 text-2xl font-extrabold text-slate-950 dark:text-white">Cài đặt thông báo</h1>
+          <p class="mt-0.5 text-xs text-slate-500 dark:text-slate-400">Chọn kênh và nội dung bạn muốn nhận.</p>
         </div>
 
-        <div v-if="loading" class="py-12 text-center">
-          <LoadingSpinner />
+        <button type="button" class="inline-flex h-9 items-center gap-1.5 bg-violet-700 px-4 text-xs font-bold text-white transition hover:bg-violet-800 disabled:cursor-not-allowed disabled:opacity-60" :disabled="saving || loading" @click="save">
+          {{ saving ? 'Đang lưu...' : 'Lưu thay đổi' }}
+        </button>
+      </header>
+
+      <div v-if="loading" class="py-12 text-center"><LoadingSpinner /></div>
+
+      <form v-else class="mt-4" @submit.prevent="save">
+        <div v-if="successMessage" class="mb-3 border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-300">{{ successMessage }}</div>
+        <div v-if="errorMessage" class="mb-3 border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-semibold text-rose-700 dark:border-rose-900 dark:bg-rose-950/40 dark:text-rose-300">{{ errorMessage }}</div>
+
+        <div class="grid gap-4 xl:grid-cols-2">
+          <section>
+            <div class="mb-2 flex items-center justify-between">
+              <h2 class="text-sm font-bold text-slate-900 dark:text-white">Kênh nhận thông báo</h2>
+              <span class="text-[10px] uppercase tracking-wider text-slate-400">2 tùy chọn</span>
+            </div>
+            <div class="divide-y divide-slate-200 border border-slate-200 bg-white dark:divide-slate-800 dark:border-slate-800 dark:bg-slate-900">
+              <label v-for="item in channels" :key="item.key" class="flex min-h-16 cursor-pointer items-center gap-3 px-3 py-2.5 transition hover:bg-slate-50 dark:hover:bg-slate-800/70">
+                <span class="min-w-0 flex-1"><b class="block text-xs text-slate-900 dark:text-white">{{ item.title }}</b><span class="block truncate text-[11px] text-slate-500">{{ item.description }}</span></span>
+                <input v-model="form[item.key]" type="checkbox" class="h-4 w-4 shrink-0 accent-violet-600" />
+              </label>
+            </div>
+          </section>
+
+          <section>
+            <div class="mb-2 flex items-center justify-between">
+              <h2 class="text-sm font-bold text-slate-900 dark:text-white">Chủ đề và sự kiện</h2>
+              <span class="text-[10px] uppercase tracking-wider text-slate-400">4 tùy chọn</span>
+            </div>
+            <div class="divide-y divide-slate-200 border border-slate-200 bg-white dark:divide-slate-800 dark:border-slate-800 dark:bg-slate-900">
+              <label v-for="item in topics" :key="item.key" class="flex min-h-16 cursor-pointer items-center gap-3 px-3 py-2.5 transition hover:bg-slate-50 dark:hover:bg-slate-800/70">
+                <span class="min-w-0 flex-1"><b class="block text-xs text-slate-900 dark:text-white">{{ item.title }}</b><span class="block truncate text-[11px] text-slate-500">{{ item.description }}</span></span>
+                <input v-model="form[item.key]" type="checkbox" class="h-4 w-4 shrink-0 accent-violet-600" />
+              </label>
+            </div>
+          </section>
         </div>
-
-        <form v-else class="mt-8 space-y-8" @submit.prevent="save">
-          <!-- Alert feedback -->
-          <div
-            v-if="successMessage"
-            class="rounded-2xl bg-emerald-50 p-4 text-sm font-medium text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300"
-          >
-            ✓ {{ successMessage }}
-          </div>
-          <div
-            v-if="errorMessage"
-            class="rounded-2xl bg-red-50 p-4 text-sm font-medium text-red-700 dark:bg-red-950/40 dark:text-red-300"
-          >
-            ✕ {{ errorMessage }}
-          </div>
-
-          <!-- Kênh nhận thông báo -->
-          <div>
-            <h2 class="text-base font-bold text-slate-900 dark:text-white">Kênh nhận thông báo</h2>
-            <div class="mt-4 divide-y divide-slate-100 rounded-2xl border border-slate-200/80 p-2 dark:divide-slate-800 dark:border-slate-800">
-              <!-- In-app toggle -->
-              <label class="flex items-center justify-between p-3.5 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-850/50 rounded-xl transition-colors">
-                <div>
-                  <span class="text-sm font-bold text-slate-900 dark:text-white">Thông báo trên Website (In-app)</span>
-                  <p class="text-xs text-slate-500 dark:text-slate-400">Nhận biểu tượng chuông và popup thời gian thực trên website</p>
-                </div>
-                <input
-                  v-model="form.inAppEnabled"
-                  type="checkbox"
-                  class="h-5 w-5 rounded border-slate-300 text-purple-600 focus:ring-purple-500 dark:border-slate-700 dark:bg-slate-800"
-                />
-              </label>
-
-              <!-- Email toggle -->
-              <label class="flex items-center justify-between p-3.5 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-850/50 rounded-xl transition-colors">
-                <div>
-                  <span class="text-sm font-bold text-slate-900 dark:text-white">Email thông báo</span>
-                  <p class="text-xs text-slate-500 dark:text-slate-400">Nhận thư gửi về hộp thư điện tử đã đăng ký</p>
-                </div>
-                <input
-                  v-model="form.emailEnabled"
-                  type="checkbox"
-                  class="h-5 w-5 rounded border-slate-300 text-purple-600 focus:ring-purple-500 dark:border-slate-700 dark:bg-slate-800"
-                />
-              </label>
-            </div>
-          </div>
-
-          <!-- Các chủ đề thông báo -->
-          <div>
-            <h2 class="text-base font-bold text-slate-900 dark:text-white">Chủ đề & Sự kiện</h2>
-            <div class="mt-4 divide-y divide-slate-100 rounded-2xl border border-slate-200/80 p-2 dark:divide-slate-800 dark:border-slate-800">
-              <!-- Course updates -->
-              <label class="flex items-center justify-between p-3.5 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-850/50 rounded-xl transition-colors">
-                <div>
-                  <span class="text-sm font-bold text-slate-900 dark:text-white">Cập nhật khóa học & Thông báo giảng viên</span>
-                  <p class="text-xs text-slate-500 dark:text-slate-400">Khi giảng viên đăng bài giảng mới, tài liệu hoặc thông báo quan trọng</p>
-                </div>
-                <input
-                  v-model="form.courseUpdates"
-                  type="checkbox"
-                  class="h-5 w-5 rounded border-slate-300 text-purple-600 focus:ring-purple-500 dark:border-slate-700 dark:bg-slate-800"
-                />
-              </label>
-
-              <!-- Assignment reminders -->
-              <label class="flex items-center justify-between p-3.5 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-850/50 rounded-xl transition-colors">
-                <div>
-                  <span class="text-sm font-bold text-slate-900 dark:text-white">Nhắc hạn nộp bài tập (Assignment)</span>
-                  <p class="text-xs text-slate-500 dark:text-slate-400">Nhận thông báo khi sắp đến hạn nộp bài tập trong khóa học</p>
-                </div>
-                <input
-                  v-model="form.assignmentReminders"
-                  type="checkbox"
-                  class="h-5 w-5 rounded border-slate-300 text-purple-600 focus:ring-purple-500 dark:border-slate-700 dark:bg-slate-800"
-                />
-              </label>
-
-              <!-- Quiz results -->
-              <label class="flex items-center justify-between p-3.5 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-850/50 rounded-xl transition-colors">
-                <div>
-                  <span class="text-sm font-bold text-slate-900 dark:text-white">Kết quả bài trắc nghiệm (Quiz)</span>
-                  <p class="text-xs text-slate-500 dark:text-slate-400">Thông báo điểm số và nhận xét sau khi hoàn thành Quiz</p>
-                </div>
-                <input
-                  v-model="form.quizResults"
-                  type="checkbox"
-                  class="h-5 w-5 rounded border-slate-300 text-purple-600 focus:ring-purple-500 dark:border-slate-700 dark:bg-slate-800"
-                />
-              </label>
-
-              <!-- Certificate updates -->
-              <label class="flex items-center justify-between p-3.5 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-850/50 rounded-xl transition-colors">
-                <div>
-                  <span class="text-sm font-bold text-slate-900 dark:text-white">Chứng chỉ hoàn thành khóa học</span>
-                  <p class="text-xs text-slate-500 dark:text-slate-400">Nhận thông báo ngay khi chứng chỉ của bạn được cấp</p>
-                </div>
-                <input
-                  v-model="form.certificateUpdates"
-                  type="checkbox"
-                  class="h-5 w-5 rounded border-slate-300 text-purple-600 focus:ring-purple-500 dark:border-slate-700 dark:bg-slate-800"
-                />
-              </label>
-            </div>
-          </div>
-
-          <!-- Submit Button -->
-          <div class="flex justify-end pt-2">
-            <BaseButton type="submit" :loading="saving">
-              Lưu thay đổi
-            </BaseButton>
-          </div>
-        </form>
-      </div>
+      </form>
     </main>
   </DefaultLayout>
 </template>

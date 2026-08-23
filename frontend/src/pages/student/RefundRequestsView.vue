@@ -46,7 +46,7 @@ onMounted(loadRequests)
 
 <template>
   <DefaultLayout>
-    <main class="app-page max-w-6xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
+    <main class="app-page navbar-page">
       <header class="flex flex-wrap items-end justify-between gap-4">
         <div>
           <p class="text-sm font-bold uppercase tracking-wider text-purple-600">Hoàn tiền</p>
@@ -59,15 +59,15 @@ onMounted(loadRequests)
       </header>
 
       <LoadingSpinner v-if="refundApi.loading.value && !requests.length" class="py-20" />
-      <p v-else-if="error" class="mt-5 rounded-2xl bg-red-50 p-4 text-sm text-red-700 dark:bg-red-950/30 dark:text-red-300">{{ error }}</p>
+      <p v-else-if="error" class="mt-4 border border-red-200 bg-red-50 p-3 text-xs text-red-700 dark:border-red-900 dark:bg-red-950/30 dark:text-red-300">{{ error }}</p>
 
-      <section v-else-if="requests.length" class="mt-8 space-y-4">
+      <section v-else-if="requests.length" class="mt-4 space-y-2">
         <article
           v-for="item in requests"
           :key="item.id"
           class="surface-card overflow-hidden transition-all hover:border-purple-200 dark:hover:border-purple-900"
         >
-          <header class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 bg-slate-50/70 px-5 py-4 dark:border-slate-800 dark:bg-slate-950/20">
+          <header class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 bg-slate-50/70 px-3 py-3 dark:border-slate-800 dark:bg-slate-950/20">
             <div>
               <div class="flex items-center gap-3">
                 <span class="font-mono text-xs font-bold text-slate-500">Mã đơn: {{ item.order?.orderNumber || item.orderId }}</span>
@@ -80,7 +80,7 @@ onMounted(loadRequests)
             </b>
           </header>
 
-          <div class="p-5">
+          <div class="p-3">
             <div class="mb-4 text-sm text-slate-700 dark:text-slate-300">
               <span class="font-bold text-slate-900 dark:text-white">Lý do: </span>
               <span>{{ item.reason }}</span>

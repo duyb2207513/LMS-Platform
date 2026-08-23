@@ -27,13 +27,13 @@ const maxSeconds = computed(() => {
           Thời gian học thực tế theo từng ngày
         </p>
       </div>
-      <span class="rounded-lg bg-purple-50 px-2.5 py-1 text-xs font-bold text-purple-700 dark:bg-purple-950/50 dark:text-purple-300">
+      <span class="bg-purple-50 px-2.5 py-1 text-xs font-bold text-purple-700 dark:bg-purple-950/50 dark:text-purple-300">
         Phút học / ngày
       </span>
     </div>
 
     <div v-if="items.length" class="mt-6">
-      <div class="flex h-48 items-end gap-2 sm:gap-3 overflow-x-auto pb-2 pt-6">
+      <div class="flex h-80 min-h-[20rem] items-end gap-2 overflow-x-auto pb-2 pt-8 sm:gap-3">
         <div
           v-for="item in items"
           :key="item.date"
@@ -41,7 +41,7 @@ const maxSeconds = computed(() => {
         >
           <!-- Tooltip -->
           <div class="absolute bottom-full mb-2 hidden group-hover:flex flex-col items-center z-20">
-            <div class="rounded-xl bg-slate-900 px-3 py-1.5 text-center text-xs font-bold text-white shadow-xl whitespace-nowrap dark:bg-slate-800">
+            <div class="bg-slate-900 px-3 py-1.5 text-center text-xs font-bold text-white shadow-xl whitespace-nowrap dark:bg-slate-800">
               <p>{{ formatDate(item.date) }}</p>
               <p class="text-purple-300">{{ formatSeconds(item.learningSeconds) }}</p>
               <p v-if="item.completedLessons > 0" class="text-[10px] font-normal text-slate-300">
@@ -53,7 +53,7 @@ const maxSeconds = computed(() => {
 
           <!-- Bar -->
           <div
-            class="w-full max-w-[36px] rounded-t-xl bg-gradient-to-t from-violet-600 to-purple-500 transition-all duration-300 group-hover:from-violet-500 group-hover:to-purple-400"
+            class="w-full max-w-[48px] bg-gradient-to-t from-violet-600 to-purple-500 transition-all duration-300 group-hover:from-violet-500 group-hover:to-purple-400"
             :style="{ height: `${Math.max(8, (item.learningSeconds / maxSeconds) * 100)}%` }"
           />
 
