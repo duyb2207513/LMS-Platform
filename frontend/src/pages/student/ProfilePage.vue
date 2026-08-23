@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import BaseInput from '@/components/ui/BaseInput.vue'
@@ -10,6 +11,9 @@ import type { ApiResponse, User } from '@/types'
 
 const auth = useAuthStore()
 const api = useApi()
+const route = useRoute()
+const router = useRouter()
+const activeSection = ref<'profile' | 'password'>(route.query.section === 'password' ? 'password' : 'profile')
 const firstName = ref('')
 const lastName = ref('')
 const phoneNumber = ref('')
@@ -18,6 +22,16 @@ const pickerKey = ref(0)
 const message = ref('')
 const error = ref('')
 const saving = ref(false)
+const currentPassword = ref('')
+const newPassword = ref('')
+const confirmNewPassword = ref('')
+const passwordMessage = ref('')
+const passwordError = ref('')
+
+function selectSection(section: 'profile' | 'password') {
+  activeSection.value = section
+  void router.replace({ path: '/profile', query: section === 'password' ? { section: 'password' } : {} })
+}
 
 onMounted(async () => {
   try {
@@ -83,15 +97,47 @@ async function removeAvatar() {
     saving.value = false
   }
 }
+
+async function savePassword() {
+  passwordMessage.value = ''
+  passwordError.value = ''
+  if (newPassword.value === currentPassword.value) {
+    passwordError.value = 'Mật khẩu mới không được giống mật khẩu hiện tại'
+    return
+  }
+  if (newPassword.value !== confirmNewPassword.value) {
+    passwordError.value = 'Mật khẩu xác nhận không khớp'
+    return
+  }
+  try {
+    await api.patch('/users/me/password', {
+      currentPassword: currentPassword.value,
+      newPassword: newPassword.value,
+      confirmNewPassword: confirmNewPassword.value,
+    })
+    passwordMessage.value = 'Đổi mật khẩu thành công'
+    currentPassword.value = ''
+    newPassword.value = ''
+    confirmNewPassword.value = ''
+  } catch (cause) {
+    passwordError.value = cause instanceof Error ? cause.message : 'Không thể đổi mật khẩu'
+  }
+}
 </script>
 
 <template>
   <DefaultLayout>
-    <main class="mx-auto max-w-2xl px-4 py-12">
-      <h1 class="text-3xl font-black dark:text-white">Hồ sơ của tôi</h1>
-      <p class="mb-7 mt-2 text-slate-500">Cập nhật tên và tải ảnh đại diện từ thiết bị</p>
+    <main class="navbar-page">
+      <h1 class="text-3xl font-black dark:text-white">Tài khoản của tôi</h1>
+      <p class="mt-2 text-slate-500">Quản lý hồ sơ cá nhân và mật khẩu tại cùng một nơi.</p>
 
-      <form class="space-y-5 rounded-2xl border bg-white p-6 dark:border-slate-800 dark:bg-slate-900" @submit.prevent="save">
+      <div class="mt-5 inline-flex border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
+        <button type="button" :class="['px-3 py-2 text-xs font-bold transition', activeSection === 'profile' ? 'bg-violet-700 text-white' : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800']" @click="selectSection('profile')">Thông tin cá nhân</button>
+        <button type="button" :class="['px-3 py-2 text-xs font-bold transition', activeSection === 'password' ? 'bg-violet-700 text-white' : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800']" @click="selectSection('password')">Đổi mật khẩu</button>
+      </div>
+
+      <form v-if="activeSection === 'profile'" class="mt-3 space-y-4 border bg-white p-4 dark:border-slate-800 dark:bg-slate-900" @submit.prevent="save">
+        <div><h2 class="text-base font-black">Thông tin cá nhân</h2><p class="mt-1 text-xs text-slate-500">Cập nhật tên, số điện thoại và ảnh đại diện.</p></div>
         <div class="grid gap-4 sm:grid-cols-2">
           <BaseInput id="profile-last-name" v-model="lastName" label="Họ và tên đệm" placeholder="Trần Minh" required />
           <BaseInput id="profile-first-name" v-model="firstName" label="Tên" placeholder="Duy" required />
@@ -119,6 +165,16 @@ async function removeAvatar() {
         <p v-if="message" class="text-emerald-600">{{ message }}</p>
         <p v-if="error" class="text-red-600">{{ error }}</p>
         <BaseButton type="submit" :loading="saving">Lưu thay đổi</BaseButton>
+      </form>
+
+      <form v-else class="mt-3 space-y-4 border bg-white p-4 dark:border-slate-800 dark:bg-slate-900" @submit.prevent="savePassword">
+        <div><h2 class="text-base font-black">Đổi mật khẩu</h2><p class="mt-1 text-xs text-slate-500">Mật khẩu mới phải có chữ hoa, chữ thường, số và tối thiểu 8 ký tự.</p></div>
+        <BaseInput id="current-password" v-model="currentPassword" type="password" label="Mật khẩu hiện tại" autocomplete="current-password" required />
+        <BaseInput id="new-password" v-model="newPassword" type="password" label="Mật khẩu mới" autocomplete="new-password" required />
+        <BaseInput id="confirm-new-password" v-model="confirmNewPassword" type="password" label="Xác nhận mật khẩu mới" autocomplete="new-password" required />
+        <p v-if="passwordMessage" class="rounded-xl bg-emerald-50 p-3 text-sm font-semibold text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">{{ passwordMessage }}</p>
+        <p v-if="passwordError" class="rounded-xl bg-red-50 p-3 text-sm font-semibold text-red-700 dark:bg-red-950 dark:text-red-300">{{ passwordError }}</p>
+        <BaseButton type="submit" :loading="api.loading.value">Cập nhật mật khẩu</BaseButton>
       </form>
     </main>
   </DefaultLayout>

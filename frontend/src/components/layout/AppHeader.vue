@@ -7,8 +7,9 @@ import NotificationBell from "@/components/notifications/NotificationBell.vue";
 import { API_BASE_URL } from "@/composables/useApi";
 import { useAuthStore } from "@/stores/auth";
 
-const props = withDefaults(defineProps<{ workspace?: boolean }>(), {
+const props = withDefaults(defineProps<{ workspace?: boolean; sidebar?: boolean }>(), {
   workspace: false,
+  sidebar: false,
 });
 const emit = defineEmits<{ toggleWorkspace: [] }>();
 const auth = useAuthStore();
@@ -28,6 +29,14 @@ const mainLinkClass = (path: string) => {
     path === "/"
       ? route.path === "/"
       : route.path === path || route.path.startsWith(`${path}/`);
+  if (!auth.isLoggedIn) {
+    return [
+      "rounded-xl px-4 py-2 text-sm font-semibold transition-colors",
+      active
+        ? "bg-white text-violet-700"
+        : "text-violet-100 hover:bg-violet-600 hover:text-white",
+    ];
+  }
   return [
     "rounded-xl px-4 py-2 text-sm font-semibold transition-colors",
     active
@@ -45,7 +54,7 @@ async function logout() {
 
 function toggleMobileNavigation() {
   profileOpen.value = false;
-  if (props.workspace) emit("toggleWorkspace");
+  if (props.workspace || props.sidebar) emit("toggleWorkspace");
   else mobileMenuOpen.value = !mobileMenuOpen.value;
 }
 
@@ -60,29 +69,36 @@ watch(
 
 <template>
   <header
-    class="sticky top-0 z-40 border-b border-slate-200/80 bg-white/88 backdrop-blur-xl dark:border-slate-800 dark:bg-slate-950/88"
+    :class="[
+      'sticky top-0 z-40 border-b shadow-sm',
+      !auth.isLoggedIn
+        ? 'border-violet-800 bg-gradient-to-r from-indigo-800 via-violet-700 to-purple-700'
+        : 'border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950',
+    ]"
   >
     <div
-      class="mx-auto flex h-16 max-w-[90rem] items-center justify-between gap-3 px-3 sm:px-5 lg:px-8"
+      class="flex h-[4.5rem] w-full items-center justify-between gap-3 px-4 sm:px-6"
     >
-      <AppBrand />
+      <div class="flex min-w-0 items-center gap-7">
+        <AppBrand :compact="!auth.isLoggedIn || auth.isStudent" icon-size="lg" />
 
-      <nav
-        v-if="!workspace"
-        class="hidden items-center gap-1 md:flex"
-        aria-label="Điều hướng chính"
-      >
-        <RouterLink to="/" :class="mainLinkClass('/')">Trang chủ</RouterLink>
-        <RouterLink to="/courses" :class="mainLinkClass('/courses')"
-          >Khám phá</RouterLink
+        <nav
+          v-if="!workspace"
+          class="hidden items-center gap-1 md:flex"
+          aria-label="Điều hướng chính"
         >
-        <RouterLink
-          v-if="auth.isStudent"
-          to="/my-courses"
-          :class="mainLinkClass('/my-courses')"
-          >Khóa học của tôi</RouterLink
-        >
-      </nav>
+          <RouterLink :to="auth.isStudent ? '/dashboard' : '/'" :class="mainLinkClass(auth.isStudent ? '/dashboard' : '/')">Trang chủ</RouterLink>
+          <RouterLink to="/courses" :class="mainLinkClass('/courses')"
+            >Khám phá</RouterLink
+          >
+          <RouterLink
+            v-if="auth.isStudent"
+            to="/my-courses"
+            :class="mainLinkClass('/my-courses')"
+            >Khóa học của tôi</RouterLink
+          >
+        </nav>
+      </div>
 
       <div class="flex shrink-0 items-center gap-1.5 sm:gap-2">
         <RouterLink
@@ -104,19 +120,19 @@ watch(
         <template v-if="!auth.isLoggedIn">
           <RouterLink
             to="/login"
-            class="hidden min-h-10 items-center rounded-xl px-3.5 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-100 sm:inline-flex dark:text-slate-200 dark:hover:bg-slate-800"
+            class="hidden min-h-10 items-center rounded-xl border-2 border-white px-4 text-sm font-bold text-white transition-colors hover:bg-white hover:text-violet-700 sm:inline-flex"
           >
             Đăng nhập
           </RouterLink>
           <RouterLink
             to="/register"
-            class="inline-flex min-h-10 items-center rounded-xl bg-gradient-to-r from-violet-600 to-purple-600 px-3.5 text-sm font-bold text-white shadow-md shadow-purple-500/20 transition hover:from-violet-700 hover:to-purple-700 sm:px-4"
+            class="inline-flex min-h-10 items-center rounded-xl border-2 border-white bg-white px-3.5 text-sm font-bold text-violet-700 shadow-md transition hover:border-violet-100 hover:bg-violet-100 sm:px-4"
           >
             Đăng ký
           </RouterLink>
         </template>
 
-        <div v-else class="relative">
+        <div v-else-if="!auth.isStudent" class="relative">
           <button
             type="button"
             class="flex min-h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white p-1.5 pr-1.5 text-left shadow-sm transition hover:border-purple-200 hover:bg-purple-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-purple-500/15 dark:border-slate-700 dark:bg-slate-900 dark:hover:border-purple-800 dark:hover:bg-purple-950/30 sm:pr-3"
@@ -256,12 +272,22 @@ watch(
         </div>
 
         <button
+          v-else
+          type="button"
+          class="inline-flex min-h-10 items-center gap-2 rounded-xl border border-red-200 px-3 text-sm font-bold text-red-600 transition hover:border-red-600 hover:bg-red-600 hover:text-white sm:px-4 dark:border-red-900 dark:text-red-400 dark:hover:bg-red-600 dark:hover:text-white"
+          @click="logout"
+        >
+          <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 17l5-5-5-5m5 5H3m9-8h6a2 2 0 012 2v12a2 2 0 01-2 2h-6" /></svg>
+          <span class="hidden sm:inline">Đăng xuất</span>
+        </button>
+
+        <button
           type="button"
           :class="[
             'grid h-10 w-10 place-items-center rounded-xl border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:border-purple-200 hover:bg-purple-50 hover:text-purple-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-purple-800 dark:hover:bg-purple-950/30',
-            workspace ? 'lg:hidden' : 'md:hidden',
+            workspace || sidebar ? 'lg:hidden' : 'md:hidden',
           ]"
-          :aria-label="workspace ? 'Mở menu quản lý' : 'Mở menu điều hướng'"
+          :aria-label="workspace || sidebar ? 'Mở thanh điều hướng' : 'Mở menu điều hướng'"
           :aria-expanded="mobileMenuOpen"
           @click="toggleMobileNavigation"
         >
@@ -285,12 +311,12 @@ watch(
 
     <Transition name="mobile-nav">
       <nav
-        v-if="mobileMenuOpen && !workspace"
+        v-if="mobileMenuOpen && !workspace && !sidebar"
         class="border-t border-slate-100 bg-white px-3 py-3 shadow-lg md:hidden dark:border-slate-800 dark:bg-slate-950"
         aria-label="Điều hướng mobile"
       >
         <div class="mx-auto grid max-w-7xl gap-1">
-          <RouterLink to="/" :class="mainLinkClass('/')">Trang chủ</RouterLink>
+          <RouterLink :to="auth.isStudent ? '/dashboard' : '/'" :class="mainLinkClass(auth.isStudent ? '/dashboard' : '/')">Trang chủ</RouterLink>
           <RouterLink to="/courses" :class="mainLinkClass('/courses')"
             >Khám phá</RouterLink
           >

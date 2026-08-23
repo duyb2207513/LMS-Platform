@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { Bot } from '@lucide/vue'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
 import VueOfficePdf from '@vue-office/pdf'
 import BaseModal from '@/components/ui/BaseModal.vue'
@@ -343,40 +344,39 @@ onBeforeUnmount(() => {
     <input ref="pdfInput" type="file" accept="application/pdf" class="hidden" @change="onPdfSelected" />
     <input ref="videoInput" type="file" accept="video/mp4,video/webm,video/ogg,video/quicktime" class="hidden" @change="onVideoSelected" />
 
-    <main class="app-page max-w-7xl px-4 py-7 sm:px-6 lg:px-8">
-      <header class="mb-6"><p class="text-sm font-bold uppercase tracking-wider text-purple-600">Giao tiếp</p><h1 class="app-page-title mt-2">Tin nhắn</h1><p class="app-page-description">Trao đổi trực tiếp với học viên, giảng viên, quản trị viên và Trợ lý AI LMS.</p></header>
-      <p v-if="error" class="mb-4 rounded-xl bg-red-50 p-3 text-sm text-red-700 dark:bg-red-950/30 dark:text-red-300">{{ error }}</p>
+    <main class="relative h-[calc(100vh-4.5rem)] w-full overflow-hidden">
+      <p v-if="error" class="absolute inset-x-2 top-2 z-30 border border-red-200 bg-red-50 p-2 text-xs text-red-700 shadow dark:border-red-900 dark:bg-red-950 dark:text-red-300">{{ error }}</p>
       
-      <section class="grid min-h-[72vh] overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900 lg:grid-cols-[22rem_minmax(0,1fr)]">
+      <section class="grid h-full min-h-0 overflow-hidden border-y border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 lg:grid-cols-[22rem_minmax(0,1fr)]">
         <!-- Sidebar Contacts List -->
-        <aside class="border-b border-slate-200 p-4 dark:border-slate-800 lg:border-b-0 lg:border-r">
-          <input v-model="search" class="min-h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm outline-none transition focus:border-purple-500 dark:border-slate-700 dark:bg-slate-800 dark:text-white" placeholder="Tìm người dùng hoặc Trợ lý AI..." />
-          <div class="mt-4 max-h-[60vh] space-y-1.5 overflow-y-auto">
+        <aside class="flex min-h-0 flex-col border-b border-slate-200 p-3 dark:border-slate-800 lg:border-b-0 lg:border-r">
+          <input v-model="search" class="h-9 w-full border border-slate-200 bg-slate-50 px-3 text-xs outline-none transition focus:border-purple-500 dark:border-slate-700 dark:bg-slate-800 dark:text-white" placeholder="Tìm người dùng hoặc Trợ lý AI..." />
+          <div class="mt-2 min-h-0 flex-1 divide-y divide-slate-100 overflow-y-auto dark:divide-slate-800">
             <button
               v-for="contact in visibleContacts"
               :key="contact.id"
               type="button"
               :class="[
-                'flex w-full items-center gap-3 rounded-2xl p-3 text-left transition',
+                'flex min-h-12 w-full items-center gap-2 p-2 text-left transition',
                 selected?.id === contact.id ? 'bg-purple-100 text-purple-900 dark:bg-purple-950/50 dark:text-purple-100 font-bold' : 'hover:bg-slate-100 dark:hover:bg-slate-800',
                 contact.id === AI_BOT_CONTACT.id ? 'border border-purple-200/80 bg-purple-50/40 dark:border-purple-900/40 dark:bg-purple-950/20' : ''
               ]"
               @click="openChat(contact.id)"
             >
-              <span v-if="contact.id === AI_BOT_CONTACT.id" class="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-gradient-to-br from-indigo-500 via-purple-600 to-fuchsia-600 text-xl shadow-md">
-                🤖
+              <span v-if="contact.id === AI_BOT_CONTACT.id" class="grid h-8 w-8 shrink-0 place-items-center bg-violet-700 text-white">
+                <Bot :size="17" :stroke-width="2" />
               </span>
-              <img v-else-if="contact.avatarUrl" :src="contact.avatarUrl" alt="" class="h-11 w-11 rounded-full object-cover">
-              <span v-else class="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-gradient-to-br from-violet-500 to-purple-700 font-bold text-white">
+              <img v-else-if="contact.avatarUrl" :src="contact.avatarUrl" alt="" class="h-8 w-8 rounded-full object-cover">
+              <span v-else class="grid h-8 w-8 shrink-0 place-items-center bg-violet-700 text-xs font-bold text-white">
                 {{ contact.fullName.charAt(0) }}
               </span>
 
               <span class="min-w-0 flex-1">
                 <span class="flex items-center gap-1.5">
-                  <b class="block truncate text-sm">{{ contact.fullName }}</b>
-                  <span v-if="contact.id === AI_BOT_CONTACT.id" class="rounded-full bg-purple-200 px-1.5 py-0.2 text-[9px] font-black text-purple-800 dark:bg-purple-900 dark:text-purple-200">AI</span>
+                  <b class="block truncate text-xs">{{ contact.fullName }}</b>
+                  <span v-if="contact.id === AI_BOT_CONTACT.id" class="bg-purple-200 px-1.5 py-0.5 text-[8px] font-black text-purple-800 dark:bg-purple-900 dark:text-purple-200">AI</span>
                 </span>
-                <small :class="['block text-xs', contact.id === AI_BOT_CONTACT.id ? 'text-purple-600 dark:text-purple-400 font-semibold' : 'text-slate-500 dark:text-slate-400']">
+                <small :class="['block text-[10px]', contact.id === AI_BOT_CONTACT.id ? 'text-purple-600 dark:text-purple-400 font-semibold' : 'text-slate-500 dark:text-slate-400']">
                   {{ contact.id === AI_BOT_CONTACT.id ? 'Hỗ trợ tự động 24/7' : contact.role }}
                 </small>
               </span>
@@ -386,11 +386,11 @@ onBeforeUnmount(() => {
         </aside>
 
         <!-- Main Chat Area -->
-        <div v-if="selected" class="flex min-h-[72vh] min-w-0 flex-col">
+        <div v-if="selected" class="flex h-full min-h-0 min-w-0 flex-col">
           <!-- Chat Header -->
           <header class="flex items-center gap-3 border-b border-slate-200 p-4 dark:border-slate-800">
-            <span v-if="selected.id === AI_BOT_CONTACT.id" class="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-xl shadow">
-              🤖
+            <span v-if="selected.id === AI_BOT_CONTACT.id" class="grid h-9 w-9 shrink-0 place-items-center bg-violet-700 text-white">
+              <Bot :size="18" :stroke-width="2" />
             </span>
             <img v-else-if="selected.avatarUrl" :src="selected.avatarUrl" alt="" class="h-10 w-10 rounded-full object-cover">
             <span v-else class="grid h-10 w-10 place-items-center rounded-full bg-purple-600 font-bold text-white">
@@ -409,7 +409,7 @@ onBeforeUnmount(() => {
           </header>
 
           <!-- Chat Messages Scroll Container -->
-          <div ref="messageList" class="flex-1 space-y-3 overflow-y-auto bg-slate-50/60 p-4 dark:bg-slate-950/30 sm:p-6">
+          <div ref="messageList" class="min-h-0 flex-1 space-y-3 overflow-y-auto bg-slate-50/60 p-4 dark:bg-slate-950/30 sm:p-6">
             <LoadingSpinner v-if="loadingChat" class="py-16"/>
             <template v-else>
               <article v-for="item in messages" :key="item.id" :class="['flex', item.senderId === auth.user?.id ? 'justify-end' : 'justify-start']">
@@ -555,7 +555,7 @@ onBeforeUnmount(() => {
           </div>
         </div>
 
-        <div v-else class="grid min-h-[50vh] place-items-center p-8 text-center">
+        <div v-else class="grid h-full min-h-0 place-items-center p-8 text-center">
           <div>
             <span class="text-5xl">💬</span>
             <h2 class="mt-4 text-xl font-black">Chọn một người để trò chuyện</h2>

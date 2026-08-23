@@ -33,7 +33,7 @@ withDefaults(defineProps<{
   background: #ede9fe;
 }
 
-.course-thumbnail--compact { border-radius: 1rem; }
+.course-thumbnail--compact { border-radius: 0; }
 
 .course-thumbnail__placeholder {
   position: relative;
@@ -41,16 +41,14 @@ withDefaults(defineProps<{
   height: 100%;
   place-items: center;
   overflow: hidden;
-  background:
-    radial-gradient(circle at 18% 10%, rgba(255,255,255,.9), transparent 30%),
-    linear-gradient(135deg, #ede9fe 0%, #f5d0fe 52%, #ddd6fe 100%);
+  background: linear-gradient(135deg, #ede9fe 0%, #f5d0fe 52%, #ddd6fe 100%);
 }
 
 .course-thumbnail__grid {
   position: absolute;
   inset: 0;
   opacity: .32;
-  background-image: linear-gradient(rgba(124,58,237,.13) 1px, transparent 1px), linear-gradient(90deg, rgba(124,58,237,.13) 1px, transparent 1px);
+  background-image: linear-gradient(#c4b5fd 1px, transparent 1px), linear-gradient(90deg, #c4b5fd 1px, transparent 1px);
   background-size: 26px 26px;
   transform: perspective(420px) rotateX(58deg) scale(1.35) translateY(24%);
 }
@@ -61,18 +59,17 @@ withDefaults(defineProps<{
   width: 4.25rem;
   height: 4.25rem;
   place-items: center;
-  border: 1px solid rgba(255,255,255,.78);
-  border-radius: 1.35rem;
-  background: rgba(255,255,255,.72);
+  border: 1px solid #ffffff;
+  border-radius: 0;
+  background: #ffffff;
   color: #7c3aed;
-  box-shadow: 0 16px 38px rgba(91,33,182,.18);
-  backdrop-filter: blur(8px);
+  box-shadow: none;
 }
 
 .course-thumbnail__icon svg { width: 2rem; height: 2rem; }
 
 :global(.dark) .course-thumbnail__placeholder {
-  background: radial-gradient(circle at 18% 10%, rgba(168,85,247,.24), transparent 32%), linear-gradient(135deg, #24133c, #3b185f 55%, #1e1b4b);
+  background: linear-gradient(135deg, #24133c, #3b185f 55%, #1e1b4b);
 }
-:global(.dark) .course-thumbnail__icon { background: rgba(15,23,42,.72); border-color: rgba(255,255,255,.12); color: #d8b4fe; }
+:global(.dark) .course-thumbnail__icon { background: #0f172a; border-color: #475569; color: #d8b4fe; }
 </style>

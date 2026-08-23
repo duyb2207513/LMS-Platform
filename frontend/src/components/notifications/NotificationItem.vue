@@ -1,27 +1,33 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
+import {
+  AlarmClock,
+  Bell,
+  BookOpen,
+  CheckCircle2,
+  ClipboardCheck,
+  CreditCard,
+  GraduationCap,
+  Megaphone,
+  MessageCircle,
+  PartyPopper,
+  Trophy,
+  X,
+} from '@lucide/vue'
 import { NotificationType, type Notification } from '@/types'
 
-const props = defineProps<{
-  notification: Notification
-}>()
-
+const props = defineProps<{ notification: Notification }>()
 const emit = defineEmits<{
   read: [id: string]
   delete: [id: string]
   click: [notification: Notification]
 }>()
-
 const router = useRouter()
 
-// Relative time formatter
 const relativeTime = computed(() => {
   if (!props.notification.createdAt) return ''
-  const now = new Date().getTime()
-  const created = new Date(props.notification.createdAt).getTime()
-  const diffMinutes = Math.floor((now - created) / (1000 * 60))
-
+  const diffMinutes = Math.floor((Date.now() - new Date(props.notification.createdAt).getTime()) / 60000)
   if (diffMinutes < 1) return 'Vừa xong'
   if (diffMinutes < 60) return `${diffMinutes} phút trước`
   const diffHours = Math.floor(diffMinutes / 60)
@@ -31,62 +37,41 @@ const relativeTime = computed(() => {
   return new Date(props.notification.createdAt).toLocaleDateString('vi-VN')
 })
 
-// Icon & Color based on NotificationType
 const visual = computed(() => {
   switch (props.notification.type) {
     case NotificationType.WELCOME:
-      return {
-        bg: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
-        icon: '🎉',
-      }
+      return { tone: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300', icon: PartyPopper }
     case NotificationType.COURSE_ENROLLED:
-      return {
-        bg: 'bg-purple-500/10 text-purple-600 dark:text-purple-400',
-        icon: '🎓',
-      }
+      return { tone: 'bg-violet-100 text-violet-700 dark:bg-violet-950 dark:text-violet-300', icon: GraduationCap }
     case NotificationType.COURSE_ANNOUNCEMENT:
-      return {
-        bg: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
-        icon: '📢',
-      }
+      return { tone: 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300', icon: Megaphone }
     case NotificationType.ASSIGNMENT_DUE:
-      return {
-        bg: 'bg-red-500/10 text-red-600 dark:text-red-400',
-        icon: '⏰',
-      }
+      return { tone: 'bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300', icon: AlarmClock }
+    case NotificationType.ASSIGNMENT_GRADED:
+      return { tone: 'bg-teal-100 text-teal-700 dark:bg-teal-950 dark:text-teal-300', icon: ClipboardCheck }
     case NotificationType.QUIZ_RESULT:
-      return {
-        bg: 'bg-blue-500/10 text-blue-600 dark:text-blue-400',
-        icon: '📝',
-      }
+      return { tone: 'bg-sky-100 text-sky-700 dark:bg-sky-950 dark:text-sky-300', icon: CheckCircle2 }
     case NotificationType.CERTIFICATE_ISSUED:
-      return {
-        bg: 'bg-yellow-500/10 text-yellow-600 dark:text-yellow-400',
-        icon: '🏆',
-      }
+      return { tone: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-950 dark:text-yellow-300', icon: Trophy }
+    case NotificationType.PAYMENT_SUCCEEDED:
+      return { tone: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300', icon: CreditCard }
+    case NotificationType.DIRECT_MESSAGE:
+      return { tone: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300', icon: MessageCircle }
     case NotificationType.NEW_LESSON:
+      return { tone: 'bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300', icon: BookOpen }
     default:
-      return {
-        bg: 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400',
-        icon: '🔔',
-      }
+      return { tone: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300', icon: Bell }
   }
 })
 
 function handleClick() {
   emit('click', props.notification)
-  if (!props.notification.isRead) {
-    emit('read', props.notification.id)
-  }
+  if (!props.notification.isRead) emit('read', props.notification.id)
 
-  // Safe navigation based on data.url
   const targetUrl = props.notification.data?.url
   if (targetUrl && typeof targetUrl === 'string') {
-    if (targetUrl.startsWith('http')) {
-      window.open(targetUrl, '_blank')
-    } else {
-      router.push(targetUrl)
-    }
+    if (targetUrl.startsWith('http')) window.open(targetUrl, '_blank', 'noopener,noreferrer')
+    else router.push(targetUrl)
   }
 }
 </script>
@@ -94,66 +79,31 @@ function handleClick() {
 <template>
   <div
     :class="[
-      'group relative flex items-start gap-3.5 rounded-2xl p-3.5 transition-all duration-200 cursor-pointer',
+      'group relative flex min-h-14 cursor-pointer items-center gap-2.5 border-l-2 px-2.5 py-2 transition-colors',
       notification.isRead
-        ? 'bg-transparent hover:bg-slate-50 dark:hover:bg-slate-850/50'
-        : 'bg-purple-50/60 hover:bg-purple-50 dark:bg-purple-950/20 dark:hover:bg-purple-950/30 font-medium',
+        ? 'border-transparent bg-white hover:bg-slate-50 dark:bg-slate-900 dark:hover:bg-slate-800/70'
+        : 'border-violet-600 bg-violet-50/60 hover:bg-violet-50 dark:bg-violet-950/20',
     ]"
     role="button"
     tabindex="0"
     @click="handleClick"
     @keydown.enter="handleClick"
   >
-    <!-- Icon / Visual badge -->
-    <div
-      :class="[
-        'grid h-10 w-10 shrink-0 place-items-center rounded-xl text-lg shadow-sm transition-transform duration-200 group-hover:scale-105',
-        visual.bg,
-      ]"
-    >
-      {{ visual.icon }}
-    </div>
+    <span class="grid h-8 w-8 shrink-0 place-items-center" :class="visual.tone">
+      <component :is="visual.icon" :size="17" :stroke-width="2" />
+    </span>
 
-    <!-- Content -->
     <div class="min-w-0 flex-1">
-      <div class="flex items-start justify-between gap-2">
-        <h4
-          :class="[
-            'text-sm leading-snug line-clamp-1',
-            notification.isRead
-              ? 'text-slate-800 dark:text-slate-200 font-semibold'
-              : 'text-slate-950 dark:text-white font-bold',
-          ]"
-        >
-          {{ notification.title }}
-        </h4>
-        <span class="shrink-0 text-[11px] font-medium text-slate-400 dark:text-slate-500">
-          {{ relativeTime }}
-        </span>
+      <div class="flex items-center gap-2">
+        <h4 :class="['min-w-0 flex-1 truncate text-[13px] leading-5 text-slate-900 dark:text-white', notification.isRead ? 'font-semibold' : 'font-bold']">{{ notification.title }}</h4>
+        <time class="shrink-0 text-[10px] font-medium text-slate-400">{{ relativeTime }}</time>
       </div>
-
-      <p class="mt-1 text-xs leading-relaxed text-slate-600 dark:text-slate-400 line-clamp-2">
-        {{ notification.message }}
-      </p>
+      <p class="truncate text-[11px] leading-4 text-slate-500 dark:text-slate-400">{{ notification.message }}</p>
     </div>
 
-    <!-- Unread dot & Action buttons -->
-    <div class="flex shrink-0 items-center gap-1 self-center" @click.stop>
-      <span
-        v-if="!notification.isRead"
-        class="h-2 w-2 rounded-full bg-purple-600 ring-4 ring-purple-200 dark:ring-purple-900/50"
-        title="Chưa đọc"
-      />
-      <button
-        type="button"
-        class="opacity-0 group-hover:opacity-100 transition-opacity duration-150 grid h-7 w-7 place-items-center rounded-lg text-slate-400 hover:bg-slate-200/60 hover:text-red-600 dark:hover:bg-slate-700/60 dark:hover:text-red-400"
-        title="Xóa thông báo"
-        @click.stop="$emit('delete', notification.id)"
-      >
-        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      </button>
-    </div>
+    <span v-if="!notification.isRead" class="h-1.5 w-1.5 shrink-0 bg-violet-600" title="Chưa đọc" />
+    <button type="button" class="grid h-7 w-7 shrink-0 place-items-center text-slate-400 opacity-0 transition group-hover:opacity-100 hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-950/40" title="Xóa thông báo" aria-label="Xóa thông báo" @click.stop="$emit('delete', notification.id)">
+      <X :size="15" :stroke-width="2" />
+    </button>
   </div>
 </template>

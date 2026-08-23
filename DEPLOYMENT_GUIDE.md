@@ -1,222 +1,233 @@
-# Hướng Dẫn Triển Khai (Deploy) Hệ Thống LMS Platform 100% Miễn Phí
+# 🚀 Hướng Dẫn Triển Khai (Deploy) Hệ Thống LMS Platform từ Localhost lên Cloud
 
-Tài liệu này hướng dẫn chi tiết từng bước để triển khai toàn bộ hệ thống **LMS Platform (Vue 3 + Node.js Express + PostgreSQL + AI Assistant)** lên môi trường Cloud hoàn toàn **miễn phí (0 VNĐ)** với hiệu năng cao, bảo mật và chứng chỉ SSL/HTTPS tự động.
+Tài liệu này hướng dẫn chi tiết từ **khởi chạy, kiểm thử ở máy Local (Docker)** cho đến **triển khai toàn bộ hệ thống lên Cloud miễn phí (0 VNĐ)**:
+- **Frontend:** Vercel (Vue 3 + Vite + Tailwind CSS)
+- **Backend:** Render.com (Node.js 22 Express + TypeScript + Prisma 7 ORM)
+- **Database:** Supabase (PostgreSQL 17 Singapore Region)
+- **Media & File Storage:** Cloudinary (Lưu trữ ảnh Avatar, Thumbnail, File bài nộp)
+- **AI Assistant:** Google AI Studio (Gemini 2.0 Flash)
+- **Authentication:** Google Identity Services & GitHub OAuth 2.0
 
 ---
 
-## 🏗️ Kiến Trúc Triển Khai
+## 🏗️ Kiến Trúc Hệ Thống
 
 ```
-┌────────────────────────────────┐
-│      1. FRONTEND (Vercel)      │
-│     Vue 3 + Vite + Tailwind    │
-│  https://your-lms.vercel.app   │
-└───────────────┬────────────────┘
-                │ (HTTPS / REST API)
-                ▼
-┌────────────────────────────────┐       ┌────────────────────────────────┐
-│      2. BACKEND (Render)       │ ────► │     3. DATABASE (Supabase)     │
-│   Node.js Express + Prisma     │       │    PostgreSQL (500MB Free)     │
-│ https://your-api.onrender.com  │       └────────────────────────────────┘
-└───────────────┬────────────────┘
-                │
-                ├──────────────────────► ┌────────────────────────────────┐
-                │                        │    4. FILE STORAGE (Cloudinary)│
-                │                        │       Ảnh, Avatar, PDF, Docs   │
-                │                        └────────────────────────────────┘
-                │
-                └──────────────────────► ┌────────────────────────────────┐
-                                         │  5. AI ASSISTANT (AI Studio)   │
-                                         │      Gemini 2.0 Flash Agent    │
-                                         └────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────┐
+│                     1. FRONTEND (Vercel)                        │
+│                   Vue 3 + Vite + Pinia + SPA                    │
+│             https://lms-platform-lemon-theta.vercel.app         │
+└────────────────────────────────┬────────────────────────────────┘
+                                 │ (HTTPS / REST API + WebSocket)
+                                 ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                     2. BACKEND (Render)                         │
+│               Node.js 22 Express + Docker Container             │
+│              https://lms-platform-5rwf.onrender.com             │
+└───────┬────────────────────────┬────────────────────────┬───────┘
+        │                        │                        │
+        ▼                        ▼                        ▼
+┌──────────────────┐   ┌──────────────────┐   ┌──────────────────┐
+│  3. DATABASE     │   │ 4. FILE STORAGE  │   │  5. AI ASSISTANT │
+│   (Supabase)     │   │   (Cloudinary)   │   │  (Google AI)     │
+│  PostgreSQL 17   │   │  Avatar, Thumb,  │   │  Gemini 2.0      │
+│  Session/Pooler  │   │  Assignment Files│   │  Flash Agent     │
+└──────────────────┘   └──────────────────┘   └──────────────────┘
 ```
 
 ---
 
-## 📋 Bảng Tổng Hợp Dịch Vụ & Chi Phí
+## 📋 Bảng Tổng Hợp Biến Môi Trường (Environment Variables)
 
-| Thành phần | Dịch vụ đề xuất | Gói miễn phí | Mục đích |
-| :--- | :--- | :--- | :--- |
-| **Frontend** | [Vercel](https://vercel.com) | Free Hobby | Host giao diện Vue 3 SPA, CDN toàn cầu siêu nhanh, HTTPS miễn phí. |
-| **Backend** | [Render.com](https://render.com) | Free Web Service | Chạy API Server Node.js Express & WebSocket. |
-| **Database** | [Supabase](https://supabase.com) | Free Tier (500MB) | Cơ sở dữ liệu PostgreSQL 24/7, hỗ trợ Prisma ORM. |
-| **Media Storage** | [Cloudinary](https://cloudinary.com) | Free Tier (25GB) | Lưu trữ Avatar, Thumbnail khóa học, File PDF nộp bài. |
-| **Video bài giảng** | [YouTube Unlisted](https://youtube.com) | Không giới hạn | Lưu trữ và phát video bài giảng 1080p/4K mượt mà. |
-| **AI Assistant** | [Google AI Studio](https://aistudio.google.com) | Free Quota | Vận hành Trợ lý Học tập AI (Gemini 2.0 Flash). |
+### 1. Biến môi trường Backend (Khai báo trên Render & `backend/.env`)
+
+| Tên biến (Key) | Bắt buộc | Mô tả & Giá trị mẫu |
+| :--- | :---: | :--- |
+| `NODE_ENV` | **Có** | `production` (hoặc `development` khi chạy local) |
+| `PORT` | **Có** | `3000` |
+| `DATABASE_URL` | **Có** | Chuỗi kết nối PostgreSQL Supabase: `postgresql://postgres.xxx:Pass@aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres?pgbouncer=true` |
+| `JWT_ACCESS_SECRET` | **Có** | Chuỗi ngẫu nhiên bảo mật: `lms-access-secret-production-key-2026` |
+| `JWT_REFRESH_SECRET` | **Có** | Chuỗi ngẫu nhiên bảo mật: `lms-refresh-secret-production-key-2026` |
+| `FRONTEND_URL` | **Có** | URL Frontend chính thức: `https://lms-platform-lemon-theta.vercel.app` *(Không có dấu `/` ở cuối)* |
+| `CLOUDINARY_CLOUD_NAME` | **Có** | Cloud Name từ Cloudinary Dashboard (ví dụ: `dxyzk1234`) |
+| `CLOUDINARY_API_KEY` | **Có** | API Key từ Cloudinary Dashboard (ví dụ: `123456789012345`) |
+| `CLOUDINARY_API_SECRET` | **Có** | API Secret từ Cloudinary Dashboard (ví dụ: `AbCdEfGhIjKlMnOp...`) |
+| `GOOGLE_CLIENT_ID` | Tùy chọn | Google OAuth Client ID (ví dụ: `456249048931-xxx.apps.googleusercontent.com`) |
+| `GITHUB_CLIENT_ID` | Tùy chọn | GitHub OAuth Client ID |
+| `GITHUB_CLIENT_SECRET` | Tùy chọn | GitHub OAuth Client Secret |
+| `GITHUB_CALLBACK_URL` | Tùy chọn | `https://lms-platform-5rwf.onrender.com/api/v1/auth/github/callback` |
+| `GEMINI_API_KEY` | Tùy chọn | API Key từ Google AI Studio (ví dụ: `AIzaSyD1heMfTjge...`) |
+| `GEMINI_MODEL` | Tùy chọn | `gemini-2.0-flash` |
+| `RATE_LIMIT_MAX` | Tùy chọn | `300` |
+| `AUTH_RATE_LIMIT_MAX` | Tùy chọn | `20` |
+
+### 2. Biến môi trường Frontend (Khai báo trên Vercel)
+
+| Tên biến (Key) | Bắt buộc | Mô tả & Giá trị mẫu |
+| :--- | :---: | :--- |
+| `VITE_API_BASE_URL` | **Có** | URL Backend Render kèm `/api/v1`: `https://lms-platform-5rwf.onrender.com/api/v1` |
+| `VITE_GOOGLE_CLIENT_ID` | Tùy chọn | Google OAuth Client ID (trùng với backend) |
 
 ---
 
-## 🚀 Hướng Dẫn Thực Hiện Từng Bước
+## 🛠️ Hướng Dẫn Chi Tiết Từng Bước (Từ Local Đến Cloud)
 
-### BƯỚC 1: Tạo Database PostgreSQL trên Supabase
+### BƯỚC 1: Khởi Tạo Các Dịch Vụ Cloud Miễn Phí
 
-1. Truy cập [supabase.com](https://supabase.com) và bấm **Sign In / Sign Up** bằng tài khoản GitHub.
-2. Bấm **New Project** ➔ Chọn Organization của bạn.
-3. Điền thông tin:
+#### 1.1 Tạo Database trên Supabase (PostgreSQL)
+1. Đăng ký/Đăng nhập [supabase.com](https://supabase.com).
+2. Tạo New Project:
    * **Name:** `lms-database`
-   * **Database Password:** *Nhập mật khẩu an toàn và ghi nhớ lại (ví dụ: `MyStrongPass123!@#`)*
-   * **Region:** Chọn `Southeast Asia (Singapore)` để có tốc độ kết nối nhanh nhất về Việt Nam.
-4. Sau khi khởi tạo xong (mất khoảng 1-2 phút):
-   * Vào mục **Project Settings** (icon bánh răng ở menu bên trái) ➔ Chọn **Database**.
-   * Cuộn xuống mục **Connection string** ➔ Chọn tab **URI** ➔ Chế độ **Session (port 5432)** hoặc **Transaction (port 6543)**.
-   * Sao chép đường dẫn kết nối, thay `[YOUR-PASSWORD]` bằng mật khẩu đã tạo ở trên. Ví dụ:
+   * **Database Password:** Đặt mật khẩu an toàn (ví dụ: `MyStrongPass123!@#`).
+   * **Region:** `Southeast Asia (Singapore)`.
+3. Lấy Connection String:
+   * Vào **Project Settings** ➔ **Database** ➔ Cuộn xuống **Connection string** ➔ Chọn tab **URI**.
+   * Chọn chế độ **Transaction (port 6543)** hoặc **Session (port 5432)** và copy chuỗi kết nối:
+     ```text
+     postgresql://postgres.ckdntlkhwalaggjwinik:MyStrongPass123!@#@aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres?pgbouncer=true
      ```
-     postgresql://postgres.xxxx:[YOUR-PASSWORD]@aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres?pgbouncer=true
-     ```
 
----
+#### 1.2 Tạo Kho Lưu Trữ File trên Cloudinary
+1. Đăng ký tài khoản miễn phí tại [cloudinary.com](https://cloudinary.com).
+2. Tại trang **Dashboard (Console)**, lưu lại 3 thông số:
+   * **Cloud Name**
+   * **API Key**
+   * **API Secret**
 
-### BƯỚC 2: Tạo Kho Lưu Trữ File trên Cloudinary
+#### 1.3 Tạo API Key AI Assistant trên Google AI Studio
+1. Truy cập [aistudio.google.com](https://aistudio.google.com).
+2. Bấm **Get API Key** ➔ **Create API Key**.
 
-1. Truy cập [cloudinary.com](https://cloudinary.com) và đăng ký tài khoản miễn phí.
-2. Tại trang **Dashboard**, bạn sẽ thấy mục **Product Environment Credentials**.
-3. Lưu lại 3 thông số:
-   * `Cloud Name` (ví dụ: `dxyzk1234`)
-   * `API Key` (ví dụ: `123456789012345`)
-   * `API Secret` (ví dụ: `AbCdEfGhIjKlMnOpQrStUvWxYz`)
+#### 1.4 Tạo Google OAuth Client ID (Cho Đăng Nhập Google)
+1. Vào [Google Cloud Console ➔ Credentials](https://console.cloud.google.com/apis/credentials).
+2. Tạo **OAuth 2.0 Client ID** (Application type: **Web application**).
+3. **Authorized JavaScript origins:**
+   * `http://localhost:5173`
+   * `https://lms-platform-lemon-theta.vercel.app`
+   * `https://lms-platform-git-develop-11-lms-platform.vercel.app` *(hoặc domain preview Vercel)*
+4. **Authorized redirect URIs:**
+   * `http://localhost:5173`
+   * `https://lms-platform-lemon-theta.vercel.app`
+5. Copy **Client ID** để cấu hình cho Frontend & Backend.
 
----
-
-### BƯỚC 3: Đồng Bộ Dữ Liệu Lên Database Mới (Migration & Seed)
-
-Tại máy tính cục bộ của bạn, thực hiện di chuyển cấu trúc bảng và dữ liệu mẫu lên Supabase:
-
-1. Mở file `backend/.env` trên máy, thay thế tạm thời `DATABASE_URL` bằng chuỗi kết nối Supabase từ Bước 1:
-   ```env
-   DATABASE_URL="postgresql://postgres.xxxx:mat_khau_cua_ban@aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres?pgbouncer=true"
+#### 1.5 Tạo GitHub OAuth App (Cho Đăng Nhập GitHub)
+1. Vào **GitHub Settings** ➔ **Developer Settings** ➔ **OAuth Apps** ➔ **New OAuth App**.
+2. **Homepage URL:** `https://lms-platform-lemon-theta.vercel.app`
+3. **Authorization callback URL:**
+   ```text
+   https://lms-platform-5rwf.onrender.com/api/v1/auth/github/callback
    ```
-2. Mở terminal tại thư mục `backend` và chạy các lệnh:
-   ```bash
-   # 1. Tạo toàn bộ bảng trong database
-   npx prisma migrate deploy
-
-   # 2. Tạo client Prisma
-   npx prisma generate
-
-   # 3. Nạp dữ liệu mẫu ban đầu (tài khoản admin, giảng viên, khóa học mẫu)
-   npm run db:seed
-   ```
+4. Lưu lại **Client ID** và tạo **Client Secret**.
 
 ---
 
-### BƯỚC 4: Đẩy Toàn Bộ Mã Nguồn Lên GitHub
+### BƯỚC 2: Đồng Bộ Database & Chạy Kiểm Thử Dưới Localhost
 
-1. Tạo một repository mới trên GitHub (ví dụ: `lms-platform`).
-2. Mở terminal tại thư mục gốc dự án và push code:
-   ```bash
-   git add .
-   git commit -m "feat: prepare production configuration and deployment guide"
-   git branch -M main
-   git remote add origin https://github.com/YOUR_USERNAME/lms-platform.git
-   git push -u origin main
-   ```
+Mở terminal tại máy tính của bạn:
+
+```powershell
+# 1. Khởi động các container dưới local (Database local, Backend, Frontend)
+docker compose up -d
+
+# 2. Đẩy cấu trúc bảng (Migration) lên Supabase
+docker compose exec backend npx prisma migrate deploy
+
+# 3. Nạp dữ liệu mẫu ban đầu (Admin, Giảng viên, Khóa học mẫu)
+docker compose exec backend npm run db:seed
+
+# 4. Chạy toàn bộ Unit Tests & Integration Tests để đảm bảo hệ thống hoàn hảo
+docker compose exec backend npm test
+docker compose exec backend npm run test:integration
+```
 
 ---
 
-### BƯỚC 5: Deploy Backend Lên Render.com
+### BƯỚC 3: Đẩy Toàn Bộ Mã Nguồn Lên GitHub
 
-1. Truy cập [render.com](https://render.com) và đăng nhập bằng GitHub.
-2. Bấm nút **New +** ở góc phải ➔ Chọn **Web Service**.
-3. Chọn Repository `lms-platform` vừa tạo.
-4. Cấu hình các thông số sau:
-   * **Name:** `lms-backend` *(hoặc tên tùy chọn)*
+```powershell
+# Kiểm tra nhánh hiện tại
+git status
+
+# Thêm tất cả thay đổi và commit
+git add .
+git commit -m "feat: complete cloud deployment configuration"
+
+# Đẩy code lên nhánh develop / main
+git push origin develop
+```
+
+---
+
+### BƯỚC 4: Triển Khai Backend Lên Render.com (Docker Web Service)
+
+1. Truy cập [render.com](https://render.com) ➔ Đăng nhập bằng GitHub.
+2. Bấm nút **New +** ➔ Chọn **Web Service**.
+3. Chọn Repository `duyb2207513/LMS-Platform`.
+4. Cấu hình các thông số cơ bản:
+   * **Name:** `lms-backend`
    * **Region:** `Singapore (Southeast Asia)`
+   * **Branch:** `develop` *(hoặc nhánh chứa code mới nhất của bạn)*
    * **Root Directory:** `backend`
-   * **Runtime:** `Node`
-   * **Build Command:**
-     ```bash
-     npm ci && npm run build && npx prisma generate
-     ```
-   * **Start Command:**
-     ```bash
-     npm run start
-     ```
+   * **Runtime:** `Docker`
    * **Instance Type:** `Free`
-5. Cuộn xuống mục **Environment Variables** và thêm các biến:
-
-| Key | Value mẫu |
-| :--- | :--- |
-| `NODE_ENV` | `production` |
-| `PORT` | `3000` |
-| `DATABASE_URL` | *(Chuỗi kết nối Supabase từ Bước 1)* |
-| `JWT_ACCESS_SECRET` | `lms-super-secret-access-token-key-2026` |
-| `JWT_REFRESH_SECRET` | `lms-super-secret-refresh-token-key-2026` |
-| `GEMINI_API_KEY` | `AIzaSyD1heMfTjge37DO4V7A3yAcxFjMYAlOzUo` |
-| `GEMINI_MODEL` | `gemini-2.0-flash` |
-| `CLOUDINARY_CLOUD_NAME` | *(Cloud Name từ Bước 2)* |
-| `CLOUDINARY_API_KEY` | *(API Key từ Bước 2)* |
-| `CLOUDINARY_API_SECRET` | *(API Secret từ Bước 2)* |
-| `FRONTEND_URL` | `http://localhost:5173` *(Sẽ cập nhật lại ở Bước 7)* |
-
+5. Cuộn xuống mục **Environment Variables**, bấm **Add Environment Variable** và thêm đầy đủ các biến ở **Bảng Biến Môi Trường Backend**.
 6. Bấm **Create Web Service**.
-7. Chờ 2–3 phút để Render build xong. Sau khi hoàn tất, Render sẽ cấp cho bạn một đường dẫn API (ví dụ: `https://lms-backend-xxxx.onrender.com`).
+7. *(Khắc phục cache nếu cần)*: Bấm **Manual Deploy** ➔ **Clear build cache & deploy** để Render build sạch từ Dockerfile.
+8. Sau 1-2 phút, Render sẽ cấp URL Backend cho bạn:
+   `https://lms-platform-5rwf.onrender.com`
 
 ---
 
-### BƯỚC 6: Deploy Frontend Lên Vercel
+### BƯỚC 5: Triển Khai Frontend Lên Vercel
 
-1. Tạo file [`frontend/vercel.json`](file:///c:/Users/tranm/OneDrive/Documents/lms-platform/frontend/vercel.json) để hỗ trợ định tuyến SPA (tránh lỗi 404 khi F5):
-   ```json
-   {
-     "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
-   }
-   ```
-2. Commit và push file này lên GitHub:
-   ```bash
-   git add frontend/vercel.json
-   git commit -m "chore: add vercel rewrite config for vue spa"
-   git push origin main
-   ```
-3. Truy cập [vercel.com](https://vercel.com) ➔ Đăng nhập bằng GitHub.
-4. Bấm **Add New...** ➔ Chọn **Project** ➔ Chọn repository `lms-platform`.
-5. Cấu hình Project:
+1. Truy cập [vercel.com](https://vercel.com) ➔ Đăng nhập bằng GitHub.
+2. Bấm **Add New...** ➔ **Project** ➔ Chọn repository `LMS-Platform`.
+3. Cấu hình Project:
    * **Framework Preset:** `Vite`
-   * **Root Directory:** Bấm **Edit** và chọn thư mục `frontend`.
+   * **Root Directory:** Bấm **Edit** và chọn `frontend`
    * **Build Command:** `npm run build`
    * **Output Directory:** `dist`
-6. Mở rộng mục **Environment Variables** và thêm:
-   * `VITE_API_BASE_URL`: `https://lms-backend-xxxx.onrender.com/api/v1` *(Dán URL backend Render từ Bước 5 kèm `/api/v1`)*
-7. Bấm nút **Deploy**.
-8. Sau 1 phút, Vercel sẽ cung cấp link website chính thức của bạn (ví dụ: `https://lms-platform-xxxx.vercel.app`).
+4. Mở rộng mục **Environment Variables**:
+   * `VITE_API_BASE_URL`: `https://lms-platform-5rwf.onrender.com/api/v1`
+   * `VITE_GOOGLE_CLIENT_ID`: `<Google Client ID của bạn>`
+5. Bấm nút **Deploy**.
+6. Vercel sẽ cấp URL Frontend chính thức (ví dụ: `https://lms-platform-lemon-theta.vercel.app`).
 
 ---
 
-### BƯỚC 7: Cập Nhật Liên Kết Chéo & Hoàn Tất
+### BƯỚC 6: Đồng Bộ Khóa Chéo Hoàn Tất (Final Sync)
 
-1. Quay lại trang quản trị **Render.com** ➔ Vào service `lms-backend` ➔ Mục **Environment**.
-2. Tìm biến `FRONTEND_URL` và đổi giá trị thành link Vercel chính thức:
+1. Mở lại **Render.com** ➔ Chọn service `lms-backend` ➔ **Environment**.
+2. Kiểm tra biến `FRONTEND_URL` đã trỏ đúng domain Vercel:
    ```env
-   FRONTEND_URL="https://lms-platform-xxxx.vercel.app"
+   FRONTEND_URL="https://lms-platform-lemon-theta.vercel.app"
    ```
-3. Render sẽ tự động lưu và khởi động lại server.
+3. Lưu lại để Render tự động cập nhật CORS.
 
 ---
 
-## ✅ Danh Sách Kiểm Tra Nghiệm Thu (QA Checklist)
+## ✅ Checklist Kiểm Thử Nghiệm Thu (QA Checklist)
 
-Sau khi hoàn tất, hãy truy cập vào trang web trên Vercel và thực hiện kiểm tra:
-
-- [ ] **1. Đăng ký & Đăng nhập:** Tạo thử tài khoản học viên mới, kiểm tra đăng nhập và nhận JWT token.
-- [ ] **2. Khám phá Khóa học:** Xem danh sách khóa học tải trực tiếp từ cơ sở dữ liệu Supabase.
-- [ ] **3. Trợ lý AI (Gemini Flash):** Bấm vào icon chat màu tím ở góc dưới màn hình, hỏi thử các câu hỏi:
-  - *"Tìm cho tôi các khóa học miễn phí"*
-  - *"Nó gồm những bài gì?"* (Kiểm tra trí nhớ liên kết câu trước)
-  - *"Chính sách hoàn tiền trong 24 giờ như thế nào?"*
-- [ ] **4. Học tập:** Mở một bài giảng video, làm bài Quiz và nộp thử Assignment.
-- [ ] **5. Điều hướng SPA:** Thử F5 (Refresh) tại các trang `/courses`, `/dashboard`, `/messages` để đảm bảo không bị lỗi 404.
+- [ ] **1. Đăng ký & Đăng nhập Email:** Đăng ký tài khoản mới, kiểm tra JWT access token.
+- [ ] **2. Đăng nhập Google & GitHub:** Bấm icon đăng nhập xã hội, kiểm tra popup và đăng nhập thành công.
+- [ ] **3. Khám phá Khóa học:** Danh sách khóa học load trực tiếp từ Supabase PostgreSQL không bị lỗi 500/400.
+- [ ] **4. Upload File lên Cloudinary:** Thử cập nhật ảnh đại diện (Avatar) hoặc upload Thumbnail khóa học, kiểm tra ảnh hiển thị trực tiếp từ CDN `res.cloudinary.com`.
+- [ ] **5. Trợ lý AI (Gemini Flash):** Mở chat widget màu tím góc dưới, hỏi câu hỏi tìm khóa học.
+- [ ] **6. Học tập & Làm bài tập:** Mở bài học, xem video, làm quiz và nộp file bài tập (PDF/DOCX).
+- [ ] **7. F5 Refresh Trang (SPA Routing):** Bấm F5 ở các trang `/courses`, `/dashboard`, `/messages` để xác nhận không bị lỗi 404 Vercel.
 
 ---
 
 ## 🛠️ Xử Lý Sự Cố Thường Gặp (Troubleshooting)
 
-### 1. Backend Render phản hồi chậm ở request đầu tiên (Cold Start)
-* **Nguyên nhân:** Gói miễn phí của Render sẽ tạm dừng (Sleep) server sau 15 phút không có lượt truy cập.
-* **Cách khắc phục:** Lượt truy cập đầu tiên sẽ mất khoảng 30–40 giây để server khởi động lại. Các request tiếp theo sẽ chạy với tốc độ bình thường (mili-giây). Có thể dùng các dịch vụ ping miễn phí như [UptimeRobot](https://uptimerobot.com) để ping URL backend mỗi 10 phút một lần nhằm giữ server luôn hoạt động.
+### 1. Backend Render bị ngủ (Cold Start) ở lượt truy cập đầu tiên
+* **Hiện tượng:** Request đầu tiên sau 15 phút không hoạt động mất 30–50 giây.
+* **Khắc phục:** Sử dụng dịch vụ ping miễn phí như [UptimeRobot](https://uptimerobot.com) hoặc [Cron-Job.org](https://cron-job.org) để gửi request `GET https://lms-platform-5rwf.onrender.com/api/v1/health/ready` mỗi 10 phút một lần nhằm giữ Backend luôn thức 24/7.
 
-### 2. Lỗi CORS khi gọi API từ Frontend
-* **Nguyên nhân:** Biến `FRONTEND_URL` trên Render chưa khớp chính xác với domain Vercel.
-* **Cách khắc phục:** Đảm bảo `FRONTEND_URL` trên Render là `https://ten-du-an.vercel.app` (không có dấu gạch chéo `/` ở cuối).
+### 2. Lỗi `Cannot find module '/app/dist/server.js'` khi Render build Docker
+* **Nguyên nhân:** Render lưu cache layer Docker cũ.
+* **Khắc phục:** Trên Render Dashboard, bấm **Manual Deploy** ➔ chọn **Clear build cache & deploy**.
 
-### 3. Lỗi 404 khi tải lại trang con trên Vercel
-* **Nguyên nhân:** Chưa có file cấu hình rewrite cho Single Page Application.
-* **Cách khắc phục:** Đảm bảo file `frontend/vercel.json` đã có mặt trong repository với nội dung rewrite về `/index.html`.
+### 3. Lỗi `MIME type of text/html` khi tải module script trên Vercel
+* **Nguyên nhân:** Trình duyệt lưu cache file `index.html` cũ khi vừa có bản deploy mới.
+* **Khắc phục:** Nhấn `Ctrl + Shift + R` để xóa cache trình duyệt. Dự án đã được cấu hình sẵn header `Cache-Control: no-cache` và router auto-reload trong `vercel.json` để tự động xử lý.

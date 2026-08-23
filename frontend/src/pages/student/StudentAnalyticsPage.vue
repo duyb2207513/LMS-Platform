@@ -1,144 +1,96 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { Clock, Target } from '@lucide/vue'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
 import { useApi } from '@/composables/useApi'
 import { useAnalyticsFormatter } from '@/composables/useAnalyticsFormatter'
-import type {
-  StudentOverview,
-  StudentCourseProgress,
-  StudentActivityItem,
-  StudentActivityResponse,
-} from '@/types/analytics'
-import MetricCard from '@/components/analytics/MetricCard.vue'
+import type { StudentOverview, StudentActivityItem, StudentActivityResponse } from '@/types/analytics'
 import DateRangeFilter from '@/components/analytics/DateRangeFilter.vue'
 import DashboardSkeleton from '@/components/analytics/DashboardSkeleton.vue'
 import StudyStreakCard from '@/components/student-dashboard/StudyStreakCard.vue'
 import LearningActivityChart from '@/components/student-dashboard/LearningActivityChart.vue'
-import CourseProgressList from '@/components/student-dashboard/CourseProgressList.vue'
 
-const router = useRouter()
 const api = useApi()
 const { formatSeconds, formatPercent } = useAnalyticsFormatter()
-
 const overview = ref<StudentOverview | null>(null)
-const courseProgress = ref<StudentCourseProgress[]>([])
 const activityData = ref<StudentActivityItem[]>([])
 const loading = ref(true)
 const error = ref<string | null>(null)
-
-function goBack() {
-  if (window.history.state?.back) {
-    router.back()
-  } else {
-    router.push('/dashboard')
-  }
-}
 
 async function loadData(range?: { from: string; to: string }) {
   loading.value = true
   error.value = null
   try {
-    const [overviewRes, progressRes, activityRes] = await Promise.all([
+    const [overviewRes, activityRes] = await Promise.all([
       api.get<{ data: StudentOverview }>('/analytics/student/overview'),
-      api.get<{ data: StudentCourseProgress[] }>('/analytics/student/course-progress'),
       api.get<StudentActivityResponse>('/analytics/student/activity', range || {}),
     ])
 
     if (overviewRes?.data) overview.value = overviewRes.data
-    if (progressRes?.data) courseProgress.value = progressRes.data
     if (activityRes?.data) activityData.value = activityRes.data
-  } catch (err) {
-    error.value = err instanceof Error ? err.message : 'Không thể tải dữ liệu phân tích'
+  } catch (caught) {
+    error.value = caught instanceof Error ? caught.message : 'Không thể tải dữ liệu phân tích.'
   } finally {
     loading.value = false
   }
 }
 
-onMounted(() => {
-  loadData()
-})
+onMounted(() => loadData())
 </script>
 
 <template>
   <DefaultLayout>
-    <div class="mx-auto max-w-7xl px-4 py-8">
-      <div class="mb-4">
-        <button
-          type="button"
-          class="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-bold text-slate-700 shadow-sm transition hover:border-purple-300 hover:bg-purple-50 hover:text-purple-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-purple-800 dark:hover:bg-purple-950/30"
-          @click="goBack"
-        >
-          ← Quay lại 
-        </button>
-      </div>
-
-      <header class="flex flex-wrap items-center justify-between gap-4">
+    <div class="analytics-page navbar-page">
+      <header class="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p class="text-xs font-bold uppercase tracking-widest text-purple-600 dark:text-purple-400">
-            Dashboard Cá Nhân
-          </p>
-          <h1 class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white mt-1">
-            Phân Tích Tiến Độ Học Tập
-          </h1>
+          <p class="text-xs font-bold uppercase tracking-widest text-violet-600 dark:text-violet-400">Dashboard cá nhân</p>
+          <h1 class="mt-1 text-2xl font-black text-slate-900 dark:text-white sm:text-3xl">Phân tích tiến độ học tập</h1>
         </div>
-
         <DateRangeFilter @change="loadData" />
       </header>
 
-      <div v-if="error" class="mt-6 rounded-2xl bg-rose-50 p-4 text-sm font-semibold text-rose-700 dark:bg-rose-950/40 dark:text-rose-300">
-        {{ error }}
-      </div>
-
+      <div v-if="error" class="mt-6 border border-rose-200 bg-rose-50 p-4 text-sm font-semibold text-rose-700 dark:border-rose-900 dark:bg-rose-950/40 dark:text-rose-300">{{ error }}</div>
       <DashboardSkeleton v-if="loading && !overview" class="mt-6" />
 
       <template v-else-if="overview">
-        <!-- Streak Banner -->
         <section class="mt-6">
-          <StudyStreakCard
-            :current-streak="overview.currentStreakDays"
-            :longest-streak="overview.longestStreakDays"
-          />
+          <StudyStreakCard :current-streak="overview.currentStreakDays" :longest-streak="overview.longestStreakDays" />
         </section>
 
-        <!-- KPI Metrics Grid -->
-        <section class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <MetricCard
-            title="Tổng khóa học"
-            :value="overview.enrolledCourses"
-            subtitle="Đã đăng ký"
-            icon="📚"
-            color="purple"
-          />
-          <MetricCard
-            title="Đang học"
-            :value="overview.inProgressCourses"
-            :subtitle="`${overview.completedCourses} khóa đã hoàn thành`"
-            icon="📖"
-            color="blue"
-          />
-          <MetricCard
-            title="Thời gian học"
-            :value="formatSeconds(overview.totalLearningSeconds)"
-            subtitle="Tổng thời lượng thực tế"
-            icon="⏱️"
-            color="emerald"
-          />
-          <MetricCard
-            title="Điểm Quiz TB"
-            :value="overview.averageQuizScore ? formatPercent(overview.averageQuizScore) : 'N/A'"
-            subtitle="Attempt cao nhất"
-            icon="🎯"
-            color="amber"
-          />
+        <section class="mt-4 grid gap-3 sm:grid-cols-2" aria-label="Chỉ số học tập">
+          <article class="flex items-center gap-4 border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
+            <span class="grid h-11 w-11 shrink-0 place-items-center bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300"><Clock :size="22" :stroke-width="2" /></span>
+            <div class="min-w-0">
+              <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Thời gian học</p>
+              <p class="mt-1 text-2xl font-black text-slate-950 dark:text-white">{{ formatSeconds(overview.totalLearningSeconds) }}</p>
+              <p class="text-xs text-slate-500">Tổng thời lượng học thực tế</p>
+            </div>
+          </article>
+
+          <article class="flex items-center gap-4 border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
+            <span class="grid h-11 w-11 shrink-0 place-items-center bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300"><Target :size="22" :stroke-width="2" /></span>
+            <div class="min-w-0">
+              <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Điểm Quiz trung bình</p>
+              <p class="mt-1 text-2xl font-black text-slate-950 dark:text-white">{{ overview.averageQuizScore ? formatPercent(overview.averageQuizScore) : '0%' }}</p>
+              <p class="text-xs text-slate-500">Tính từ kết quả làm bài cao nhất</p>
+            </div>
+          </article>
         </section>
 
-        <!-- Charts & Lists -->
-        <section class="mt-6 grid gap-6 lg:grid-cols-[1.3fr_1fr]">
+        <section class="mt-4">
           <LearningActivityChart :items="activityData" />
-          <CourseProgressList :items="courseProgress" />
         </section>
       </template>
     </div>
   </DefaultLayout>
 </template>
+
+<style scoped>
+.analytics-page :deep(.surface-card),
+.analytics-page :deep(.rounded-2xl),
+.analytics-page :deep(.rounded-xl),
+.analytics-page :deep(.rounded-lg),
+.analytics-page :deep(.rounded-full) {
+  border-radius: 0 !important;
+}
+</style>

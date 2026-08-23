@@ -106,8 +106,10 @@ async function submit() {
         <p class="mt-2 text-sm text-slate-500">Bắt đầu hành trình học tập của bạn</p>
       </div>
 
-      <GitHubSignInButton />
-      <GoogleSignInButton @credential="loginWithGoogle" @error="error = $event" />
+      <div class="flex items-center justify-center gap-3" aria-label="Đăng ký bằng mạng xã hội">
+        <GitHubSignInButton />
+        <GoogleSignInButton @credential="loginWithGoogle" @error="error = $event" />
+      </div>
 
       <div class="flex items-center gap-3">
         <span class="h-px flex-1 bg-slate-200 dark:bg-slate-700" />
@@ -130,7 +132,7 @@ async function submit() {
         />
         <BaseInput id="register-password" v-model="password" type="password" label="Mật khẩu" required />
         <BaseInput id="confirm-password" v-model="confirmPassword" type="password" label="Xác nhận mật khẩu" required />
-        <p v-if="error" class="rounded-xl bg-red-50 p-3 text-sm text-red-700 dark:bg-red-950/30 dark:text-red-300">{{ error }}</p>
+        <p v-if="error" class="border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:bg-red-950/30 dark:text-red-300">{{ error }}</p>
         <BaseButton type="submit" :loading="loading" :full-width="true">Đăng ký</BaseButton>
       </form>
       <p class="text-center text-sm">Đã có tài khoản? <RouterLink to="/login" class="font-bold text-purple-600">Đăng nhập</RouterLink></p>
