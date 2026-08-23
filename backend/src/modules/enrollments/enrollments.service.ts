@@ -22,7 +22,10 @@ export async function enrollFreeCourse(courseId: string, studentId: string) {
 
 export async function listMyEnrollments(studentId: string) {
   const enrollments = await prisma.enrollment.findMany({
-    where: { studentId },
+    where: {
+      studentId,
+      status: { in: ["ACTIVE", "COMPLETED"] }
+    },
     orderBy: { enrolledAt: "desc" },
     include: { course: { select: { id: true, title: true, slug: true, thumbnailUrl: true, instructor: { select: { id: true, fullName: true } }, category: { select: { id: true, name: true, slug: true } } } } }
   });

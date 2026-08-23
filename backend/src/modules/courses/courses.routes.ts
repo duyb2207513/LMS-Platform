@@ -247,14 +247,14 @@ coursesRouter.post(
 
 /**
  * @openapi
- * /courses/{slug}:
+ * /courses/{courseId}:
  *   get:
  *     operationId: getPublicCourse
- *     summary: Get a published course by slug
+ *     summary: Get a published course by slug or ID
  *     tags: [Courses]
  *     security: []
  *     parameters:
- *       - { in: path, name: slug, required: true, schema: { type: string } }
+ *       - { in: path, name: courseId, required: true, schema: { type: string } }
  *     responses:
  *       200:
  *         description: Course retrieved successfully
@@ -263,6 +263,7 @@ coursesRouter.post(
  *             schema: { $ref: '#/components/schemas/CourseResponse' }
  *       404: { description: Published course not found }
  */
-coursesRouter.get("/:slug", asyncHandler(getPublicCourseController));
+coursesRouter.get("/:courseId", asyncHandler(getPublicCourseController));
 
 export default coursesRouter;
+

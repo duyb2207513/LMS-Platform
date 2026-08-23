@@ -293,3 +293,65 @@ export async function completeMockPayment(
     currency: payment.currency,
   });
 }
+
+export type SepayWebhookPayload = {
+  id?: number | string;
+  gateway?: string;
+  transactionDate?: string;
+  accountNumber?: string;
+  code?: string | null;
+  content?: string;
+  transferType?: "in" | "out";
+  transferAmount?: number;
+  accumulated?: number;
+  subAccount?: string | null;
+  referenceCode?: string;
+  description?: string;
+};
+
+export async function processSepayWebhook(payload: SepayWebhookPayload) {
+  const content = (payload.content || payload.description || "").trim();
+  const transferAmount = Number(payload.transferAmount || 0);
+
+  if (payload.transferType && payload.transferType !== "in") {
+    return { success: true, message: "Ignored transfer out" };
+  }
+
+  // Find Order matching order number inside transfer content (e.g. ORD-xxx or alphanumeric)
+  const pendingOrders = await prisma.order.findMany({
+    where: { status: "PENDING" },
+    select: { id: true, orderNumber: true, total: true, payments: { where: { status: "PENDING" }, select: { id: true, amount: true, currency: true } } },
+  });
+
+  const matchedOrder = pendingOrders.find(order => {
+    const cleanNum = order.orderNumber.replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+    const cleanContent = content.replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+    return cleanContent.includes(cleanNum);
+  });
+
+  if (!matchedOrder || !matchedOrder.payments[0]) {
+    return { success: false, message: `No pending order matched content: ${content}` };
+  }
+
+  const payment = matchedOrder.payments[0];
+
+  // Verify amount (allow match if transferAmount >= order amount)
+  if (transferAmount > 0 && transferAmount < Number(payment.amount)) {
+    return { success: false, message: `Transfer amount ${transferAmount} is less than order amount ${payment.amount}` };
+  }
+
+  const eventId = `sepay:${payload.id || payload.referenceCode || Date.now()}`;
+  const providerTransactionId = String(payload.referenceCode || payload.id || `SEPAY-${Date.now()}`);
+
+  return processMockWebhook({
+    eventId,
+    paymentId: payment.id,
+    status: "SUCCEEDED",
+    providerTransactionId,
+    amount: Number(payment.amount),
+    currency: payment.currency,
+  });
+}
+
+
+

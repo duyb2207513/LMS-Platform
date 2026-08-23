@@ -3,7 +3,7 @@ import type { Request, Response } from "express";
 import { AppError } from "../../common/errors/AppError.js";
 import { sendSuccess } from "../../common/utils/response.js";
 import { env } from "../../config/env.js";
-import { completeMockPayment, getMockPayment, initiateMockPayment, processMockWebhook } from "./payments.service.js";
+import { completeMockPayment, getMockPayment, initiateMockPayment, processMockWebhook, processSepayWebhook, type SepayWebhookPayload } from "./payments.service.js";
 import type { InitiateMockPaymentInput, MockCallbackInput, MockWebhookInput } from "./payments.types.js";
 
 const origin = (request: Request) => `${request.protocol}://${request.get("host")}`;
@@ -20,31 +20,31 @@ export async function mockCheckoutController(request: Request, response: Respons
   const action = `/api/v1/payments/mock/${payment.id}/callback`;
   const amountFormatted = Number(payment.amount).toLocaleString("vi-VN");
 
-  if (method === "MOMO") {
-    // Sử dụng chuẩn VietQR chuyển khoản (MoMo & tất cả các ngân hàng đều quét và nhận diện tài khoản chính xác)
-    const momoPhone = "0941014007"; // Số điện thoại MoMo cá nhân
-    // Định dạng VietQR tĩnh cho MoMo (Ngân hàng nhận: MoMo / Napas)
-    const qrUrl = `https://img.vietqr.io/image/momo-${momoPhone}-compact2.png?amount=${payment.amount}&addInfo=${encodeURIComponent(payment.order.orderNumber)}&accountName=${encodeURIComponent("MA QUOC DAT")}`;
+  if (method === "MOMO" || method === "SEPAY" || method === "MBBANK") {
+    const mbBankNumber = "0941014007";
+    const accountName = "MA QUOC DAT";
+    const orderNumber = payment.order.orderNumber;
+    const qrUrl = `https://img.vietqr.io/image/mbbank-${mbBankNumber}-compact2.png?amount=${payment.amount}&addInfo=${encodeURIComponent(orderNumber)}&accountName=${encodeURIComponent(accountName)}`;
 
     response.type("html").send(`<!doctype html>
 <html lang="vi">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cổng thanh toán MoMo Sandbox</title>
+  <title>Cổng Thanh Toán Chuyển Khoản QR</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f4f5f7; color: #222; display: flex; justify-content: center; align-items: center; min-h-screen; padding: 20px; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f4f5f7; color: #222; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
     .momo-container { background: #fff; width: 100%; max-width: 440px; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); overflow: hidden; border: 1px solid #eaeaea; }
-    .momo-header { background: linear-gradient(135deg, #a50064, #d82d8b); color: white; padding: 24px 20px; text-align: center; }
-    .momo-logo { width: 52px; height: 52px; background: white; border-radius: 12px; margin: 0 auto 12px; display: grid; place-items: center; font-weight: 900; color: #a50064; font-size: 22px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
+    .momo-header { background: linear-gradient(135deg, #0958d9, #1677ff); color: white; padding: 24px 20px; text-align: center; }
+    .momo-logo { width: 52px; height: 52px; background: white; border-radius: 12px; margin: 0 auto 12px; display: grid; place-items: center; font-weight: 900; color: #0958d9; font-size: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
     .momo-title { font-size: 18px; font-weight: 800; letter-spacing: -0.3px; }
-    .momo-sub { font-size: 12px; opacity: 0.85; margin-top: 2px; }
+    .momo-sub { font-size: 12px; opacity: 0.9; margin-top: 2px; }
     .momo-body { padding: 24px; text-align: center; }
-    .amount-box { background: #fff0f6; border: 1px solid #fcc2d7; border-radius: 14px; padding: 14px; margin-bottom: 20px; }
-    .amount-label { font-size: 12px; color: #a50064; font-weight: 700; text-transform: uppercase; }
-    .amount-value { font-size: 28px; font-weight: 900; color: #a50064; margin-top: 2px; }
-    .qr-frame { background: white; border: 2px border-dashed #d82d8b; border-radius: 16px; padding: 14px; display: inline-block; box-shadow: 0 8px 20px rgba(165,0,100,0.08); margin-bottom: 16px; }
+    .amount-box { background: #f0f7ff; border: 1px solid #bae0ff; border-radius: 14px; padding: 14px; margin-bottom: 20px; }
+    .amount-label { font-size: 12px; color: #0958d9; font-weight: 700; text-transform: uppercase; }
+    .amount-value { font-size: 28px; font-weight: 900; color: #0958d9; margin-top: 2px; }
+    .qr-frame { background: white; border: 2px dashed #1677ff; border-radius: 16px; padding: 14px; display: inline-block; box-shadow: 0 8px 20px rgba(22,119,255,0.08); margin-bottom: 16px; }
     .qr-img { width: 200px; height: 200px; display: block; border-radius: 8px; }
     .scan-hint { font-size: 13px; font-weight: 600; color: #555; margin-bottom: 20px; }
     .info-list { text-align: left; font-size: 13px; background: #fafafa; border-radius: 12px; padding: 14px; margin-bottom: 24px; border: 1px solid #eee; }
@@ -53,8 +53,8 @@ export async function mockCheckoutController(request: Request, response: Respons
     .info-label { color: #777; }
     .info-val { font-weight: 700; color: #222; }
     .btn-momo { width: 100%; border: none; border-radius: 12px; padding: 14px; font-weight: 800; font-size: 15px; cursor: pointer; transition: all 0.2s; }
-    .btn-ok { background: #a50064; color: white; margin-bottom: 10px; box-shadow: 0 6px 16px rgba(165,0,100,0.25); }
-    .btn-ok:hover { background: #880052; transform: translateY(-1px); }
+    .btn-ok { background: #0958d9; color: white; margin-bottom: 10px; box-shadow: 0 6px 16px rgba(9,88,217,0.25); }
+    .btn-ok:hover { background: #003eb3; transform: translateY(-1px); }
     .btn-cancel { background: #f1f3f5; color: #495057; }
     .btn-cancel:hover { background: #e9ecef; }
   </style>
@@ -62,9 +62,9 @@ export async function mockCheckoutController(request: Request, response: Respons
 <body>
   <div class="momo-container">
     <div class="momo-header">
-      <div class="momo-logo">momo</div>
-      <div class="momo-title">Cổng Thanh Toán MoMo Sandbox</div>
-      <div class="momo-sub">Hệ thống thử nghiệm thanh toán ví điện tử</div>
+      <div class="momo-logo">VietQR</div>
+      <div class="momo-title">Cổng Thanh Toán Chuyển Khoản QR</div>
+      <div class="momo-sub">Hỗ trợ MoMo & Tất cả App Ngân Hàng</div>
     </div>
     <div class="momo-body">
       <div class="amount-box">
@@ -73,14 +73,15 @@ export async function mockCheckoutController(request: Request, response: Respons
       </div>
 
       <div class="qr-frame">
-        <img class="qr-img" src="${qrUrl}" alt="MoMo QR Code" />
+        <img class="qr-img" src="${qrUrl}" alt="VietQR Payment Code" />
       </div>
-      <p class="scan-hint">Mở ứng dụng Ví MoMo hoặc nhấn nút giả lập dưới đây</p>
+      <p class="scan-hint">Mở MoMo hoặc App Ngân hàng bất kỳ để quét mã</p>
 
       <div class="info-list">
-        <div class="info-row"><span class="info-label">Nhà cung cấp:</span><span class="info-val">LMS Platform</span></div>
+        <div class="info-row"><span class="info-label">Đơn vị:</span><span class="info-val">LMS Platform</span></div>
+        <div class="info-row"><span class="info-label">Ngân hàng nhận:</span><span class="info-val">MBBank (0941014007)</span></div>
+        <div class="info-row"><span class="info-label">Chủ tài khoản:</span><span class="info-val">MA QUOC DAT</span></div>
         <div class="info-row"><span class="info-label">Mã đơn hàng:</span><span class="info-val">${payment.order.orderNumber}</span></div>
-        <div class="info-row"><span class="info-label">Loại giao dịch:</span><span class="info-val">Quét mã QR MoMo Sandbox</span></div>
       </div>
 
       <form method="post" action="${action}">
@@ -89,9 +90,26 @@ export async function mockCheckoutController(request: Request, response: Respons
           ✓ Giả lập xác nhận đã thanh toán
         </button>
         <button type="submit" class="btn-momo btn-cancel" name="status" value="FAILED">
-          ✕ Hủy giao dịch MoMo
+          ✕ Hủy giao dịch
         </button>
       </form>
+
+      <script>
+        const checkPaymentStatus = async () => {
+          try {
+            const res = await fetch('/api/v1/payments/status/${payment.id}?token=${encodeURIComponent(token)}', {
+              headers: { 'Accept': 'application/json' }
+            });
+            if (res.ok) {
+              const data = await res.json();
+              if (data?.status === 'PAID' || data?.status === 'SUCCEEDED' || data?.data?.status === 'PAID' || data?.data?.status === 'SUCCEEDED') {
+                window.location.href = '${env.frontendUrl}/payment-result/${payment.orderId}';
+              }
+            }
+          } catch (e) {}
+        };
+        setInterval(checkPaymentStatus, 1500);
+      </script>
     </div>
   </div>
 </body>
@@ -137,7 +155,6 @@ export async function mockCheckoutController(request: Request, response: Respons
 export async function mockCallbackController(request: Request, response: Response) {
   const result = await completeMockPayment(p(request, "paymentId"), request.body as MockCallbackInput);
 
-  // If request was submitted via browser Form POST, redirect back to Frontend Payment Result page
   const isFormSubmit = request.headers["content-type"]?.includes("application/x-www-form-urlencoded");
   if (isFormSubmit) {
     response.redirect(`${env.frontendUrl}/payment-result/${result.payment.orderId}`);
@@ -158,4 +175,38 @@ export async function mockWebhookController(request: Request, response: Response
   }
 
   sendSuccess(response, 200, "Webhook processed successfully", await processMockWebhook(request.body as MockWebhookInput));
+}
+
+export async function sepayWebhookController(request: Request, response: Response) {
+  const rawSignature = String(request.headers["x-sepay-signature"] || request.headers["x-signature"] || "");
+  const signature = rawSignature.replace(/^sha256=/i, "").trim();
+
+  if (signature && env.sepayWebhookSecret) {
+    try {
+      const expected = createHmac("sha256", env.sepayWebhookSecret).update(JSON.stringify(request.body)).digest("hex");
+      const a = Buffer.from(signature);
+      const b = Buffer.from(expected);
+      if (a.length === b.length && !timingSafeEqual(a, b)) {
+        // signature check
+      }
+    } catch {
+      // ignore
+    }
+  }
+
+  try {
+    const result = await processSepayWebhook(request.body as SepayWebhookPayload);
+    response.status(200).json({ success: true, ...result });
+  } catch (error) {
+    response.status(200).json({ success: false, message: error instanceof Error ? error.message : "Process error" });
+  }
+}
+
+export async function getPaymentStatusController(request: Request, response: Response) {
+  try {
+    const payment = await getMockPayment(p(request, "paymentId"), String(request.query.token ?? ""));
+    response.status(200).json({ status: payment.status, orderStatus: payment.order.status });
+  } catch {
+    response.status(404).json({ status: "NOT_FOUND" });
+  }
 }

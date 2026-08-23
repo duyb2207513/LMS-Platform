@@ -47,5 +47,6 @@ export const env = {
   geminiModel: process.env.GEMINI_MODEL ?? "gemini-2.0-flash",
   cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME ?? "",
   cloudinaryApiKey: process.env.CLOUDINARY_API_KEY ?? "",
-  cloudinaryApiSecret: process.env.CLOUDINARY_API_SECRET ?? ""
+  cloudinaryApiSecret: process.env.CLOUDINARY_API_SECRET ?? "",
+  sepayWebhookSecret: process.env.SEPAY_WEBHOOK_SECRET ?? "whsec_Y44TJtVfundHz0nBu9Es2NKtuwhLoAGj"
 } as const;

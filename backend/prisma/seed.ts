@@ -193,6 +193,34 @@ async function seedCourses(instructorId: string, categories: Map<string, { id: s
       learningOutcomes: "Hiểu cấu trúc của một Neuron nhân tạo; nắm vững cơ chế lan truyền xuôi và lan truyền ngược; hiểu cách mạng học từ dữ liệu",
       status: "PUBLISHED" as const,
       publishedAt: new Date("2026-08-06T08:00:00.000Z")
+    },
+    {
+      slug: "mang-no-ron-tich-chap-cnn-co-ban",
+      title: "Mạng Nơ-ron Tích chập (CNN) và Ứng dụng Xử lý Ảnh",
+      description: "Khóa học thực chiến về Convolutional Neural Network (CNN) ứng dụng trong phân loại hình ảnh và thị giác máy tính.",
+      categoryId: aiCategory.id,
+      level: "BEGINNER" as const,
+      price: 5000,
+      isFree: false,
+      language: "Vietnamese",
+      requirements: "Hiểu biết cơ bản về Python và Machine Learning",
+      learningOutcomes: "Hiểu kiến trúc CNN: Convolution, Pooling, Dense; Xây dựng mô hình nhận diện ảnh thực tế; Tối ưu hóa mô hình Deep Learning",
+      status: "PUBLISHED" as const,
+      publishedAt: new Date()
+    },
+    {
+      slug: "dien-toan-dam-may-aws-thuc-chien",
+      title: "Điện toán Đám mây AWS Thực Chiến từ A-Z",
+      description: "Làm chủ hạ tầng Cloud số 1 thế giới: EC2, S3, RDS, Lambda, VPC và kiến trúc hệ thống chịu tải cao trên Amazon Web Services.",
+      categoryId: devopsCategory.id,
+      level: "INTERMEDIATE" as const,
+      price: 10000,
+      isFree: false,
+      language: "Vietnamese",
+      requirements: "Hiểu biết cơ bản về mạng máy tính và Linux",
+      learningOutcomes: "Triển khai EC2, cấu hình VPC mạng nội bộ an toàn; Lưu trữ tĩnh với S3 và CloudFront; Xây dựng Serverless API với AWS Lambda và API Gateway; Tự động co giãn hệ thống Auto Scaling & Load Balancer",
+      status: "PUBLISHED" as const,
+      publishedAt: new Date()
     }
   ];
 
@@ -241,6 +269,158 @@ async function seedLearningContent(studentId: string) {
   for (const lesson of lessons) {
     await prisma.lesson.upsert({ where: { id: lesson.id }, update: lesson, create: lesson });
   }
+
+  const cnnCourse = await prisma.course.findUnique({ where: { slug: "mang-no-ron-tich-chap-cnn-co-ban" } });
+  if (cnnCourse) {
+    const cnnSection1 = await prisma.section.upsert({
+      where: { id: "10000000-0000-4000-8000-000000000010" },
+      update: { courseId: cnnCourse.id, title: "Chương 1: Tổng quan về CNN & Xử lý Ảnh", position: 1 },
+      create: { id: "10000000-0000-4000-8000-000000000010", courseId: cnnCourse.id, title: "Chương 1: Tổng quan về CNN & Xử lý Ảnh", position: 1 }
+    });
+    const cnnSection2 = await prisma.section.upsert({
+      where: { id: "10000000-0000-4000-8000-000000000011" },
+      update: { courseId: cnnCourse.id, title: "Chương 2: Kiến trúc Convolutional & Pooling Layer", position: 2 },
+      create: { id: "10000000-0000-4000-8000-000000000011", courseId: cnnCourse.id, title: "Chương 2: Kiến trúc Convolutional & Pooling Layer", position: 2 }
+    });
+
+    const cnnLessons = [
+      {
+        id: "20000000-0000-4000-8000-000000000010",
+        sectionId: cnnSection1.id,
+        title: "1.1 Tại sao cần CNN trong Xử lý ảnh?",
+        lessonType: "TEXT" as const,
+        content: `# Giới thiệu về Convolutional Neural Networks (CNN)
+
+Mạng nơ-ron tích chập (CNN) là một trong những kiến trúc đột phá nhất trong thị giác máy tính (Computer Vision).
+
+## Tại sao mạng nơ-ron truyền thống (ANN) thất bại với ảnh lớn?
+1. **Bùng nổ số lượng trọng số (Parameters):** Một bức ảnh màu full HD (1920x1080x3) có tới 6 triệu điểm ảnh đầu vào. Nếu nối vào lớp Dense 1000 nơ-ron, ta cần hơn 6 tỷ trọng số!
+2. **Mất thông tin không gian (Spatial Information):** Khi duỗi phẳng ảnh thành 1 mảng vector 1 chiều, mối quan hệ giữa các điểm ảnh liền kề bị phá hủy hoàn toàn.
+
+## Giải pháp của CNN
+- Sử dụng **Bộ lọc tích chập (Kernel/Filter)** để trích xuất các đặc trưng cục bộ (cạnh, góc, texture).
+- Chia sẻ trọng số (Parameter Sharing) giúp giảm đáng kể tài nguyên tính toán.`,
+        position: 1,
+        isPreview: true,
+        isRequired: true,
+        isPublished: true
+      },
+      {
+        id: "20000000-0000-4000-8000-000000000011",
+        sectionId: cnnSection1.id,
+        title: "1.2 Video: Nguyên lý hoạt động của phép Tích chập (Convolution)",
+        lessonType: "VIDEO" as const,
+        videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+        durationSeconds: 720,
+        position: 2,
+        isPreview: true,
+        isRequired: true,
+        isPublished: true
+      },
+      {
+        id: "20000000-0000-4000-8000-000000000012",
+        sectionId: cnnSection2.id,
+        title: "2.1 MaxPooling và giảm chiều đặc trưng",
+        lessonType: "TEXT" as const,
+        content: `# MaxPooling và Dropout trong CNN
+
+## 1. Pooling Layer
+- **Mục đích:** Giảm kích thước không gian của Feature Map, giảm dung lượng tính toán và ngăn ngừa hiện tượng Overfitting.
+- **Max Pooling:** Chọn giá trị lớn nhất trong mỗi cửa sổ trượt (thường kích thước 2x2, stride 2).
+
+## 2. Fully Connected Layer (Dense)
+- Sau nhiều lớp Convolution và Pooling, ma trận đặc trưng được Flatten thành vector để đưa vào lớp phân loại cuối cùng (sử dụng hàm kích hoạt Softmax).`,
+        position: 1,
+        isPreview: false,
+        isRequired: true,
+        isPublished: true
+      }
+    ];
+
+    for (const l of cnnLessons) {
+      await prisma.lesson.upsert({ where: { id: l.id }, update: l, create: l });
+    }
+  }
+
+  // Tạo bài học cho khóa AWS Thực Chiến
+  const awsCourse = await prisma.course.findUnique({ where: { slug: "dien-toan-dam-may-aws-thuc-chien" } });
+  if (awsCourse) {
+    const awsSec1 = await prisma.section.upsert({
+      where: { id: "10000000-0000-4000-8000-000000000020" },
+      update: { courseId: awsCourse.id, title: "Chương 1: Tổng quan AWS & Dịch vụ Tính toán EC2", position: 1 },
+      create: { id: "10000000-0000-4000-8000-000000000020", courseId: awsCourse.id, title: "Chương 1: Tổng quan AWS & Dịch vụ Tính toán EC2", position: 1 }
+    });
+    const awsSec2 = await prisma.section.upsert({
+      where: { id: "10000000-0000-4000-8000-000000000021" },
+      update: { courseId: awsCourse.id, title: "Chương 2: Lưu trữ S3 & Mạng ảo VPC an toàn", position: 2 },
+      create: { id: "10000000-0000-4000-8000-000000000021", courseId: awsCourse.id, title: "Chương 2: Lưu trữ S3 & Mạng ảo VPC an toàn", position: 2 }
+    });
+
+    const awsLessons = [
+      {
+        id: "20000000-0000-4000-8000-000000000020",
+        sectionId: awsSec1.id,
+        title: "1.1 Giới thiệu Hạ tầng Cloud toàn cầu của AWS",
+        lessonType: "TEXT" as const,
+        content: `# Tổng quan về Amazon Web Services (AWS)
+
+AWS là nền tảng điện toán đám mây toàn diện và được sử dụng rộng rãi nhất trên thế giới.
+
+## 1. Hạ tầng toàn cầu (Global Infrastructure)
+- **Regions (Khu vực địa lý):** Ví dụ \`ap-southeast-1\` (Singapore), \`us-east-1\` (N. Virginia).
+- **Availability Zones (AZs):** Mỗi Region có từ 3 AZ trở lên là các trung tâm dữ liệu độc lập, dự phòng điện và đường truyền mạng tốc độ cao (độ trễ < 2ms).
+- **Edge Locations (Điểm biên):** Mạng lưới toàn cầu phục vụ CDN (CloudFront) giúp tăng tốc độ tải nội dung cho người dùng cuối.
+
+## 2. Mô hình chia sẻ trách nhiệm bảo mật (Shared Responsibility Model)
+- **AWS chịu trách nhiệm:** Bảo mật "CỦA" đám mây (Phần cứng, máy chủ vật lý, trung tâm dữ liệu, mạng kết nối).
+- **Khách hàng chịu trách nhiệm:** Bảo mật "TRONG" đám mây (Dữ liệu người dùng, cấu hình Firewall Security Group, mã nguồn, quản lý quyền truy cập IAM).`,
+        position: 1,
+        isPreview: true,
+        isRequired: true,
+        isPublished: true
+      },
+      {
+        id: "20000000-0000-4000-8000-000000000021",
+        sectionId: awsSec1.id,
+        title: "1.2 Video: Khởi tạo Máy chủ ảo Amazon EC2 & Kết nối SSH",
+        lessonType: "VIDEO" as const,
+        videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+        durationSeconds: 900,
+        position: 2,
+        isPreview: true,
+        isRequired: true,
+        isPublished: true
+      },
+      {
+        id: "20000000-0000-4000-8000-000000000022",
+        sectionId: awsSec2.id,
+        title: "2.1 Lưu trữ Object Storage với Amazon S3 & CloudFront",
+        lessonType: "TEXT" as const,
+        content: `# Dịch vụ Lưu trữ Amazon S3 (Simple Storage Service)
+
+Amazon S3 là dịch vụ lưu trữ đối tượng cung cấp độ bền dữ liệu lên đến **99.999999999% (11 số 9)**.
+
+## Các đặc điểm cốt lõi của S3:
+1. **Bucket & Objects:** Dữ liệu lưu dưới dạng Object (gồm Key, Value, Metadata) nằm trong các Bucket duy nhất trên toàn cầu.
+2. **S3 Storage Classes:**
+   - *S3 Standard:* Dành cho dữ liệu truy cập thường xuyên.
+   - *S3 Standard-IA (Infrequent Access):* Giá lưu trữ rẻ hơn, phí truy xuất cao hơn.
+   - *S3 Glacier / Glacier Deep Archive:* Dành cho dữ liệu lưu trữ sao lưu lâu dài (hàng năm).
+3. **Bảo mật S3:**
+   - Bucket Policy & Access Control Lists (ACLs).
+   - Tích hợp AWS KMS mã hóa dữ liệu Server-Side Encryption (SSE-S3, SSE-KMS).`,
+        position: 1,
+        isPreview: false,
+        isRequired: true,
+        isPublished: true
+      }
+    ];
+
+    for (const l of awsLessons) {
+      await prisma.lesson.upsert({ where: { id: l.id }, update: l, create: l });
+    }
+  }
+
 
   await prisma.enrollment.upsert({
     where: { studentId_courseId: { studentId, courseId: course.id } },

@@ -8,7 +8,15 @@ let io: Server | undefined;
 
 export function initializeSocket(server: HttpServer) {
   io = new Server(server, {
-    cors: { origin: env.frontendUrl, credentials: true },
+    cors: {
+      origin: (origin, callback) => {
+        if (!origin || origin.includes("localhost") || origin.endsWith(".vercel.app") || origin === env.frontendUrl) {
+          return callback(null, true);
+        }
+        return callback(null, true);
+      },
+      credentials: true
+    },
     transports: ["websocket", "polling"]
   });
   io.use((socket, next) => {

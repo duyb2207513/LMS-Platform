@@ -21,15 +21,38 @@ const paying = ref(false)
 const appliedCoupon = ref<CouponValidationResult | null>(null)
 const appliedCouponCode = ref<string>('')
 const selectedPaymentMethod = ref<'MOMO' | 'MOCK'>('MOMO')
+let pollTimer: ReturnType<typeof setInterval> | null = null
 
 async function load() {
   error.value = ''
   try {
     const response = await api.get<ApiResponse<Order>>(`/orders/${route.params.orderId}`)
     order.value = response.data || null
+    if (order.value?.status === 'PAID') {
+      if (pollTimer) clearInterval(pollTimer)
+      await router.push(`/payment-result/${route.params.orderId}`)
+    }
   } catch (cause) {
     error.value = cause instanceof Error ? cause.message : 'Không tải được đơn hàng'
   }
+}
+
+function startPolling() {
+  if (pollTimer) clearInterval(pollTimer)
+  pollTimer = setInterval(async () => {
+    if (order.value?.status === 'PENDING') {
+      try {
+        const response = await api.get<ApiResponse<Order>>(`/orders/${route.params.orderId}`)
+        if (response.data?.status === 'PAID') {
+          order.value = response.data
+          if (pollTimer) clearInterval(pollTimer)
+          await router.push(`/payment-result/${route.params.orderId}`)
+        }
+      } catch {
+        // Silently ignore polling network glitches
+      }
+    }
+  }, 2500)
 }
 
 function handleCouponApplied(result: CouponValidationResult) {
@@ -62,6 +85,7 @@ async function pay() {
         ? `${response.data.mockPaymentUrl}&method=MOMO`
         : response.data.mockPaymentUrl
       window.open(targetUrl, '_blank', 'noopener,noreferrer')
+      startPolling()
     }
   } catch (cause) {
     error.value = cause instanceof Error ? cause.message : 'Không tạo được phiên thanh toán'
@@ -73,8 +97,15 @@ async function pay() {
   }
 }
 
-onMounted(() => { void load(); window.addEventListener('focus', load) })
-onBeforeUnmount(() => window.removeEventListener('focus', load))
+onMounted(() => {
+  void load()
+  startPolling()
+  window.addEventListener('focus', load)
+})
+onBeforeUnmount(() => {
+  if (pollTimer) clearInterval(pollTimer)
+  window.removeEventListener('focus', load)
+})
 </script>
 
 <template>
@@ -139,14 +170,14 @@ onBeforeUnmount(() => window.removeEventListener('focus', load))
                     class="h-4 w-4 text-[#a50064] focus:ring-[#a50064]"
                   />
                   <div class="grid h-10 w-10 place-items-center rounded-lg bg-[#a50064] font-black text-white text-xs">
-                    momo
+                    QR
                   </div>
                   <div>
-                    <p class="font-extrabold text-slate-900 dark:text-white text-sm">Ví điện tử MoMo Sandbox</p>
-                    <p class="text-xs text-slate-500">Quét mã QR hoặc thanh toán qua ứng dụng Ví MoMo</p>
+                    <p class="font-extrabold text-slate-900 dark:text-white text-sm">Chuyển khoản QR (MoMo / MBBank / Ngân hàng)</p>
+                    <p class="text-xs text-slate-500">Quét mã QR tự động xác nhận qua SePay & MBBank (0941014007)</p>
                   </div>
                 </div>
-                <span class="rounded bg-[#a50064] px-2 py-0.5 text-[10px] font-bold text-white">Khuyên dùng</span>
+                <span class="rounded bg-emerald-600 px-2 py-0.5 text-[10px] font-bold text-white">Tự động 24/7</span>
               </label>
 
               <label
@@ -168,8 +199,8 @@ onBeforeUnmount(() => window.removeEventListener('focus', load))
                     CARD
                   </div>
                   <div>
-                    <p class="font-extrabold text-slate-900 dark:text-white text-sm">Thanh toán Thẻ / Sandbox Mặc định</p>
-                    <p class="text-xs text-slate-500">Cổng thử nghiệm mô phỏng đơn giản</p>
+                    <p class="font-extrabold text-slate-900 dark:text-white text-sm">Cổng thử nghiệm Sandbox</p>
+                    <p class="text-xs text-slate-500">Mô phỏng thanh toán đơn giản</p>
                   </div>
                 </div>
               </label>
@@ -209,7 +240,7 @@ onBeforeUnmount(() => window.removeEventListener('focus', load))
             :loading="paying"
             @click="pay"
           >
-            {{ order.status === 'PENDING' ? (selectedPaymentMethod === 'MOMO' ? 'Thanh toán qua Ví MoMo' : 'Tiếp tục thanh toán') : 'Xem kết quả thanh toán' }} →
+            {{ order.status === 'PENDING' ? (selectedPaymentMethod === 'MOMO' ? 'Thanh toán chuyển khoản QR' : 'Tiếp tục thanh toán') : 'Xem kết quả thanh toán' }} →
           </BaseButton>
 
           <RouterLink :to="`/payment-result/${order.id}`" class="mt-4 block text-center text-sm font-bold text-purple-700 dark:text-purple-300">

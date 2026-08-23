@@ -30,6 +30,11 @@ const allowedOrigins = [
   "https://lms-platform-lemon-theta.vercel.app"
 ].filter(Boolean) as string[];
 
+app.use((req, res, next) => {
+  res.setHeader("Bypass-Tunnel-Reminder", "true");
+  next();
+});
+
 app.use(
   cors({
     origin: (origin, callback) => {

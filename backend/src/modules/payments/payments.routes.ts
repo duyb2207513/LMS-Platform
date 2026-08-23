@@ -4,10 +4,12 @@ import { authorize } from "../../common/middlewares/authorize.js";
 import { validateRequest } from "../../common/middlewares/validateRequest.js";
 import { asyncHandler } from "../../common/utils/asyncHandler.js";
 import {
+  getPaymentStatusController,
   initiateMockPaymentController,
   mockCallbackController,
   mockCheckoutController,
   mockWebhookController,
+  sepayWebhookController,
 } from "./payments.controller.js";
 import {
   validateInitiateMockPaymentInput,
@@ -65,6 +67,7 @@ export const paymentsRouter = Router();
  *     responses: { 200: { description: Webhook processed or previously processed }, 401: { description: Invalid signature } }
  */
 paymentsRouter.get("/mock/:paymentId", asyncHandler(mockCheckoutController));
+paymentsRouter.get("/status/:paymentId", asyncHandler(getPaymentStatusController));
 paymentsRouter.post(
   "/mock/:paymentId/callback",
   validateRequest(validateMockCallbackInput),
@@ -75,3 +78,14 @@ paymentsRouter.post(
   validateRequest(validateMockWebhookInput),
   asyncHandler(mockWebhookController),
 );
+paymentsRouter.post(
+  "/webhook/sepay",
+  asyncHandler(sepayWebhookController),
+);
+paymentsRouter.post(
+  "/webhooks/sepay",
+  asyncHandler(sepayWebhookController),
+);
+
+
+
