@@ -1,4 +1,4 @@
-import { createHmac, timingSafeEqual } from "node:crypto";
+import { createHmac, randomBytes, timingSafeEqual } from "node:crypto";
 import type { Request, Response } from "express";
 import { AppError } from "../../common/errors/AppError.js";
 import { sendSuccess } from "../../common/utils/response.js";
@@ -19,6 +19,24 @@ export async function mockCheckoutController(request: Request, response: Respons
   const method = String(request.query.method ?? "MOCK").toUpperCase();
   const action = `/api/v1/payments/mock/${payment.id}/callback`;
   const amountFormatted = Number(payment.amount).toLocaleString("vi-VN");
+  const cspNonce = randomBytes(18).toString("base64");
+
+  // Helmet's default production CSP intentionally blocks third-party images
+  // and inline scripts. This checkout needs one VietQR image and one polling
+  // script, so grant only those narrow capabilities for this response.
+  response.setHeader(
+    "Content-Security-Policy",
+    [
+      "default-src 'none'",
+      "base-uri 'none'",
+      "form-action 'self'",
+      "frame-ancestors 'self'",
+      "connect-src 'self'",
+      "img-src 'self' data: https://img.vietqr.io",
+      `style-src 'nonce-${cspNonce}'`,
+      `script-src 'nonce-${cspNonce}'`,
+    ].join("; "),
+  );
 
   if (method === "MOMO" || method === "SEPAY" || method === "MBBANK") {
     const mbBankNumber = "0941014007";
@@ -32,7 +50,7 @@ export async function mockCheckoutController(request: Request, response: Respons
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cổng Thanh Toán Chuyển Khoản QR</title>
-  <style>
+  <style nonce="${cspNonce}">
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f4f5f7; color: #222; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
     .momo-container { background: #fff; width: 100%; max-width: 440px; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); overflow: hidden; border: 1px solid #eaeaea; }
@@ -94,7 +112,7 @@ export async function mockCheckoutController(request: Request, response: Respons
         </button>
       </form>
 
-      <script>
+      <script nonce="${cspNonce}">
         const checkPaymentStatus = async () => {
           try {
             const res = await fetch('/api/v1/payments/status/${payment.id}?token=${encodeURIComponent(token)}', {
@@ -124,7 +142,7 @@ export async function mockCheckoutController(request: Request, response: Respons
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mock Payment Sandbox</title>
-  <style>
+  <style nonce="${cspNonce}">
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; max-width: 480px; margin: 40px auto; padding: 24px; color: #1e293b; background: #f8fafc; }
     .card { background: white; border: 1px solid #e2e8f0; border-radius: 20px; padding: 28px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
     h1 { font-size: 22px; font-weight: 800; margin-bottom: 6px; }

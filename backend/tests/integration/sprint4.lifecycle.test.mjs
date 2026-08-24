@@ -63,6 +63,14 @@ try {
   const checkoutUrl = new URL(checkout.mockPaymentUrl);
   const token = checkoutUrl.searchParams.get("token");
   assert.ok(token);
+  const hostedCheckout = await fetch(`${checkout.mockPaymentUrl}&method=MOMO`);
+  assert.equal(hostedCheckout.status, 200);
+  const checkoutCsp = hostedCheckout.headers.get("content-security-policy") || "";
+  const hostedCheckoutHtml = await hostedCheckout.text();
+  assert.match(checkoutCsp, /img-src 'self' data: https:\/\/img\.vietqr\.io/);
+  assert.match(checkoutCsp, /script-src 'nonce-[^']+'/);
+  assert.match(hostedCheckoutHtml, /<script nonce="[^"]+">/);
+  assert.match(hostedCheckoutHtml, /<style nonce="[^"]+">/);
   const failedToken = await json(`${api}/payments/mock/${checkout.payment.id}/callback`, "POST", null, { token: "wrong-token", status: "SUCCEEDED" });
   assert.equal(failedToken.status, 404);
 
