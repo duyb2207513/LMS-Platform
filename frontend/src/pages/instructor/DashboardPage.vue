@@ -1,108 +1,173 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import InstructorLayout from '@/layouts/InstructorLayout.vue'
 import { useAuthStore } from '@/stores/auth'
 import { useCourseStore } from '@/stores/courses'
+import { useRevenueApi } from '@/api/revenue.api'
+import { formatMoney } from '@/utils/formatters'
 import { CourseStatus } from '@/types'
+import type { CourseRevenue, InstructorEarning, RevenueOverview } from '@/types/commerce'
 
 const auth = useAuthStore()
 const courseStore = useCourseStore()
-
-onMounted(async () => {
-  await courseStore.fetchMyCourses()
-})
+const revenueApi = useRevenueApi()
+const overview = ref<RevenueOverview | null>(null)
+const earnings = ref<InstructorEarning[]>([])
+const courseRevenues = ref<CourseRevenue[]>([])
 
 function countByStatus(status: CourseStatus) {
-  return courseStore.myCourses.filter((c) => c.status === status).length
+  return courseStore.myCourses.filter((course) => course.status === status).length
 }
+
+const publishedCount = computed(() => countByStatus(CourseStatus.PUBLISHED))
+const draftCount = computed(() => countByStatus(CourseStatus.DRAFT))
+const archivedCount = computed(() => countByStatus(CourseStatus.ARCHIVED))
+const publishPercent = computed(() => {
+  if (!courseStore.myCourses.length) return 0
+  return Math.round((publishedCount.value / courseStore.myCourses.length) * 100)
+})
+
+const revenuePoints = computed(() => {
+  const now = new Date()
+  return Array.from({ length: 6 }, (_, index) => {
+    const date = new Date(now.getFullYear(), now.getMonth() - (5 - index), 1)
+    const amount = earnings.value
+      .filter((item) => {
+        const createdAt = new Date(item.createdAt)
+        return createdAt.getFullYear() === date.getFullYear() && createdAt.getMonth() === date.getMonth()
+      })
+      .reduce((total, item) => total + Number(item.netAmount || 0), 0)
+
+    return { key: `${date.getFullYear()}-${date.getMonth()}`, label: `T${date.getMonth() + 1}`, amount }
+  })
+})
+
+const maxRevenue = computed(() => Math.max(...revenuePoints.value.map((point) => point.amount), 1))
+const hasRevenueTrend = computed(() => revenuePoints.value.some((point) => point.amount > 0))
+const topCourseRevenues = computed(() =>
+  [...courseRevenues.value].sort((left, right) => right.netRevenue - left.netRevenue).slice(0, 4),
+)
+
+function barHeight(amount: number) {
+  if (!amount) return '3%'
+  return `${Math.max(8, Math.round((amount / maxRevenue.value) * 100))}%`
+}
+
+onMounted(async () => {
+  const [, overviewResult, earningsResult, coursesResult] = await Promise.allSettled([
+    courseStore.fetchMyCourses(),
+    revenueApi.getRevenueOverview(),
+    revenueApi.getEarningsHistory({ limit: 100 }),
+    revenueApi.getRevenueByCourse(),
+  ])
+
+  if (overviewResult.status === 'fulfilled') overview.value = overviewResult.value.data || null
+  if (earningsResult.status === 'fulfilled') earnings.value = earningsResult.value.data || []
+  if (coursesResult.status === 'fulfilled') courseRevenues.value = coursesResult.value.data || []
+})
 </script>
 
 <template>
   <InstructorLayout>
-    <div class="max-w-6xl">
-      <!-- Welcome -->
-      <div class="mb-8">
-        <h1 class="text-3xl font-extrabold text-slate-900 dark:text-white">
-          Dashboard Giảng viên 📚
-        </h1>
-        <p class="mt-2 text-lg text-slate-500 dark:text-slate-400">
-          Xin chào, {{ auth.user?.fullName }}! Quản lý khóa học của bạn tại đây.
-        </p>
-      </div>
+    <main class="instructor-dashboard w-full">
+      <header class="border-b border-slate-200 pb-3 dark:border-slate-800">
+        <div>
+          <p class="text-[10px] font-bold uppercase tracking-[0.16em] text-purple-600 dark:text-purple-400">Tổng quan giảng viên</p>
+          <h1 class="mt-1 text-2xl font-black tracking-tight text-slate-950 dark:text-white">Xin chào, {{ auth.user?.fullName }}</h1>
+          <p class="mt-1 text-xs text-slate-500">Theo dõi khóa học và doanh thu trong cùng một màn hình.</p>
+        </div>
+      </header>
 
-      <!-- Stats -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-        <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-800 transition-colors duration-300">
-          <div class="flex items-center gap-4">
-            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-purple-500/25">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-              </svg>
+      <section class="mt-3 grid border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 sm:grid-cols-2 xl:grid-cols-4">
+        <article class="metric-cell"><span>Khóa học</span><b>{{ courseStore.myCourses.length }}</b><small>{{ publishedCount }} đang xuất bản</small></article>
+        <article class="metric-cell metric-cell--green"><span>Doanh thu thực nhận</span><b>{{ formatMoney(overview?.netRevenue || 0, overview?.currency) }}</b><small>Sau phí nền tảng</small></article>
+        <article class="metric-cell metric-cell--purple"><span>Số dư khả dụng</span><b>{{ formatMoney(overview?.availableBalance || 0, overview?.currency) }}</b><small>Sẵn sàng giải ngân</small></article>
+        <article class="metric-cell metric-cell--amber"><span>Đang chờ</span><b>{{ formatMoney(overview?.pendingBalance || 0, overview?.currency) }}</b><small>Chưa khả dụng</small></article>
+      </section>
+
+      <section class="mt-3 grid gap-3 xl:grid-cols-[minmax(0,1.65fr)_minmax(18rem,.75fr)]">
+        <article class="dashboard-panel">
+          <header class="flex items-start justify-between gap-3 border-b border-slate-100 px-4 py-3 dark:border-slate-800">
+            <div><h2 class="text-sm font-extrabold">Doanh thu 6 tháng gần nhất</h2><p class="mt-0.5 text-[11px] text-slate-500">Doanh thu thực nhận theo tháng</p></div>
+            <b class="text-sm text-emerald-600 dark:text-emerald-400">{{ formatMoney(overview?.netRevenue || 0, overview?.currency) }}</b>
+          </header>
+
+          <div class="relative h-64 px-4 pb-3 pt-5">
+            <div class="pointer-events-none absolute inset-x-4 bottom-9 top-5 flex flex-col justify-between">
+              <span v-for="line in 4" :key="line" class="block border-t border-dashed border-slate-200 dark:border-slate-800" />
             </div>
-            <div>
-              <p class="text-2xl font-bold text-slate-900 dark:text-white">{{ courseStore.myCourses.length }}</p>
-              <p class="text-sm text-slate-500 dark:text-slate-400">Tổng khóa học</p>
+            <div class="relative flex h-full items-end gap-3">
+              <div v-for="point in revenuePoints" :key="point.key" class="flex h-full min-w-0 flex-1 flex-col justify-end">
+                <div class="group relative flex min-h-0 flex-1 items-end justify-center">
+                  <span class="revenue-tooltip">{{ formatMoney(point.amount, overview?.currency) }}</span>
+                  <div :class="['w-full max-w-14 bg-purple-600 transition-[height] duration-500', point.amount ? 'opacity-100' : 'opacity-20']" :style="{ height: barHeight(point.amount) }" />
+                </div>
+                <span class="mt-2 text-center text-[10px] font-semibold text-slate-500">{{ point.label }}</span>
+              </div>
+            </div>
+            <p v-if="!hasRevenueTrend" class="pointer-events-none absolute inset-x-0 top-1/2 text-center text-xs text-slate-400">Chưa phát sinh doanh thu trong giai đoạn này</p>
+          </div>
+        </article>
+
+        <article class="dashboard-panel">
+          <header class="border-b border-slate-100 px-4 py-3 dark:border-slate-800"><h2 class="text-sm font-extrabold">Cơ cấu tài chính</h2><p class="mt-0.5 text-[11px] text-slate-500">Tóm tắt dòng tiền hiện tại</p></header>
+          <dl class="divide-y divide-slate-100 px-4 dark:divide-slate-800">
+            <div class="finance-row"><dt>Doanh thu gộp</dt><dd>{{ formatMoney(overview?.grossRevenue || 0, overview?.currency) }}</dd></div>
+            <div class="finance-row"><dt>Phí nền tảng</dt><dd class="text-rose-600">− {{ formatMoney(overview?.platformFees || 0, overview?.currency) }}</dd></div>
+            <div class="finance-row"><dt>Đã thanh toán</dt><dd class="text-emerald-600">{{ formatMoney(overview?.paidAmount || 0, overview?.currency) }}</dd></div>
+            <div class="finance-row"><dt>Đảo ngược</dt><dd>{{ formatMoney(overview?.reversedAmount || 0, overview?.currency) }}</dd></div>
+          </dl>
+        </article>
+      </section>
+
+      <section class="mt-3 grid gap-3 xl:grid-cols-[.75fr_1.25fr]">
+        <article class="dashboard-panel p-4">
+          <div class="flex items-center justify-between gap-3">
+            <div><h2 class="text-sm font-extrabold">Tình trạng khóa học</h2><p class="mt-0.5 text-[11px] text-slate-500">{{ publishPercent }}% khóa học đã xuất bản</p></div>
+            <b class="text-xl text-purple-600">{{ publishedCount }}/{{ courseStore.myCourses.length }}</b>
+          </div>
+          <div class="mt-4 flex h-3 overflow-hidden bg-slate-100 dark:bg-slate-800">
+            <span class="bg-emerald-500" :style="{ width: `${publishPercent}%` }" />
+            <span class="bg-amber-400" :style="{ width: `${courseStore.myCourses.length ? (draftCount / courseStore.myCourses.length) * 100 : 0}%` }" />
+            <span class="bg-slate-400" :style="{ width: `${courseStore.myCourses.length ? (archivedCount / courseStore.myCourses.length) * 100 : 0}%` }" />
+          </div>
+          <div class="mt-3 grid grid-cols-3 gap-2 text-[11px]">
+            <span><i class="status-dot bg-emerald-500" />Xuất bản · {{ publishedCount }}</span>
+            <span><i class="status-dot bg-amber-400" />Bản nháp · {{ draftCount }}</span>
+            <span><i class="status-dot bg-slate-400" />Lưu trữ · {{ archivedCount }}</span>
+          </div>
+        </article>
+
+        <article class="dashboard-panel">
+          <header class="flex items-center justify-between border-b border-slate-100 px-4 py-3 dark:border-slate-800">
+            <div><h2 class="text-sm font-extrabold">Khóa học tạo doanh thu</h2><p class="mt-0.5 text-[11px] text-slate-500">Xếp theo doanh thu thực nhận</p></div>
+            <RouterLink to="/instructor/courses" class="text-[11px] font-bold text-purple-600">Xem khóa học</RouterLink>
+          </header>
+          <div v-if="topCourseRevenues.length" class="divide-y divide-slate-100 px-4 dark:divide-slate-800">
+            <div v-for="course in topCourseRevenues" :key="course.courseId" class="grid grid-cols-[minmax(0,1fr)_auto] gap-3 py-2.5 text-xs">
+              <div class="min-w-0"><b class="block truncate">{{ course.title }}</b><span class="mt-0.5 block text-[10px] text-slate-500">{{ course.successfulOrders }} đơn thành công</span></div>
+              <b class="text-emerald-600">{{ formatMoney(course.netRevenue, course.currency) }}</b>
             </div>
           </div>
-        </div>
-
-        <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-800 transition-colors duration-300">
-          <div class="flex items-center gap-4">
-            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center text-white shadow-lg shadow-emerald-500/25">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <div>
-              <p class="text-2xl font-bold text-slate-900 dark:text-white">{{ countByStatus(CourseStatus.PUBLISHED) }}</p>
-              <p class="text-sm text-slate-500 dark:text-slate-400">Đã xuất bản</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-800 transition-colors duration-300">
-          <div class="flex items-center gap-4">
-            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center text-white shadow-lg shadow-amber-500/25">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-              </svg>
-            </div>
-            <div>
-              <p class="text-2xl font-bold text-slate-900 dark:text-white">{{ countByStatus(CourseStatus.DRAFT) }}</p>
-              <p class="text-sm text-slate-500 dark:text-slate-400">Bản nháp</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-800 transition-colors duration-300">
-          <div class="flex items-center gap-4">
-            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-slate-500 to-slate-600 flex items-center justify-center text-white shadow-lg shadow-slate-500/25">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
-              </svg>
-            </div>
-            <div>
-              <p class="text-2xl font-bold text-slate-900 dark:text-white">{{ countByStatus(CourseStatus.ARCHIVED) }}</p>
-              <p class="text-sm text-slate-500 dark:text-slate-400">Đã lưu trữ</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Quick Actions -->
-      <div class="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-8 text-white shadow-lg shadow-indigo-500/10">
-        <h2 class="text-2xl font-bold">Tạo khóa học mới</h2>
-        <p class="mt-2 text-indigo-100">Chia sẻ kiến thức của bạn với hàng ngàn học viên</p>
-        <router-link
-          to="/instructor/courses/create"
-          class="inline-flex items-center gap-2 mt-6 px-6 py-3 rounded-xl bg-white text-purple-700 font-semibold hover:shadow-lg transition-all"
-        >
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-          </svg>
-          Tạo khóa học
-        </router-link>
-      </div>
-    </div>
+          <p v-else class="px-4 py-8 text-center text-xs text-slate-400">Chưa có khóa học phát sinh doanh thu.</p>
+        </article>
+      </section>
+    </main>
   </InstructorLayout>
 </template>
+
+<style scoped>
+.metric-cell{position:relative;min-width:0;padding:.9rem 1rem;border-right:1px solid var(--border)}
+.metric-cell:last-child{border-right:0}.metric-cell::before{position:absolute;inset:0 auto 0 0;width:3px;background:#64748b;content:''}
+.metric-cell--green::before{background:#10b981}.metric-cell--purple::before{background:#9333ea}.metric-cell--amber::before{background:#f59e0b}
+.metric-cell span{display:block;font-size:.65rem;font-weight:700;color:var(--text-muted)}
+.metric-cell b{display:block;margin-top:.2rem;overflow:hidden;text-overflow:ellipsis;font-size:1.1rem;font-weight:900;white-space:nowrap}
+.metric-cell small{display:block;margin-top:.15rem;font-size:.625rem;color:var(--text-muted)}
+.dashboard-panel{border:1px solid var(--border);background:var(--surface);box-shadow:var(--shadow-sm)}
+.finance-row{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.85rem 0;font-size:.72rem}
+.finance-row dt{color:var(--text-muted)}.finance-row dd{font-weight:800;text-align:right}
+.status-dot{display:inline-block;width:.45rem;height:.45rem;margin-right:.35rem;border-radius:50%}
+.revenue-tooltip{position:absolute;bottom:calc(100% + .35rem);display:none;z-index:2;white-space:nowrap;background:#0f172a;padding:.25rem .4rem;color:white;font-size:.6rem}
+.group:hover .revenue-tooltip{display:block}
+@media(max-width:639px){.metric-cell{border-right:0;border-bottom:1px solid var(--border)}.metric-cell:last-child{border-bottom:0}}
+</style>

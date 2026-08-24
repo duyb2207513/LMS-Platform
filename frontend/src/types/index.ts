@@ -125,13 +125,15 @@ export interface AuthSession {
 
 export interface Enrollment { id:string;courseId:string;progressPercent:number;status:'ACTIVE'|'COMPLETED'|'CANCELLED';enrolledAt:string;completedAt:string|null;course:Course }
 export interface LessonProgress { isCompleted:boolean;lastWatchedSecond:number;completedAt?:string|null }
-export interface Lesson { id:string;sectionId:string;title:string;lessonType:'VIDEO'|'TEXT'|'DOCUMENT';content:string|null;videoUrl:string|null;documentUrl:string|null;durationSeconds:number|null;position:number;isPreview:boolean;isRequired:boolean;isPublished:boolean;progress?:LessonProgress;quiz?:Quiz|null }
-export interface CourseSection { id:string;courseId:string;title:string;position:number;lessons:Lesson[] }
+export type LessonContentType = 'VIDEO'|'TEXT'|'DOCUMENT'
+export interface LessonContent { id:string;lessonId:string;contentType:LessonContentType;textContent:string|null;fileUrl:string|null;originalName:string|null;mimeType:string|null;sizeBytes:number|null;position:number;createdAt:string;updatedAt:string }
+export interface Lesson { id:string;sectionId:string;title:string;lessonType:LessonContentType;content:string|null;videoUrl:string|null;documentUrl:string|null;durationSeconds:number|null;position:number;isPreview:boolean;isRequired:boolean;isPublished:boolean;contents?:LessonContent[];progress?:LessonProgress;quiz?:Quiz|null }
+export interface CourseSection { id:string;courseId:string;title:string;position:number;lessons:Lesson[];quiz?:Quiz|null }
 export interface CourseContent { course:Pick<Course,'id'|'title'>;sections:CourseSection[] }
 export interface CourseProgress { totalLessons:number;completedLessons:number;progressPercent:number }
 export interface QuizOption { id:string;text:string;position:number;isCorrect?:boolean }
-export interface QuizQuestion { id:string;text:string;explanation?:string|null;points:number;position:number;options:QuizOption[] }
-export interface Quiz { id:string;lessonId:string;courseId?:string;title:string;description:string|null;passingScore:number;maxAttempts:number;timeLimitMinutes:number|null;isPublished:boolean;questions?:QuizQuestion[] }
+export interface QuizQuestion { id:string;text:string;imageUrl?:string|null;explanation?:string|null;points:number;position:number;options:QuizOption[] }
+export interface Quiz { id:string;lessonId?:string|null;sectionId?:string|null;courseId?:string;title:string;description:string|null;passingScore:number;maxAttempts:number;timeLimitMinutes:number|null;isPublished:boolean;questions?:QuizQuestion[] }
 export interface QuizAttempt { id:string;quizId:string;attemptNumber:number;status:'IN_PROGRESS'|'SUBMITTED';score:number|null;passed:boolean|null;startedAt:string;submittedAt:string|null }
 export interface QuizResult extends QuizAttempt { earnedPoints:number;totalPoints:number;score:number;passed:boolean;answers:Array<{questionId:string;question:string;selectedOptionId:string|null;correctOptionId?:string;isCorrect:boolean;pointsEarned:number;explanation:string|null}> }
 export interface Review { id:string;courseId:string;rating:number;content:string|null;createdAt:string;updatedAt:string;user:Pick<User,'id'|'fullName'|'avatarUrl'> }
@@ -143,7 +145,8 @@ export interface Certificate { id:string;certificateNumber:string;verificationCo
 export interface SubmissionFile { id:string;originalName:string;fileUrl:string;mimeType:string;sizeBytes:number;createdAt:string }
 export interface SubmissionFeedback { id:string;score:number;comment:string|null;gradedAt:string;updatedAt:string;grader?:Pick<User,'id'|'fullName'> }
 export interface AssignmentSubmission { id:string;assignmentId:string;studentId:string;attemptNumber:number;textContent:string|null;status:'SUBMITTED'|'GRADED';submittedAt:string;updatedAt:string;student?:Pick<User,'id'|'fullName'|'email'|'avatarUrl'>;files:SubmissionFile[];feedback:SubmissionFeedback|null }
-export interface Assignment { id:string;courseId:string;title:string;description:string|null;instructions:string|null;dueAt:string;maxScore:number;allowResubmission:boolean;maxSubmissions:number;allowLateSubmissions:boolean;isPublished:boolean;createdAt:string;updatedAt:string;isOverdue?:boolean;remainingSubmissions?:number;submissions?:AssignmentSubmission[];_count?:{submissions:number};course?:Pick<Course,'id'|'title'|'slug'> }
+export interface AssignmentAttachment { id:string;assignmentId:string;originalName:string;fileUrl:string;mimeType:string;sizeBytes:number;createdAt:string }
+export interface Assignment { id:string;courseId:string;title:string;description:string|null;instructions:string|null;dueAt:string;maxScore:number;allowResubmission:boolean;maxSubmissions:number;allowLateSubmissions:boolean;isPublished:boolean;createdAt:string;updatedAt:string;attachments?:AssignmentAttachment[];isOverdue?:boolean;remainingSubmissions?:number;submissions?:AssignmentSubmission[];_count?:{submissions:number};course?:Pick<Course,'id'|'title'|'slug'> }
 export interface CourseGradeRule { courseId:string;assignmentWeight:number;quizWeight:number;passingScore:number }
 export interface CourseGrade { courseId:string;studentId:string;finalScore:number;passed:boolean;rule:CourseGradeRule;assignment:{percent:number;earned:number;maximum:number;total:number;graded:number};quiz:{percent:number;total:number;attempted:number};student?:Pick<User,'id'|'fullName'|'email'|'avatarUrl'> }
 export type MessageContact = Pick<User, 'id' | 'fullName' | 'email' | 'avatarUrl' | 'role' | 'status'>

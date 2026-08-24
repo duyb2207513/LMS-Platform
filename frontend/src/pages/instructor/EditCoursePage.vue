@@ -135,24 +135,24 @@ onMounted(async () => {
 <template>
   <InstructorLayout>
     <div v-if="pageLoading" class="py-12"><LoadingSpinner /></div>
-    <div v-else class="max-w-3xl">
-      <div class="mb-8">
-        <router-link to="/instructor/courses" class="inline-flex items-center gap-1 text-sm text-slate-500 dark:text-slate-400 hover:text-purple-600 dark:hover:text-purple-400 mb-4 transition-colors">
+    <main v-else class="course-editor-page">
+      <header class="course-editor-header">
+        <router-link to="/instructor/courses" class="course-editor-back" aria-label="Quay lại danh sách khóa học">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-          Quay lại danh sách
         </router-link>
-        <h1 class="text-3xl font-extrabold text-slate-900 dark:text-white">Chỉnh sửa khóa học</h1>
-        <p class="mt-2 text-slate-500 dark:text-slate-400">Cập nhật thông tin chi tiết hoặc thay đổi trạng thái khóa học</p>
-      </div>
+        <p class="course-editor-eyebrow">Quản lý khóa học</p>
+        <h1>Chỉnh sửa khóa học</h1>
+        <p>Cập nhật thông tin, ảnh đại diện và trạng thái phát hành.</p>
+      </header>
 
       <!-- Messages -->
-      <div v-if="error" class="mb-6 p-4 rounded-xl bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900 text-sm text-red-600 dark:text-red-400">{{ error }}</div>
-      <div v-if="success" class="mb-6 p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900 text-sm text-emerald-600 dark:text-emerald-400">{{ success }}</div>
+      <div v-if="error" class="course-editor-alert course-editor-alert--error">{{ error }}</div>
+      <div v-if="success" class="course-editor-alert course-editor-alert--success">{{ success }}</div>
 
       <!-- Action Panel: Status -->
-      <div class="mb-8 bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 p-6 transition-colors duration-300">
-        <h2 class="text-lg font-bold text-slate-900 dark:text-white mb-4">Trạng thái phát hành</h2>
-        <div class="flex flex-wrap gap-3">
+      <section class="course-status-panel">
+        <div><h2>Trạng thái phát hành</h2><p>Khóa học hiện đang ở trạng thái <strong>{{ currentStatus }}</strong>.</p></div>
+        <div class="flex flex-wrap gap-2">
           <BaseButton
             v-if="currentStatus !== CourseStatus.PUBLISHED"
             @click="handleStatusChange(CourseStatus.PUBLISHED)"
@@ -177,21 +177,21 @@ onMounted(async () => {
             Lưu trữ khóa học
           </BaseButton>
         </div>
-      </div>
+      </section>
 
-      <form @submit.prevent="handleSubmit" class="space-y-8">
-        <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 p-6 space-y-5 transition-colors duration-300">
-          <h2 class="text-lg font-bold text-slate-900 dark:text-white pb-2 border-b border-slate-100 dark:border-slate-800">Thông tin cơ bản</h2>
+      <form class="course-editor-form" @submit.prevent="handleSubmit">
+        <section class="course-form-section">
+          <div class="course-form-section__heading"><span>01</span><div><h2>Thông tin cơ bản</h2><p>Tên, mô tả và cách phân loại khóa học.</p></div></div>
           <BaseInput id="edit-title" v-model="form.title" label="Tên khóa học" placeholder="VD: Lập trình Vue.js từ cơ bản đến nâng cao" :required="true" />
           
           <div class="space-y-1.5">
             <label for="edit-desc" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Mô tả <span class="text-red-500">*</span></label>
-            <textarea id="edit-desc" v-model="form.description" placeholder="Mô tả chi tiết..." rows="4" required class="w-full rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:border-purple-500 dark:focus:border-purple-400 focus:outline-none resize-none transition-colors duration-200" />
+            <textarea id="edit-desc" v-model="form.description" placeholder="Mô tả chi tiết..." rows="4" required class="course-control resize-none" />
           </div>
 
           <div class="space-y-1.5">
             <label for="edit-cat" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Danh mục <span class="text-red-500">*</span></label>
-            <select id="edit-cat" v-model="form.categoryId" required class="w-full rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:border-purple-500 dark:focus:border-purple-400 focus:outline-none cursor-pointer transition-colors duration-200">
+            <select id="edit-cat" v-model="form.categoryId" required class="course-control cursor-pointer">
               <option value="" disabled>Chọn danh mục</option>
               <option v-for="cat in categoryStore.categories" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
             </select>
@@ -200,35 +200,34 @@ onMounted(async () => {
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <div class="space-y-1.5">
               <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Cấp độ</label>
-              <select v-model="form.level" class="w-full rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:border-purple-500 dark:focus:border-purple-400 focus:outline-none cursor-pointer transition-colors duration-200">
+              <select v-model="form.level" class="course-control cursor-pointer">
                 <option v-for="l in levels" :key="l.value" :value="l.value">{{ l.label }}</option>
               </select>
             </div>
             <BaseInput id="edit-lang" v-model="form.language" label="Ngôn ngữ" placeholder="Vietnamese" />
           </div>
-        </div>
+        </section>
 
-        <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 p-6 space-y-5 transition-colors duration-300">
-          <h2 class="text-lg font-bold text-slate-900 dark:text-white pb-2 border-b border-slate-100 dark:border-slate-800">Giá khóa học</h2>
+        <section class="course-form-section">
+          <div class="course-form-section__heading"><span>02</span><div><h2>Giá khóa học</h2><p>Chọn hình thức miễn phí hoặc thiết lập học phí.</p></div></div>
           <div class="flex items-center gap-3">
-            <label class="relative inline-flex items-center cursor-pointer">
-              <input type="checkbox" v-model="form.isFree" class="sr-only peer" />
-              <div class="w-11 h-6 bg-slate-200 dark:bg-slate-800 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600" />
+            <label class="course-check-label">
+              <input v-model="form.isFree" type="checkbox" class="course-checkbox" />
+              <span>Miễn phí</span>
             </label>
-            <span class="text-sm font-medium text-slate-700 dark:text-slate-300">Miễn phí</span>
           </div>
           <BaseInput v-if="!form.isFree" id="edit-price" v-model="form.price" label="Giá (VND)" type="number" placeholder="0" />
-        </div>
+        </section>
 
-        <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 p-6 space-y-5 transition-colors duration-300">
-          <h2 class="text-lg font-bold text-slate-900 dark:text-white pb-2 border-b border-slate-100 dark:border-slate-800">Chi tiết</h2>
+        <section class="course-form-section">
+          <div class="course-form-section__heading"><span>03</span><div><h2>Nội dung giới thiệu</h2><p>Kết quả học tập, yêu cầu đầu vào và ảnh đại diện.</p></div></div>
           <div class="space-y-1.5">
             <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Bạn sẽ học được gì</label>
-            <textarea v-model="form.learningOutcomes" rows="4" placeholder="Liệt kê những gì học viên đạt được..." class="w-full rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:border-purple-500 dark:focus:border-purple-400 focus:outline-none resize-none transition-colors duration-200" />
+            <textarea v-model="form.learningOutcomes" rows="4" placeholder="Liệt kê những gì học viên đạt được..." class="course-control resize-none" />
           </div>
           <div class="space-y-1.5">
             <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Yêu cầu</label>
-            <textarea v-model="form.requirements" rows="3" placeholder="Yêu cầu trước khi học..." class="w-full rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:border-purple-500 dark:focus:border-purple-400 focus:outline-none resize-none transition-colors duration-200" />
+            <textarea v-model="form.requirements" rows="3" placeholder="Yêu cầu trước khi học..." class="course-control resize-none" />
           </div>
           <ImageFilePicker
             :key="pickerKey"
@@ -239,13 +238,18 @@ onMounted(async () => {
             @change="thumbnailFile = $event"
             @error="error = $event"
           />
-        </div>
+        </section>
 
-        <div class="flex justify-end gap-4">
+        <footer class="course-form-actions">
           <router-link to="/instructor/courses"><BaseButton variant="secondary">Hủy</BaseButton></router-link>
           <BaseButton type="submit" :loading="loading" size="lg">Cập nhật khóa học</BaseButton>
-        </div>
+        </footer>
       </form>
-    </div>
+    </main>
   </InstructorLayout>
 </template>
+
+<style scoped>
+.course-editor-page{width:100%;max-width:68rem}.course-editor-header{border-bottom:1px solid var(--border);padding-bottom:1rem}.course-editor-back{display:grid;width:2.25rem;height:2.25rem;place-items:center;border:1px solid var(--border);color:var(--text-muted)}.course-editor-back:hover{border-color:var(--brand);color:var(--brand)}.course-editor-eyebrow{margin-top:.8rem;color:var(--brand)!important;font-size:.68rem!important;font-weight:850;letter-spacing:.12em;text-transform:uppercase}.course-editor-header h1{margin-top:.2rem;font-size:1.85rem;line-height:1.15;font-weight:900}.course-editor-header>p:last-child{margin-top:.35rem;color:var(--text-muted);font-size:.85rem}.course-editor-alert{margin-top:1rem;border-left:3px solid;padding:.7rem .85rem;font-size:.8rem}.course-editor-alert--error{border-color:#dc2626;background:#fef2f2;color:#b91c1c}.course-editor-alert--success{border-color:#059669;background:#ecfdf5;color:#047857}.course-status-panel{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-top:1.25rem;border:1px solid var(--border);background:var(--surface);padding:.85rem 1rem}.course-status-panel h2{font-size:.9rem;font-weight:850}.course-status-panel p{margin-top:.15rem;color:var(--text-muted);font-size:.7rem}.course-status-panel strong{color:var(--brand)}.course-editor-form{margin-top:1rem;border:1px solid var(--border);background:var(--surface)}.course-form-section{display:grid;grid-template-columns:15rem minmax(0,1fr);gap:1.5rem;padding:1.25rem}.course-form-section:not(:last-of-type){border-bottom:1px solid var(--border)}.course-form-section__heading{display:flex;align-items:flex-start;gap:.7rem}.course-form-section__heading>span{display:grid;width:2rem;height:2rem;place-items:center;background:var(--brand-soft);color:var(--brand);font-size:.68rem;font-weight:900}.course-form-section__heading h2{font-size:.9rem;font-weight:850}.course-form-section__heading p{margin-top:.2rem;color:var(--text-muted);font-size:.7rem;line-height:1.45}.course-form-section>:not(.course-form-section__heading){grid-column:2}.course-control{width:100%;min-height:2.75rem;border:1px solid var(--border);background:var(--surface-muted);padding:.7rem .8rem;color:var(--text);outline:none}.course-control:focus{border-color:var(--brand)}.course-check-label{display:inline-flex;align-items:center;gap:.6rem;cursor:pointer;color:var(--text);font-size:.8rem;font-weight:750}.course-checkbox{width:1.1rem;height:1.1rem;accent-color:var(--brand)}.course-form-actions{display:flex;justify-content:flex-end;gap:.65rem;border-top:1px solid var(--border);background:var(--surface-muted);padding:.9rem 1.25rem}.course-editor-page :deep(button),.course-editor-page :deep(input),.course-editor-page :deep(textarea),.course-editor-page :deep(select),.course-editor-page :deep([class*="rounded"]){border-radius:0!important}
+@media(max-width:760px){.course-status-panel{align-items:stretch;flex-direction:column}.course-form-section{grid-template-columns:1fr}.course-form-section>:not(.course-form-section__heading){grid-column:1}.course-form-actions>*{flex:1}.course-form-actions :deep(button){width:100%}}
+</style>

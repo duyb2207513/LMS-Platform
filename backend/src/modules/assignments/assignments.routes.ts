@@ -3,12 +3,12 @@ import { authenticate } from "../../common/middlewares/authenticate.js";
 import { authorize } from "../../common/middlewares/authorize.js";
 import { validateRequest } from "../../common/middlewares/validateRequest.js";
 import { asyncHandler } from "../../common/utils/asyncHandler.js";
-import { uploadSubmissionFiles } from "../../config/upload.js";
+import { uploadAssignmentAttachments, uploadSubmissionFiles } from "../../config/upload.js";
 import {
-  createAssignmentController, deleteAssignmentController, downloadSubmissionFileController, getAssignmentController,
+  createAssignmentController, deleteAssignmentAttachmentController, deleteAssignmentController, downloadAssignmentAttachmentController, downloadSubmissionFileController, getAssignmentController,
   getCourseGradeRuleController, getMyCourseGradeController, getSubmissionController, gradeSubmissionController,
   listAssignmentSubmissionsController, listCourseAssignmentsController, listCourseGradesController,
-  listMySubmissionsController, submitAssignmentController, updateAssignmentController, updateCourseGradeRuleController
+  listMySubmissionsController, submitAssignmentController, updateAssignmentController, updateCourseGradeRuleController, uploadAssignmentAttachmentsController
 } from "./assignments.controller.js";
 import { validateCourseGradeRuleInput, validateCreateAssignmentInput, validateGradeSubmissionInput, validateUpdateAssignmentInput } from "./assignments.validation.js";
 
@@ -67,6 +67,11 @@ export const assignmentsRouter = Router();
 assignmentsRouter.get("/:assignmentId", authenticate, asyncHandler(getAssignmentController));
 assignmentsRouter.patch("/:assignmentId", ...manage, validateRequest(validateUpdateAssignmentInput), asyncHandler(updateAssignmentController));
 assignmentsRouter.delete("/:assignmentId", ...manage, asyncHandler(deleteAssignmentController));
+/** @openapi
+ * /assignments/{assignmentId}/attachments:
+ *   post: { summary: Upload images or files attached to an assignment prompt, tags: [Assignments], security: [{ bearerAuth: [] }], parameters: [{ in: path, name: assignmentId, required: true, schema: { type: string, format: uuid } }], requestBody: { required: true, content: { multipart/form-data: { schema: { type: object, required: [files], properties: { files: { type: array, maxItems: 5, items: { type: string, format: binary } } } } } } }, responses: { 201: { description: Attachments uploaded }, 400: { description: Invalid type or size }, 403: { description: Course ownership required } } }
+ */
+assignmentsRouter.post("/:assignmentId/attachments",...manage,uploadAssignmentAttachments,asyncHandler(uploadAssignmentAttachmentsController));
 /**
  * @openapi
  * /assignments/{assignmentId}/submissions:
@@ -142,6 +147,16 @@ export const submissionFilesRouter = Router();
  *       404: { description: File not found }
  */
 submissionFilesRouter.get("/:fileId/download", authenticate, asyncHandler(downloadSubmissionFileController));
+
+export const assignmentAttachmentsRouter=Router();
+/** @openapi
+ * /assignment-attachments/{attachmentId}/download:
+ *   get: { summary: Download an assignment prompt attachment, tags: [Assignments], security: [{ bearerAuth: [] }], parameters: [{ in: path, name: attachmentId, required: true, schema: { type: string, format: uuid } }], responses: { 200: { description: Attachment file }, 403: { description: Enrollment or ownership required } } }
+ * /assignment-attachments/{attachmentId}:
+ *   delete: { summary: Delete an assignment prompt attachment, tags: [Assignments], security: [{ bearerAuth: [] }], parameters: [{ in: path, name: attachmentId, required: true, schema: { type: string, format: uuid } }], responses: { 204: { description: Attachment deleted }, 403: { description: Course ownership required } } }
+ */
+assignmentAttachmentsRouter.get("/:attachmentId/download",authenticate,asyncHandler(downloadAssignmentAttachmentController));
+assignmentAttachmentsRouter.delete("/:attachmentId",...manage,asyncHandler(deleteAssignmentAttachmentController));
 
 export const courseGradesRouter = Router({ mergeParams: true });
 /**

@@ -84,7 +84,7 @@ async function submit() {
     submitting.value = false;
   }
 }
-async function download(file: SubmissionFile) {
+async function download(file: Pick<SubmissionFile, "fileUrl" | "originalName">) {
   try {
     const token = localStorage.getItem("accessToken");
     const response = await fetch(file.fileUrl, {
@@ -193,6 +193,7 @@ onMounted(load);
                   "Giảng viên chưa bổ sung hướng dẫn chi tiết."
                 }}
               </p>
+              <div v-if="item.attachments?.length" class="mt-5 border-t border-slate-200 pt-4 dark:border-slate-700"><h3 class="text-sm font-black">Tài liệu đính kèm</h3><button v-for="file in item.attachments" :key="file.id" type="button" class="mt-2 flex w-full items-center justify-between border border-slate-200 px-3 py-2 text-left text-sm hover:border-purple-400 dark:border-slate-700" @click="download(file)"><span class="truncate font-semibold">{{ file.originalName }}</span><span class="ml-3 shrink-0 text-xs text-slate-400">{{ fileSize(file.sizeBytes) }} · Tải xuống</span></button></div>
             </section>
             <section class="surface-card p-6">
               <div class="flex items-center justify-between gap-3">

@@ -169,6 +169,37 @@ export async function getPublicCourse(slugOrId: string) {
   return serializeCourse(course);
 }
 
+export async function getInstructorCourse(courseId: string, actor: AuthTokenPayload) {
+  ensureValidCourseId(courseId);
+  const course = await prisma.course.findUnique({
+    where: { id: courseId },
+    select: {
+      id: true,
+      instructorId: true,
+      categoryId: true,
+      title: true,
+      slug: true,
+      description: true,
+      thumbnailUrl: true,
+      level: true,
+      price: true,
+      isFree: true,
+      language: true,
+      requirements: true,
+      learningOutcomes: true,
+      status: true,
+      publishedAt: true,
+      createdAt: true,
+      updatedAt: true,
+      category: { select: { id: true, name: true, slug: true } },
+      instructor: { select: { id: true, fullName: true, avatarUrl: true } }
+    }
+  });
+  if (!course) throw new AppError(404, "Course not found");
+  assertCanManageCourse(course, actor);
+  return serializeCourse(course);
+}
+
 export async function listInstructorCourses(
   actor: AuthTokenPayload,
   query: InstructorCourseQuery

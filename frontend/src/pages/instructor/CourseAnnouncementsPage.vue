@@ -27,7 +27,7 @@ async function loadData() {
   errorMessage.value = ''
   try {
     const [courseRes, announcementsRes] = await Promise.all([
-      api.get<ApiResponse<Course>>(`/courses/${courseId}`),
+      api.get<ApiResponse<Course>>(`/instructor/courses/${courseId}`),
       api.get<ApiResponse<CourseAnnouncement[]>>(`/courses/${courseId}/announcements`),
     ])
     course.value = courseRes.data || null
@@ -103,7 +103,7 @@ onMounted(loadData)
 
 <template>
   <InstructorLayout>
-    <div class="max-w-5xl mx-auto">
+    <div class="w-full">
       <!-- Breadcrumb -->
       <div class="mb-6 flex items-center justify-between">
         <RouterLink

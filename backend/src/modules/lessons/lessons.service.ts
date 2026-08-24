@@ -7,7 +7,7 @@ import type { CreateLessonInput, UpdateLessonInput } from "./lessons.types.js";
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const canManage = (instructorId: string, actor: AuthTokenPayload) => actor.role === "ADMIN" || instructorId === actor.userId;
 
-async function getManagedLesson(lessonId: string, actor: AuthTokenPayload) {
+export async function getManagedLesson(lessonId: string, actor: AuthTokenPayload) {
   if (!UUID.test(lessonId)) throw new AppError(404, "Lesson not found");
   const lesson = await prisma.lesson.findUnique({
     where: { id: lessonId },
@@ -81,4 +81,3 @@ export async function deleteLesson(lessonId: string, actor: AuthTokenPayload) {
   return [lesson.videoUrl, lesson.documentUrl].filter((url): url is string => Boolean(url));
 }
 
-export { getManagedLesson };

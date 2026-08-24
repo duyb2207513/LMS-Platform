@@ -674,6 +674,7 @@ const swaggerDefinition = {
           content: { type: "string", nullable: true },
           videoUrl: { type: "string", format: "uri", nullable: true },
           documentUrl: { type: "string", format: "uri", nullable: true },
+          contents: { type: "array", description: "Ordered multi-format content blocks; legacy lesson fields remain during migration", items: { $ref: "#/components/schemas/LessonContent" } },
           durationSeconds: { type: "integer", minimum: 0, nullable: true },
           position: { type: "integer", minimum: 1 },
           isPreview: { type: "boolean" },
@@ -719,6 +720,20 @@ const swaggerDefinition = {
           isRequired: { type: "boolean", default: true },
           isPublished: { type: "boolean", default: false },
         },
+      },
+      LessonContent: {
+        type: "object",
+        required: ["id", "lessonId", "contentType", "position"],
+        properties: {
+          id: { type: "string", format: "uuid" }, lessonId: { type: "string", format: "uuid" },
+          contentType: { $ref: "#/components/schemas/LessonType" }, textContent: { type: "string", nullable: true },
+          fileUrl: { type: "string", format: "uri", nullable: true }, originalName: { type: "string", nullable: true },
+          mimeType: { type: "string", nullable: true }, sizeBytes: { type: "integer", nullable: true }, position: { type: "integer", minimum: 1 }
+        }
+      },
+      LessonContentRequest: {
+        type: "object", additionalProperties: false, required: ["contentType"],
+        properties: { contentType: { $ref: "#/components/schemas/LessonType" }, textContent: { type: "string", nullable: true, maxLength: 100000 }, position: { type: "integer", minimum: 1 } }
       },
       UpdateLessonRequest: {
         type: "object",

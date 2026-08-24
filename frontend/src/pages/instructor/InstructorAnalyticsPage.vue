@@ -87,7 +87,7 @@ onMounted(() => {
 
 <template>
   <InstructorLayout>
-    <div class="mx-auto max-w-7xl px-4 py-8">
+    <div class="w-full py-3">
       <div class="mb-4">
         <button
           type="button"

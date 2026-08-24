@@ -108,6 +108,17 @@ try {
   })).json();
   assert.equal(ownerList.data.length, 2);
   assert.equal(ownerList.data.every((course) => course.instructor.id === owner.id), true);
+  const managedDraftResponse = await fetch(`${api}/instructor/courses/${first.id}`, {
+    headers: { authorization: ownerAuth }
+  });
+  assert.equal(managedDraftResponse.status, 200);
+  assert.equal((await managedDraftResponse.json()).data.id, first.id);
+  assert.equal((await fetch(`${api}/instructor/courses/${first.id}`, {
+    headers: { authorization: otherAuth }
+  })).status, 403);
+  assert.equal((await fetch(`${api}/instructor/courses/${first.id}`, {
+    headers: { authorization: adminAuth }
+  })).status, 200);
   const adminList = await (await fetch(`${api}/instructor/courses`, {
     headers: { authorization: adminAuth }
   })).json();

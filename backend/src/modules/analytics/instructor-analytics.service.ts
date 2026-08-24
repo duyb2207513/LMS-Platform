@@ -21,7 +21,7 @@ export async function getInstructorOverview(instructorId: string, query: Instruc
     prisma.enrollment.findMany({ where: allEnrollmentWhere, distinct: ["studentId"], select: { studentId: true } }),
     prisma.enrollment.count({ where: enrollmentWhere }),
     prisma.enrollment.count({ where: { ...allEnrollmentWhere, OR: [{ status: "COMPLETED" }, { completedAt: { not: null } }, { progressPercent: { gte: 100 } }] } }),
-    prisma.quizAttempt.aggregate({ where: { status: "SUBMITTED", score: { not: null }, submittedAt: time, quiz: { lesson: { section: { courseId: { in: courseIds } } } } }, _avg: { score: true } }),
+    prisma.quizAttempt.aggregate({ where: { status: "SUBMITTED", score: { not: null }, submittedAt: time, quiz: { OR: [{ section: { courseId: { in: courseIds } } }, { lesson: { section: { courseId: { in: courseIds } } } }] } }, _avg: { score: true } }),
     prisma.review.aggregate({ where: { courseId: { in: courseIds }, createdAt: time }, _avg: { rating: true }, _count: { rating: true } }),
     prisma.orderItem.aggregate({ where: { courseId: { in: courseIds }, order: { status: "PAID", payments: { some: { status: "SUCCEEDED", paidAt: time } } } }, _sum: { priceSnapshot: true } })
   ]);
@@ -59,7 +59,10 @@ export async function getInstructorCoursePerformance(instructorId: string, query
     prisma.enrollment.findMany({ where: { courseId: { in: courseIds }, status: { in: ["ACTIVE", "COMPLETED"] }, enrolledAt: time }, select: { courseId: true, studentId: true, status: true, completedAt: true, progressPercent: true } }),
     prisma.learningEvent.findMany({ where: { courseId: { in: courseIds }, occurredAt: time }, select: { courseId: true, userId: true } }),
     prisma.videoWatchEvent.findMany({ where: { courseId: { in: courseIds }, startedAt: time }, select: { courseId: true, userId: true } }),
-    prisma.quizAttempt.findMany({ where: { status: "SUBMITTED", score: { not: null }, submittedAt: time, quiz: { lesson: { section: { courseId: { in: courseIds } } } } }, select: { score: true, quiz: { select: { lesson: { select: { section: { select: { courseId: true } } } } } } } }),
+    prisma.quizAttempt.findMany({
+      where: { status: "SUBMITTED", score: { not: null }, submittedAt: time, quiz: { OR: [{ section: { courseId: { in: courseIds } } }, { lesson: { section: { courseId: { in: courseIds } } } }] } },
+      select: { score: true, quiz: { select: { section: { select: { courseId: true } }, lesson: { select: { section: { select: { courseId: true } } } } } } }
+    }),
     prisma.review.findMany({ where: { courseId: { in: courseIds }, createdAt: time }, select: { courseId: true, rating: true } }),
     prisma.orderItem.findMany({ where: { courseId: { in: courseIds }, order: { status: "PAID", payments: { some: { status: "SUCCEEDED", paidAt: time } } } }, select: { courseId: true, priceSnapshot: true } })
   ]);
@@ -69,7 +72,7 @@ export async function getInstructorCoursePerformance(instructorId: string, query
   const result = courses.map(course => {
     const courseEnrollments = enrollments.filter(item => item.courseId === course.id);
     const completed = courseEnrollments.filter(item => item.status === "COMPLETED" || item.completedAt !== null || decimal(item.progressPercent) >= 100).length;
-    const scores = attempts.filter(item => item.quiz.lesson.section.courseId === course.id).map(item => decimal(item.score));
+    const scores = attempts.filter(item => (item.quiz.section?.courseId ?? item.quiz.lesson?.section.courseId) === course.id).map(item => decimal(item.score));
     const ratings = reviews.filter(item => item.courseId === course.id).map(item => item.rating);
     return {
       courseId: course.id,

@@ -28,7 +28,10 @@ export async function listManagedSections(courseId: string, actor: AuthTokenPayl
   return prisma.section.findMany({
     where: { courseId },
     orderBy: [{ position: "asc" }, { createdAt: "asc" }],
-    include: { lessons: { orderBy: [{ position: "asc" }, { createdAt: "asc" }], include: { quiz: { include: { questions: { orderBy: [{ position: "asc" }, { createdAt: "asc" }], include: { options: { orderBy: [{ position: "asc" }, { createdAt: "asc" }] } } } } } } } }
+    include: {
+      quiz: { include: { questions: { orderBy: [{ position: "asc" }, { createdAt: "asc" }], include: { options: { orderBy: [{ position: "asc" }, { createdAt: "asc" }] } } } } },
+      lessons: { orderBy: [{ position: "asc" }, { createdAt: "asc" }], include: { contents: { orderBy: [{ position: "asc" }, { createdAt: "asc" }] }, quiz: { include: { questions: { orderBy: [{ position: "asc" }, { createdAt: "asc" }], include: { options: { orderBy: [{ position: "asc" }, { createdAt: "asc" }] } } } } } } }
+    }
   });
 }
 

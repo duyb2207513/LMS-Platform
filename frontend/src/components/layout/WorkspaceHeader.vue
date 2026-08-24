@@ -74,11 +74,9 @@ watch(
 
 <template>
   <header
-    class="sticky top-0 z-40 border-b border-slate-200/80 bg-white/92 backdrop-blur-xl transition-colors duration-300 dark:border-slate-800 dark:bg-slate-950/92"
+    class="workspace-header sticky top-0 z-40 border-b border-slate-200 bg-white transition-colors duration-300 dark:border-slate-800 dark:bg-slate-950"
   >
-    <div
-      class="mx-auto flex h-16 max-w-[100rem] items-center justify-between gap-3 px-3 sm:px-5 lg:px-8"
-    >
+    <div class="flex h-[4.5rem] w-full items-center gap-3 px-4 lg:px-5">
       <!-- Left: Mobile menu toggle + Brand & Role Badge -->
       <div class="flex items-center gap-2.5 sm:gap-3">
         <button
@@ -93,8 +91,9 @@ watch(
         </button>
 
         <div class="flex items-center gap-2.5">
-          <AppBrand :to="dashboardPath" />
+          <AppBrand :to="dashboardPath" :compact="auth.isInstructor" />
           <RouterLink
+            v-if="auth.isAdmin"
             :to="dashboardPath"
             :class="[
               'hidden rounded-lg px-2.5 py-1 text-[11px] font-extrabold tracking-wider shadow-sm ring-1 ring-inset transition hover:opacity-80 sm:inline-flex',
@@ -105,11 +104,39 @@ watch(
           >
             {{ roleBadgeText }}
           </RouterLink>
+
+          <div v-if="auth.isInstructor" class="relative ml-1">
+            <button
+              type="button"
+              class="workspace-action grid h-10 w-10 place-items-center border border-purple-300 bg-purple-50 text-purple-700 transition hover:border-purple-500 hover:bg-purple-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 dark:border-purple-800 dark:bg-purple-950/40 dark:text-purple-300 dark:hover:bg-purple-900/50"
+              aria-label="Tạo mới"
+              title="Tạo mới"
+              @click="quickActionsOpen = !quickActionsOpen; profileOpen = false"
+            >
+              <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4.5v15m7.5-7.5h-15" />
+              </svg>
+            </button>
+
+            <Transition name="dropdown">
+              <div
+                v-if="quickActionsOpen"
+                class="absolute left-0 mt-2 w-56 overflow-hidden border border-slate-200 bg-white p-1.5 shadow-xl dark:border-slate-700 dark:bg-slate-900"
+              >
+                <RouterLink to="/instructor/courses/create" class="profile-link">
+                  Tạo khóa học mới
+                </RouterLink>
+                <RouterLink to="/instructor/courses" class="profile-link">
+                  Tạo bài tập hoặc quiz
+                </RouterLink>
+              </div>
+            </Transition>
+          </div>
         </div>
       </div>
 
       <!-- Center: Quick Management Search -->
-      <div class="hidden max-w-md flex-1 md:block lg:max-w-lg">
+      <div class="hidden min-w-0 max-w-xl flex-1 md:block">
         <form @submit.prevent="handleSearchSubmit" class="relative">
           <span
             class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400 dark:text-slate-500"
@@ -123,7 +150,7 @@ watch(
             v-model="searchKeyword"
             type="search"
             :placeholder="auth.isAdmin ? 'Tìm nhanh khóa học, coupon, người dùng...' : 'Tìm khóa học, bài tập...'"
-            class="h-10 w-full rounded-xl border border-slate-200 bg-slate-50/80 pl-9 pr-14 text-xs font-medium text-slate-900 transition placeholder:text-slate-400 focus:border-purple-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-purple-500/10 dark:border-slate-800 dark:bg-slate-900/80 dark:text-white dark:placeholder:text-slate-500 dark:focus:border-purple-400 dark:focus:bg-slate-900"
+            class="h-10 w-full rounded-lg border border-slate-200 bg-slate-50 pl-9 pr-14 text-sm font-medium text-slate-900 transition placeholder:text-slate-400 focus:border-purple-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/10 dark:border-slate-800 dark:bg-slate-900 dark:text-white dark:placeholder:text-slate-500 dark:focus:border-purple-400"
           />
           <kbd
             class="pointer-events-none absolute inset-y-2 right-2.5 hidden items-center rounded-md border border-slate-200 bg-white px-1.5 text-[10px] font-semibold text-slate-400 shadow-sm sm:inline-flex dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400"
@@ -134,9 +161,9 @@ watch(
       </div>
 
       <!-- Right: Quick Actions + View Website + Theme + Notifications + Profile -->
-      <div class="flex shrink-0 items-center gap-1.5 sm:gap-2">
+      <div class="ml-auto flex shrink-0 items-center gap-2">
         <!-- Quick Action (+ Tạo mới) -->
-        <div class="relative">
+        <div v-if="!auth.isInstructor" class="relative">
           <button
             type="button"
             class="inline-flex h-10 items-center gap-1.5 rounded-xl bg-gradient-to-r from-violet-600 to-purple-600 px-3 text-xs font-bold text-white shadow-md shadow-purple-500/20 transition hover:from-violet-700 hover:to-purple-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 sm:px-3.5"
@@ -239,7 +266,7 @@ watch(
         <!-- Button: Xem Website (Switch to Student Preview Mode) -->
         <RouterLink
           to="/courses"
-          class="hidden h-10 items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50/80 px-3 text-xs font-bold text-slate-700 transition hover:border-purple-200 hover:bg-purple-50 hover:text-purple-700 md:inline-flex dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-300 dark:hover:border-purple-800 dark:hover:bg-purple-950/30 dark:hover:text-purple-300"
+          class="workspace-action hidden h-10 items-center gap-1.5 border border-slate-200 bg-white px-3 text-xs font-bold text-slate-700 transition hover:border-purple-300 hover:bg-purple-50 hover:text-purple-700 md:inline-flex dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-purple-800 dark:hover:bg-purple-950/30 dark:hover:text-purple-300"
           title="Xem danh mục khóa học với tư cách học viên"
         >
           <svg class="h-4 w-4 text-slate-500 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -256,7 +283,7 @@ watch(
         <NotificationBell />
 
         <!-- Profile Menu -->
-        <div class="relative">
+        <div v-if="!auth.isInstructor" class="relative">
           <button
             type="button"
             class="flex min-h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white p-1.5 pr-1.5 text-left shadow-sm transition hover:border-purple-200 hover:bg-purple-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-purple-500/15 dark:border-slate-700 dark:bg-slate-900 dark:hover:border-purple-800 dark:hover:bg-purple-950/30 sm:pr-3"
@@ -380,12 +407,32 @@ watch(
             </div>
           </Transition>
         </div>
+
+        <button
+          v-if="auth.isInstructor"
+          type="button"
+          class="workspace-action inline-flex h-10 items-center gap-2 border border-red-200 bg-white px-3 text-xs font-bold text-red-600 transition hover:border-red-400 hover:bg-red-50 dark:border-red-900 dark:bg-slate-900 dark:text-red-400 dark:hover:bg-red-950/30 sm:px-4"
+          @click="logout"
+        >
+          <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6A2.25 2.25 0 005.25 5.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3-3H9.75m9 0-3-3m3 3-3 3" />
+          </svg>
+          <span class="hidden sm:inline">Đăng xuất</span>
+        </button>
       </div>
     </div>
   </header>
 </template>
 
 <style scoped>
+.workspace-header {
+  box-shadow: 0 1px 3px rgb(15 23 42 / 0.06);
+}
+
+.workspace-action {
+  border-radius: 0.5rem;
+}
+
 .profile-link {
   display: flex;
   align-items: center;

@@ -183,7 +183,7 @@ onBeforeUnmount(closePreview);
 
 <template>
   <InstructorLayout
-    ><main class="mx-auto max-w-6xl">
+    ><main class="w-full">
       <header>
         <button
           class="text-sm font-bold text-purple-600"

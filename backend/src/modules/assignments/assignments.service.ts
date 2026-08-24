@@ -3,7 +3,7 @@ import { unlink } from "node:fs/promises";
 import path from "node:path";
 import { AppError } from "../../common/errors/AppError.js";
 import { prisma } from "../../config/database.js";
-import { isValidStoredSubmissionFile, SUBMISSION_FILE_DIRECTORY, SUBMISSION_TOTAL_MAX_SIZE } from "../../config/upload.js";
+import { ASSIGNMENT_ATTACHMENT_DIRECTORY, isValidStoredSubmissionFile, SUBMISSION_FILE_DIRECTORY, SUBMISSION_TOTAL_MAX_SIZE } from "../../config/upload.js";
 import { isCloudinaryConfigured, uploadFileToCloudinary } from "../../config/cloudinary.js";
 import type { AuthTokenPayload } from "../auth/auth.types.js";
 import { assertCourseEnrollment, canManageCourse, UUID } from "../interactions/access.js";
@@ -56,14 +56,14 @@ async function removeUploadedFiles(files: Express.Multer.File[]) {
 export async function listCourseAssignments(courseId: string, actor: AuthTokenPayload) {
   const course = await courseContext(courseId);
   if (canManageCourse(course.instructorId, actor)) {
-    const assignments = await prisma.assignment.findMany({ where: { courseId }, orderBy: [{ dueAt: "asc" }, { createdAt: "asc" }], include: { _count: { select: { submissions: true } } } });
+    const assignments = await prisma.assignment.findMany({ where: { courseId }, orderBy: [{ dueAt: "asc" }, { createdAt: "asc" }], include: { attachments: { orderBy: { createdAt: "asc" } }, _count: { select: { submissions: true } } } });
     return assignments.map(serializeAssignment);
   }
   if (actor.role !== "STUDENT") throw new AppError(403, "You do not have permission to view these assignments");
   await assertCourseEnrollment(courseId, actor.userId);
   const assignments = await prisma.assignment.findMany({
     where: { courseId, isPublished: true }, orderBy: [{ dueAt: "asc" }, { createdAt: "asc" }],
-    include: { submissions: { where: { studentId: actor.userId }, orderBy: { attemptNumber: "desc" }, include: submissionInclude } }
+    include: { attachments: { orderBy: { createdAt: "asc" } }, submissions: { where: { studentId: actor.userId }, orderBy: { attemptNumber: "desc" }, include: submissionInclude } }
   });
   return assignments.map(item => ({ ...serializeAssignment(item), isOverdue: item.dueAt < new Date(), remainingSubmissions: Math.max(0, item.maxSubmissions - item.submissions.length) }));
 }
@@ -77,7 +77,7 @@ export async function getAssignment(assignmentId: string, actor: AuthTokenPayloa
   }
   const assignment = await prisma.assignment.findUnique({
     where: { id: assignmentId },
-    include: { course: { select: { id: true, title: true, slug: true } }, submissions: manager ? false : { where: { studentId: actor.userId }, orderBy: { attemptNumber: "desc" }, include: submissionInclude }, _count: manager ? { select: { submissions: true } } : false }
+    include: { attachments: { orderBy: { createdAt: "asc" } }, course: { select: { id: true, title: true, slug: true } }, submissions: manager ? false : { where: { studentId: actor.userId }, orderBy: { attemptNumber: "desc" }, include: submissionInclude }, _count: manager ? { select: { submissions: true } } : false }
   });
   return serializeAssignment(assignment as Record<string, any>);
 }
@@ -110,8 +110,30 @@ export async function updateAssignment(assignmentId: string, actor: AuthTokenPay
 export async function deleteAssignment(assignmentId: string, actor: AuthTokenPayload) {
   await managedAssignment(assignmentId, actor);
   if (await prisma.assignmentSubmission.count({ where: { assignmentId } })) throw new AppError(409, "An assignment with submissions cannot be deleted");
+  const attachments = await prisma.assignmentAttachment.findMany({ where: { assignmentId }, select: { storedName: true } });
   await prisma.assignment.delete({ where: { id: assignmentId } });
+  return attachments.map(item => item.storedName);
 }
+
+export async function addAssignmentAttachments(assignmentId: string, actor: AuthTokenPayload, files: Express.Multer.File[], baseUrl: string) {
+  await managedAssignment(assignmentId, actor);
+  try {
+    if (!files.length) throw new AppError(400, "At least one attachment is required");
+    if (files.reduce((sum, file) => sum + file.size, 0) > SUBMISSION_TOTAL_MAX_SIZE) throw new AppError(400, "Assignment attachments must not exceed 50 MB in total");
+    for (const file of files) if (!(await isValidStoredSubmissionFile(file.path, file.mimetype))) throw new AppError(400, `File content does not match its type: ${file.originalname}`);
+    const rows = await Promise.all(files.map(async file => {
+      const id = randomUUID(); let storedName = file.filename;
+      if (isCloudinaryConfigured()) { const uploaded = await uploadFileToCloudinary(file.path, { folder: "lms/assignment-attachments", resourceType: "auto" }); storedName = uploaded.secure_url; await unlink(file.path).catch(() => undefined); }
+      return { id, assignmentId, originalName: path.basename(file.originalname).slice(0,255), storedName, fileUrl: `${baseUrl}/api/v1/assignment-attachments/${id}/download`, mimeType: file.mimetype, sizeBytes: file.size };
+    }));
+    await prisma.assignmentAttachment.createMany({ data: rows });
+    return prisma.assignmentAttachment.findMany({ where: { id: { in: rows.map(row => row.id) } }, orderBy: { createdAt: "asc" } });
+  } catch(error) { await removeUploadedFiles(files); throw error; }
+}
+
+async function attachmentContext(id:string){if(!UUID.test(id))throw new AppError(404,"Assignment attachment not found");const item=await prisma.assignmentAttachment.findUnique({where:{id},include:{assignment:{include:{course:{select:{instructorId:true}}}}}});if(!item)throw new AppError(404,"Assignment attachment not found");return item;}
+export async function deleteAssignmentAttachment(id:string,actor:AuthTokenPayload){const item=await attachmentContext(id);if(!canManageCourse(item.assignment.course.instructorId,actor))throw new AppError(403,"You do not have permission to manage this attachment");await prisma.assignmentAttachment.delete({where:{id}});return item.storedName;}
+export async function getAssignmentAttachment(id:string,actor:AuthTokenPayload){const item=await attachmentContext(id);if(!canManageCourse(item.assignment.course.instructorId,actor)){if(actor.role!=="STUDENT")throw new AppError(403,"You do not have permission to download this attachment");await assertCourseEnrollment(item.assignment.courseId,actor.userId);if(!item.assignment.isPublished)throw new AppError(404,"Published assignment attachment not found");}return {path:item.storedName.startsWith("http")?item.storedName:path.join(ASSIGNMENT_ATTACHMENT_DIRECTORY,item.storedName),name:item.originalName,mimeType:item.mimeType};}
 
 export async function submitAssignment(assignmentId: string, studentId: string, textContent: unknown, files: Express.Multer.File[], baseUrl: string) {
   const assignment = await assignmentContext(assignmentId);
@@ -236,7 +258,7 @@ async function calculateCourseGrade(courseId: string, studentId: string) {
   const [rule, assignments, quizzes] = await Promise.all([
     gradeRule(courseId),
     prisma.assignment.findMany({ where: { courseId, isPublished: true }, select: { id: true, title: true, maxScore: true, submissions: { where: { studentId }, orderBy: { attemptNumber: "desc" }, take: 1, select: { id: true, attemptNumber: true, status: true, feedback: { select: { score: true } } } } } }),
-    prisma.quiz.findMany({ where: { isPublished: true, lesson: { section: { courseId } } }, select: { id: true, title: true, attempts: { where: { studentId, status: "SUBMITTED" }, select: { score: true } } } })
+    prisma.quiz.findMany({ where: { isPublished: true, OR: [{ section: { courseId } }, { lesson: { section: { courseId } } }] }, select: { id: true, title: true, attempts: { where: { studentId, status: "SUBMITTED" }, select: { score: true } } } })
   ]);
   const assignmentMax = assignments.reduce((sum, item) => sum + decimal(item.maxScore), 0);
   const assignmentEarned = assignments.reduce((sum, item) => sum + decimal(item.submissions[0]?.feedback?.score), 0);

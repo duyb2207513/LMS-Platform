@@ -404,6 +404,7 @@ export const ModelName = {
   AuditLog: 'AuditLog',
   Category: 'Category',
   Course: 'Course',
+  LessonContent: 'LessonContent',
   Section: 'Section',
   Lesson: 'Lesson',
   Enrollment: 'Enrollment',
@@ -414,6 +415,7 @@ export const ModelName = {
   QuizAttempt: 'QuizAttempt',
   AttemptAnswer: 'AttemptAnswer',
   Assignment: 'Assignment',
+  AssignmentAttachment: 'AssignmentAttachment',
   AssignmentSubmission: 'AssignmentSubmission',
   SubmissionFile: 'SubmissionFile',
   SubmissionFeedback: 'SubmissionFeedback',
@@ -454,7 +456,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "directMessage" | "authSession" | "authToken" | "auditLog" | "category" | "course" | "section" | "lesson" | "enrollment" | "lessonProgress" | "quiz" | "question" | "quizOption" | "quizAttempt" | "attemptAnswer" | "assignment" | "assignmentSubmission" | "submissionFile" | "submissionFeedback" | "courseGradeRule" | "notification" | "notificationPreference" | "pushDevice" | "emailLog" | "courseAnnouncement" | "learningEvent" | "videoWatchEvent" | "review" | "comment" | "order" | "orderItem" | "payment" | "paymentWebhookEvent" | "certificate" | "coupon" | "couponCourse" | "couponUsage" | "refundRequest" | "paymentRefund" | "instructorEarning" | "payout"
+    modelProps: "user" | "directMessage" | "authSession" | "authToken" | "auditLog" | "category" | "course" | "lessonContent" | "section" | "lesson" | "enrollment" | "lessonProgress" | "quiz" | "question" | "quizOption" | "quizAttempt" | "attemptAnswer" | "assignment" | "assignmentAttachment" | "assignmentSubmission" | "submissionFile" | "submissionFeedback" | "courseGradeRule" | "notification" | "notificationPreference" | "pushDevice" | "emailLog" | "courseAnnouncement" | "learningEvent" | "videoWatchEvent" | "review" | "comment" | "order" | "orderItem" | "payment" | "paymentWebhookEvent" | "certificate" | "coupon" | "couponCourse" | "couponUsage" | "refundRequest" | "paymentRefund" | "instructorEarning" | "payout"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -973,6 +975,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.CourseCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.CourseCountAggregateOutputType> | number
+        }
+      }
+    }
+    LessonContent: {
+      payload: Prisma.$LessonContentPayload<ExtArgs>
+      fields: Prisma.LessonContentFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.LessonContentFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LessonContentPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.LessonContentFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LessonContentPayload>
+        }
+        findFirst: {
+          args: Prisma.LessonContentFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LessonContentPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.LessonContentFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LessonContentPayload>
+        }
+        findMany: {
+          args: Prisma.LessonContentFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LessonContentPayload>[]
+        }
+        create: {
+          args: Prisma.LessonContentCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LessonContentPayload>
+        }
+        createMany: {
+          args: Prisma.LessonContentCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.LessonContentCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LessonContentPayload>[]
+        }
+        delete: {
+          args: Prisma.LessonContentDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LessonContentPayload>
+        }
+        update: {
+          args: Prisma.LessonContentUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LessonContentPayload>
+        }
+        deleteMany: {
+          args: Prisma.LessonContentDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.LessonContentUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.LessonContentUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LessonContentPayload>[]
+        }
+        upsert: {
+          args: Prisma.LessonContentUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LessonContentPayload>
+        }
+        aggregate: {
+          args: Prisma.LessonContentAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateLessonContent>
+        }
+        groupBy: {
+          args: Prisma.LessonContentGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.LessonContentGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.LessonContentCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.LessonContentCountAggregateOutputType> | number
         }
       }
     }
@@ -1713,6 +1789,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.AssignmentCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.AssignmentCountAggregateOutputType> | number
+        }
+      }
+    }
+    AssignmentAttachment: {
+      payload: Prisma.$AssignmentAttachmentPayload<ExtArgs>
+      fields: Prisma.AssignmentAttachmentFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AssignmentAttachmentFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AssignmentAttachmentPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AssignmentAttachmentFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AssignmentAttachmentPayload>
+        }
+        findFirst: {
+          args: Prisma.AssignmentAttachmentFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AssignmentAttachmentPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AssignmentAttachmentFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AssignmentAttachmentPayload>
+        }
+        findMany: {
+          args: Prisma.AssignmentAttachmentFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AssignmentAttachmentPayload>[]
+        }
+        create: {
+          args: Prisma.AssignmentAttachmentCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AssignmentAttachmentPayload>
+        }
+        createMany: {
+          args: Prisma.AssignmentAttachmentCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AssignmentAttachmentCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AssignmentAttachmentPayload>[]
+        }
+        delete: {
+          args: Prisma.AssignmentAttachmentDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AssignmentAttachmentPayload>
+        }
+        update: {
+          args: Prisma.AssignmentAttachmentUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AssignmentAttachmentPayload>
+        }
+        deleteMany: {
+          args: Prisma.AssignmentAttachmentDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AssignmentAttachmentUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AssignmentAttachmentUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AssignmentAttachmentPayload>[]
+        }
+        upsert: {
+          args: Prisma.AssignmentAttachmentUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AssignmentAttachmentPayload>
+        }
+        aggregate: {
+          args: Prisma.AssignmentAttachmentAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAssignmentAttachment>
+        }
+        groupBy: {
+          args: Prisma.AssignmentAttachmentGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AssignmentAttachmentGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AssignmentAttachmentCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AssignmentAttachmentCountAggregateOutputType> | number
         }
       }
     }
@@ -3721,6 +3871,23 @@ export const CourseScalarFieldEnum = {
 export type CourseScalarFieldEnum = (typeof CourseScalarFieldEnum)[keyof typeof CourseScalarFieldEnum]
 
 
+export const LessonContentScalarFieldEnum = {
+  id: 'id',
+  lessonId: 'lessonId',
+  contentType: 'contentType',
+  textContent: 'textContent',
+  fileUrl: 'fileUrl',
+  originalName: 'originalName',
+  mimeType: 'mimeType',
+  sizeBytes: 'sizeBytes',
+  position: 'position',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type LessonContentScalarFieldEnum = (typeof LessonContentScalarFieldEnum)[keyof typeof LessonContentScalarFieldEnum]
+
+
 export const SectionScalarFieldEnum = {
   id: 'id',
   courseId: 'courseId',
@@ -3782,6 +3949,7 @@ export type LessonProgressScalarFieldEnum = (typeof LessonProgressScalarFieldEnu
 export const QuizScalarFieldEnum = {
   id: 'id',
   lessonId: 'lessonId',
+  sectionId: 'sectionId',
   title: 'title',
   description: 'description',
   passingScore: 'passingScore',
@@ -3800,6 +3968,7 @@ export const QuestionScalarFieldEnum = {
   quizId: 'quizId',
   text: 'text',
   explanation: 'explanation',
+  imageUrl: 'imageUrl',
   points: 'points',
   position: 'position',
   createdAt: 'createdAt',
@@ -3868,6 +4037,20 @@ export const AssignmentScalarFieldEnum = {
 } as const
 
 export type AssignmentScalarFieldEnum = (typeof AssignmentScalarFieldEnum)[keyof typeof AssignmentScalarFieldEnum]
+
+
+export const AssignmentAttachmentScalarFieldEnum = {
+  id: 'id',
+  assignmentId: 'assignmentId',
+  originalName: 'originalName',
+  storedName: 'storedName',
+  fileUrl: 'fileUrl',
+  mimeType: 'mimeType',
+  sizeBytes: 'sizeBytes',
+  createdAt: 'createdAt'
+} as const
+
+export type AssignmentAttachmentScalarFieldEnum = (typeof AssignmentAttachmentScalarFieldEnum)[keyof typeof AssignmentAttachmentScalarFieldEnum]
 
 
 export const AssignmentSubmissionScalarFieldEnum = {
@@ -4875,6 +5058,7 @@ export type GlobalOmitConfig = {
   auditLog?: Prisma.AuditLogOmit
   category?: Prisma.CategoryOmit
   course?: Prisma.CourseOmit
+  lessonContent?: Prisma.LessonContentOmit
   section?: Prisma.SectionOmit
   lesson?: Prisma.LessonOmit
   enrollment?: Prisma.EnrollmentOmit
@@ -4885,6 +5069,7 @@ export type GlobalOmitConfig = {
   quizAttempt?: Prisma.QuizAttemptOmit
   attemptAnswer?: Prisma.AttemptAnswerOmit
   assignment?: Prisma.AssignmentOmit
+  assignmentAttachment?: Prisma.AssignmentAttachmentOmit
   assignmentSubmission?: Prisma.AssignmentSubmissionOmit
   submissionFile?: Prisma.SubmissionFileOmit
   submissionFeedback?: Prisma.SubmissionFeedbackOmit

@@ -24,11 +24,11 @@ function linkClasses(path: string) { return ['group flex min-h-11 items-center g
       </button>
     </div>
     <div class="border-b border-slate-100 p-4 dark:border-slate-800 lg:p-5">
-      <div class="flex items-center gap-3 rounded-2xl bg-slate-50 p-3 dark:bg-slate-800/70">
+      <RouterLink to="/profile" class="flex items-center gap-3 rounded-2xl bg-slate-50 p-3 transition hover:bg-purple-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 dark:bg-slate-800/70 dark:hover:bg-purple-950/30" aria-label="Mở hồ sơ cá nhân" @click="emit('close')">
         <img v-if="auth.user?.avatarUrl" :src="auth.user.avatarUrl" alt="" class="h-11 w-11 shrink-0 rounded-xl object-cover">
         <div v-else class="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-violet-600 to-purple-600 text-sm font-extrabold text-white shadow-md shadow-purple-500/20">{{ auth.userInitials }}</div>
         <div class="min-w-0"><p class="truncate text-sm font-bold text-slate-900 dark:text-white">{{ auth.user?.fullName }}</p><p class="mt-0.5 truncate text-xs text-slate-500 dark:text-slate-400">{{ roleLabel }}</p></div>
-      </div>
+      </RouterLink>
     </div>
     <nav class="flex-1 space-y-1 overflow-y-auto p-3">
       <RouterLink v-for="item in items" :key="item.to" :to="item.to" :class="linkClasses(item.to)" @click="emit('close')">

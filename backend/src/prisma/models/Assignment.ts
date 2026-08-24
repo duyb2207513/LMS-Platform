@@ -286,6 +286,7 @@ export type AssignmentWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"Assignment"> | Date | string
   course?: Prisma.XOR<Prisma.CourseScalarRelationFilter, Prisma.CourseWhereInput>
   submissions?: Prisma.AssignmentSubmissionListRelationFilter
+  attachments?: Prisma.AssignmentAttachmentListRelationFilter
 }
 
 export type AssignmentOrderByWithRelationInput = {
@@ -304,6 +305,7 @@ export type AssignmentOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   course?: Prisma.CourseOrderByWithRelationInput
   submissions?: Prisma.AssignmentSubmissionOrderByRelationAggregateInput
+  attachments?: Prisma.AssignmentAttachmentOrderByRelationAggregateInput
 }
 
 export type AssignmentWhereUniqueInput = Prisma.AtLeast<{
@@ -325,6 +327,7 @@ export type AssignmentWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"Assignment"> | Date | string
   course?: Prisma.XOR<Prisma.CourseScalarRelationFilter, Prisma.CourseWhereInput>
   submissions?: Prisma.AssignmentSubmissionListRelationFilter
+  attachments?: Prisma.AssignmentAttachmentListRelationFilter
 }, "id">
 
 export type AssignmentOrderByWithAggregationInput = {
@@ -382,6 +385,7 @@ export type AssignmentCreateInput = {
   updatedAt?: Date | string
   course: Prisma.CourseCreateNestedOneWithoutAssignmentsInput
   submissions?: Prisma.AssignmentSubmissionCreateNestedManyWithoutAssignmentInput
+  attachments?: Prisma.AssignmentAttachmentCreateNestedManyWithoutAssignmentInput
 }
 
 export type AssignmentUncheckedCreateInput = {
@@ -399,6 +403,7 @@ export type AssignmentUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   submissions?: Prisma.AssignmentSubmissionUncheckedCreateNestedManyWithoutAssignmentInput
+  attachments?: Prisma.AssignmentAttachmentUncheckedCreateNestedManyWithoutAssignmentInput
 }
 
 export type AssignmentUpdateInput = {
@@ -416,6 +421,7 @@ export type AssignmentUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   course?: Prisma.CourseUpdateOneRequiredWithoutAssignmentsNestedInput
   submissions?: Prisma.AssignmentSubmissionUpdateManyWithoutAssignmentNestedInput
+  attachments?: Prisma.AssignmentAttachmentUpdateManyWithoutAssignmentNestedInput
 }
 
 export type AssignmentUncheckedUpdateInput = {
@@ -433,6 +439,7 @@ export type AssignmentUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   submissions?: Prisma.AssignmentSubmissionUncheckedUpdateManyWithoutAssignmentNestedInput
+  attachments?: Prisma.AssignmentAttachmentUncheckedUpdateManyWithoutAssignmentNestedInput
 }
 
 export type AssignmentCreateManyInput = {
@@ -597,6 +604,20 @@ export type AssignmentUncheckedUpdateManyWithoutCourseNestedInput = {
   deleteMany?: Prisma.AssignmentScalarWhereInput | Prisma.AssignmentScalarWhereInput[]
 }
 
+export type AssignmentCreateNestedOneWithoutAttachmentsInput = {
+  create?: Prisma.XOR<Prisma.AssignmentCreateWithoutAttachmentsInput, Prisma.AssignmentUncheckedCreateWithoutAttachmentsInput>
+  connectOrCreate?: Prisma.AssignmentCreateOrConnectWithoutAttachmentsInput
+  connect?: Prisma.AssignmentWhereUniqueInput
+}
+
+export type AssignmentUpdateOneRequiredWithoutAttachmentsNestedInput = {
+  create?: Prisma.XOR<Prisma.AssignmentCreateWithoutAttachmentsInput, Prisma.AssignmentUncheckedCreateWithoutAttachmentsInput>
+  connectOrCreate?: Prisma.AssignmentCreateOrConnectWithoutAttachmentsInput
+  upsert?: Prisma.AssignmentUpsertWithoutAttachmentsInput
+  connect?: Prisma.AssignmentWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AssignmentUpdateToOneWithWhereWithoutAttachmentsInput, Prisma.AssignmentUpdateWithoutAttachmentsInput>, Prisma.AssignmentUncheckedUpdateWithoutAttachmentsInput>
+}
+
 export type AssignmentCreateNestedOneWithoutSubmissionsInput = {
   create?: Prisma.XOR<Prisma.AssignmentCreateWithoutSubmissionsInput, Prisma.AssignmentUncheckedCreateWithoutSubmissionsInput>
   connectOrCreate?: Prisma.AssignmentCreateOrConnectWithoutSubmissionsInput
@@ -625,6 +646,7 @@ export type AssignmentCreateWithoutCourseInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   submissions?: Prisma.AssignmentSubmissionCreateNestedManyWithoutAssignmentInput
+  attachments?: Prisma.AssignmentAttachmentCreateNestedManyWithoutAssignmentInput
 }
 
 export type AssignmentUncheckedCreateWithoutCourseInput = {
@@ -641,6 +663,7 @@ export type AssignmentUncheckedCreateWithoutCourseInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   submissions?: Prisma.AssignmentSubmissionUncheckedCreateNestedManyWithoutAssignmentInput
+  attachments?: Prisma.AssignmentAttachmentUncheckedCreateNestedManyWithoutAssignmentInput
 }
 
 export type AssignmentCreateOrConnectWithoutCourseInput = {
@@ -688,6 +711,90 @@ export type AssignmentScalarWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"Assignment"> | Date | string
 }
 
+export type AssignmentCreateWithoutAttachmentsInput = {
+  id?: string
+  title: string
+  description?: string | null
+  instructions?: string | null
+  dueAt: Date | string
+  maxScore?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  allowResubmission?: boolean
+  maxSubmissions?: number
+  allowLateSubmissions?: boolean
+  isPublished?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  course: Prisma.CourseCreateNestedOneWithoutAssignmentsInput
+  submissions?: Prisma.AssignmentSubmissionCreateNestedManyWithoutAssignmentInput
+}
+
+export type AssignmentUncheckedCreateWithoutAttachmentsInput = {
+  id?: string
+  courseId: string
+  title: string
+  description?: string | null
+  instructions?: string | null
+  dueAt: Date | string
+  maxScore?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  allowResubmission?: boolean
+  maxSubmissions?: number
+  allowLateSubmissions?: boolean
+  isPublished?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  submissions?: Prisma.AssignmentSubmissionUncheckedCreateNestedManyWithoutAssignmentInput
+}
+
+export type AssignmentCreateOrConnectWithoutAttachmentsInput = {
+  where: Prisma.AssignmentWhereUniqueInput
+  create: Prisma.XOR<Prisma.AssignmentCreateWithoutAttachmentsInput, Prisma.AssignmentUncheckedCreateWithoutAttachmentsInput>
+}
+
+export type AssignmentUpsertWithoutAttachmentsInput = {
+  update: Prisma.XOR<Prisma.AssignmentUpdateWithoutAttachmentsInput, Prisma.AssignmentUncheckedUpdateWithoutAttachmentsInput>
+  create: Prisma.XOR<Prisma.AssignmentCreateWithoutAttachmentsInput, Prisma.AssignmentUncheckedCreateWithoutAttachmentsInput>
+  where?: Prisma.AssignmentWhereInput
+}
+
+export type AssignmentUpdateToOneWithWhereWithoutAttachmentsInput = {
+  where?: Prisma.AssignmentWhereInput
+  data: Prisma.XOR<Prisma.AssignmentUpdateWithoutAttachmentsInput, Prisma.AssignmentUncheckedUpdateWithoutAttachmentsInput>
+}
+
+export type AssignmentUpdateWithoutAttachmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  instructions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dueAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxScore?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  allowResubmission?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  maxSubmissions?: Prisma.IntFieldUpdateOperationsInput | number
+  allowLateSubmissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPublished?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  course?: Prisma.CourseUpdateOneRequiredWithoutAssignmentsNestedInput
+  submissions?: Prisma.AssignmentSubmissionUpdateManyWithoutAssignmentNestedInput
+}
+
+export type AssignmentUncheckedUpdateWithoutAttachmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  courseId?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  instructions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dueAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  maxScore?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  allowResubmission?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  maxSubmissions?: Prisma.IntFieldUpdateOperationsInput | number
+  allowLateSubmissions?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isPublished?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  submissions?: Prisma.AssignmentSubmissionUncheckedUpdateManyWithoutAssignmentNestedInput
+}
+
 export type AssignmentCreateWithoutSubmissionsInput = {
   id?: string
   title: string
@@ -702,6 +809,7 @@ export type AssignmentCreateWithoutSubmissionsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   course: Prisma.CourseCreateNestedOneWithoutAssignmentsInput
+  attachments?: Prisma.AssignmentAttachmentCreateNestedManyWithoutAssignmentInput
 }
 
 export type AssignmentUncheckedCreateWithoutSubmissionsInput = {
@@ -718,6 +826,7 @@ export type AssignmentUncheckedCreateWithoutSubmissionsInput = {
   isPublished?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  attachments?: Prisma.AssignmentAttachmentUncheckedCreateNestedManyWithoutAssignmentInput
 }
 
 export type AssignmentCreateOrConnectWithoutSubmissionsInput = {
@@ -750,6 +859,7 @@ export type AssignmentUpdateWithoutSubmissionsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   course?: Prisma.CourseUpdateOneRequiredWithoutAssignmentsNestedInput
+  attachments?: Prisma.AssignmentAttachmentUpdateManyWithoutAssignmentNestedInput
 }
 
 export type AssignmentUncheckedUpdateWithoutSubmissionsInput = {
@@ -766,6 +876,7 @@ export type AssignmentUncheckedUpdateWithoutSubmissionsInput = {
   isPublished?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  attachments?: Prisma.AssignmentAttachmentUncheckedUpdateManyWithoutAssignmentNestedInput
 }
 
 export type AssignmentCreateManyCourseInput = {
@@ -797,6 +908,7 @@ export type AssignmentUpdateWithoutCourseInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   submissions?: Prisma.AssignmentSubmissionUpdateManyWithoutAssignmentNestedInput
+  attachments?: Prisma.AssignmentAttachmentUpdateManyWithoutAssignmentNestedInput
 }
 
 export type AssignmentUncheckedUpdateWithoutCourseInput = {
@@ -813,6 +925,7 @@ export type AssignmentUncheckedUpdateWithoutCourseInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   submissions?: Prisma.AssignmentSubmissionUncheckedUpdateManyWithoutAssignmentNestedInput
+  attachments?: Prisma.AssignmentAttachmentUncheckedUpdateManyWithoutAssignmentNestedInput
 }
 
 export type AssignmentUncheckedUpdateManyWithoutCourseInput = {
@@ -837,10 +950,12 @@ export type AssignmentUncheckedUpdateManyWithoutCourseInput = {
 
 export type AssignmentCountOutputType = {
   submissions: number
+  attachments: number
 }
 
 export type AssignmentCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   submissions?: boolean | AssignmentCountOutputTypeCountSubmissionsArgs
+  attachments?: boolean | AssignmentCountOutputTypeCountAttachmentsArgs
 }
 
 /**
@@ -860,6 +975,13 @@ export type AssignmentCountOutputTypeCountSubmissionsArgs<ExtArgs extends runtim
   where?: Prisma.AssignmentSubmissionWhereInput
 }
 
+/**
+ * AssignmentCountOutputType without action
+ */
+export type AssignmentCountOutputTypeCountAttachmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AssignmentAttachmentWhereInput
+}
+
 
 export type AssignmentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -877,6 +999,7 @@ export type AssignmentSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   updatedAt?: boolean
   course?: boolean | Prisma.CourseDefaultArgs<ExtArgs>
   submissions?: boolean | Prisma.Assignment$submissionsArgs<ExtArgs>
+  attachments?: boolean | Prisma.Assignment$attachmentsArgs<ExtArgs>
   _count?: boolean | Prisma.AssignmentCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["assignment"]>
 
@@ -934,6 +1057,7 @@ export type AssignmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs
 export type AssignmentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   course?: boolean | Prisma.CourseDefaultArgs<ExtArgs>
   submissions?: boolean | Prisma.Assignment$submissionsArgs<ExtArgs>
+  attachments?: boolean | Prisma.Assignment$attachmentsArgs<ExtArgs>
   _count?: boolean | Prisma.AssignmentCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type AssignmentIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -948,6 +1072,7 @@ export type $AssignmentPayload<ExtArgs extends runtime.Types.Extensions.Internal
   objects: {
     course: Prisma.$CoursePayload<ExtArgs>
     submissions: Prisma.$AssignmentSubmissionPayload<ExtArgs>[]
+    attachments: Prisma.$AssignmentAttachmentPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1359,6 +1484,7 @@ export interface Prisma__AssignmentClient<T, Null = never, ExtArgs extends runti
   readonly [Symbol.toStringTag]: "PrismaPromise"
   course<T extends Prisma.CourseDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CourseDefaultArgs<ExtArgs>>): Prisma.Prisma__CourseClient<runtime.Types.Result.GetResult<Prisma.$CoursePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   submissions<T extends Prisma.Assignment$submissionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Assignment$submissionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AssignmentSubmissionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  attachments<T extends Prisma.Assignment$attachmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Assignment$attachmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AssignmentAttachmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1823,6 +1949,30 @@ export type Assignment$submissionsArgs<ExtArgs extends runtime.Types.Extensions.
   take?: number
   skip?: number
   distinct?: Prisma.AssignmentSubmissionScalarFieldEnum | Prisma.AssignmentSubmissionScalarFieldEnum[]
+}
+
+/**
+ * Assignment.attachments
+ */
+export type Assignment$attachmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AssignmentAttachment
+   */
+  select?: Prisma.AssignmentAttachmentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AssignmentAttachment
+   */
+  omit?: Prisma.AssignmentAttachmentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AssignmentAttachmentInclude<ExtArgs> | null
+  where?: Prisma.AssignmentAttachmentWhereInput
+  orderBy?: Prisma.AssignmentAttachmentOrderByWithRelationInput | Prisma.AssignmentAttachmentOrderByWithRelationInput[]
+  cursor?: Prisma.AssignmentAttachmentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AssignmentAttachmentScalarFieldEnum | Prisma.AssignmentAttachmentScalarFieldEnum[]
 }
 
 /**

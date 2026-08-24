@@ -13,7 +13,9 @@ const auth = useAuthStore()
 const api = useApi()
 const route = useRoute()
 const router = useRouter()
-const activeSection = ref<'profile' | 'password'>(route.query.section === 'password' ? 'password' : 'profile')
+type ProfileSection = 'profile' | 'password' | 'email'
+const initialSection: ProfileSection = route.query.section === 'password' ? 'password' : route.query.section === 'email' ? 'email' : 'profile'
+const activeSection = ref<ProfileSection>(initialSection)
 const firstName = ref('')
 const lastName = ref('')
 const phoneNumber = ref('')
@@ -27,10 +29,23 @@ const newPassword = ref('')
 const confirmNewPassword = ref('')
 const passwordMessage = ref('')
 const passwordError = ref('')
+const newEmail = ref('')
+const emailCurrentPassword = ref('')
+const newEmailError = ref('')
+const emailMessage = ref('')
+const emailError = ref('')
 
-function selectSection(section: 'profile' | 'password') {
+function selectSection(section: ProfileSection) {
   activeSection.value = section
-  void router.replace({ path: '/profile', query: section === 'password' ? { section: 'password' } : {} })
+  void router.replace({ path: '/profile', query: section === 'profile' ? {} : { section } })
+}
+
+function validateNewEmail() {
+  const mail = newEmail.value.trim().toLowerCase()
+  if (!mail) newEmailError.value = ''
+  else if (mail.endsWith('@example.com')) newEmailError.value = 'Không được sử dụng email có đuôi @example.com'
+  else if (mail === auth.user?.email.toLowerCase()) newEmailError.value = 'Email mới phải khác email hiện tại'
+  else newEmailError.value = ''
 }
 
 onMounted(async () => {
@@ -123,17 +138,36 @@ async function savePassword() {
     passwordError.value = cause instanceof Error ? cause.message : 'Không thể đổi mật khẩu'
   }
 }
+
+async function changeEmail() {
+  emailMessage.value = ''
+  emailError.value = ''
+  validateNewEmail()
+  if (newEmailError.value) return
+  try {
+    await api.post('/auth/change-email', {
+      newEmail: newEmail.value.trim().toLowerCase(),
+      currentPassword: emailCurrentPassword.value || undefined,
+    })
+    emailMessage.value = 'Đã gửi liên kết xác nhận đến địa chỉ email mới'
+    newEmail.value = ''
+    emailCurrentPassword.value = ''
+  } catch (cause) {
+    emailError.value = cause instanceof Error ? cause.message : 'Không thể đổi địa chỉ email'
+  }
+}
 </script>
 
 <template>
   <DefaultLayout>
     <main class="navbar-page">
       <h1 class="text-3xl font-black dark:text-white">Tài khoản của tôi</h1>
-      <p class="mt-2 text-slate-500">Quản lý hồ sơ cá nhân và mật khẩu tại cùng một nơi.</p>
+      <p class="mt-2 text-slate-500">Quản lý thông tin cá nhân, mật khẩu và địa chỉ email tại cùng một nơi.</p>
 
       <div class="mt-5 inline-flex border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
         <button type="button" :class="['px-3 py-2 text-xs font-bold transition', activeSection === 'profile' ? 'bg-violet-700 text-white' : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800']" @click="selectSection('profile')">Thông tin cá nhân</button>
         <button type="button" :class="['px-3 py-2 text-xs font-bold transition', activeSection === 'password' ? 'bg-violet-700 text-white' : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800']" @click="selectSection('password')">Đổi mật khẩu</button>
+        <button type="button" :class="['px-3 py-2 text-xs font-bold transition', activeSection === 'email' ? 'bg-violet-700 text-white' : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800']" @click="selectSection('email')">Đổi email</button>
       </div>
 
       <form v-if="activeSection === 'profile'" class="mt-3 space-y-4 border bg-white p-4 dark:border-slate-800 dark:bg-slate-900" @submit.prevent="save">
@@ -167,7 +201,7 @@ async function savePassword() {
         <BaseButton type="submit" :loading="saving">Lưu thay đổi</BaseButton>
       </form>
 
-      <form v-else class="mt-3 space-y-4 border bg-white p-4 dark:border-slate-800 dark:bg-slate-900" @submit.prevent="savePassword">
+      <form v-else-if="activeSection === 'password'" class="mt-3 space-y-4 border bg-white p-4 dark:border-slate-800 dark:bg-slate-900" @submit.prevent="savePassword">
         <div><h2 class="text-base font-black">Đổi mật khẩu</h2><p class="mt-1 text-xs text-slate-500">Mật khẩu mới phải có chữ hoa, chữ thường, số và tối thiểu 8 ký tự.</p></div>
         <BaseInput id="current-password" v-model="currentPassword" type="password" label="Mật khẩu hiện tại" autocomplete="current-password" required />
         <BaseInput id="new-password" v-model="newPassword" type="password" label="Mật khẩu mới" autocomplete="new-password" required />
@@ -175,6 +209,16 @@ async function savePassword() {
         <p v-if="passwordMessage" class="rounded-xl bg-emerald-50 p-3 text-sm font-semibold text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">{{ passwordMessage }}</p>
         <p v-if="passwordError" class="rounded-xl bg-red-50 p-3 text-sm font-semibold text-red-700 dark:bg-red-950 dark:text-red-300">{{ passwordError }}</p>
         <BaseButton type="submit" :loading="api.loading.value">Cập nhật mật khẩu</BaseButton>
+      </form>
+
+      <form v-else class="mt-3 space-y-4 border bg-white p-4 dark:border-slate-800 dark:bg-slate-900" @submit.prevent="changeEmail">
+        <div><h2 class="text-base font-black">Đổi địa chỉ email</h2><p class="mt-1 text-xs text-slate-500">Một liên kết xác nhận sẽ được gửi đến email mới trước khi thay đổi có hiệu lực.</p></div>
+        <BaseInput id="current-email" :model-value="auth.user?.email || ''" type="email" label="Email hiện tại" disabled />
+        <BaseInput id="new-email" v-model="newEmail" type="email" label="Email mới" placeholder="ban@gmail.com" :error="newEmailError" required @blur="validateNewEmail" @input="validateNewEmail" />
+        <BaseInput id="email-current-password" v-model="emailCurrentPassword" type="password" label="Mật khẩu hiện tại" hint="Không bắt buộc với tài khoản Google hoặc GitHub" autocomplete="current-password" />
+        <p v-if="emailMessage" class="bg-emerald-50 p-3 text-sm font-semibold text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">{{ emailMessage }}</p>
+        <p v-if="emailError" class="bg-red-50 p-3 text-sm font-semibold text-red-700 dark:bg-red-950 dark:text-red-300">{{ emailError }}</p>
+        <BaseButton type="submit" :loading="api.loading.value">Gửi email xác nhận</BaseButton>
       </form>
     </main>
   </DefaultLayout>

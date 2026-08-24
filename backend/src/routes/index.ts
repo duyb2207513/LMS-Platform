@@ -13,7 +13,7 @@ import { courseProgressRouter, lessonProgressRouter } from "../modules/progress/
 import { courseSectionsRouter, sectionsRouter } from "../modules/sections/sections.routes.js";
 import usersRouter from "../modules/users/users.routes.js";
 import { commentsRouter, lessonCommentsRouter } from "../modules/comments/comments.routes.js";
-import { lessonQuizzesRouter, optionsRouter, questionsRouter, quizAttemptsRouter, quizzesRouter } from "../modules/quizzes/quizzes.routes.js";
+import { lessonQuizzesRouter, optionsRouter, questionsRouter, quizAttemptsRouter, quizzesRouter, sectionQuizzesRouter } from "../modules/quizzes/quizzes.routes.js";
 import { courseReviewsRouter, reviewsRouter } from "../modules/reviews/reviews.routes.js";
 import certificatesRouter, { courseCertificatesRouter } from "../modules/certificates/certificates.routes.js";
 import ordersRouter from "../modules/orders/orders.routes.js";
@@ -25,11 +25,12 @@ import { adminRefundRouter, refundRouter } from "../modules/refunds/refund.route
 import instructorCommerceRouter from "../modules/earnings/earning.routes.js";
 import adminPayoutRouter from "../modules/payouts/payout.routes.js";
 import messagesRouter from "../modules/messages/messages.routes.js";
-import { assignmentsRouter, courseAssignmentsRouter, courseGradesRouter, submissionFilesRouter, submissionsRouter } from "../modules/assignments/assignments.routes.js";
+import { assignmentAttachmentsRouter, assignmentsRouter, courseAssignmentsRouter, courseGradesRouter, submissionFilesRouter, submissionsRouter } from "../modules/assignments/assignments.routes.js";
 import { announcementsRouter, courseAnnouncementsRouter } from "../modules/announcements/announcement.routes.js";
 import notificationsRouter from "../modules/notifications/notification.routes.js";
 import preferencesRouter from "../modules/notification-preferences/preference.routes.js";
 import aiRouter from "../modules/ai/ai.routes.js";
+import { lessonContentsByLessonRouter, lessonContentsRouter } from "../modules/lesson-contents/lesson-contents.routes.js";
 
 const router = Router();
 
@@ -54,11 +55,14 @@ router.use("/courses/:courseId/grades", courseGradesRouter);
 router.use("/courses/:courseId/announcements", courseAnnouncementsRouter);
 router.use("/courses", coursesRouter);
 router.use("/sections/:sectionId/lessons", sectionLessonsRouter);
+router.use("/sections/:sectionId/quizzes", sectionQuizzesRouter);
 router.use("/sections", sectionsRouter);
 router.use("/lessons/:lessonId/progress", lessonProgressRouter);
 router.use("/lessons/:lessonId/quizzes", lessonQuizzesRouter);
 router.use("/lessons/:lessonId/comments", lessonCommentsRouter);
+router.use("/lessons/:lessonId/contents", lessonContentsByLessonRouter);
 router.use("/lessons", lessonsRouter);
+router.use("/lesson-contents", lessonContentsRouter);
 router.use("/quizzes", quizzesRouter);
 router.use("/questions", questionsRouter);
 router.use("/options", optionsRouter);
@@ -66,6 +70,7 @@ router.use("/quiz-attempts", quizAttemptsRouter);
 router.use("/assignments", assignmentsRouter);
 router.use("/submissions", submissionsRouter);
 router.use("/submission-files", submissionFilesRouter);
+router.use("/assignment-attachments", assignmentAttachmentsRouter);
 router.use("/announcements", announcementsRouter);
 router.use("/notifications", notificationsRouter);
 router.use("/notification-preferences", preferencesRouter);

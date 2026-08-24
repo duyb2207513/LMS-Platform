@@ -16,6 +16,7 @@ import {
   archiveCourse,
   createCourse,
   deleteOrArchiveCourse,
+  getInstructorCourse,
   getPublicCourse,
   listInstructorCourses,
   listPublicCourses,
@@ -78,6 +79,17 @@ export async function listInstructorCoursesController(
   };
   const result = await listInstructorCourses(request.auth, query);
   sendSuccess(response, 200, "Instructor courses retrieved successfully", result);
+}
+
+export async function getInstructorCourseController(
+  request: Request,
+  response: Response
+): Promise<void> {
+  const course = await getInstructorCourse(
+    routeParameter(request, "courseId"),
+    request.auth
+  );
+  sendSuccess(response, 200, "Instructor course retrieved successfully", course);
 }
 
 export async function updateCourseController(
