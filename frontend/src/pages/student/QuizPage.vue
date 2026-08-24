@@ -116,6 +116,7 @@ onMounted(load);
                 >({{ question.points }} điểm)</span
               >
             </h2>
+            <img v-if="question.imageUrl" :src="question.imageUrl" :alt="question.text" class="mt-4 max-h-80 w-full border border-slate-200 object-contain dark:border-slate-700">
             <label
               v-for="option in question.options"
               :key="option.id"

@@ -3,7 +3,8 @@ import { authenticate } from "../../common/middlewares/authenticate.js";
 import { authorize } from "../../common/middlewares/authorize.js";
 import { validateRequest } from "../../common/middlewares/validateRequest.js";
 import { asyncHandler } from "../../common/utils/asyncHandler.js";
-import { createOptionController, createQuestionController, createQuizController, deleteOptionController, deleteQuestionController, deleteQuizController, getQuizController, listMyAttemptsController, startAttemptController, submitAttemptController, updateOptionController, updateQuestionController, updateQuizController } from "./quizzes.controller.js";
+import { uploadQuizQuestionImage } from "../../config/upload.js";
+import { createOptionController, createQuestionController, createQuizController, createSectionQuizController, deleteOptionController, deleteQuestionController, deleteQuestionImageController, deleteQuizController, getQuizController, listMyAttemptsController, startAttemptController, submitAttemptController, updateOptionController, updateQuestionController, updateQuizController, uploadQuestionImageController } from "./quizzes.controller.js";
 import { validateCreateOptionInput, validateCreateQuestionInput, validateCreateQuizInput, validateSubmitAttemptInput, validateUpdateOptionInput, validateUpdateQuestionInput, validateUpdateQuizInput } from "./quizzes.validation.js";
 
 const manage = [authenticate, authorize("INSTRUCTOR", "ADMIN")] as const;
@@ -20,6 +21,20 @@ export const lessonQuizzesRouter = Router({ mergeParams: true });
  *     responses: { 201: { description: Quiz created successfully }, 403: { description: Course ownership required }, 409: { description: Lesson already has a quiz } }
  */
 lessonQuizzesRouter.post("/", ...manage, validateRequest(validateCreateQuizInput), asyncHandler(createQuizController));
+
+export const sectionQuizzesRouter = Router({ mergeParams: true });
+/**
+ * @openapi
+ * /sections/{sectionId}/quizzes:
+ *   post:
+ *     summary: Create the completion quiz for a section
+ *     tags: [Quizzes]
+ *     security: [{ bearerAuth: [] }]
+ *     parameters: [{ in: path, name: sectionId, required: true, schema: { type: string, format: uuid } }]
+ *     requestBody: { required: true, content: { application/json: { schema: { $ref: '#/components/schemas/CreateQuizRequest' } } } }
+ *     responses: { 201: { description: Section quiz created }, 403: { description: Course ownership required }, 409: { description: Section already has a quiz } }
+ */
+sectionQuizzesRouter.post("/", ...manage, validateRequest(validateCreateQuizInput), asyncHandler(createSectionQuizController));
 
 export const quizzesRouter = Router();
 /**
@@ -103,6 +118,13 @@ export const questionsRouter = Router();
 questionsRouter.patch("/:questionId", ...manage, validateRequest(validateUpdateQuestionInput), asyncHandler(updateQuestionController));
 questionsRouter.delete("/:questionId", ...manage, asyncHandler(deleteQuestionController));
 questionsRouter.post("/:questionId/options", ...manage, validateRequest(validateCreateOptionInput), asyncHandler(createOptionController));
+/** @openapi
+ * /questions/{questionId}/image:
+ *   post: { summary: Upload or replace a quiz question image, tags: [Quiz questions], security: [{ bearerAuth: [] }], parameters: [{ in: path, name: questionId, required: true, schema: { type: string, format: uuid } }], requestBody: { required: true, content: { multipart/form-data: { schema: { type: object, required: [image], properties: { image: { type: string, format: binary } } } } } }, responses: { 200: { description: Image uploaded }, 400: { description: Invalid image or quiz already attempted } } }
+ *   delete: { summary: Remove a quiz question image, tags: [Quiz questions], security: [{ bearerAuth: [] }], parameters: [{ in: path, name: questionId, required: true, schema: { type: string, format: uuid } }], responses: { 204: { description: Image removed } } }
+ */
+questionsRouter.post("/:questionId/image",...manage,uploadQuizQuestionImage,asyncHandler(uploadQuestionImageController));
+questionsRouter.delete("/:questionId/image",...manage,asyncHandler(deleteQuestionImageController));
 
 export const optionsRouter = Router();
 /**

@@ -58,6 +58,7 @@ export const ModelName = {
   AuditLog: 'AuditLog',
   Category: 'Category',
   Course: 'Course',
+  LessonContent: 'LessonContent',
   Section: 'Section',
   Lesson: 'Lesson',
   Enrollment: 'Enrollment',
@@ -68,6 +69,7 @@ export const ModelName = {
   QuizAttempt: 'QuizAttempt',
   AttemptAnswer: 'AttemptAnswer',
   Assignment: 'Assignment',
+  AssignmentAttachment: 'AssignmentAttachment',
   AssignmentSubmission: 'AssignmentSubmission',
   SubmissionFile: 'SubmissionFile',
   SubmissionFeedback: 'SubmissionFeedback',
@@ -227,6 +229,23 @@ export const CourseScalarFieldEnum = {
 export type CourseScalarFieldEnum = (typeof CourseScalarFieldEnum)[keyof typeof CourseScalarFieldEnum]
 
 
+export const LessonContentScalarFieldEnum = {
+  id: 'id',
+  lessonId: 'lessonId',
+  contentType: 'contentType',
+  textContent: 'textContent',
+  fileUrl: 'fileUrl',
+  originalName: 'originalName',
+  mimeType: 'mimeType',
+  sizeBytes: 'sizeBytes',
+  position: 'position',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type LessonContentScalarFieldEnum = (typeof LessonContentScalarFieldEnum)[keyof typeof LessonContentScalarFieldEnum]
+
+
 export const SectionScalarFieldEnum = {
   id: 'id',
   courseId: 'courseId',
@@ -288,6 +307,7 @@ export type LessonProgressScalarFieldEnum = (typeof LessonProgressScalarFieldEnu
 export const QuizScalarFieldEnum = {
   id: 'id',
   lessonId: 'lessonId',
+  sectionId: 'sectionId',
   title: 'title',
   description: 'description',
   passingScore: 'passingScore',
@@ -306,6 +326,7 @@ export const QuestionScalarFieldEnum = {
   quizId: 'quizId',
   text: 'text',
   explanation: 'explanation',
+  imageUrl: 'imageUrl',
   points: 'points',
   position: 'position',
   createdAt: 'createdAt',
@@ -374,6 +395,20 @@ export const AssignmentScalarFieldEnum = {
 } as const
 
 export type AssignmentScalarFieldEnum = (typeof AssignmentScalarFieldEnum)[keyof typeof AssignmentScalarFieldEnum]
+
+
+export const AssignmentAttachmentScalarFieldEnum = {
+  id: 'id',
+  assignmentId: 'assignmentId',
+  originalName: 'originalName',
+  storedName: 'storedName',
+  fileUrl: 'fileUrl',
+  mimeType: 'mimeType',
+  sizeBytes: 'sizeBytes',
+  createdAt: 'createdAt'
+} as const
+
+export type AssignmentAttachmentScalarFieldEnum = (typeof AssignmentAttachmentScalarFieldEnum)[keyof typeof AssignmentAttachmentScalarFieldEnum]
 
 
 export const AssignmentSubmissionScalarFieldEnum = {

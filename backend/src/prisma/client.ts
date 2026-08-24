@@ -77,6 +77,11 @@ export type Category = Prisma.CategoryModel
  */
 export type Course = Prisma.CourseModel
 /**
+ * Model LessonContent
+ * 
+ */
+export type LessonContent = Prisma.LessonContentModel
+/**
  * Model Section
  * 
  */
@@ -126,6 +131,11 @@ export type AttemptAnswer = Prisma.AttemptAnswerModel
  * 
  */
 export type Assignment = Prisma.AssignmentModel
+/**
+ * Model AssignmentAttachment
+ * 
+ */
+export type AssignmentAttachment = Prisma.AssignmentAttachmentModel
 /**
  * Model AssignmentSubmission
  * 

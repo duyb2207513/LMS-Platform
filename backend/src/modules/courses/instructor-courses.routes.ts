@@ -3,7 +3,10 @@ import { authenticate } from "../../common/middlewares/authenticate.js";
 import { authorize } from "../../common/middlewares/authorize.js";
 import { validateQuery } from "../../common/middlewares/validateQuery.js";
 import { asyncHandler } from "../../common/utils/asyncHandler.js";
-import { listInstructorCoursesController } from "./courses.controller.js";
+import {
+  getInstructorCourseController,
+  listInstructorCoursesController
+} from "./courses.controller.js";
 import { validateInstructorCourseQuery } from "./courses.validation.js";
 
 const instructorCoursesRouter = Router();
@@ -38,6 +41,34 @@ instructorCoursesRouter.get(
   authorize("INSTRUCTOR", "ADMIN"),
   validateQuery(validateInstructorCourseQuery),
   asyncHandler(listInstructorCoursesController)
+);
+
+/**
+ * @openapi
+ * /instructor/courses/{courseId}:
+ *   get:
+ *     operationId: getInstructorCourse
+ *     summary: Get a course managed by the current instructor
+ *     description: Returns draft, published, or archived courses when the caller owns the course. Admins can access every course.
+ *     tags: [Courses]
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - { in: path, name: courseId, required: true, schema: { type: string, format: uuid } }
+ *     responses:
+ *       200:
+ *         description: Instructor course retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/CourseResponse' }
+ *       401: { description: Authentication required }
+ *       403: { description: Course ownership or role required }
+ *       404: { description: Course not found }
+ */
+instructorCoursesRouter.get(
+  "/courses/:courseId",
+  authenticate,
+  authorize("INSTRUCTOR", "ADMIN"),
+  asyncHandler(getInstructorCourseController)
 );
 
 export default instructorCoursesRouter;

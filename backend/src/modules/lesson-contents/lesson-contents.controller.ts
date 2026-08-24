@@ -1,0 +1,14 @@
+import { unlink } from "node:fs/promises"; import path from "node:path"; import type { Request, Response } from "express";
+import { AppError } from "../../common/errors/AppError.js"; import { sendSuccess } from "../../common/utils/response.js";
+import { deleteFromCloudinary, isCloudinaryConfigured, uploadFileToCloudinary } from "../../config/cloudinary.js";
+import { isValidStoredLessonFile, LESSON_FILE_DIRECTORY } from "../../config/upload.js";
+import type { LessonContentInput, ReorderLessonContentsInput, UpdateLessonContentInput } from "./lesson-contents.types.js";
+import { createLessonContent, deleteLessonContent, listLessonContents, reorderLessonContents, setLessonContentFile, updateLessonContent } from "./lesson-contents.service.js";
+const p=(r:Request,k:string)=>String(r.params[k]??"");
+async function remove(url:string|null){ if(!url)return; if(url.includes("cloudinary.com")){ await Promise.allSettled([deleteFromCloudinary(url,"raw"),deleteFromCloudinary(url,"video"),deleteFromCloudinary(url,"image")]); } else await unlink(path.join(LESSON_FILE_DIRECTORY,path.basename(url))).catch(()=>undefined); }
+export async function listController(r:Request,s:Response){sendSuccess(s,200,"Lesson contents retrieved successfully",await listLessonContents(p(r,"lessonId"),r.auth));}
+export async function createController(r:Request,s:Response){sendSuccess(s,201,"Lesson content created successfully",await createLessonContent(p(r,"lessonId"),r.auth,r.body as LessonContentInput));}
+export async function updateController(r:Request,s:Response){sendSuccess(s,200,"Lesson content updated successfully",await updateLessonContent(p(r,"contentId"),r.auth,r.body as UpdateLessonContentInput));}
+export async function reorderController(r:Request,s:Response){sendSuccess(s,200,"Lesson contents reordered successfully",await reorderLessonContents(p(r,"lessonId"),r.auth,r.body as ReorderLessonContentsInput));}
+export async function deleteController(r:Request,s:Response){await remove(await deleteLessonContent(p(r,"contentId"),r.auth));s.status(204).send();}
+export async function uploadController(r:Request,s:Response){if(!r.file)throw new AppError(400,"Content file is required"); if(!(await isValidStoredLessonFile(r.file.path,r.file.mimetype))){await unlink(r.file.path).catch(()=>undefined);throw new AppError(400,"Content file is invalid");} let url:string; if(isCloudinaryConfigured()){try{url=(await uploadFileToCloudinary(r.file.path,{folder:"lms/lesson-contents",resourceType:"auto"})).secure_url;}finally{await unlink(r.file.path).catch(()=>undefined);}}else url=`${r.protocol}://${r.get("host")}/uploads/lesson-files/${r.file.filename}`; try{const result=await setLessonContentFile(p(r,"contentId"),r.auth,url,r.file);await remove(result.previousUrl);sendSuccess(s,200,"Lesson content file uploaded successfully",result.content);}catch(error){if(!isCloudinaryConfigured())await unlink(r.file.path).catch(()=>undefined);throw error;}}

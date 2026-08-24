@@ -32,7 +32,6 @@ const groups = [
   {
     label: 'Tài khoản',
     items: [
-      { label: 'Hồ sơ của tôi', to: '/profile', icon: 'user' },
       { label: 'Bảo mật & thiết bị', to: '/security', icon: 'shield' },
     ],
   },
@@ -97,7 +96,7 @@ const linkClass = (path: string) => [
     </div>
 
     <div class="border-b border-slate-100 p-4 dark:border-slate-800" :class="collapsed ? 'lg:px-3 lg:py-4' : ''">
-      <div class="flex items-center gap-3 rounded-2xl bg-slate-50 p-3 dark:bg-slate-800" :class="collapsed ? 'lg:justify-center lg:p-2' : ''">
+      <RouterLink to="/profile" class="flex items-center gap-3 rounded-2xl bg-slate-50 p-3 transition hover:bg-violet-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 dark:bg-slate-800 dark:hover:bg-violet-950/30" :class="collapsed ? 'lg:justify-center lg:p-2' : ''" aria-label="Mở hồ sơ cá nhân" @click="emit('close')">
         <img v-if="auth.user?.avatarUrl" :src="assetUrl(auth.user.avatarUrl)" alt="" class="h-11 w-11 rounded-xl object-cover" />
         <span v-else class="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-violet-700 text-sm font-black text-white">{{ auth.userInitials }}</span>
         <div class="min-w-0" :class="collapsed ? 'lg:hidden' : ''">
@@ -105,7 +104,7 @@ const linkClass = (path: string) => [
           <p class="mt-0.5 truncate text-xs text-slate-500">{{ auth.user?.email }}</p>
           <span class="mt-2 inline-flex rounded-full bg-violet-100 px-2 py-0.5 text-[10px] font-black text-violet-700 dark:bg-violet-950 dark:text-violet-300">HỌC VIÊN</span>
         </div>
-      </div>
+      </RouterLink>
     </div>
 
     <nav class="flex-1 space-y-5 overflow-y-auto overflow-x-hidden p-3">

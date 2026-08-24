@@ -2,7 +2,6 @@
 import { computed, onMounted, ref } from "vue";
 import DefaultLayout from "@/layouts/DefaultLayout.vue";
 import BaseButton from "@/components/ui/BaseButton.vue";
-import BaseInput from "@/components/ui/BaseInput.vue";
 import BaseModal from "@/components/ui/BaseModal.vue";
 import { useApi } from "@/composables/useApi";
 import { useAuthStore } from "@/stores/auth";
@@ -11,25 +10,12 @@ import type { ApiResponse, AuthSession } from "@/types";
 const api = useApi(),
   auth = useAuthStore(),
   sessions = ref<AuthSession[]>([]),
-  newEmail = ref(""),
-  currentPassword = ref(""),
   message = ref(""),
   error = ref(""),
-  newEmailError = ref(""),
   revokeTarget = ref<AuthSession | null>(null);
 const otherSessions = computed(
   () => sessions.value.filter((session) => !session.isCurrent).length,
 );
-function validateNewEmail() {
-  const mail = newEmail.value.trim().toLowerCase();
-  if (!mail) {
-    newEmailError.value = "";
-  } else if (mail.endsWith("@example.com")) {
-    newEmailError.value = "Không được sử dụng email có đuôi @example.com";
-  } else {
-    newEmailError.value = "";
-  }
-}
 function deviceName(userAgent: string | null) {
   if (!userAgent) return "Thiết bị không xác định";
   const browser = userAgent.includes("Edg/")
@@ -58,24 +44,6 @@ async function loadSessions() {
   } catch (cause) {
     error.value =
       cause instanceof Error ? cause.message : "Không thể tải phiên đăng nhập";
-  }
-}
-async function changeEmail() {
-  error.value = "";
-  message.value = "";
-  validateNewEmail();
-  if (newEmailError.value) return;
-  try {
-    await api.post("/auth/change-email", {
-      newEmail: newEmail.value.trim(),
-      currentPassword: currentPassword.value || undefined,
-    });
-    message.value = "Đã gửi liên kết xác nhận đến email mới.";
-    newEmail.value = "";
-    currentPassword.value = "";
-  } catch (cause) {
-    error.value =
-      cause instanceof Error ? cause.message : "Không thể đổi email";
   }
 }
 async function revoke(session: AuthSession) {
@@ -114,9 +82,9 @@ onMounted(loadSessions);
         <p class="text-sm font-bold uppercase tracking-wider text-purple-600">
           Tài khoản
         </p>
-        <h1 class="app-page-title mt-2">Bảo mật và phiên đăng nhập</h1>
+        <h1 class="app-page-title mt-2">Thiết bị đăng nhập</h1>
         <p class="app-page-description">
-          Quản lý email và những thiết bị đang truy cập tài khoản.
+          Xem và quản lý những thiết bị đang truy cập tài khoản.
         </p>
       </header>
       <p
@@ -131,40 +99,7 @@ onMounted(loadSessions);
       >
         {{ error }}
       </p>
-      <section class="surface-card mt-4 p-4">
-        <h2 class="text-base font-black">Đổi địa chỉ email</h2>
-        <p class="mt-1 text-xs text-slate-500">
-          Email hiện tại: <b>{{ auth.user?.email }}</b>
-        </p>
-        <form
-          class="mt-5 grid gap-4 sm:grid-cols-2"
-          @submit.prevent="changeEmail"
-        >
-          <BaseInput
-            id="new-email"
-            v-model="newEmail"
-            type="email"
-            label="Email mới"
-            placeholder="ban@gmail.com"
-            :error="newEmailError"
-            required
-            @blur="validateNewEmail"
-            @input="validateNewEmail"
-          /><BaseInput
-            id="email-password"
-            v-model="currentPassword"
-            type="password"
-            label="Mật khẩu hiện tại"
-            hint="Không bắt buộc với tài khoản Google / GitHub"
-          />
-          <div class="sm:col-span-2">
-            <BaseButton type="submit" :loading="api.loading.value"
-              >Gửi email xác nhận</BaseButton
-            >
-          </div>
-        </form>
-      </section>
-      <section class="surface-card mt-6 overflow-hidden">
+      <section class="surface-card mt-4 overflow-hidden">
         <header
           class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 p-4 dark:border-slate-800"
         >

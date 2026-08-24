@@ -41,6 +41,7 @@ export type QuestionMinAggregateOutputType = {
   quizId: string | null
   text: string | null
   explanation: string | null
+  imageUrl: string | null
   points: number | null
   position: number | null
   createdAt: Date | null
@@ -52,6 +53,7 @@ export type QuestionMaxAggregateOutputType = {
   quizId: string | null
   text: string | null
   explanation: string | null
+  imageUrl: string | null
   points: number | null
   position: number | null
   createdAt: Date | null
@@ -63,6 +65,7 @@ export type QuestionCountAggregateOutputType = {
   quizId: number
   text: number
   explanation: number
+  imageUrl: number
   points: number
   position: number
   createdAt: number
@@ -86,6 +89,7 @@ export type QuestionMinAggregateInputType = {
   quizId?: true
   text?: true
   explanation?: true
+  imageUrl?: true
   points?: true
   position?: true
   createdAt?: true
@@ -97,6 +101,7 @@ export type QuestionMaxAggregateInputType = {
   quizId?: true
   text?: true
   explanation?: true
+  imageUrl?: true
   points?: true
   position?: true
   createdAt?: true
@@ -108,6 +113,7 @@ export type QuestionCountAggregateInputType = {
   quizId?: true
   text?: true
   explanation?: true
+  imageUrl?: true
   points?: true
   position?: true
   createdAt?: true
@@ -206,6 +212,7 @@ export type QuestionGroupByOutputType = {
   quizId: string
   text: string
   explanation: string | null
+  imageUrl: string | null
   points: number
   position: number
   createdAt: Date
@@ -240,6 +247,7 @@ export type QuestionWhereInput = {
   quizId?: Prisma.UuidFilter<"Question"> | string
   text?: Prisma.StringFilter<"Question"> | string
   explanation?: Prisma.StringNullableFilter<"Question"> | string | null
+  imageUrl?: Prisma.StringNullableFilter<"Question"> | string | null
   points?: Prisma.IntFilter<"Question"> | number
   position?: Prisma.IntFilter<"Question"> | number
   createdAt?: Prisma.DateTimeFilter<"Question"> | Date | string
@@ -254,6 +262,7 @@ export type QuestionOrderByWithRelationInput = {
   quizId?: Prisma.SortOrder
   text?: Prisma.SortOrder
   explanation?: Prisma.SortOrderInput | Prisma.SortOrder
+  imageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   points?: Prisma.SortOrder
   position?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -271,6 +280,7 @@ export type QuestionWhereUniqueInput = Prisma.AtLeast<{
   quizId?: Prisma.UuidFilter<"Question"> | string
   text?: Prisma.StringFilter<"Question"> | string
   explanation?: Prisma.StringNullableFilter<"Question"> | string | null
+  imageUrl?: Prisma.StringNullableFilter<"Question"> | string | null
   points?: Prisma.IntFilter<"Question"> | number
   position?: Prisma.IntFilter<"Question"> | number
   createdAt?: Prisma.DateTimeFilter<"Question"> | Date | string
@@ -285,6 +295,7 @@ export type QuestionOrderByWithAggregationInput = {
   quizId?: Prisma.SortOrder
   text?: Prisma.SortOrder
   explanation?: Prisma.SortOrderInput | Prisma.SortOrder
+  imageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   points?: Prisma.SortOrder
   position?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -304,6 +315,7 @@ export type QuestionScalarWhereWithAggregatesInput = {
   quizId?: Prisma.UuidWithAggregatesFilter<"Question"> | string
   text?: Prisma.StringWithAggregatesFilter<"Question"> | string
   explanation?: Prisma.StringNullableWithAggregatesFilter<"Question"> | string | null
+  imageUrl?: Prisma.StringNullableWithAggregatesFilter<"Question"> | string | null
   points?: Prisma.IntWithAggregatesFilter<"Question"> | number
   position?: Prisma.IntWithAggregatesFilter<"Question"> | number
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Question"> | Date | string
@@ -314,6 +326,7 @@ export type QuestionCreateInput = {
   id?: string
   text: string
   explanation?: string | null
+  imageUrl?: string | null
   points?: number
   position: number
   createdAt?: Date | string
@@ -328,6 +341,7 @@ export type QuestionUncheckedCreateInput = {
   quizId: string
   text: string
   explanation?: string | null
+  imageUrl?: string | null
   points?: number
   position: number
   createdAt?: Date | string
@@ -340,6 +354,7 @@ export type QuestionUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   text?: Prisma.StringFieldUpdateOperationsInput | string
   explanation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   points?: Prisma.IntFieldUpdateOperationsInput | number
   position?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -354,6 +369,7 @@ export type QuestionUncheckedUpdateInput = {
   quizId?: Prisma.StringFieldUpdateOperationsInput | string
   text?: Prisma.StringFieldUpdateOperationsInput | string
   explanation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   points?: Prisma.IntFieldUpdateOperationsInput | number
   position?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -367,6 +383,7 @@ export type QuestionCreateManyInput = {
   quizId: string
   text: string
   explanation?: string | null
+  imageUrl?: string | null
   points?: number
   position: number
   createdAt?: Date | string
@@ -377,6 +394,7 @@ export type QuestionUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   text?: Prisma.StringFieldUpdateOperationsInput | string
   explanation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   points?: Prisma.IntFieldUpdateOperationsInput | number
   position?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -388,6 +406,7 @@ export type QuestionUncheckedUpdateManyInput = {
   quizId?: Prisma.StringFieldUpdateOperationsInput | string
   text?: Prisma.StringFieldUpdateOperationsInput | string
   explanation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   points?: Prisma.IntFieldUpdateOperationsInput | number
   position?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -409,6 +428,7 @@ export type QuestionCountOrderByAggregateInput = {
   quizId?: Prisma.SortOrder
   text?: Prisma.SortOrder
   explanation?: Prisma.SortOrder
+  imageUrl?: Prisma.SortOrder
   points?: Prisma.SortOrder
   position?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -425,6 +445,7 @@ export type QuestionMaxOrderByAggregateInput = {
   quizId?: Prisma.SortOrder
   text?: Prisma.SortOrder
   explanation?: Prisma.SortOrder
+  imageUrl?: Prisma.SortOrder
   points?: Prisma.SortOrder
   position?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -436,6 +457,7 @@ export type QuestionMinOrderByAggregateInput = {
   quizId?: Prisma.SortOrder
   text?: Prisma.SortOrder
   explanation?: Prisma.SortOrder
+  imageUrl?: Prisma.SortOrder
   points?: Prisma.SortOrder
   position?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -526,6 +548,7 @@ export type QuestionCreateWithoutQuizInput = {
   id?: string
   text: string
   explanation?: string | null
+  imageUrl?: string | null
   points?: number
   position: number
   createdAt?: Date | string
@@ -538,6 +561,7 @@ export type QuestionUncheckedCreateWithoutQuizInput = {
   id?: string
   text: string
   explanation?: string | null
+  imageUrl?: string | null
   points?: number
   position: number
   createdAt?: Date | string
@@ -580,6 +604,7 @@ export type QuestionScalarWhereInput = {
   quizId?: Prisma.UuidFilter<"Question"> | string
   text?: Prisma.StringFilter<"Question"> | string
   explanation?: Prisma.StringNullableFilter<"Question"> | string | null
+  imageUrl?: Prisma.StringNullableFilter<"Question"> | string | null
   points?: Prisma.IntFilter<"Question"> | number
   position?: Prisma.IntFilter<"Question"> | number
   createdAt?: Prisma.DateTimeFilter<"Question"> | Date | string
@@ -590,6 +615,7 @@ export type QuestionCreateWithoutOptionsInput = {
   id?: string
   text: string
   explanation?: string | null
+  imageUrl?: string | null
   points?: number
   position: number
   createdAt?: Date | string
@@ -603,6 +629,7 @@ export type QuestionUncheckedCreateWithoutOptionsInput = {
   quizId: string
   text: string
   explanation?: string | null
+  imageUrl?: string | null
   points?: number
   position: number
   createdAt?: Date | string
@@ -630,6 +657,7 @@ export type QuestionUpdateWithoutOptionsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   text?: Prisma.StringFieldUpdateOperationsInput | string
   explanation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   points?: Prisma.IntFieldUpdateOperationsInput | number
   position?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -643,6 +671,7 @@ export type QuestionUncheckedUpdateWithoutOptionsInput = {
   quizId?: Prisma.StringFieldUpdateOperationsInput | string
   text?: Prisma.StringFieldUpdateOperationsInput | string
   explanation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   points?: Prisma.IntFieldUpdateOperationsInput | number
   position?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -654,6 +683,7 @@ export type QuestionCreateWithoutAnswersInput = {
   id?: string
   text: string
   explanation?: string | null
+  imageUrl?: string | null
   points?: number
   position: number
   createdAt?: Date | string
@@ -667,6 +697,7 @@ export type QuestionUncheckedCreateWithoutAnswersInput = {
   quizId: string
   text: string
   explanation?: string | null
+  imageUrl?: string | null
   points?: number
   position: number
   createdAt?: Date | string
@@ -694,6 +725,7 @@ export type QuestionUpdateWithoutAnswersInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   text?: Prisma.StringFieldUpdateOperationsInput | string
   explanation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   points?: Prisma.IntFieldUpdateOperationsInput | number
   position?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -707,6 +739,7 @@ export type QuestionUncheckedUpdateWithoutAnswersInput = {
   quizId?: Prisma.StringFieldUpdateOperationsInput | string
   text?: Prisma.StringFieldUpdateOperationsInput | string
   explanation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   points?: Prisma.IntFieldUpdateOperationsInput | number
   position?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -718,6 +751,7 @@ export type QuestionCreateManyQuizInput = {
   id?: string
   text: string
   explanation?: string | null
+  imageUrl?: string | null
   points?: number
   position: number
   createdAt?: Date | string
@@ -728,6 +762,7 @@ export type QuestionUpdateWithoutQuizInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   text?: Prisma.StringFieldUpdateOperationsInput | string
   explanation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   points?: Prisma.IntFieldUpdateOperationsInput | number
   position?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -740,6 +775,7 @@ export type QuestionUncheckedUpdateWithoutQuizInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   text?: Prisma.StringFieldUpdateOperationsInput | string
   explanation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   points?: Prisma.IntFieldUpdateOperationsInput | number
   position?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -752,6 +788,7 @@ export type QuestionUncheckedUpdateManyWithoutQuizInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   text?: Prisma.StringFieldUpdateOperationsInput | string
   explanation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   points?: Prisma.IntFieldUpdateOperationsInput | number
   position?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -803,6 +840,7 @@ export type QuestionSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   quizId?: boolean
   text?: boolean
   explanation?: boolean
+  imageUrl?: boolean
   points?: boolean
   position?: boolean
   createdAt?: boolean
@@ -818,6 +856,7 @@ export type QuestionSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   quizId?: boolean
   text?: boolean
   explanation?: boolean
+  imageUrl?: boolean
   points?: boolean
   position?: boolean
   createdAt?: boolean
@@ -830,6 +869,7 @@ export type QuestionSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   quizId?: boolean
   text?: boolean
   explanation?: boolean
+  imageUrl?: boolean
   points?: boolean
   position?: boolean
   createdAt?: boolean
@@ -842,13 +882,14 @@ export type QuestionSelectScalar = {
   quizId?: boolean
   text?: boolean
   explanation?: boolean
+  imageUrl?: boolean
   points?: boolean
   position?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type QuestionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "quizId" | "text" | "explanation" | "points" | "position" | "createdAt" | "updatedAt", ExtArgs["result"]["question"]>
+export type QuestionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "quizId" | "text" | "explanation" | "imageUrl" | "points" | "position" | "createdAt" | "updatedAt", ExtArgs["result"]["question"]>
 export type QuestionInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   quiz?: boolean | Prisma.QuizDefaultArgs<ExtArgs>
   options?: boolean | Prisma.Question$optionsArgs<ExtArgs>
@@ -874,6 +915,7 @@ export type $QuestionPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     quizId: string
     text: string
     explanation: string | null
+    imageUrl: string | null
     points: number
     position: number
     createdAt: Date
@@ -1308,6 +1350,7 @@ export interface QuestionFieldRefs {
   readonly quizId: Prisma.FieldRef<"Question", 'String'>
   readonly text: Prisma.FieldRef<"Question", 'String'>
   readonly explanation: Prisma.FieldRef<"Question", 'String'>
+  readonly imageUrl: Prisma.FieldRef<"Question", 'String'>
   readonly points: Prisma.FieldRef<"Question", 'Int'>
   readonly position: Prisma.FieldRef<"Question", 'Int'>
   readonly createdAt: Prisma.FieldRef<"Question", 'DateTime'>

@@ -14,11 +14,15 @@ export const LESSON_FILE_MAX_SIZE = 100 * 1024 * 1024;
 export const SUBMISSION_FILE_DIRECTORY = path.resolve("uploads", "submissions");
 export const SUBMISSION_FILE_MAX_SIZE = 20 * 1024 * 1024;
 export const SUBMISSION_TOTAL_MAX_SIZE = 50 * 1024 * 1024;
+export const QUIZ_IMAGE_DIRECTORY = path.resolve("uploads", "quiz-images");
+export const ASSIGNMENT_ATTACHMENT_DIRECTORY = path.resolve("uploads", "assignment-attachments");
 
 mkdirSync(COURSE_THUMBNAIL_DIRECTORY, { recursive: true });
 mkdirSync(AVATAR_DIRECTORY, { recursive: true });
 mkdirSync(LESSON_FILE_DIRECTORY, { recursive: true });
 mkdirSync(SUBMISSION_FILE_DIRECTORY, { recursive: true });
+mkdirSync(QUIZ_IMAGE_DIRECTORY, { recursive: true });
+mkdirSync(ASSIGNMENT_ATTACHMENT_DIRECTORY, { recursive: true });
 
 const allowedMimeTypes = new Map([
   ["image/jpeg", ".jpg"],
@@ -247,3 +251,37 @@ export async function isValidStoredSubmissionFile(filePath: string, mimeType: st
     await handle.close();
   }
 }
+
+function imageUpload(directory: string, field: string) {
+  return multer({
+    storage: multer.diskStorage({ destination: directory, filename: (_request, file, callback) => callback(null, `${randomUUID()}${allowedMimeTypes.get(file.mimetype) ?? ""}`) }),
+    limits: { fileSize: COURSE_THUMBNAIL_MAX_SIZE, files: 1 },
+    fileFilter: (_request, file, callback) => allowedMimeTypes.has(file.mimetype) ? callback(null, true) : callback(new AppError(400, "Image must be JPG, PNG, or WebP"))
+  }).single(field);
+}
+
+const quizImageUpload = imageUpload(QUIZ_IMAGE_DIRECTORY, "image");
+export const uploadQuizQuestionImage: import("express").RequestHandler = (request, response, next) => {
+  quizImageUpload(request, response, error => {
+    if (!error) return next();
+    if (error instanceof AppError) return next(error);
+    if (error instanceof multer.MulterError && error.code === "LIMIT_FILE_SIZE") return next(new AppError(400, "Question image must not exceed 5 MB"));
+    next(new AppError(400, "Invalid question image upload"));
+  });
+};
+
+const assignmentAttachmentUpload = multer({
+  storage: multer.diskStorage({ destination: ASSIGNMENT_ATTACHMENT_DIRECTORY, filename: (_request, file, callback) => callback(null, `${randomUUID()}${allowedSubmissionMimeTypes.get(file.mimetype) ?? ""}`) }),
+  limits: { fileSize: SUBMISSION_FILE_MAX_SIZE, files: 5 },
+  fileFilter: (_request, file, callback) => allowedSubmissionMimeTypes.has(file.mimetype) ? callback(null, true) : callback(new AppError(400, "Assignment attachments must be images, PDF, TXT, Word, Excel, or ZIP"))
+}).array("files", 5);
+
+export const uploadAssignmentAttachments: import("express").RequestHandler = (request, response, next) => {
+  assignmentAttachmentUpload(request, response, error => {
+    if (!error) return next();
+    if (error instanceof AppError) return next(error);
+    if (error instanceof multer.MulterError && error.code === "LIMIT_FILE_SIZE") return next(new AppError(400, "Each assignment attachment must not exceed 20 MB"));
+    if (error instanceof multer.MulterError && error.code === "LIMIT_FILE_COUNT") return next(new AppError(400, "An assignment accepts at most 5 attachments per upload"));
+    next(new AppError(400, "Invalid assignment attachment upload"));
+  });
+};

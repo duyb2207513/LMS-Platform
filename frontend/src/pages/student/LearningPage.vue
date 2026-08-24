@@ -18,6 +18,8 @@ import {
   ChevronRight,
   ClipboardList,
   FileText,
+  LockKeyhole,
+  ListChecks,
   Menu,
   Megaphone,
   PanelLeftClose,
@@ -45,15 +47,9 @@ const nextLesson = computed(() => lessonIndex.value >= 0 ? lessons.value[lessonI
 const selectedSection = computed(() => content.value?.sections.find((section) => section.lessons.some((lesson) => lesson.id === selected.value?.id)))
 const asset = (url: string | null) => !url ? '' : url.startsWith('http') ? url : `${API_BASE_URL.replace('/api/v1', '')}${url}`
 const lessonTypeLabel = (type: Lesson['lessonType']) => ({ TEXT: 'Bài đọc', VIDEO: 'Video', DOCUMENT: 'Tài liệu' }[type])
-const docType = computed(() => {
-  if (selected.value?.lessonType !== 'DOCUMENT' || !selected.value.documentUrl) return '';
-  const url = selected.value.documentUrl.toLowerCase();
-  if (url.endsWith('.pdf')) return 'pdf';
-  if (url.endsWith('.pptx') || url.endsWith('.ppt')) return 'pptx';
-  if (url.endsWith('.docx') || url.endsWith('.doc')) return 'docx';
-  return '';
-})
-
+const lessonBlocks = computed(() => selected.value?.contents?.length ? selected.value.contents : selected.value ? [{ id: `legacy-${selected.value.id}`, lessonId: selected.value.id, contentType: selected.value.lessonType, textContent: selected.value.content, fileUrl: selected.value.lessonType === 'VIDEO' ? selected.value.videoUrl : selected.value.documentUrl, originalName: null, mimeType: null, sizeBytes: null, position: 1, createdAt: '', updatedAt: '' }] : [])
+const docTypeFor = (url: string | null) => { const value=(url||'').toLowerCase(); if(value.endsWith('.pdf'))return 'pdf';if(value.endsWith('.pptx')||value.endsWith('.ppt'))return 'pptx';if(value.endsWith('.docx')||value.endsWith('.doc'))return 'docx';return '' }
+const sectionQuizUnlocked = (section: CourseContent['sections'][number]) => section.lessons.filter(lesson => lesson.isPublished && lesson.isRequired).every(lesson => lesson.progress?.isCompleted)
 async function load() {
   try {
     const selectedId = selected.value?.id
@@ -91,10 +87,10 @@ async function send() {
 }
 
 async function remove(id: string) { await api.del(`/comments/${id}`); await loadComments() }
-const renderedContent = computed(() => {
-  if (!selected.value?.content) return ''
+const renderText = (content: string | null) => {
+  if (!content) return ''
   // Escape HTML to prevent XSS
-  let textVal = selected.value.content
+  let textVal = content
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
@@ -103,9 +99,13 @@ const renderedContent = computed(() => {
   textVal = textVal.replace(/\[image:(.+?)\]/g, (_, url) => {
     return `<img src="${asset(url)}" alt="Sơ đồ cây quyết định" class="my-6 max-w-full rounded-2xl border border-slate-200 shadow-sm dark:border-slate-800" />`
   })
-
-  return textVal
-})
+  return textVal.split('\n').map(line => {
+    const heading = /^(#{1,5})\s+(.+)$/.exec(line.trim())
+    if (heading) { const level = heading[1]!.length; return `<h${level}>${heading[2]}</h${level}>` }
+    if (line.includes('<img ')) return line
+    return line.trim() ? `<p>${line}</p>` : '<br>'
+  }).join('')
+}
 
 watch(() => selected.value?.id, () => void loadComments())
 onMounted(load)
@@ -147,6 +147,8 @@ onMounted(load)
               <span :class="['lesson-state', lesson.progress?.isCompleted ? 'lesson-state--done' : '']"><Check v-if="lesson.progress?.isCompleted" :size="14" /><template v-else>{{ lesson.position }}</template></span>
               <span class="min-w-0 flex-1"><span class="line-clamp-2 font-semibold">{{ lesson.title }}</span><span class="mt-1 block text-[11px] opacity-65">{{ lessonTypeLabel(lesson.lessonType) }}<template v-if="lesson.durationSeconds"> · {{ Math.ceil(lesson.durationSeconds / 60) }} phút</template></span></span>
             </button>
+            <RouterLink v-if="section.quiz && sectionQuizUnlocked(section)" :to="{ path: `/quiz/${section.quiz.id}`, query: { courseId } }" class="section-quiz-link"><span class="lesson-state section-quiz-state"><ListChecks :size="14" /></span><span class="min-w-0 flex-1"><b class="block text-sm">Quiz cuối chương</b><small>{{ section.quiz.title }}</small></span><ChevronRight :size="15" /></RouterLink>
+            <div v-else-if="section.quiz" class="section-quiz-link section-quiz-link--locked"><span class="lesson-state"><LockKeyhole :size="13" /></span><span class="min-w-0 flex-1"><b class="block text-sm">Quiz cuối chương</b><small>Hoàn thành các bài bắt buộc để mở khóa</small></span></div>
           </section>
 
           <section class="mt-6 border-t border-slate-200 pt-4 dark:border-slate-800">
@@ -195,16 +197,17 @@ onMounted(load)
           <p v-else-if="error" class="rounded-2xl bg-red-50 p-4 text-red-700 dark:bg-red-950/30 dark:text-red-300">{{ error }}</p>
           <template v-else-if="selected">
             <div class="mb-6"><p class="text-xs font-extrabold uppercase tracking-[0.14em] text-purple-600 dark:text-purple-400">{{ lessonTypeLabel(selected.lessonType) }} · Bài {{ lessonIndex + 1 }}/{{ lessons.length }}</p><h1 class="mt-2 text-3xl font-black tracking-tight sm:text-4xl">{{ selected.title }}</h1></div>
-            <section class="viewer-shell" :class="selected.lessonType === 'TEXT' ? 'viewer-shell--text' : ''">
-              <article v-if="selected.lessonType === 'TEXT'" class="lesson-prose whitespace-pre-line" v-html="renderedContent" />
-              <video v-else-if="selected.lessonType === 'VIDEO' && selected.videoUrl" :src="asset(selected.videoUrl)" controls class="max-h-[70vh] w-full bg-black" />
-              <div v-else-if="selected.lessonType === 'DOCUMENT' && selected.documentUrl" class="h-[70vh] min-h-[520px] w-full overflow-hidden bg-white">
-                <VueOfficePdf v-if="docType === 'pdf'" :src="asset(selected.documentUrl)" class="h-full w-full" />
-                <VueOfficePptx v-else-if="docType === 'pptx'" :src="asset(selected.documentUrl)" class="h-full w-full" />
-                <VueOfficeDocx v-else-if="docType === 'docx'" :src="asset(selected.documentUrl)" class="h-full w-full" />
-                <iframe v-else :src="asset(selected.documentUrl)" class="h-full w-full" title="Tài liệu bài học" />
-              </div>
-              <div v-else class="grid min-h-72 place-items-center p-8 text-center"><div><FileText :size="42" class="mx-auto text-slate-400" /><p class="mt-3 font-bold">Nội dung đang được cập nhật</p><p class="mt-1 text-sm text-slate-500">Giảng viên chưa tải nội dung cho bài học này.</p></div></div>
+            <section class="space-y-5">
+              <article v-for="(block,blockIndex) in lessonBlocks" :key="block.id" class="viewer-shell" :class="block.contentType === 'TEXT' ? 'viewer-shell--text' : ''">
+                <div class="border-b border-slate-200 px-4 py-2 text-xs font-bold uppercase tracking-wider text-purple-600">Nội dung {{ blockIndex + 1 }} · {{ lessonTypeLabel(block.contentType) }}</div>
+                <article v-if="block.contentType === 'TEXT'" class="lesson-prose whitespace-pre-line" v-html="renderText(block.textContent)" />
+                <video v-else-if="block.contentType === 'VIDEO' && block.fileUrl" :src="asset(block.fileUrl)" controls class="max-h-[70vh] w-full bg-black" />
+                <div v-else-if="block.contentType === 'DOCUMENT' && block.fileUrl" class="h-[70vh] min-h-[520px] w-full overflow-hidden bg-white">
+                  <VueOfficePdf v-if="docTypeFor(block.fileUrl) === 'pdf'" :src="asset(block.fileUrl)" class="h-full w-full" /><VueOfficePptx v-else-if="docTypeFor(block.fileUrl) === 'pptx'" :src="asset(block.fileUrl)" class="h-full w-full" /><VueOfficeDocx v-else-if="docTypeFor(block.fileUrl) === 'docx'" :src="asset(block.fileUrl)" class="h-full w-full" /><iframe v-else :src="asset(block.fileUrl)" class="h-full w-full" title="Tài liệu bài học" />
+                </div>
+                <div v-else class="grid min-h-72 place-items-center p-8 text-center"><div><FileText :size="42" class="mx-auto text-slate-400" /><p class="mt-3 font-bold">Nội dung đang được cập nhật</p></div></div>
+              </article>
+              <div v-if="!lessonBlocks.length" class="viewer-shell grid min-h-72 place-items-center p-8 text-center"><div><FileText :size="42" class="mx-auto text-slate-400" /><p class="mt-3 font-bold">Nội dung đang được cập nhật</p></div></div>
             </section>
 
             <div class="mt-5 flex flex-wrap items-center justify-between gap-3"><BaseButton variant="secondary" :disabled="!previousLesson" @click="navigateLesson(previousLesson)"><ChevronLeft :size="17" /> Bài trước</BaseButton><div class="flex flex-wrap gap-2"><RouterLink v-slot="{ navigate }" v-if="selected.quiz" :to="{ path: `/quiz/${selected.quiz.id}`, query: { courseId } }" custom><BaseButton variant="outline" @click="navigate">Làm quiz</BaseButton></RouterLink><BaseButton @click="complete"><Check v-if="!selected.progress?.isCompleted" :size="17" />{{ selected.progress?.isCompleted ? 'Đánh dấu chưa xong' : 'Hoàn thành bài học' }}</BaseButton></div><BaseButton variant="secondary" :disabled="!nextLesson" @click="navigateLesson(nextLesson)">Bài tiếp <ChevronRight :size="17" /></BaseButton></div>
@@ -242,7 +245,8 @@ onMounted(load)
 .learning-sidebar-toggle{position:absolute;right:0;top:.75rem;z-index:20;height:3rem;width:1.75rem;place-items:center;border:1px solid var(--border);border-right:0;border-radius:999px 0 0 999px;background:var(--surface-muted);color:var(--text-muted);transition:color .2s ease,background .2s ease}
 .learning-sidebar-toggle:hover{background:var(--brand-soft);color:var(--brand)}
 .lesson-link{display:flex;width:100%;align-items:flex-start;gap:.7rem;border-left:3px solid transparent;padding:.7rem .65rem;text-align:left;color:var(--text-muted);transition:.18s}.lesson-link:hover{background:var(--surface-muted);color:var(--text)}.lesson-link--active{border-left-color:var(--brand);background:var(--brand-soft)!important;color:var(--brand)!important}.lesson-state{display:grid;width:1.65rem;height:1.65rem;flex-shrink:0;place-items:center;border:1px solid var(--border);font-size:.65rem;font-weight:800}.lesson-state--done{border-color:#10b981;background:#10b981;color:white}
-.viewer-shell{min-height:clamp(32rem,68vh,54rem);overflow:hidden;border:1px solid var(--border);border-radius:1.35rem;background:var(--surface);box-shadow:var(--shadow-sm)}.viewer-shell--text{padding:1rem}.viewer-shell>video{min-height:clamp(32rem,68vh,54rem);object-fit:contain}.lesson-prose{margin:0;max-width:none;font-size:1.03rem;line-height:2;color:var(--text)}.discussion-panel{width:min(100%,48rem)}.comment-box{width:100%;resize:vertical;border:1px solid var(--border);border-radius:.5rem;background:var(--surface-muted);padding:.75rem;color:var(--text);outline:none}.comment-box:focus{border-color:#a855f7;box-shadow:0 0 0 3px rgba(168,85,247,.1)}
+.section-quiz-link{display:flex;align-items:center;gap:.7rem;margin-top:.45rem;border:1px solid #fcd34d;background:#fffbeb;padding:.7rem;color:#92400e}.section-quiz-link:hover{background:#fef3c7}.section-quiz-link small{display:block;margin-top:.15rem;font-size:.65rem;opacity:.75}.section-quiz-state{border-color:#f59e0b;background:#f59e0b;color:white}.section-quiz-link--locked{cursor:not-allowed;border-color:var(--border);background:var(--surface-muted);color:var(--text-muted);opacity:.78}
+.viewer-shell{min-height:clamp(32rem,68vh,54rem);overflow:hidden;border:1px solid var(--border);border-radius:1.35rem;background:var(--surface);box-shadow:var(--shadow-sm)}.viewer-shell--text{padding:2rem}.viewer-shell>video{min-height:clamp(32rem,68vh,54rem);object-fit:contain}.lesson-prose{margin:0;max-width:none;color:var(--text)}.lesson-prose :deep(h1){margin:1.6rem 0 .8rem;font-size:2rem;line-height:1.2;font-weight:900}.lesson-prose :deep(h2){margin:1.4rem 0 .7rem;font-size:1.65rem;line-height:1.25;font-weight:850}.lesson-prose :deep(h3){margin:1.2rem 0 .6rem;font-size:1.35rem;line-height:1.3;font-weight:800}.lesson-prose :deep(h4){margin:1rem 0 .5rem;font-size:1.12rem;line-height:1.35;font-weight:800}.lesson-prose :deep(h5){margin:.9rem 0 .45rem;font-size:.95rem;line-height:1.4;font-weight:800;text-transform:uppercase;letter-spacing:.04em}.lesson-prose :deep(p){margin:.55rem 0;font-size:1rem;line-height:1.85}.discussion-panel{width:min(100%,48rem)}.comment-box{width:100%;resize:vertical;border:1px solid var(--border);border-radius:.5rem;background:var(--surface-muted);padding:.75rem;color:var(--text);outline:none}.comment-box:focus{border-color:#a855f7;box-shadow:0 0 0 3px rgba(168,85,247,.1)}
 @media(min-width:1024px){
   .learning-sidebar{position:sticky;top:4.5rem;z-index:10;height:calc(100vh - 4.5rem);width:17rem;min-width:17rem;padding-top:0;transition:width .3s ease,min-width .3s ease}
   .sidebar-collapsed .learning-sidebar.sidebar-hidden{width:5.25rem;min-width:5.25rem;overflow:hidden}

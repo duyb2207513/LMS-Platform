@@ -219,7 +219,7 @@ const router = createRouter({
     {
       path: "/instructor/revenue",
       name: "instructor-revenue",
-      component: () => import("@/pages/instructor/RevenueDashboardView.vue"),
+      redirect: "/instructor",
       meta: { requiresAuth: true, roles: [UserRole.INSTRUCTOR] },
     },
     {
@@ -277,6 +277,15 @@ const router = createRouter({
     {
       path: "/instructor/lessons/:lessonId/quiz",
       name: "quiz-builder",
+      component: () => import("@/pages/instructor/QuizBuilderPage.vue"),
+      meta: {
+        requiresAuth: true,
+        roles: [UserRole.INSTRUCTOR],
+      },
+    },
+    {
+      path: "/instructor/sections/:sectionId/quiz",
+      name: "section-quiz-builder",
       component: () => import("@/pages/instructor/QuizBuilderPage.vue"),
       meta: {
         requiresAuth: true,

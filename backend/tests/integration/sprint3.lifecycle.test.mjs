@@ -37,6 +37,16 @@ try {
   assert.equal((await fetch(`${api}/quizzes/${quiz.id}/attempts`, { method: "POST", headers: { authorization: studentAuth } })).status, 409);
   assert.equal((await json(`${api}/questions/${question.id}`, "PATCH", ownerAuth, { text: "Changed" })).status, 409);
 
+  const sectionQuizResponse = await json(`${api}/sections/${section.id}/quizzes`, "POST", ownerAuth, { title: "Section completion quiz", passingScore: 70, maxAttempts: 2 }); assert.equal(sectionQuizResponse.status, 201); const sectionQuiz = (await sectionQuizResponse.json()).data;
+  const sectionQuestionResponse = await json(`${api}/quizzes/${sectionQuiz.id}/questions`, "POST", ownerAuth, { text: "Section complete?", points: 1 }); assert.equal(sectionQuestionResponse.status, 201); const sectionQuestion = (await sectionQuestionResponse.json()).data;
+  const sectionCorrect = (await (await json(`${api}/questions/${sectionQuestion.id}/options`, "POST", ownerAuth, { text: "Yes", isCorrect: true })).json()).data;
+  await json(`${api}/questions/${sectionQuestion.id}/options`, "POST", ownerAuth, { text: "No" });
+  assert.equal((await json(`${api}/quizzes/${sectionQuiz.id}`, "PATCH", ownerAuth, { isPublished: true })).status, 200);
+  assert.equal((await fetch(`${api}/quizzes/${sectionQuiz.id}/attempts`, { method: "POST", headers: { authorization: studentAuth } })).status, 409);
+  await prisma.lessonProgress.create({ data: { studentId: student.id, lessonId: lesson.id, isCompleted: true, completedAt: new Date() } });
+  const sectionAttemptResponse = await fetch(`${api}/quizzes/${sectionQuiz.id}/attempts`, { method: "POST", headers: { authorization: studentAuth } }); assert.equal(sectionAttemptResponse.status, 201); const sectionAttempt = (await sectionAttemptResponse.json()).data;
+  const sectionSubmit = await json(`${api}/quiz-attempts/${sectionAttempt.id}/submit`, "POST", studentAuth, { answers: [{ questionId: sectionQuestion.id, optionId: sectionCorrect.id }] }); assert.equal(sectionSubmit.status, 200);
+
   assert.equal((await json(`${api}/courses/${course.id}/reviews`, "POST", outsiderAuth, { rating: 5 })).status, 403);
   const reviewResponse = await json(`${api}/courses/${course.id}/reviews`, "POST", studentAuth, { rating: 5, content: "Great" }); assert.equal(reviewResponse.status, 201); const review = (await reviewResponse.json()).data;
   assert.equal((await json(`${api}/courses/${course.id}/reviews`, "POST", studentAuth, { rating: 4 })).status, 409);

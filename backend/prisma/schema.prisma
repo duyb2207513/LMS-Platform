@@ -336,6 +336,26 @@ model Course {
   @@map("courses")
 }
 
+model LessonContent {
+  id           String     @id @default(uuid()) @db.Uuid
+  lessonId     String     @map("lesson_id") @db.Uuid
+  contentType  LessonType @map("content_type")
+  textContent  String?    @map("text_content")
+  fileUrl      String?    @map("file_url")
+  originalName String?    @map("original_name") @db.VarChar(255)
+  mimeType     String?    @map("mime_type") @db.VarChar(150)
+  sizeBytes    Int?       @map("size_bytes")
+  position     Int
+  createdAt    DateTime   @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt    DateTime   @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@unique([lessonId, position])
+  @@index([lessonId])
+  @@map("lesson_contents")
+}
+
 model Section {
   id        String   @id @default(uuid()) @db.Uuid
   courseId  String   @map("course_id") @db.Uuid
@@ -346,6 +366,7 @@ model Section {
 
   course  Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
   lessons Lesson[]
+  quiz    Quiz?
 
   @@index([courseId, position])
   @@map("sections")
@@ -373,6 +394,7 @@ model Lesson {
   comments         Comment[]
   learningEvents   LearningEvent[]
   videoWatchEvents VideoWatchEvent[]
+  contents         LessonContent[]
 
   @@index([sectionId, position])
   @@index([isPublished])
@@ -417,7 +439,8 @@ model LessonProgress {
 
 model Quiz {
   id               String   @id @default(uuid()) @db.Uuid
-  lessonId         String   @unique @map("lesson_id") @db.Uuid
+  lessonId         String?  @unique @map("lesson_id") @db.Uuid
+  sectionId        String?  @unique @map("section_id") @db.Uuid
   title            String   @db.VarChar(255)
   description      String?
   passingScore     Int      @default(70) @map("passing_score")
@@ -427,11 +450,13 @@ model Quiz {
   createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt        DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
 
-  lesson    Lesson        @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  lesson    Lesson?       @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  section   Section?      @relation(fields: [sectionId], references: [id], onDelete: Cascade)
   questions Question[]
   attempts  QuizAttempt[]
 
   @@index([isPublished])
+  @@index([sectionId])
   @@map("quizzes")
 }
 
@@ -440,6 +465,7 @@ model Question {
   quizId      String   @map("quiz_id") @db.Uuid
   text        String
   explanation String?
+  imageUrl    String?  @map("image_url")
   points      Int      @default(1)
   position    Int
   createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
@@ -525,10 +551,27 @@ model Assignment {
 
   course      Course                 @relation(fields: [courseId], references: [id], onDelete: Cascade)
   submissions AssignmentSubmission[]
+  attachments AssignmentAttachment[]
 
   @@index([courseId, dueAt])
   @@index([isPublished])
   @@map("assignments")
+}
+
+model AssignmentAttachment {
+  id           String   @id @default(uuid()) @db.Uuid
+  assignmentId String   @map("assignment_id") @db.Uuid
+  originalName String   @map("original_name") @db.VarChar(255)
+  storedName   String   @map("stored_name") @db.VarChar(500)
+  fileUrl      String   @map("file_url")
+  mimeType     String   @map("mime_type") @db.VarChar(150)
+  sizeBytes    Int      @map("size_bytes")
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  assignment Assignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+
+  @@index([assignmentId])
+  @@map("assignment_attachments")
 }
 
 model AssignmentSubmission {
