@@ -173,6 +173,16 @@ async function openChat(userId: string) {
   finally { loadingChat.value = false }
 }
 
+async function showConversationList() {
+  selected.value = null
+  messages.value = []
+  content.value = ''
+  pendingAttachment.value = null
+  const query = { ...route.query }
+  delete query.userId
+  await router.replace({ query })
+}
+
 function buildFinalMessageContent(rawText: string, attachment: Attachment | null): string {
   if (!attachment) return rawText.trim()
   const tag = `[attachment:${attachment.type}|name=${attachment.name}|url=${attachment.url}]`
@@ -349,7 +359,7 @@ onBeforeUnmount(() => {
       
       <section class="grid h-full min-h-0 overflow-hidden border-y border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 lg:grid-cols-[22rem_minmax(0,1fr)]">
         <!-- Sidebar Contacts List -->
-        <aside class="flex min-h-0 flex-col border-b border-slate-200 p-3 dark:border-slate-800 lg:border-b-0 lg:border-r">
+        <aside :class="['h-full min-h-0 flex-col border-b border-slate-200 p-3 dark:border-slate-800 lg:flex lg:border-b-0 lg:border-r', selected ? 'hidden' : 'flex']">
           <input v-model="search" class="h-9 w-full border border-slate-200 bg-slate-50 px-3 text-xs outline-none transition focus:border-purple-500 dark:border-slate-700 dark:bg-slate-800 dark:text-white" placeholder="Tìm người dùng hoặc Trợ lý AI..." />
           <div class="mt-2 min-h-0 flex-1 divide-y divide-slate-100 overflow-y-auto dark:divide-slate-800">
             <button
@@ -359,7 +369,7 @@ onBeforeUnmount(() => {
               :class="[
                 'flex min-h-12 w-full items-center gap-2 p-2 text-left transition',
                 selected?.id === contact.id ? 'bg-purple-100 text-purple-900 dark:bg-purple-950/50 dark:text-purple-100 font-bold' : 'hover:bg-slate-100 dark:hover:bg-slate-800',
-                contact.id === AI_BOT_CONTACT.id ? 'border border-purple-200/80 bg-purple-50/40 dark:border-purple-900/40 dark:bg-purple-950/20' : ''
+                contact.id === AI_BOT_CONTACT.id ? 'bg-purple-50/70 dark:bg-purple-950/20' : ''
               ]"
               @click="openChat(contact.id)"
             >
@@ -389,6 +399,9 @@ onBeforeUnmount(() => {
         <div v-if="selected" class="flex h-full min-h-0 min-w-0 flex-col">
           <!-- Chat Header -->
           <header class="flex items-center gap-3 border-b border-slate-200 p-4 dark:border-slate-800">
+            <button type="button" class="grid h-9 w-9 shrink-0 place-items-center border border-slate-200 text-slate-600 lg:hidden dark:border-slate-700 dark:text-slate-300" aria-label="Quay lại danh sách trò chuyện" @click="showConversationList">
+              <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6" stroke-linecap="round" stroke-linejoin="round" /></svg>
+            </button>
             <span v-if="selected.id === AI_BOT_CONTACT.id" class="grid h-9 w-9 shrink-0 place-items-center bg-violet-700 text-white">
               <Bot :size="18" :stroke-width="2" />
             </span>
@@ -413,7 +426,7 @@ onBeforeUnmount(() => {
             <LoadingSpinner v-if="loadingChat" class="py-16"/>
             <template v-else>
               <article v-for="item in messages" :key="item.id" :class="['flex', item.senderId === auth.user?.id ? 'justify-end' : 'justify-start']">
-                <div :class="['max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-6 shadow-sm', item.senderId === auth.user?.id ? 'rounded-br-md bg-gradient-to-br from-violet-600 to-purple-700 text-white' : 'rounded-bl-md border border-slate-200 bg-white text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-white']">
+                <div :class="['max-w-[85%] rounded-xl px-4 py-3 text-sm leading-6 shadow-sm', item.senderId === auth.user?.id ? 'rounded-br-sm bg-violet-700 text-white' : 'rounded-bl-sm border border-slate-200 bg-white text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-white']">
                   <!-- Attachment Display -->
                   <template v-if="parseMessage(item.content).attachment">
                     <!-- PDF -->
@@ -555,7 +568,7 @@ onBeforeUnmount(() => {
           </div>
         </div>
 
-        <div v-else class="grid h-full min-h-0 place-items-center p-8 text-center">
+        <div v-else class="hidden h-full min-h-0 place-items-center p-8 text-center lg:grid">
           <div>
             <span class="text-5xl">💬</span>
             <h2 class="mt-4 text-xl font-black">Chọn một người để trò chuyện</h2>

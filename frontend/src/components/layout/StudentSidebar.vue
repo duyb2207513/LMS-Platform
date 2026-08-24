@@ -16,6 +16,15 @@ const assetUrl = (url?: string | null) =>
   !url || url.startsWith('http') ? url || '' : `${API_BASE_URL.replace('/api/v1', '')}${url}`
 
 const groups = [
+  {
+    label: 'Điều hướng chính',
+    mobileOnly: true,
+    items: [
+      { label: 'Trang chủ', to: '/dashboard', icon: 'home' },
+      { label: 'Khám phá', to: '/courses', icon: 'search' },
+      { label: 'Khóa học của tôi', to: '/my-courses', icon: 'book' },
+    ],
+  },
   // {
   //   label: 'Học tập',
   //   items: [
@@ -108,11 +117,14 @@ const linkClass = (path: string) => [
     </div>
 
     <nav class="flex-1 space-y-5 overflow-y-auto overflow-x-hidden p-3">
-      <section v-for="group in groups" :key="group.label" :class="collapsed ? 'lg:border-b lg:border-slate-100 lg:pb-3 dark:lg:border-slate-800' : ''">
+      <section v-for="group in groups" :key="group.label" :class="[collapsed ? 'lg:border-b lg:border-slate-100 lg:pb-3 dark:lg:border-slate-800' : '', group.mobileOnly ? 'lg:hidden' : '']">
         <p class="mb-1.5 px-3 text-[10px] font-black uppercase tracking-[0.16em] text-slate-400" :class="collapsed ? 'lg:hidden' : ''">{{ group.label }}</p>
         <div class="space-y-1">
           <RouterLink v-for="item in group.items" :key="item.to" :to="item.to" :class="[linkClass(item.to), collapsed ? 'lg:justify-center lg:px-2' : '']" :title="collapsed ? item.label : undefined" @click="emit('close')">
-            <svg v-if="item.icon === 'chart'" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 19V9m5 10V5m5 14v-7m5 7V3" /></svg>
+            <svg v-if="item.icon === 'home'" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m3 11 9-8 9 8v9a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1v-9Z" /></svg>
+            <svg v-else-if="item.icon === 'search'" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" stroke-width="2"/><path stroke-linecap="round" stroke-width="2" d="m20 20-4-4"/></svg>
+            <svg v-else-if="item.icon === 'book'" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5.5A2.5 2.5 0 0 1 6.5 3H11v16H6.5A2.5 2.5 0 0 0 4 21.5v-16Zm16 0A2.5 2.5 0 0 0 17.5 3H13v16h4.5a2.5 2.5 0 0 1 2.5 2.5v-16Z" /></svg>
+            <svg v-else-if="item.icon === 'chart'" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 19V9m5 10V5m5 14v-7m5 7V3" /></svg>
             <svg v-else-if="item.icon === 'bell'" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.4-1.4A2 2 0 0118 14.2V11a6 6 0 10-12 0v3.2a2 2 0 01-.6 1.4L4 17h5m6 0a3 3 0 11-6 0" /></svg>
             <svg v-else-if="item.icon === 'message'" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h8M8 14h5m8-2a9 9 0 11-4.2-7.6L21 3v9z" /></svg>
             <svg v-else-if="item.icon === 'user'" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2m7-10a4 4 0 100-8 4 4 0 000 8zm7 0 2 2 4-4" /></svg>

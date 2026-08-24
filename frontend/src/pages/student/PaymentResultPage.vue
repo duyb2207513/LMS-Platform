@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
@@ -8,13 +8,100 @@ import LoadingSpinner from '@/components/ui/LoadingSpinner.vue'
 import { useApi } from '@/composables/useApi'
 import type { ApiResponse, Order } from '@/types'
 
-const route = useRoute(), api = useApi(), order = ref<Order | null>(null), error = ref(''), refreshing = ref(false)
+const route = useRoute()
+const api = useApi()
+const order = ref<Order | null>(null)
+const error = ref('')
+const refreshing = ref(false)
+let pollTimer: ReturnType<typeof setInterval> | null = null
+
 const money = (value: number) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value)
-const state = computed(() => order.value?.status === 'PAID' ? { title: 'Thanh toán thành công', description: 'Khóa học đã được thêm vào tài khoản của bạn.', icon: '✓', tone: 'success' } : order.value?.status === 'CANCELLED' ? { title: 'Đơn hàng đã hủy', description: 'Đơn hàng này không còn hiệu lực thanh toán.', icon: '×', tone: 'danger' } : { title: 'Đang chờ thanh toán', description: 'Hệ thống chưa nhận được xác nhận thanh toán cho đơn hàng.', icon: '···', tone: 'pending' })
-async function load() { refreshing.value = true; error.value = ''; try { const response = await api.get<ApiResponse<Order>>(`/orders/${route.params.orderId}`); order.value = response.data || null } catch (cause) { error.value = cause instanceof Error ? cause.message : 'Không tải được kết quả' } finally { refreshing.value = false } }
-onMounted(load)
+const state = computed(() => {
+  if (order.value?.status === 'PAID') return { title: 'Thanh toán thành công', description: 'Khóa học đã được mở trong tài khoản của bạn.', symbol: '✓', tone: 'success' }
+  if (order.value?.status === 'CANCELLED') return { title: 'Giao dịch đã kết thúc', description: 'Đơn hàng đã bị hủy và không còn hiệu lực.', symbol: '×', tone: 'danger' }
+  return { title: 'Đang xác nhận giao dịch', description: 'Hệ thống đang chờ tín hiệu từ cổng thanh toán.', symbol: '…', tone: 'pending' }
+})
+
+async function load(silent = false) {
+  if (!silent) refreshing.value = true
+  error.value = ''
+  try {
+    const response = await api.get<ApiResponse<Order>>(`/orders/${route.params.orderId}`)
+    order.value = response.data || null
+    if (order.value?.status !== 'PENDING' && pollTimer) {
+      clearInterval(pollTimer)
+      pollTimer = null
+    }
+  } catch (cause) {
+    error.value = cause instanceof Error ? cause.message : 'Không tải được kết quả'
+  } finally {
+    if (!silent) refreshing.value = false
+  }
+}
+
+onMounted(async () => {
+  await load()
+  if (order.value?.status === 'PENDING') pollTimer = setInterval(() => void load(true), 2500)
+})
+onBeforeUnmount(() => { if (pollTimer) clearInterval(pollTimer) })
 </script>
 
-<template><DefaultLayout><main class="app-page max-w-3xl px-4 py-10 sm:px-6 sm:py-16"><LoadingSpinner v-if="api.loading.value && !order" class="py-20"/><section v-else-if="order" class="surface-card overflow-hidden"><div :class="['result-hero', `result-hero--${state.tone}`]"><span class="result-icon">{{ state.icon }}</span><h1 class="mt-5 text-3xl font-black tracking-tight sm:text-4xl">{{ state.title }}</h1><p class="mt-2 max-w-md text-sm opacity-80 sm:text-base">{{ state.description }}</p></div><div class="p-6 sm:p-8"><div class="flex flex-wrap items-center justify-between gap-3"><div><p class="text-xs font-bold uppercase tracking-wider text-slate-400">Mã đơn hàng</p><p class="mt-1 font-mono font-bold">{{ order.orderNumber }}</p></div><StatusBadge :status="order.status"/></div><dl class="mt-6 divide-y divide-slate-100 border-y border-slate-100 text-sm dark:divide-slate-800 dark:border-slate-800"><div class="flex justify-between gap-4 py-4"><dt class="text-slate-500">Thời gian tạo</dt><dd class="font-semibold">{{ new Date(order.createdAt).toLocaleString('vi-VN') }}</dd></div><div class="flex justify-between gap-4 py-4"><dt class="text-slate-500">Số khóa học</dt><dd class="font-semibold">{{ order.items.length }}</dd></div><div class="flex justify-between gap-4 py-4"><dt class="text-slate-500">Tổng thanh toán</dt><dd class="text-lg font-black text-purple-700 dark:text-purple-300">{{ money(order.total) }}</dd></div></dl><p v-if="error" class="mt-4 rounded-xl bg-red-50 p-3 text-sm text-red-700">{{ error }}</p><div class="mt-7 flex flex-wrap justify-center gap-3"><BaseButton variant="secondary" :loading="refreshing" @click="load">Kiểm tra lại</BaseButton><RouterLink v-if="order.status === 'PAID'" to="/my-courses"><BaseButton>Vào khóa học →</BaseButton></RouterLink><RouterLink v-else-if="order.status === 'PENDING'" :to="`/checkout/${order.id}`"><BaseButton>Tiếp tục thanh toán</BaseButton></RouterLink><RouterLink v-else to="/courses"><BaseButton>Chọn khóa học khác</BaseButton></RouterLink></div></div></section></main></DefaultLayout></template>
+<template>
+  <DefaultLayout>
+    <main class="result-page">
+      <LoadingSpinner v-if="api.loading.value && !order" class="py-20" />
+      <section v-else-if="order" class="result-layout">
+        <div :class="['result-status', `result-status--${state.tone}`]">
+          <span class="result-symbol">{{ state.symbol }}</span>
+          <p class="result-eyebrow">KẾT QUẢ GIAO DỊCH</p>
+          <h1>{{ state.title }}</h1>
+          <p class="result-description">{{ state.description }}</p>
+          <span v-if="order.status === 'PENDING'" class="result-live"><i /> Tự động kiểm tra mỗi 2,5 giây</span>
+        </div>
+        <div class="result-detail">
+          <div class="flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-5 dark:border-slate-800">
+            <div><p class="text-xs font-black uppercase tracking-[.14em] text-slate-400">Mã đơn hàng</p><p class="mt-1 font-mono text-lg font-black">{{ order.orderNumber }}</p></div>
+            <StatusBadge :status="order.status" />
+          </div>
+          <dl class="result-facts">
+            <div><dt>Thời gian tạo</dt><dd>{{ new Date(order.createdAt).toLocaleString('vi-VN') }}</dd></div>
+            <div><dt>Số khóa học</dt><dd>{{ order.items.length }}</dd></div>
+            <div><dt>Tổng thanh toán</dt><dd class="text-xl text-purple-700 dark:text-purple-300">{{ money(order.total) }}</dd></div>
+          </dl>
+          <div class="border-t border-slate-200 pt-5 dark:border-slate-800">
+            <p v-if="error" class="mb-4 border border-red-200 bg-red-50 p-3 text-sm text-red-700">{{ error }}</p>
+            <div class="grid gap-2 sm:grid-cols-2">
+              <BaseButton class="!rounded-none" variant="secondary" :loading="refreshing" @click="load()">Kiểm tra lại trạng thái</BaseButton>
+              <RouterLink v-if="order.status === 'PAID'" to="/my-courses"><BaseButton class="!rounded-none" :full-width="true">Vào khóa học →</BaseButton></RouterLink>
+              <RouterLink v-else-if="order.status === 'PENDING'" :to="`/checkout/${order.id}`"><BaseButton class="!rounded-none" :full-width="true">Quay lại thanh toán</BaseButton></RouterLink>
+              <RouterLink v-else to="/courses"><BaseButton class="!rounded-none" :full-width="true">Chọn khóa học khác</BaseButton></RouterLink>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </DefaultLayout>
+</template>
 
-<style scoped>.result-hero{display:flex;flex-direction:column;align-items:center;padding:3rem 1.5rem;text-align:center}.result-hero--success{background:linear-gradient(135deg,#ecfdf5,#d1fae5);color:#065f46}.result-hero--danger{background:linear-gradient(135deg,#fef2f2,#fee2e2);color:#991b1b}.result-hero--pending{background:linear-gradient(135deg,#fffbeb,#fef3c7);color:#92400e}.result-icon{display:grid;width:5rem;height:5rem;place-items:center;border:1px solid currentColor;border-radius:50%;background:rgba(255,255,255,.6);font-size:2rem;font-weight:900;box-shadow:0 12px 30px rgba(15,23,42,.08)}:global(.dark) .result-hero--success{background:linear-gradient(135deg,#052e24,#064e3b);color:#a7f3d0}:global(.dark) .result-hero--danger{background:linear-gradient(135deg,#450a0a,#7f1d1d);color:#fecaca}:global(.dark) .result-hero--pending{background:linear-gradient(135deg,#451a03,#78350f);color:#fde68a}</style>
+<style scoped>
+.result-page { width:100%; min-height:calc(100vh - 4.5rem); }
+.result-layout { display:grid; min-height:calc(100vh - 4.5rem); }
+.result-status { display:flex; min-height:22rem; flex-direction:column; justify-content:center; padding:clamp(2rem,7vw,6rem); color:#fff; }
+.result-status--success { background:#047857; }
+.result-status--danger { background:#b91c1c; }
+.result-status--pending { background:#b45309; }
+.result-symbol { display:grid; width:4rem; height:4rem; place-items:center; border:2px solid currentColor; font-size:2rem; font-weight:950; }
+.result-eyebrow { margin-top:2rem; font-size:.72rem; font-weight:900; letter-spacing:.18em; opacity:.8; }
+.result-status h1 { margin-top:.5rem; font-size:clamp(2.25rem,5vw,4.5rem); font-weight:950; letter-spacing:-.05em; line-height:1; }
+.result-description { margin-top:1rem; max-width:34rem; opacity:.85; }
+.result-live { display:flex; align-items:center; gap:.5rem; margin-top:2rem; font-size:.75rem; font-weight:800; }
+.result-live i { width:.55rem; height:.55rem; animation:pulse 1.4s infinite; background:currentColor; }
+.result-detail { align-self:center; padding:clamp(1.5rem,5vw,4rem); }
+.result-facts { margin-block:1.5rem; border-block:1px solid var(--border); }
+.result-facts>div { display:flex; justify-content:space-between; gap:1rem; border-bottom:1px solid var(--border); padding:1rem 0; }
+.result-facts>div:last-child { border-bottom:0; }
+.result-facts dt { color:var(--text-muted); }
+.result-facts dd { text-align:right; font-weight:800; }
+@media (min-width:900px) { .result-layout { grid-template-columns:minmax(0,1.15fr) minmax(24rem,.85fr); } }
+@keyframes pulse { 50% { opacity:.3; transform:scale(.75); } }
+</style>

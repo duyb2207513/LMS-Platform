@@ -8,6 +8,8 @@ import {
   watch,
 } from "vue";
 import VueOfficePdf from "@vue-office/pdf";
+import { Bot } from "@lucide/vue";
+import { useRoute } from "vue-router";
 import BaseModal from "@/components/ui/BaseModal.vue";
 import BaseButton from "@/components/ui/BaseButton.vue";
 import { generateAiBotResponse } from "@/utils/aiBotHelper";
@@ -33,6 +35,7 @@ type Attachment = {
 };
 
 const api = useApi();
+const route = useRoute();
 const auth = useAuthStore();
 const courseStore = useCourseStore();
 const notification = useNotificationStore();
@@ -627,7 +630,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div :class="['floating-chat', { 'floating-chat--open': isOpen }]" aria-live="polite">
+  <div v-if="route.name !== 'messages'" :class="['floating-chat', { 'floating-chat--open': isOpen }]" aria-live="polite">
     <!-- Hidden file inputs -->
     <input ref="pdfInput" type="file" accept="application/pdf" class="hidden" @change="onPdfSelected" />
     <input ref="videoInput" type="file" accept="video/mp4,video/webm,video/ogg,video/quicktime" class="hidden" @change="onVideoSelected" />
@@ -635,7 +638,7 @@ onBeforeUnmount(() => {
     <Transition name="chat-panel">
       <section
         v-if="isOpen"
-        class="chat-panel flex flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white text-slate-900 shadow-2xl dark:border-slate-700 dark:bg-slate-900 dark:text-white"
+        class="chat-panel flex flex-col overflow-hidden border border-slate-200 bg-white text-slate-900 shadow-2xl dark:border-slate-700 dark:bg-slate-900 dark:text-white"
         aria-label="Tin nhắn"
       >
         <!-- Header -->
@@ -653,8 +656,8 @@ onBeforeUnmount(() => {
           </button>
 
           <template v-if="activeContact">
-            <span v-if="activeContact.id === AI_BOT_CONTACT.id" class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-sm shadow-md">
-              🤖
+            <span v-if="activeContact.id === AI_BOT_CONTACT.id" class="grid h-8 w-8 shrink-0 place-items-center bg-violet-700 text-white">
+              <Bot :size="16" :stroke-width="2" />
             </span>
             <img v-else-if="activeContact.avatarUrl" :src="avatarUrl(activeContact.avatarUrl)" alt="" class="h-8 w-8 shrink-0 rounded-full object-cover" />
             <span v-else class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-gradient-to-br from-violet-500 to-purple-700 text-xs font-black text-white">
@@ -736,12 +739,12 @@ onBeforeUnmount(() => {
               v-else
               :key="row.contact.id"
               type="button"
-              :class="['flex w-full items-center gap-2 rounded-xl p-2 text-left transition hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-purple-400 dark:hover:bg-slate-800', row.contact.id === AI_BOT_CONTACT.id ? 'border border-purple-200/80 bg-purple-50/40 dark:border-purple-900/40 dark:bg-purple-950/20' : '']"
+              :class="['flex min-h-12 w-full items-center gap-2 border-b border-slate-100 p-2 text-left transition hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-purple-400 dark:border-slate-800 dark:hover:bg-slate-800', row.contact.id === AI_BOT_CONTACT.id ? 'bg-purple-50/70 dark:bg-purple-950/20' : '']"
               @click="openConversation(row.contact)"
             >
               <span class="relative shrink-0">
-                <span v-if="row.contact.id === AI_BOT_CONTACT.id" class="grid h-9 w-9 place-items-center rounded-full bg-gradient-to-br from-indigo-500 via-purple-600 to-fuchsia-600 text-sm shadow-md">
-                  🤖
+                <span v-if="row.contact.id === AI_BOT_CONTACT.id" class="grid h-9 w-9 place-items-center bg-violet-700 text-white">
+                  <Bot :size="17" :stroke-width="2" />
                 </span>
                 <img v-else-if="row.contact.avatarUrl" :src="avatarUrl(row.contact.avatarUrl)" alt="" class="h-9 w-9 rounded-full object-cover" />
                 <span v-else class="grid h-9 w-9 place-items-center rounded-full bg-gradient-to-br from-violet-500 to-purple-700 text-xs font-black text-white">
@@ -973,11 +976,11 @@ onBeforeUnmount(() => {
     <button
       v-if="!isOpen"
       type="button"
-      class="chat-launcher relative grid h-14 w-14 place-items-center rounded-full bg-gradient-to-br from-violet-600 via-purple-600 to-fuchsia-600 text-white shadow-xl shadow-purple-600/30 transition duration-200 hover:-translate-y-1 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-purple-300 dark:focus:ring-purple-900"
+      class="chat-launcher relative grid h-11 w-11 place-items-center rounded-l-xl bg-violet-700 text-white shadow-xl shadow-purple-600/25 transition duration-200 hover:-translate-x-1 focus:outline-none focus:ring-4 focus:ring-purple-300 dark:focus:ring-purple-900"
       aria-label="Mở tin nhắn"
       @click="isOpen = true"
     >
-      <svg viewBox="0 0 24 24" class="h-7 w-7" fill="none" stroke="currentColor" stroke-width="2">
+      <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4Z" stroke-linecap="round" stroke-linejoin="round" />
         <path d="M8 10h.01M12 10h.01M16 10h.01" stroke-linecap="round" stroke-width="3" />
       </svg>
@@ -1009,13 +1012,13 @@ onBeforeUnmount(() => {
 <style scoped>
 .floating-chat {
   position: fixed;
-  right: 1.5rem;
-  bottom: calc(1.5rem + env(safe-area-inset-bottom));
+  right: -0.35rem;
+  bottom: env(safe-area-inset-bottom);
   z-index: 80;
 }
 
 .chat-panel {
-  width: min(400px, calc(100vw - 1.5rem));
+  width: min(390px, 100vw);
   height: min(450px, calc(100dvh - 1rem));
 }
 
@@ -1085,8 +1088,8 @@ onBeforeUnmount(() => {
 
 @media (max-width: 639px) {
   .floating-chat {
-    right: 0.75rem;
-    bottom: calc(5.5rem + env(safe-area-inset-bottom));
+    right: -0.35rem;
+    bottom: env(safe-area-inset-bottom);
   }
 
   .chat-panel {

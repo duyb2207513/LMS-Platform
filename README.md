@@ -100,6 +100,18 @@ Sprint 6 bổ sung xác minh email, quên/đặt lại mật khẩu, Google/GitH
 
 Production Compose tự chạy Prisma migration, phục vụ Vue qua Nginx, proxy `/api` và lưu PostgreSQL/uploads trong named volumes. Nên đặt reverse proxy HTTPS hoặc load balancer phía trước cổng 80, backup volume PostgreSQL định kỳ và không chạy seed demo trên dữ liệu thật.
 
+### Webhook SePay
+
+Backend Render hiện dùng endpoint công khai:
+
+```text
+https://lms-platform-5rwf.onrender.com/api/v1/payments/webhooks/sepay
+```
+
+Nhập chính xác URL trên vào cấu hình Webhook của SePay với phương thức `POST`. Tài khoản ngân hàng kết nối trong SePay phải là cùng tài khoản được dùng để tạo VietQR. Nội dung chuyển khoản phải giữ mã đơn hàng dạng `ORD-...` để backend ghép giao dịch với đơn đang chờ.
+
+Webhook và website phải sử dụng cùng backend/database. Nếu frontend đang gọi `http://localhost:3000`, webhook Render sẽ không cập nhật đơn local; khi kiểm thử local cần dùng tunnel HTTPS trỏ vào cổng `3000`, hoặc chuyển frontend sang backend Render trước khi tạo đơn.
+
 Xem log và cập nhật phiên bản:
 
 ```bash
