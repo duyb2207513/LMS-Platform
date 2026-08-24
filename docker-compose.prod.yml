@@ -40,6 +40,7 @@ services:
       ASSIGNMENT_REMINDER_INTERVAL_MINUTES: ${ASSIGNMENT_REMINDER_INTERVAL_MINUTES:-15}
       SENTRY_DSN: ${SENTRY_DSN:-}
       LOG_LEVEL: ${LOG_LEVEL:-info}
+      SEPAY_WEBHOOK_SECRET: ${SEPAY_WEBHOOK_SECRET:-whsec_Y44TJtVfundHz0nBu9Es2NKtuwhLoAGj}
     command: sh -c "npm run db:deploy && npm start"
     volumes:
       - uploads:/app/uploads

@@ -74,6 +74,7 @@ services:
       GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.0-flash}
       SENTRY_DSN: ${SENTRY_DSN:-}
       LOG_LEVEL: ${LOG_LEVEL:-debug}
+      SEPAY_WEBHOOK_SECRET: ${SEPAY_WEBHOOK_SECRET:-whsec_Y44TJtVfundHz0nBu9Es2NKtuwhLoAGj}
 
     depends_on:
       postgres:
