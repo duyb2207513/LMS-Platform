@@ -201,29 +201,10 @@ watch(
                 role="menuitem"
                 >Dashboard</RouterLink
               >
-              <RouterLink
-                v-if="auth.isStudent"
-                to="/dashboard/analytics"
-                class="profile-link"
-                role="menuitem"
-                >📊 Phân tích tiến độ</RouterLink
-              >
-              <RouterLink
-                v-if="auth.isInstructor"
-                to="/instructor/analytics"
-                class="profile-link"
-                role="menuitem"
-                >📊 Báo cáo giảng dạy</RouterLink
-              >
               <RouterLink to="/profile" class="profile-link" role="menuitem"
                 >Hồ sơ cá nhân</RouterLink
               >
-              <RouterLink
-                to="/change-password"
-                class="profile-link"
-                role="menuitem"
-                >Đổi mật khẩu</RouterLink
-              >
+            
               <RouterLink
                 to="/notifications"
                 class="profile-link"
@@ -233,12 +214,7 @@ watch(
               <RouterLink to="/messages" class="profile-link" role="menuitem"
                 >Tin nhắn</RouterLink
               >
-              <RouterLink
-                to="/notifications/settings"
-                class="profile-link"
-                role="menuitem"
-                >Cài đặt thông báo</RouterLink
-              >
+            
               <template v-if="auth.isStudent">
                 <RouterLink
                   to="/my-courses"

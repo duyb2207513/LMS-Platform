@@ -126,9 +126,7 @@ watch(
                 <RouterLink to="/instructor/courses/create" class="profile-link">
                   Tạo khóa học mới
                 </RouterLink>
-                <RouterLink to="/instructor/courses" class="profile-link">
-                  Tạo bài tập hoặc quiz
-                </RouterLink>
+          
               </div>
             </Transition>
           </div>
@@ -343,7 +341,7 @@ watch(
               </div>
 
               <RouterLink :to="dashboardPath" class="profile-link" role="menuitem">
-                📊 Bảng điều khiển
+                 Bảng điều khiển
               </RouterLink>
 
               <RouterLink
@@ -352,7 +350,7 @@ watch(
                 class="profile-link"
                 role="menuitem"
               >
-                💰 Doanh thu & Payout
+                 Doanh thu & Payout
               </RouterLink>
 
               <RouterLink
@@ -361,7 +359,7 @@ watch(
                 class="profile-link"
                 role="menuitem"
               >
-                👥 Quản lý người dùng
+                 Quản lý người dùng
               </RouterLink>
 
               <RouterLink
@@ -370,20 +368,18 @@ watch(
                 class="profile-link"
                 role="menuitem"
               >
-                📚 Quản lý khóa học
+                 Quản lý khóa học
               </RouterLink>
 
               <RouterLink to="/profile" class="profile-link" role="menuitem">
-                👤 Hồ sơ cá nhân
+                 Hồ sơ cá nhân
               </RouterLink>
-              <RouterLink to="/change-password" class="profile-link" role="menuitem">
-                🔑 Đổi mật khẩu
-              </RouterLink>
+         
               <RouterLink to="/notifications" class="profile-link" role="menuitem">
-                🔔 Trung tâm thông báo
+                 Trung tâm thông báo
               </RouterLink>
               <RouterLink to="/messages" class="profile-link" role="menuitem">
-                💬 Tin nhắn
+                 Tin nhắn
               </RouterLink>
 
               <div class="my-1 border-t border-slate-100 dark:border-slate-800" />
@@ -393,7 +389,7 @@ watch(
                 class="profile-link text-purple-600 hover:text-purple-700 dark:text-purple-400"
                 role="menuitem"
               >
-                👁️ Xem giao diện Học viên
+                 Xem giao diện Học viên
               </RouterLink>
 
               <button
