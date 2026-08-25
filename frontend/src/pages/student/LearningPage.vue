@@ -6,7 +6,7 @@ import BaseButton from '@/components/ui/BaseButton.vue'
 import LoadingSpinner from '@/components/ui/LoadingSpinner.vue'
 import { API_BASE_URL, useApi } from '@/composables/useApi'
 import { useAuthStore } from '@/stores/auth'
-import type { ApiResponse, Comment, CourseContent, CourseProgress, Lesson } from '@/types'
+import type { ApiResponse, Comment, CourseContent, CourseProgress, Lesson, LessonContent } from '@/types'
 import VueOfficePdf from '@vue-office/pdf'
 import VueOfficeDocx from '@vue-office/docx'
 import '@vue-office/docx/lib/index.css'
@@ -40,6 +40,7 @@ const error = ref('')
 const sidebarOpen = ref(false)
 const sidebarCollapsed = ref(false)
 const courseId = String(route.params.courseId)
+const enrollmentSucceeded = computed(() => route.query.enrolled === '1')
 const lessons = computed(() => content.value?.sections.flatMap((section) => section.lessons) || [])
 const lessonIndex = computed(() => lessons.value.findIndex((lesson) => lesson.id === selected.value?.id))
 const previousLesson = computed(() => lessonIndex.value > 0 ? lessons.value[lessonIndex.value - 1] : null)
@@ -49,6 +50,8 @@ const asset = (url: string | null) => !url ? '' : url.startsWith('http') ? url :
 const lessonTypeLabel = (type: Lesson['lessonType']) => ({ TEXT: 'Bài đọc', VIDEO: 'Video', DOCUMENT: 'Tài liệu' }[type])
 const lessonBlocks = computed(() => selected.value?.contents?.length ? selected.value.contents : selected.value ? [{ id: `legacy-${selected.value.id}`, lessonId: selected.value.id, contentType: selected.value.lessonType, textContent: selected.value.content, fileUrl: selected.value.lessonType === 'VIDEO' ? selected.value.videoUrl : selected.value.documentUrl, originalName: null, mimeType: null, sizeBytes: null, position: 1, createdAt: '', updatedAt: '' }] : [])
 const docTypeFor = (url: string | null) => { const value=(url||'').toLowerCase(); if(value.endsWith('.pdf'))return 'pdf';if(value.endsWith('.pptx')||value.endsWith('.ppt'))return 'pptx';if(value.endsWith('.docx')||value.endsWith('.doc'))return 'docx';return '' }
+const isImageBlock = (block: Pick<LessonContent, 'mimeType' | 'fileUrl'>) => Boolean(block.mimeType?.startsWith('image/') || /\.(png|jpe?g|webp)$/i.test(block.fileUrl || ''))
+const blockTypeLabel = (block: Pick<LessonContent, 'contentType' | 'mimeType' | 'fileUrl'>) => isImageBlock(block) ? 'Hình ảnh' : lessonTypeLabel(block.contentType)
 const sectionQuizUnlocked = (section: CourseContent['sections'][number]) => section.lessons.filter(lesson => lesson.isPublished && lesson.isRequired).every(lesson => lesson.progress?.isCompleted)
 async function load() {
   try {
@@ -99,12 +102,26 @@ const renderText = (content: string | null) => {
   textVal = textVal.replace(/\[image:(.+?)\]/g, (_, url) => {
     return `<img src="${asset(url)}" alt="Sơ đồ cây quyết định" class="my-6 max-w-full rounded-2xl border border-slate-200 shadow-sm dark:border-slate-800" />`
   })
-  return textVal.split('\n').map(line => {
+  const inline = (value: string) => value
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*([^*]+)\*/g, '<em>$1</em>')
+  const rendered: string[] = []
+  let inList = false
+  textVal.split('\n').forEach(line => {
     const heading = /^(#{1,5})\s+(.+)$/.exec(line.trim())
-    if (heading) { const level = heading[1]!.length; return `<h${level}>${heading[2]}</h${level}>` }
-    if (line.includes('<img ')) return line
-    return line.trim() ? `<p>${line}</p>` : '<br>'
-  }).join('')
+    const bullet = /^[-•]\s+(.+)$/.exec(line.trim())
+    if (bullet) {
+      if (!inList) { rendered.push('<ul>'); inList = true }
+      rendered.push(`<li>${inline(bullet[1]!)}</li>`)
+      return
+    }
+    if (inList) { rendered.push('</ul>'); inList = false }
+    if (heading) { const level = heading[1]!.length; rendered.push(`<h${level}>${inline(heading[2]!)}</h${level}>`); return }
+    if (line.includes('<img ')) { rendered.push(line); return }
+    rendered.push(line.trim() ? `<p>${inline(line)}</p>` : '<br>')
+  })
+  if (inList) rendered.push('</ul>')
+  return rendered.join('')
 }
 
 watch(() => selected.value?.id, () => void loadComments())
@@ -193,15 +210,20 @@ onMounted(load)
           <span v-if="selected" :class="['rounded-full px-3 py-1 text-xs font-bold', selected.progress?.isCompleted ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300' : 'bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300']">{{ selected.progress?.isCompleted ? 'Đã hoàn thành' : 'Đang học' }}</span>
         </header>
         <div class="learning-content">
+          <div v-if="enrollmentSucceeded" class="mb-4 flex items-center gap-3 border border-emerald-300 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-800 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300" role="status">
+            <span class="grid h-7 w-7 shrink-0 place-items-center bg-emerald-600 text-white"><Check :size="16" /></span>
+            Đăng ký khóa học miễn phí thành công. Bạn có thể bắt đầu học ngay.
+          </div>
           <LoadingSpinner v-if="api.loading.value && !content" class="py-24" />
           <p v-else-if="error" class="rounded-2xl bg-red-50 p-4 text-red-700 dark:bg-red-950/30 dark:text-red-300">{{ error }}</p>
           <template v-else-if="selected">
             <div class="mb-6"><p class="text-xs font-extrabold uppercase tracking-[0.14em] text-purple-600 dark:text-purple-400">{{ lessonTypeLabel(selected.lessonType) }} · Bài {{ lessonIndex + 1 }}/{{ lessons.length }}</p><h1 class="mt-2 text-3xl font-black tracking-tight sm:text-4xl">{{ selected.title }}</h1></div>
             <section class="space-y-5">
               <article v-for="(block,blockIndex) in lessonBlocks" :key="block.id" class="viewer-shell" :class="block.contentType === 'TEXT' ? 'viewer-shell--text' : ''">
-                <div class="border-b border-slate-200 px-4 py-2 text-xs font-bold uppercase tracking-wider text-purple-600">Nội dung {{ blockIndex + 1 }} · {{ lessonTypeLabel(block.contentType) }}</div>
+                <div class="border-b border-slate-200 px-4 py-2 text-xs font-bold uppercase tracking-wider text-purple-600">Nội dung {{ blockIndex + 1 }} · {{ blockTypeLabel(block) }}</div>
                 <article v-if="block.contentType === 'TEXT'" class="lesson-prose whitespace-pre-line" v-html="renderText(block.textContent)" />
                 <video v-else-if="block.contentType === 'VIDEO' && block.fileUrl" :src="asset(block.fileUrl)" controls class="max-h-[70vh] w-full bg-black" />
+                <div v-else-if="isImageBlock(block) && block.fileUrl" class="grid min-h-72 place-items-center bg-white p-4 dark:bg-slate-950"><img :src="asset(block.fileUrl)" :alt="block.originalName || 'Hình ảnh bài học'" class="max-h-[72vh] max-w-full object-contain" /></div>
                 <div v-else-if="block.contentType === 'DOCUMENT' && block.fileUrl" class="h-[70vh] min-h-[520px] w-full overflow-hidden bg-white">
                   <VueOfficePdf v-if="docTypeFor(block.fileUrl) === 'pdf'" :src="asset(block.fileUrl)" class="h-full w-full" /><VueOfficePptx v-else-if="docTypeFor(block.fileUrl) === 'pptx'" :src="asset(block.fileUrl)" class="h-full w-full" /><VueOfficeDocx v-else-if="docTypeFor(block.fileUrl) === 'docx'" :src="asset(block.fileUrl)" class="h-full w-full" /><iframe v-else :src="asset(block.fileUrl)" class="h-full w-full" title="Tài liệu bài học" />
                 </div>
@@ -246,7 +268,7 @@ onMounted(load)
 .learning-sidebar-toggle:hover{background:var(--brand-soft);color:var(--brand)}
 .lesson-link{display:flex;width:100%;align-items:flex-start;gap:.7rem;border-left:3px solid transparent;padding:.7rem .65rem;text-align:left;color:var(--text-muted);transition:.18s}.lesson-link:hover{background:var(--surface-muted);color:var(--text)}.lesson-link--active{border-left-color:var(--brand);background:var(--brand-soft)!important;color:var(--brand)!important}.lesson-state{display:grid;width:1.65rem;height:1.65rem;flex-shrink:0;place-items:center;border:1px solid var(--border);font-size:.65rem;font-weight:800}.lesson-state--done{border-color:#10b981;background:#10b981;color:white}
 .section-quiz-link{display:flex;align-items:center;gap:.7rem;margin-top:.45rem;border:1px solid #fcd34d;background:#fffbeb;padding:.7rem;color:#92400e}.section-quiz-link:hover{background:#fef3c7}.section-quiz-link small{display:block;margin-top:.15rem;font-size:.65rem;opacity:.75}.section-quiz-state{border-color:#f59e0b;background:#f59e0b;color:white}.section-quiz-link--locked{cursor:not-allowed;border-color:var(--border);background:var(--surface-muted);color:var(--text-muted);opacity:.78}
-.viewer-shell{min-height:clamp(32rem,68vh,54rem);overflow:hidden;border:1px solid var(--border);border-radius:1.35rem;background:var(--surface);box-shadow:var(--shadow-sm)}.viewer-shell--text{padding:2rem}.viewer-shell>video{min-height:clamp(32rem,68vh,54rem);object-fit:contain}.lesson-prose{margin:0;max-width:none;color:var(--text)}.lesson-prose :deep(h1){margin:1.6rem 0 .8rem;font-size:2rem;line-height:1.2;font-weight:900}.lesson-prose :deep(h2){margin:1.4rem 0 .7rem;font-size:1.65rem;line-height:1.25;font-weight:850}.lesson-prose :deep(h3){margin:1.2rem 0 .6rem;font-size:1.35rem;line-height:1.3;font-weight:800}.lesson-prose :deep(h4){margin:1rem 0 .5rem;font-size:1.12rem;line-height:1.35;font-weight:800}.lesson-prose :deep(h5){margin:.9rem 0 .45rem;font-size:.95rem;line-height:1.4;font-weight:800;text-transform:uppercase;letter-spacing:.04em}.lesson-prose :deep(p){margin:.55rem 0;font-size:1rem;line-height:1.85}.discussion-panel{width:min(100%,48rem)}.comment-box{width:100%;resize:vertical;border:1px solid var(--border);border-radius:.5rem;background:var(--surface-muted);padding:.75rem;color:var(--text);outline:none}.comment-box:focus{border-color:#a855f7;box-shadow:0 0 0 3px rgba(168,85,247,.1)}
+.viewer-shell{min-height:clamp(32rem,68vh,54rem);overflow:hidden;border:1px solid var(--border);border-radius:1.35rem;background:var(--surface);box-shadow:var(--shadow-sm)}.viewer-shell--text{padding:2rem}.viewer-shell>video{min-height:clamp(32rem,68vh,54rem);object-fit:contain}.lesson-prose{margin:0;max-width:none;color:var(--text)}.lesson-prose :deep(h1){margin:1.6rem 0 .8rem;font-size:2rem;line-height:1.2;font-weight:900}.lesson-prose :deep(h2){margin:1.4rem 0 .7rem;font-size:1.65rem;line-height:1.25;font-weight:850}.lesson-prose :deep(h3){margin:1.2rem 0 .6rem;font-size:1.35rem;line-height:1.3;font-weight:800}.lesson-prose :deep(h4){margin:1rem 0 .5rem;font-size:1.12rem;line-height:1.35;font-weight:800}.lesson-prose :deep(h5){margin:.9rem 0 .45rem;font-size:.95rem;line-height:1.4;font-weight:800;text-transform:uppercase;letter-spacing:.04em}.lesson-prose :deep(p){margin:.55rem 0;font-size:1rem;line-height:1.85}.lesson-prose :deep(ul){margin:.65rem 0;padding-left:1.5rem;list-style:disc}.lesson-prose :deep(li){margin:.3rem 0;line-height:1.75}.lesson-prose :deep(strong){font-weight:850}.lesson-prose :deep(em){font-style:italic}.discussion-panel{width:min(100%,48rem)}.comment-box{width:100%;resize:vertical;border:1px solid var(--border);border-radius:.5rem;background:var(--surface-muted);padding:.75rem;color:var(--text);outline:none}.comment-box:focus{border-color:#a855f7;box-shadow:0 0 0 3px rgba(168,85,247,.1)}
 @media(min-width:1024px){
   .learning-sidebar{position:sticky;top:4.5rem;z-index:10;height:calc(100vh - 4.5rem);width:17rem;min-width:17rem;padding-top:0;transition:width .3s ease,min-width .3s ease}
   .sidebar-collapsed .learning-sidebar.sidebar-hidden{width:5.25rem;min-width:5.25rem;overflow:hidden}

@@ -63,14 +63,31 @@ async function primaryAction() {
   actionError.value = ''
   try {
     if (course.value.isFree) {
-      await api.post(`/courses/${course.value.id}/enroll`)
-      await loadEnrollments()
-      await router.push(`/learn/${course.value.id}`)
+      const response = await api.post<ApiResponse<Enrollment>>(`/courses/${course.value.id}/enroll`)
+      if (response.data) {
+        enrollments.value = [
+          response.data,
+          ...enrollments.value.filter((item) => item.courseId !== response.data?.courseId),
+        ]
+      }
+      feedback.value = 'Đăng ký khóa học miễn phí thành công.'
+      await router.push({ path: `/learn/${course.value.id}`, query: { enrolled: '1' } })
     } else {
       const response = await api.post<ApiResponse<Order>>('/orders', { courseIds: [course.value.id] })
       if (response.data) await router.push(`/checkout/${response.data.id}`)
     }
   } catch (cause) {
+    // Render can lose a slow response after the enrollment is already saved.
+    // Reconcile once before reporting failure so students can continue.
+    if (course.value?.isFree) {
+      try {
+        await loadEnrollments()
+        if (enrollment.value) {
+          await router.push({ path: `/learn/${course.value.id}`, query: { enrolled: '1' } })
+          return
+        }
+      } catch { /* Keep the original enrollment error below. */ }
+    }
     actionError.value = cause instanceof Error ? cause.message : 'Không thể thực hiện thao tác.'
   } finally { working.value = false }
 }

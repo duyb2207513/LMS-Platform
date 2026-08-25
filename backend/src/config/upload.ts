@@ -11,6 +11,7 @@ export const AVATAR_DIRECTORY = path.resolve("uploads", "avatars");
 export const AVATAR_MAX_SIZE = 5 * 1024 * 1024;
 export const LESSON_FILE_DIRECTORY = path.resolve("uploads", "lesson-files");
 export const LESSON_FILE_MAX_SIZE = 100 * 1024 * 1024;
+export const LESSON_IMAGE_MAX_SIZE = 5 * 1024 * 1024;
 export const SUBMISSION_FILE_DIRECTORY = path.resolve("uploads", "submissions");
 export const SUBMISSION_FILE_MAX_SIZE = 20 * 1024 * 1024;
 export const SUBMISSION_TOTAL_MAX_SIZE = 50 * 1024 * 1024;
@@ -38,6 +39,11 @@ const allowedLessonMimeTypes = new Map([
   ["application/vnd.openxmlformats-officedocument.wordprocessingml.document", ".docx"],
   ["application/vnd.ms-powerpoint", ".ppt"],
   ["application/vnd.openxmlformats-officedocument.presentationml.presentation", ".pptx"]
+]);
+
+const allowedLessonContentMimeTypes = new Map([
+  ...allowedLessonMimeTypes,
+  ...allowedMimeTypes
 ]);
 
 const allowedSubmissionMimeTypes = new Map([
@@ -183,7 +189,36 @@ export const uploadLessonFile: import("express").RequestHandler = (request, resp
   });
 };
 
+const lessonContentFileUpload = multer({
+  storage: multer.diskStorage({
+    destination: LESSON_FILE_DIRECTORY,
+    filename: (_request, file, callback) => {
+      callback(null, `${randomUUID()}${allowedLessonContentMimeTypes.get(file.mimetype) ?? ""}`);
+    }
+  }),
+  limits: { fileSize: LESSON_FILE_MAX_SIZE, files: 1 },
+  fileFilter: (_request, file, callback) => {
+    if (!allowedLessonContentMimeTypes.has(file.mimetype)) {
+      callback(new AppError(400, "Lesson content must be an image, video, PDF, Word, or PowerPoint file"));
+      return;
+    }
+    callback(null, true);
+  }
+}).single("file");
+
+export const uploadLessonContentFile: import("express").RequestHandler = (request, response, next) => {
+  lessonContentFileUpload(request, response, error => {
+    if (!error) return next();
+    if (error instanceof AppError) return next(error);
+    if (error instanceof multer.MulterError && error.code === "LIMIT_FILE_SIZE") {
+      return next(new AppError(400, "Lesson content file must not exceed 100 MB"));
+    }
+    next(new AppError(400, "Invalid lesson content upload"));
+  });
+};
+
 export async function isValidStoredLessonFile(filePath: string, mimeType: string): Promise<boolean> {
+  if (allowedMimeTypes.has(mimeType)) return isValidStoredImage(filePath, mimeType);
   const handle = await open(filePath, "r");
   try {
     const header = Buffer.alloc(16);

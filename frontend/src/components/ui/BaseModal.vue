@@ -7,9 +7,11 @@ const props = withDefaults(defineProps<{
   description?: string
   size?: 'sm' | 'md' | 'lg' | 'xl'
   closeOnBackdrop?: boolean
+  square?: boolean
 }>(), {
   size: 'md',
   closeOnBackdrop: true,
+  square: false,
 })
 
 const emit = defineEmits<{ close: [] }>()
@@ -49,7 +51,8 @@ onBeforeUnmount(() => {
           aria-modal="true"
           :aria-labelledby="title ? 'modal-title' : undefined"
           :class="[
-            'relative flex max-h-[calc(100vh-2rem)] w-full flex-col overflow-hidden rounded-3xl border border-white/70 bg-white shadow-2xl shadow-slate-950/20 dark:border-slate-700 dark:bg-slate-900 dark:shadow-black/50 sm:max-h-[calc(100vh-3rem)]',
+            'relative flex max-h-[calc(100vh-2rem)] w-full flex-col overflow-hidden border border-white/70 bg-white shadow-2xl shadow-slate-950/20 dark:border-slate-700 dark:bg-slate-900 dark:shadow-black/50 sm:max-h-[calc(100vh-3rem)]',
+            square ? 'rounded-none' : 'rounded-3xl',
             size === 'sm' ? 'max-w-md' : '',
             size === 'md' ? 'max-w-lg' : '',
             size === 'lg' ? 'max-w-2xl' : '',
@@ -65,7 +68,10 @@ onBeforeUnmount(() => {
             </slot>
             <button
               type="button"
-              class="grid h-9 w-9 shrink-0 place-items-center rounded-xl text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-purple-500/15 dark:hover:bg-slate-800 dark:hover:text-white"
+              :class="[
+                'grid h-9 w-9 shrink-0 place-items-center text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-purple-500/15 dark:hover:bg-slate-800 dark:hover:text-white',
+                square ? 'rounded-none' : 'rounded-xl',
+              ]"
               aria-label="Đóng"
               @click="close"
             >

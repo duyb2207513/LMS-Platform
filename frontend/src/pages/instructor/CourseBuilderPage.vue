@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
+import { Bold, CaseUpper, FileText, Image as ImageIcon, Italic, List, Play, ScrollText } from '@lucide/vue'
 import InstructorLayout from '@/layouts/InstructorLayout.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
 import BaseInput from '@/components/ui/BaseInput.vue'
@@ -13,6 +14,7 @@ import '@vue-office/docx/lib/index.css'
 import VueOfficePptx from '@vue-office/pptx'
 
 type LessonType = 'VIDEO' | 'TEXT' | 'DOCUMENT'
+type ContentChoice = LessonType | 'IMAGE'
 const route = useRoute()
 const api = useApi()
 const courseId = String(route.params.courseId)
@@ -37,25 +39,68 @@ const activeLesson = ref<Lesson | null>(null)
 const contentBlocks = ref<LessonContent[]>([])
 const contentLoading = ref(false)
 const contentSaving = ref(false)
-const newContentType = ref<LessonType>('TEXT')
+const newContentType = ref<ContentChoice>('TEXT')
 const newContentText = ref('')
 const newContentFile = ref<File | null>(null)
 const contentFileKey = ref(0)
+const contentTextarea = ref<HTMLTextAreaElement | null>(null)
 
 const lessonForm = reactive({ title: '', lessonType: 'TEXT' as LessonType, content: '', isPreview: false, isRequired: true })
 const totalLessons = computed(() => sections.value.reduce((total, section) => total + section.lessons.length, 0))
 const publishedLessons = computed(() => sections.value.flatMap((section) => section.lessons).filter((lesson) => lesson.isPublished).length)
 const acceptedLessonFiles = computed(() => lessonForm.lessonType === 'VIDEO' ? 'video/mp4,video/webm' : '.pdf,.doc,.docx,.ppt,.pptx,application/pdf')
 const currentLessonFileUrl = computed(() => !editingLesson.value ? null : editingLesson.value.lessonType === 'VIDEO' ? editingLesson.value.videoUrl : editingLesson.value.documentUrl)
-const lessonTypeLabel = (type: LessonType) => ({ TEXT: 'Văn bản', VIDEO: 'Video', DOCUMENT: 'Tài liệu' }[type])
+const lessonTypeLabel = (type: ContentChoice) => ({ TEXT: 'Văn bản', VIDEO: 'Video', DOCUMENT: 'Tài liệu', IMAGE: 'Hình ảnh' }[type])
+const contentChoices = [
+  { value: 'TEXT' as const, label: 'Văn bản', icon: FileText },
+  { value: 'VIDEO' as const, label: 'Video', icon: Play },
+  { value: 'IMAGE' as const, label: 'Hình ảnh', icon: ImageIcon },
+  { value: 'DOCUMENT' as const, label: 'Tài liệu', icon: ScrollText },
+]
 const formatBytes = (bytes: number | null) => !bytes ? '' : bytes < 1024 * 1024 ? `${Math.ceil(bytes / 1024)} KB` : `${(bytes / 1024 / 1024).toFixed(1)} MB`
 const escapeHtml = (value: string) => value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-const renderDocumentText = (value: string | null) => (value || '').split('\n').map(line => {
-  const heading = /^(#{1,5})\s+(.+)$/.exec(line.trim())
-  if (heading) { const level = heading[1]!.length; return `<h${level}>${escapeHtml(heading[2]!)}</h${level}>` }
-  return line.trim() ? `<p>${escapeHtml(line)}</p>` : '<br>'
-}).join('')
+const inlineText = (value: string) => escapeHtml(value)
+  .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+  .replace(/(^|[^*])\*([^*]+)\*/g, '$1<em>$2</em>')
+const renderDocumentText = (value: string | null) => {
+  const output: string[] = []
+  let listOpen = false
+  for (const line of (value || '').split('\n')) {
+    const trimmed = line.trim()
+    const bullet = /^[-•]\s+(.+)$/.exec(trimmed)
+    if (bullet) {
+      if (!listOpen) { output.push('<ul>'); listOpen = true }
+      output.push(`<li>${inlineText(bullet[1]!)}</li>`)
+      continue
+    }
+    if (listOpen) { output.push('</ul>'); listOpen = false }
+    const heading = /^(#{1,5})\s+(.+)$/.exec(trimmed)
+    if (heading) output.push(`<h${heading[1]!.length}>${inlineText(heading[2]!)}</h${heading[1]!.length}>`)
+    else output.push(trimmed ? `<p>${inlineText(line)}</p>` : '<br>')
+  }
+  if (listOpen) output.push('</ul>')
+  return output.join('')
+}
 function insertHeading(level: number) { const prefix = `${'#'.repeat(level)} `; newContentText.value = newContentText.value ? `${newContentText.value}\n${prefix}` : prefix }
+async function formatSelection(kind: 'bold' | 'italic' | 'uppercase' | 'bullet') {
+  const textarea = contentTextarea.value
+  if (!textarea) return
+  const start = textarea.selectionStart
+  const end = textarea.selectionEnd
+  const selected = newContentText.value.slice(start, end)
+  const fallback = kind === 'bullet' ? 'Mục danh sách' : 'văn bản'
+  let replacement = selected || fallback
+  if (kind === 'bold') replacement = `**${replacement}**`
+  if (kind === 'italic') replacement = `*${replacement}*`
+  if (kind === 'uppercase') replacement = replacement.toUpperCase()
+  if (kind === 'bullet') replacement = replacement.split('\n').map(line => `- ${line.replace(/^[-•]\s+/, '')}`).join('\n')
+  newContentText.value = `${newContentText.value.slice(0, start)}${replacement}${newContentText.value.slice(end)}`
+  await nextTick()
+  textarea.focus()
+  textarea.setSelectionRange(start, start + replacement.length)
+}
+const isImageContent = (item: Pick<LessonContent, 'mimeType' | 'fileUrl'>) => Boolean(item.mimeType?.startsWith('image/') || /\.(png|jpe?g|webp)(?:\?|$)/i.test(item.fileUrl || ''))
+const contentLabel = (item: LessonContent) => isImageContent(item) ? 'Hình ảnh' : lessonTypeLabel(item.contentType)
 
 const asset = (url: string | null) => !url ? '' : url.startsWith('http') ? url : `${API_BASE_URL.replace('/api/v1', '')}${url}`
 
@@ -184,14 +229,27 @@ async function selectLesson(lesson: Lesson) {
   finally { contentLoading.value = false }
 }
 function closeContentManager() { if (contentSaving.value) return; contentModalOpen.value = false }
-function selectContentFile(event: Event) { newContentFile.value = (event.target as HTMLInputElement).files?.[0] || null }
+function selectContentFile(event: Event) {
+  const input = event.target as HTMLInputElement
+  const file = input.files?.[0] || null
+  error.value = ''
+  if (!file) { newContentFile.value = null; return }
+  if (newContentType.value === 'IMAGE' && !['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+    input.value = ''; newContentFile.value = null; error.value = 'Hình ảnh phải có định dạng JPG, PNG hoặc WebP'; return
+  }
+  if (newContentType.value === 'IMAGE' && file.size > 5 * 1024 * 1024) {
+    input.value = ''; newContentFile.value = null; error.value = 'Hình ảnh không được vượt quá 5 MB'; return
+  }
+  newContentFile.value = file
+}
 async function addContentBlock() {
   if (!contentLesson.value) return
   if (newContentType.value === 'TEXT' && !newContentText.value.trim()) { error.value = 'Vui lòng nhập nội dung văn bản'; return }
   if (newContentType.value !== 'TEXT' && !newContentFile.value) { error.value = 'Vui lòng chọn file nội dung'; return }
   contentSaving.value = true; error.value = ''
   try {
-    const response = await api.post<ApiResponse<LessonContent>>(`/lessons/${contentLesson.value.id}/contents`, { contentType: newContentType.value, textContent: newContentType.value === 'TEXT' ? newContentText.value.trim() : null })
+    const storedType: LessonType = newContentType.value === 'IMAGE' ? 'DOCUMENT' : newContentType.value
+    const response = await api.post<ApiResponse<LessonContent>>(`/lessons/${contentLesson.value.id}/contents`, { contentType: storedType, textContent: newContentType.value === 'TEXT' ? newContentText.value.trim() : null })
     if (!response.data) throw new Error('Không nhận được nội dung vừa tạo')
     if (newContentFile.value) { const body = new FormData(); body.append('file', newContentFile.value); await api.post(`/lesson-contents/${response.data.id}/file`, body) }
     const refreshed = await api.get<ApiResponse<LessonContent[]>>(`/lessons/${contentLesson.value.id}/contents`); contentBlocks.value = refreshed.data || []
@@ -249,11 +307,12 @@ onMounted(load)
           <div v-if="activeLesson" class="document-page">
             <header class="document-title"><p>{{ sections.find(section => section.id === activeLesson?.sectionId)?.title }}</p><h2>{{ activeLesson.title }}</h2><div><span>{{ contentBlocks.length }} khối nội dung</span><button type="button" @click="openContentManager(activeLesson)">＋ Thêm nội dung</button></div></header>
             <div v-if="contentLoading" class="document-empty">Đang tải nội dung...</div>
-            <div v-else-if="!contentBlocks.length" class="document-empty"><b>Trang bài học đang trống</b><p>Nhấn “＋ Thêm nội dung” để chèn văn bản, video hoặc tài liệu.</p></div>
+            <div v-else-if="!contentBlocks.length" class="document-empty"><b>Trang bài học đang trống</b><p>Nhấn “＋ Thêm nội dung” để chèn văn bản, hình ảnh, video hoặc tài liệu.</p></div>
             <article v-for="(block,index) in contentBlocks" v-else :key="block.id" class="document-block">
-              <div class="document-block-label">{{ index + 1 }} · {{ lessonTypeLabel(block.contentType) }}</div>
+              <div class="document-block-label">{{ index + 1 }} · {{ contentLabel(block) }}</div>
               <div v-if="block.contentType === 'TEXT'" class="document-text" v-html="renderDocumentText(block.textContent)" />
               <video v-else-if="block.contentType === 'VIDEO' && block.fileUrl" :src="asset(block.fileUrl)" controls class="w-full bg-black" />
+              <img v-else-if="isImageContent(block) && block.fileUrl" :src="asset(block.fileUrl)" :alt="block.originalName || 'Hình ảnh bài học'" class="mx-auto max-h-[42rem] max-w-full object-contain" />
               <div v-else-if="block.contentType === 'DOCUMENT' && block.fileUrl" class="h-[34rem] overflow-hidden border border-slate-200"><VueOfficePdf v-if="block.fileUrl.toLowerCase().endsWith('.pdf')" :src="asset(block.fileUrl)" class="h-full w-full" /><VueOfficePptx v-else-if="/\.pptx?$/.test(block.fileUrl.toLowerCase())" :src="asset(block.fileUrl)" class="h-full w-full" /><VueOfficeDocx v-else-if="/\.docx?$/.test(block.fileUrl.toLowerCase())" :src="asset(block.fileUrl)" class="h-full w-full" /><iframe v-else :src="asset(block.fileUrl)" class="h-full w-full" /></div>
               <p v-else class="text-sm text-slate-400">Nội dung chưa có file.</p>
             </article>
@@ -275,22 +334,22 @@ onMounted(load)
     </BaseModal>
 
     <BaseModal :show="Boolean(deleteTarget)" title="Xác nhận xóa" :description="deleteTarget?.kind === 'section' ? 'Toàn bộ bài học trong chương cũng sẽ bị xóa.' : 'Thao tác này không thể hoàn tác.'" size="sm" @close="!deleting && (deleteTarget = null)"><p class="text-sm leading-6 text-slate-600 dark:text-slate-300">Bạn có chắc muốn xóa <b>“{{ deleteTarget?.title }}”</b>?</p><div class="mt-6 flex justify-end gap-3"><BaseButton variant="secondary" :disabled="deleting" @click="deleteTarget = null">Hủy</BaseButton><BaseButton variant="danger" :loading="deleting" @click="confirmDelete">Xóa nội dung</BaseButton></div></BaseModal>
-    <BaseModal :show="contentModalOpen" :title="`Nội dung · ${contentLesson?.title || ''}`" description="Một bài học có thể gồm nhiều nội dung. Dùng mũi tên để đổi thứ tự hiển thị." size="xl" @close="closeContentManager">
+    <BaseModal :show="contentModalOpen" :title="`Nội dung · ${contentLesson?.title || ''}`" description="Một bài học có thể gồm nhiều nội dung. Dùng mũi tên để đổi thứ tự hiển thị." size="xl" :square="true" @close="closeContentManager">
       <div v-if="contentLoading" class="py-10 text-center text-sm text-slate-500">Đang tải nội dung...</div>
       <div v-else class="grid gap-6 lg:grid-cols-[1.2fr_.8fr]">
         <section class="space-y-3">
           <article v-for="(item,index) in contentBlocks" :key="item.id" class="content-block-row">
             <div class="content-order"><b>{{ index + 1 }}</b><button type="button" :disabled="index===0" @click="moveContent(index,-1)">↑</button><button type="button" :disabled="index===contentBlocks.length-1" @click="moveContent(index,1)">↓</button></div>
-            <div class="min-w-0 flex-1"><div class="flex items-center gap-2"><span :class="['lesson-kind',`lesson-kind--${item.contentType.toLowerCase()}`]">{{ lessonTypeLabel(item.contentType) }}</span><b class="truncate">{{ item.originalName || (item.contentType === 'TEXT' ? 'Nội dung văn bản' : 'Chưa tải file') }}</b></div><p v-if="item.textContent" class="mt-2 line-clamp-3 whitespace-pre-line text-sm text-slate-600">{{ item.textContent }}</p><p v-if="item.sizeBytes" class="mt-1 text-xs text-slate-400">{{ formatBytes(item.sizeBytes) }}</p><a v-if="item.fileUrl" :href="asset(item.fileUrl)" target="_blank" class="mt-2 inline-block text-xs font-bold text-purple-600">Xem trước file ↗</a></div>
+            <div class="min-w-0 flex-1"><div class="flex items-center gap-2"><span :class="['lesson-kind',`lesson-kind--${isImageContent(item)?'image':item.contentType.toLowerCase()}`]">{{ contentLabel(item) }}</span><b class="truncate">{{ item.originalName || (item.contentType === 'TEXT' ? 'Nội dung văn bản' : 'Chưa tải file') }}</b></div><p v-if="item.textContent" class="mt-2 line-clamp-3 whitespace-pre-line text-sm text-slate-600">{{ item.textContent }}</p><img v-if="isImageContent(item) && item.fileUrl" :src="asset(item.fileUrl)" :alt="item.originalName || 'Hình ảnh bài học'" class="mt-2 h-20 max-w-40 border border-slate-200 object-contain"><p v-if="item.sizeBytes" class="mt-1 text-xs text-slate-400">{{ formatBytes(item.sizeBytes) }}</p><a v-if="item.fileUrl" :href="asset(item.fileUrl)" target="_blank" class="mt-2 inline-block text-xs font-bold text-purple-600">Xem trước file ↗</a></div>
             <BaseButton size="sm" variant="ghost" @click="removeContentBlock(item)">Xóa</BaseButton>
           </article>
           <p v-if="!contentBlocks.length" class="border border-dashed border-slate-300 p-8 text-center text-sm text-slate-500">Bài học chưa có nội dung.</p>
         </section>
         <form class="border-l border-slate-200 pl-6 dark:border-slate-800" @submit.prevent="addContentBlock">
-          <h3 class="font-black">Thêm nội dung</h3><div class="mt-4 grid grid-cols-3 gap-2"><button v-for="type in (['TEXT','VIDEO','DOCUMENT'] as LessonType[])" :key="type" type="button" :class="['content-type',newContentType===type?'content-type--active':'']" @click="newContentType=type;newContentFile=null;contentFileKey+=1">{{ lessonTypeLabel(type) }}</button></div>
-          <div v-if="newContentType==='TEXT'" class="mt-4"><div class="heading-toolbar" aria-label="Cấp tiêu đề"><button v-for="level in 5" :key="level" type="button" @click="insertHeading(level)">H{{ level }}</button></div><textarea v-model="newContentText" rows="10" class="builder-textarea" placeholder="Chọn H1–H5 hoặc nhập đoạn văn bản thường..." /><p class="mt-2 text-xs text-slate-400">Có thể dùng # đến ##### ở đầu dòng để tạo tiêu đề.</p></div>
-          <label v-else class="file-drop mt-4 block cursor-pointer"><b>{{ newContentFile?.name || 'Chọn file từ máy' }}</b><span class="mt-1 block text-xs text-slate-500">{{ newContentType==='VIDEO'?'MP4, WebM':'PDF, DOC, DOCX, PPT, PPTX' }} · tối đa 100 MB</span><input :key="contentFileKey" type="file" class="sr-only" :accept="newContentType==='VIDEO'?'video/mp4,video/webm':'.pdf,.doc,.docx,.ppt,.pptx'" @change="selectContentFile"></label>
-          <p v-if="error" class="mt-4 bg-red-50 p-3 text-sm text-red-700">{{ error }}</p><BaseButton class="mt-4" type="submit" :loading="contentSaving" :full-width="true">Thêm vào cuối bài học</BaseButton>
+          <div class="content-compose-head"><h3 class="font-black">Thêm nội dung</h3><div class="content-type-strip"><button v-for="choice in contentChoices" :key="choice.value" type="button" :class="['content-type',newContentType===choice.value?'content-type--active':'']" :aria-label="choice.label" :title="choice.label" @click="newContentType=choice.value;newContentFile=null;contentFileKey+=1"><component :is="choice.icon" :size="18" /></button></div></div>
+          <div v-if="newContentType==='TEXT'" class="mt-3"><div class="text-format-toolbar" aria-label="Định dạng văn bản"><div class="heading-toolbar"><button v-for="level in 5" :key="level" type="button" :title="`Tiêu đề H${level}`" @click="insertHeading(level)">H{{ level }}</button></div><div class="inline-toolbar"><button type="button" title="In đậm" aria-label="In đậm" @click="formatSelection('bold')"><Bold :size="16" /></button><button type="button" title="In nghiêng" aria-label="In nghiêng" @click="formatSelection('italic')"><Italic :size="16" /></button><button type="button" title="In hoa" aria-label="In hoa" @click="formatSelection('uppercase')"><CaseUpper :size="17" /></button><button type="button" title="Danh sách đầu dòng" aria-label="Danh sách đầu dòng" @click="formatSelection('bullet')"><List :size="17" /></button></div></div><textarea ref="contentTextarea" v-model="newContentText" rows="10" class="builder-textarea" placeholder="Bôi đen văn bản rồi chọn định dạng, hoặc nhập nội dung tại đây..." /><p class="mt-2 text-xs text-slate-400">Hỗ trợ H1–H5, in đậm, in nghiêng, IN HOA và danh sách đầu dòng.</p></div>
+          <label v-else class="file-drop mt-3 block cursor-pointer"><b>{{ newContentFile?.name || (newContentType==='IMAGE'?'Chọn hình từ máy':'Chọn file từ máy') }}</b><span class="mt-1 block text-xs text-slate-500">{{ newContentType==='VIDEO'?'MP4, WebM · tối đa 100 MB':newContentType==='IMAGE'?'JPG, PNG, WebP · tối đa 5 MB':'PDF, DOC, DOCX, PPT, PPTX · tối đa 100 MB' }}</span><input :key="contentFileKey" type="file" class="sr-only" :accept="newContentType==='VIDEO'?'video/mp4,video/webm':newContentType==='IMAGE'?'image/jpeg,image/png,image/webp':'.pdf,.doc,.docx,.ppt,.pptx'" @change="selectContentFile"></label>
+          <p v-if="error" class="mt-3 bg-red-50 p-3 text-sm text-red-700">{{ error }}</p><BaseButton class="mt-3 !rounded-none" type="submit" :loading="contentSaving" :full-width="true">Thêm vào</BaseButton>
         </form>
       </div>
     </BaseModal>
@@ -302,5 +361,24 @@ onMounted(load)
 .content-block-row{display:flex;align-items:flex-start;gap:.85rem;border:1px solid var(--border);padding:1rem;background:var(--surface)}.content-order{display:grid;grid-template-columns:repeat(3,1.8rem);align-items:center;gap:.2rem}.content-order>*{display:grid;height:1.8rem;place-items:center;border:1px solid var(--border);background:var(--surface-muted);font-size:.75rem}.content-order button:disabled{cursor:not-allowed;opacity:.3}
 .notion-section-header{display:flex;flex-wrap:wrap;align-items:center;gap:1rem;border-bottom:1px solid var(--border);padding:1rem 1.25rem;background:var(--surface-muted)}.section-index{display:grid;height:2.5rem;width:2.5rem;place-items:center;background:var(--brand-soft);color:var(--brand);font-size:.75rem;font-weight:900}.notion-add-content{display:inline-flex;align-items:center;gap:.4rem;border:1px solid var(--border);padding:.5rem .7rem;color:var(--brand);font-size:.78rem;font-weight:800}.notion-add-content:hover,.notion-insert:hover,.notion-add-section:hover{border-color:var(--brand);background:var(--brand-soft);color:var(--brand)}.notion-add-content small{display:grid;min-width:1.2rem;height:1.2rem;place-items:center;background:var(--surface-muted);color:var(--text-muted)}.section-footer-actions{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:stretch;border-top:1px solid var(--border);background:var(--surface)}.notion-insert{display:flex;align-items:center;gap:.55rem;border:0;padding:.75rem 1rem;text-align:left;color:var(--text-muted);font-size:.78rem;font-weight:750}.section-quiz-action{display:flex;align-items:center;border-left:1px solid var(--border);padding:.75rem 1rem;color:var(--brand);font-size:.78rem;font-weight:850;white-space:nowrap}.section-quiz-action:hover{background:var(--brand-soft)}.notion-add-section{display:flex;width:100%;align-items:center;justify-content:center;gap:.5rem;border:1px dashed var(--border-strong);padding:1rem;color:var(--text-muted);font-size:.9rem;font-weight:800}
 .builder-docs-layout{display:grid;grid-template-columns:24rem minmax(0,1fr);min-height:calc(100vh - 15rem);border:1px solid var(--border);background:#eef0f3}.builder-outline{max-height:calc(100vh - 6rem);overflow-y:auto;border-right:1px solid var(--border);background:#f8fafc;padding:.65rem}.outline-section{margin-bottom:.65rem;overflow:hidden;border:1px solid var(--border);background:var(--surface);box-shadow:0 1px 2px rgba(15,23,42,.04)}.builder-outline .notion-section-header{display:grid;grid-template-columns:2rem minmax(0,1fr) auto;gap:.65rem;padding:.75rem;background:var(--surface)}.builder-outline .section-index{width:2rem;height:2rem}.builder-outline .notion-section-header h2{font-size:.8rem;line-height:1.3}.builder-outline .notion-section-header>div:last-child :deep(button){min-height:1.75rem;padding:.25rem .4rem;font-size:.65rem}.builder-outline .lesson-row{display:grid;grid-template-columns:3.25rem minmax(0,1fr);gap:.65rem;cursor:pointer;padding:.7rem}.builder-outline .lesson-row>div:last-child{grid-column:2;justify-content:flex-start}.builder-outline .lesson-row>div:last-child :deep(button){min-height:1.7rem;padding:.2rem .35rem;font-size:.65rem}.builder-outline .lesson-row h3{font-size:.78rem;line-height:1.35}.builder-outline .lesson-row--active{border-left:3px solid var(--brand);background:var(--brand-soft)}.builder-outline .lesson-kind{min-width:3.25rem}.builder-outline .notion-add-content{padding:.3rem .45rem}.builder-outline .notion-add-content span{display:none}.builder-outline .section-footer-actions{font-size:.75rem}.document-stage{overflow:auto;padding:2rem}.document-page{width:min(100%,56rem);min-height:70rem;margin:0 auto;background:white;padding:4rem 5rem;box-shadow:0 2px 16px rgba(15,23,42,.14);color:#111827}.document-title{border-bottom:1px solid #e5e7eb;padding-bottom:1.25rem}.document-title>p{color:#7c3aed;font-size:.68rem;font-weight:850;text-transform:uppercase;letter-spacing:.12em}.document-title h2{max-width:46rem;margin-top:.5rem;font-size:1.75rem;font-weight:900;line-height:1.25}.document-title>div{display:flex;align-items:center;justify-content:space-between;margin-top:1rem;color:#64748b;font-size:.75rem}.document-title button{border:1px solid #c4b5fd;padding:.45rem .7rem;color:#6d28d9;font-weight:800}.document-block{position:relative;padding:1.75rem 0;border-bottom:1px solid #f1f5f9}.document-block-label{margin-bottom:1rem;color:#94a3b8;font-size:.65rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em}.document-text{color:#1f2937}.document-text :deep(h1){margin:1.6rem 0 .8rem;font-size:2rem;line-height:1.2;font-weight:900}.document-text :deep(h2){margin:1.4rem 0 .7rem;font-size:1.65rem;line-height:1.25;font-weight:850}.document-text :deep(h3){margin:1.2rem 0 .6rem;font-size:1.35rem;line-height:1.3;font-weight:800}.document-text :deep(h4){margin:1rem 0 .5rem;font-size:1.12rem;line-height:1.35;font-weight:800}.document-text :deep(h5){margin:.9rem 0 .45rem;font-size:.95rem;line-height:1.4;font-weight:800;text-transform:uppercase;letter-spacing:.04em}.document-text :deep(p){margin:.55rem 0;font-size:1rem;line-height:1.85}.document-empty{display:grid;min-height:24rem;place-items:center;align-content:center;text-align:center;color:#64748b}.document-empty b{color:#111827;font-size:1.1rem}.document-empty p{margin-top:.5rem;font-size:.82rem}.heading-toolbar{display:flex;border:1px solid var(--border);border-bottom:0;background:var(--surface-muted)}.heading-toolbar button{min-width:2.6rem;border-right:1px solid var(--border);padding:.45rem;font-size:.72rem;font-weight:850;color:var(--text-muted)}.heading-toolbar button:hover{background:var(--brand-soft);color:var(--brand)}
+.document-text :deep(ul){margin:.65rem 0;padding-left:1.45rem;list-style:disc}
+.document-text :deep(li){margin:.3rem 0;line-height:1.75}
+.document-text :deep(strong){font-weight:850}
+.document-text :deep(em){font-style:italic}
+.content-compose-head{display:flex;align-items:center;justify-content:space-between;gap:.75rem}
+.content-type-strip{display:flex;align-items:center;gap:.35rem}
+.content-type{display:grid;height:2.35rem;width:2.35rem;place-items:center;border:1px solid var(--border);border-radius:0;background:var(--surface-muted);padding:0;color:var(--text-muted)}
+.content-type:hover{border-color:var(--brand);color:var(--brand)}
+.content-type--active{border-color:var(--brand);background:var(--brand-soft);color:var(--brand);box-shadow:none}
+.text-format-toolbar{display:flex;flex-wrap:wrap;align-items:stretch;border:1px solid var(--border);border-bottom:0;background:var(--surface-muted)}
+.text-format-toolbar .heading-toolbar{border:0;border-right:1px solid var(--border)}
+.inline-toolbar{display:flex}
+.inline-toolbar button{display:grid;min-width:2.35rem;place-items:center;border-right:1px solid var(--border);padding:.45rem;color:var(--text-muted)}
+.inline-toolbar button:hover{background:var(--brand-soft);color:var(--brand)}
+.content-block-row,.builder-textarea,.file-drop,.lesson-kind{border-radius:0!important}
+.lesson-kind--image{background:#fdf2f8;color:#be185d}
+.builder-textarea:focus{box-shadow:none}
+.file-drop{padding:1.1rem}
+.content-block-row :deep(button){border-radius:0!important}
 @media(max-width:1100px){.builder-docs-layout{grid-template-columns:1fr}.builder-outline{max-height:none;border-right:0}.document-stage{padding:1rem}.document-page{min-height:40rem;padding:2rem}}
 </style>
