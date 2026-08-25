@@ -1,7 +1,6 @@
 import { useApi } from '@/composables/useApi'
 import type { Coupon, CouponValidationResult, CouponUsage } from '@/types/commerce'
 import type { ApiResponse, PaginatedResponse } from '@/types'
-#
 export function useCouponApi() {
   const api = useApi()
 
