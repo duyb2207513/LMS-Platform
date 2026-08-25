@@ -51,7 +51,6 @@ const lessonTypeLabel = (type: Lesson['lessonType']) => ({ TEXT: 'Bài đọc', 
 const lessonBlocks = computed(() => selected.value?.contents?.length ? selected.value.contents : selected.value ? [{ id: `legacy-${selected.value.id}`, lessonId: selected.value.id, contentType: selected.value.lessonType, textContent: selected.value.content, fileUrl: selected.value.lessonType === 'VIDEO' ? selected.value.videoUrl : selected.value.documentUrl, originalName: null, mimeType: null, sizeBytes: null, position: 1, createdAt: '', updatedAt: '' }] : [])
 const docTypeFor = (url: string | null) => { const value=(url||'').toLowerCase(); if(value.endsWith('.pdf'))return 'pdf';if(value.endsWith('.pptx')||value.endsWith('.ppt'))return 'pptx';if(value.endsWith('.docx')||value.endsWith('.doc'))return 'docx';return '' }
 const isImageBlock = (block: Pick<LessonContent, 'mimeType' | 'fileUrl'>) => Boolean(block.mimeType?.startsWith('image/') || /\.(png|jpe?g|webp)$/i.test(block.fileUrl || ''))
-const blockTypeLabel = (block: Pick<LessonContent, 'contentType' | 'mimeType' | 'fileUrl'>) => isImageBlock(block) ? 'Hình ảnh' : lessonTypeLabel(block.contentType)
 const sectionQuizUnlocked = (section: CourseContent['sections'][number]) => section.lessons.filter(lesson => lesson.isPublished && lesson.isRequired).every(lesson => lesson.progress?.isCompleted)
 async function load() {
   try {
@@ -219,17 +218,16 @@ onMounted(load)
           <template v-else-if="selected">
             <div class="mb-6"><p class="text-xs font-extrabold uppercase tracking-[0.14em] text-purple-600 dark:text-purple-400">{{ lessonTypeLabel(selected.lessonType) }} · Bài {{ lessonIndex + 1 }}/{{ lessons.length }}</p><h1 class="mt-2 text-3xl font-black tracking-tight sm:text-4xl">{{ selected.title }}</h1></div>
             <section class="lesson-content-stream">
-              <article v-for="(block,blockIndex) in lessonBlocks" :key="block.id" class="viewer-shell" :class="block.contentType === 'TEXT' ? 'viewer-shell--text' : ''">
-                <div class="border-b border-slate-200 px-4 py-2 text-xs font-bold uppercase tracking-wider text-purple-600">Nội dung {{ blockIndex + 1 }} · {{ blockTypeLabel(block) }}</div>
-                <article v-if="block.contentType === 'TEXT'" class="lesson-prose whitespace-pre-line" v-html="renderText(block.textContent)" />
-                <video v-else-if="block.contentType === 'VIDEO' && block.fileUrl" :src="asset(block.fileUrl)" controls class="max-h-[70vh] w-full bg-black" />
-                <div v-else-if="isImageBlock(block) && block.fileUrl" class="lesson-image-viewer"><img :src="asset(block.fileUrl)" :alt="block.originalName || 'Hình ảnh bài học'" /></div>
-                <div v-else-if="block.contentType === 'DOCUMENT' && block.fileUrl" class="lesson-document-viewer w-full overflow-hidden bg-white">
+              <template v-for="block in lessonBlocks" :key="block.id">
+                <article v-if="block.contentType === 'TEXT'" class="lesson-flow-item lesson-prose whitespace-pre-line" v-html="renderText(block.textContent)" />
+                <video v-else-if="block.contentType === 'VIDEO' && block.fileUrl" :src="asset(block.fileUrl)" controls class="lesson-flow-item lesson-video-viewer" />
+                <div v-else-if="isImageBlock(block) && block.fileUrl" class="lesson-flow-item lesson-image-viewer"><img :src="asset(block.fileUrl)" :alt="block.originalName || 'Hình ảnh bài học'" /></div>
+                <div v-else-if="block.contentType === 'DOCUMENT' && block.fileUrl" class="lesson-flow-item lesson-document-viewer w-full overflow-hidden bg-white">
                   <VueOfficePdf v-if="docTypeFor(block.fileUrl) === 'pdf'" :src="asset(block.fileUrl)" class="h-full w-full" /><VueOfficePptx v-else-if="docTypeFor(block.fileUrl) === 'pptx'" :src="asset(block.fileUrl)" class="h-full w-full" /><VueOfficeDocx v-else-if="docTypeFor(block.fileUrl) === 'docx'" :src="asset(block.fileUrl)" class="h-full w-full" /><iframe v-else :src="asset(block.fileUrl)" class="h-full w-full" title="Tài liệu bài học" />
                 </div>
-                <div v-else class="grid min-h-72 place-items-center p-8 text-center"><div><FileText :size="42" class="mx-auto text-slate-400" /><p class="mt-3 font-bold">Nội dung đang được cập nhật</p></div></div>
-              </article>
-              <div v-if="!lessonBlocks.length" class="viewer-shell grid min-h-72 place-items-center p-8 text-center"><div><FileText :size="42" class="mx-auto text-slate-400" /><p class="mt-3 font-bold">Nội dung đang được cập nhật</p></div></div>
+                <div v-else class="lesson-flow-item grid min-h-48 place-items-center text-center"><div><FileText :size="42" class="mx-auto text-slate-400" /><p class="mt-3 font-bold">Nội dung đang được cập nhật</p></div></div>
+              </template>
+              <div v-if="!lessonBlocks.length" class="grid min-h-72 place-items-center text-center"><div><FileText :size="42" class="mx-auto text-slate-400" /><p class="mt-3 font-bold">Nội dung đang được cập nhật</p></div></div>
             </section>
 
             <div class="mt-5 flex flex-wrap items-center justify-between gap-3"><BaseButton variant="secondary" :disabled="!previousLesson" @click="navigateLesson(previousLesson)"><ChevronLeft :size="17" /> Bài trước</BaseButton><div class="flex flex-wrap gap-2"><RouterLink v-slot="{ navigate }" v-if="selected.quiz" :to="{ path: `/quiz/${selected.quiz.id}`, query: { courseId } }" custom><BaseButton variant="outline" @click="navigate">Làm quiz</BaseButton></RouterLink><BaseButton @click="complete"><Check v-if="!selected.progress?.isCompleted" :size="17" />{{ selected.progress?.isCompleted ? 'Đánh dấu chưa xong' : 'Hoàn thành bài học' }}</BaseButton></div><BaseButton variant="secondary" :disabled="!nextLesson" @click="navigateLesson(nextLesson)">Bài tiếp <ChevronRight :size="17" /></BaseButton></div>
@@ -268,13 +266,10 @@ onMounted(load)
 .learning-sidebar-toggle:hover{background:var(--brand-soft);color:var(--brand)}
 .lesson-link{display:flex;width:100%;align-items:flex-start;gap:.7rem;border-left:3px solid transparent;padding:.7rem .65rem;text-align:left;color:var(--text-muted);transition:.18s}.lesson-link:hover{background:var(--surface-muted);color:var(--text)}.lesson-link--active{border-left-color:var(--brand);background:var(--brand-soft)!important;color:var(--brand)!important}.lesson-state{display:grid;width:1.65rem;height:1.65rem;flex-shrink:0;place-items:center;border:1px solid var(--border);font-size:.65rem;font-weight:800}.lesson-state--done{border-color:#10b981;background:#10b981;color:white}
 .section-quiz-link{display:flex;align-items:center;gap:.7rem;margin-top:.45rem;border:1px solid #fcd34d;background:#fffbeb;padding:.7rem;color:#92400e}.section-quiz-link:hover{background:#fef3c7}.section-quiz-link small{display:block;margin-top:.15rem;font-size:.65rem;opacity:.75}.section-quiz-state{border-color:#f59e0b;background:#f59e0b;color:white}.section-quiz-link--locked{cursor:not-allowed;border-color:var(--border);background:var(--surface-muted);color:var(--text-muted);opacity:.78}
-.lesson-content-stream{overflow:hidden;border:1px solid var(--border);background:var(--surface)}
-.viewer-shell{overflow:hidden;border:0;border-bottom:1px solid var(--border);border-radius:0;background:var(--surface);box-shadow:none}
-.viewer-shell:last-child{border-bottom:0}
-.viewer-shell--text{padding:0}
-.viewer-shell--text>.lesson-prose{padding:1.15rem 1.35rem}
-.viewer-shell>video{display:block;max-height:70vh;width:100%;object-fit:contain}
-.lesson-image-viewer{display:flex;align-items:flex-start;justify-content:center;padding:1rem 1.35rem;background:var(--surface)}
+.lesson-content-stream{overflow:hidden;border:1px solid var(--border);background:var(--surface);padding:1.25rem 1.35rem}
+.lesson-content-stream>.lesson-flow-item+.lesson-flow-item{margin-top:1rem}
+.lesson-video-viewer{display:block;max-height:70vh;width:100%;background:#000;object-fit:contain}
+.lesson-image-viewer{display:flex;align-items:flex-start;justify-content:center}
 .lesson-image-viewer img{display:block;max-height:70vh;max-width:100%;object-fit:contain}
 .lesson-document-viewer{height:min(68vh,44rem);min-height:24rem}
 .lesson-prose{margin:0;max-width:none;color:var(--text)}.lesson-prose :deep(h1){margin:1.6rem 0 .8rem;font-size:2rem;line-height:1.2;font-weight:900}.lesson-prose :deep(h2){margin:1.4rem 0 .7rem;font-size:1.65rem;line-height:1.25;font-weight:850}.lesson-prose :deep(h3){margin:1.2rem 0 .6rem;font-size:1.35rem;line-height:1.3;font-weight:800}.lesson-prose :deep(h4){margin:1rem 0 .5rem;font-size:1.12rem;line-height:1.35;font-weight:800}.lesson-prose :deep(h5){margin:.9rem 0 .45rem;font-size:.95rem;line-height:1.4;font-weight:800;text-transform:uppercase;letter-spacing:.04em}.lesson-prose :deep(p){margin:.55rem 0;font-size:1rem;line-height:1.85}.lesson-prose :deep(ul){margin:.65rem 0;padding-left:1.5rem;list-style:disc}.lesson-prose :deep(li){margin:.3rem 0;line-height:1.75}.lesson-prose :deep(strong){font-weight:850}.lesson-prose :deep(em){font-style:italic}.discussion-panel{width:min(100%,48rem)}.comment-box{width:100%;resize:vertical;border:1px solid var(--border);border-radius:.5rem;background:var(--surface-muted);padding:.75rem;color:var(--text);outline:none}.comment-box:focus{border-color:#a855f7;box-shadow:0 0 0 3px rgba(168,85,247,.1)}
