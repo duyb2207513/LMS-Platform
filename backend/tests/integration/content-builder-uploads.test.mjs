@@ -18,13 +18,16 @@ try{
   const course=await prisma.course.create({data:{instructorId:owner.id,categoryId,title:"Content builder",slug:`content-builder-${stamp}`,description:"Test",level:"BEGINNER",isFree:true,status:"PUBLISHED",publishedAt:new Date()}});courseId=course.id;
   await prisma.enrollment.create({data:{courseId,studentId:student.id}});
   const section=await prisma.section.create({data:{courseId,title:"Section",position:1}});
-  const lesson=await prisma.lesson.create({data:{sectionId:section.id,title:"Lesson",lessonType:"TEXT",content:"Legacy",position:1,isPublished:true}});
+  const lesson=await prisma.lesson.create({data:{sectionId:section.id,title:"Lesson",lessonType:"TEXT",position:1,isPublished:false}});
+
+  const publishWithoutContent=await json(`${api}/lessons/${lesson.id}`,"PATCH",ownerAuth,{isPublished:true});assert.equal(publishWithoutContent.status,400);
 
   const textResponse=await json(`${api}/lessons/${lesson.id}/contents`,`POST`,ownerAuth,{contentType:"TEXT",textContent:"First block"});assert.equal(textResponse.status,201);const textBlock=(await textResponse.json()).data;
   const documentResponse=await json(`${api}/lessons/${lesson.id}/contents`,`POST`,ownerAuth,{contentType:"DOCUMENT"});assert.equal(documentResponse.status,201);const documentBlock=(await documentResponse.json()).data;
   assert.equal((await json(`${api}/lessons/${lesson.id}/contents`,`POST`,otherAuth,{contentType:"TEXT",textContent:"Denied"})).status,403);
   const documentForm=new FormData();documentForm.append("file",new Blob(["%PDF-1.4\nContent"],{type:"application/pdf"}),"lesson.pdf");assert.equal((await fetch(`${api}/lesson-contents/${documentBlock.id}/file`,{method:"POST",headers:{authorization:ownerAuth},body:documentForm})).status,200);
   const reordered=await json(`${api}/lessons/${lesson.id}/contents/reorder`,`PATCH`,ownerAuth,{contentIds:[documentBlock.id,textBlock.id]});assert.equal(reordered.status,200);assert.equal((await reordered.json()).data[0].id,documentBlock.id);
+  const publishWithBlocks=await json(`${api}/lessons/${lesson.id}`,"PATCH",ownerAuth,{isPublished:true});assert.equal(publishWithBlocks.status,200);assert.equal((await publishWithBlocks.json()).data.isPublished,true);
   const learning=await (await fetch(`${api}/courses/${courseId}/content`,{headers:{authorization:studentAuth}})).json();assert.equal(learning.data.sections[0].lessons[0].contents.length,2);
 
   const quiz=await prisma.quiz.create({data:{lessonId:lesson.id,title:"Quiz"}});const question=await prisma.question.create({data:{quizId:quiz.id,text:"Image question",position:1}});

@@ -11,16 +11,44 @@ export async function getManagedLesson(lessonId: string, actor: AuthTokenPayload
   if (!UUID.test(lessonId)) throw new AppError(404, "Lesson not found");
   const lesson = await prisma.lesson.findUnique({
     where: { id: lessonId },
-    include: { section: { include: { course: { select: { instructorId: true } } } } }
+    include: {
+      contents: {
+        select: { contentType: true, textContent: true, fileUrl: true }
+      },
+      section: { include: { course: { select: { instructorId: true } } } }
+    }
   });
   if (!lesson) throw new AppError(404, "Lesson not found");
   if (!canManage(lesson.section.course.instructorId, actor)) throw new AppError(403, "You do not have permission to manage this lesson");
   return lesson;
 }
 
-function assertPublishable(lesson: { lessonType: string; content: string | null; videoUrl: string | null; documentUrl: string | null; isPublished: boolean }) {
+type PublishableLesson = {
+  lessonType: string;
+  content: string | null;
+  videoUrl: string | null;
+  documentUrl: string | null;
+  isPublished: boolean;
+  contents?: Array<{ contentType: string; textContent: string | null; fileUrl: string | null }>;
+};
+
+const hasText = (value: string | null) => Boolean(value?.trim());
+const isCompleteBlock = (block: NonNullable<PublishableLesson["contents"]>[number]) =>
+  block.contentType === "TEXT" ? hasText(block.textContent) : Boolean(block.fileUrl);
+
+function assertPublishable(lesson: PublishableLesson) {
   if (!lesson.isPublished) return;
-  if (lesson.lessonType === "TEXT" && !lesson.content) throw new AppError(400, "A published text lesson must have content");
+
+  // The current course builder stores one or more mixed content blocks in
+  // lesson_contents. Keep supporting the legacy Lesson fields for older data.
+  if (lesson.contents?.length) {
+    if (lesson.contents.some(block => !isCompleteBlock(block))) {
+      throw new AppError(400, "Complete every lesson content block before publishing this lesson");
+    }
+    return;
+  }
+
+  if (lesson.lessonType === "TEXT" && !hasText(lesson.content)) throw new AppError(400, "A published text lesson must have content");
   if (lesson.lessonType === "VIDEO" && !lesson.videoUrl) throw new AppError(400, "Upload a video before publishing this lesson");
   if (lesson.lessonType === "DOCUMENT" && !lesson.documentUrl) throw new AppError(400, "Upload a document before publishing this lesson");
 }
@@ -28,7 +56,7 @@ function assertPublishable(lesson: { lessonType: string; content: string | null;
 export async function createLesson(sectionId: string, actor: AuthTokenPayload, input: CreateLessonInput) {
   await getManagedSection(sectionId, actor);
   const position = input.position ?? ((await prisma.lesson.aggregate({ where: { sectionId }, _max: { position: true } }))._max.position ?? 0) + 1;
-  const candidate = { lessonType: input.lessonType, content: input.content ?? null, videoUrl: null, documentUrl: null, isPublished: input.isPublished ?? false };
+  const candidate = { lessonType: input.lessonType, content: input.content ?? null, videoUrl: null, documentUrl: null, isPublished: input.isPublished ?? false, contents: [] };
   assertPublishable(candidate);
   return prisma.lesson.create({ data: { ...input, sectionId, position } });
 }
@@ -41,7 +69,8 @@ export async function updateLesson(lessonId: string, actor: AuthTokenPayload, in
     content: input.content === undefined ? existing.content : input.content,
     videoUrl: nextType === "VIDEO" ? existing.videoUrl : null,
     documentUrl: nextType === "DOCUMENT" ? existing.documentUrl : null,
-    isPublished: input.isPublished ?? existing.isPublished
+    isPublished: input.isPublished ?? existing.isPublished,
+    contents: existing.contents
   };
   assertPublishable(candidate);
   const removedFileUrls = input.lessonType !== undefined && input.lessonType !== existing.lessonType
