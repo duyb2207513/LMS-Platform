@@ -161,10 +161,7 @@ async function changeEmail() {
 <template>
   <DefaultLayout>
     <main class="navbar-page">
-      <h1 class="text-3xl font-black dark:text-white">Tài khoản của tôi</h1>
-      <p class="mt-2 text-slate-500">Quản lý thông tin cá nhân, mật khẩu và địa chỉ email tại cùng một nơi.</p>
-
-      <div class="mt-5 inline-flex border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
+      <div class="inline-flex border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
         <button type="button" :class="['px-3 py-2 text-xs font-bold transition', activeSection === 'profile' ? 'bg-violet-700 text-white' : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800']" @click="selectSection('profile')">Thông tin cá nhân</button>
         <button type="button" :class="['px-3 py-2 text-xs font-bold transition', activeSection === 'password' ? 'bg-violet-700 text-white' : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800']" @click="selectSection('password')">Đổi mật khẩu</button>
         <button type="button" :class="['px-3 py-2 text-xs font-bold transition', activeSection === 'email' ? 'bg-violet-700 text-white' : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800']" @click="selectSection('email')">Đổi email</button>

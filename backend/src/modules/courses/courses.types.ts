@@ -7,6 +7,7 @@ export interface PublicCourseQuery {
   search?: string;
   categoryId?: string;
   level?: CourseLevel;
+  isFree?: boolean;
   minPrice?: number;
   maxPrice?: number;
   sortBy: "createdAt" | "title" | "price" | "publishedAt";

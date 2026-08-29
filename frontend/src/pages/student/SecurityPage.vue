@@ -78,15 +78,6 @@ onMounted(loadSessions);
 <template>
   <DefaultLayout
     ><main class="app-page navbar-page">
-      <header>
-        <p class="text-sm font-bold uppercase tracking-wider text-purple-600">
-          Tài khoản
-        </p>
-        <h1 class="app-page-title mt-2">Thiết bị đăng nhập</h1>
-        <p class="app-page-description">
-          Xem và quản lý những thiết bị đang truy cập tài khoản.
-        </p>
-      </header>
       <p
         v-if="message"
         class="mt-5 rounded-2xl bg-emerald-50 p-4 text-sm text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-300"

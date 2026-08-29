@@ -54,21 +54,13 @@ watch(
 <template>
   <DefaultLayout>
     <main class="w-full px-2 py-6 sm:px-3 lg:px-2">
-      <header class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <p class="text-xs font-black uppercase tracking-[0.16em] text-violet-600">Thông báo</p>
-          <h1 class="mt-0.5 text-2xl font-extrabold text-slate-950 dark:text-white">Trung tâm thông báo</h1>
-          <p class="mt-0.5 text-xs text-slate-500 dark:text-slate-400">Theo dõi những cập nhật quan trọng trong quá trình học.</p>
-        </div>
-
-        <div class="flex flex-wrap items-center gap-2">
-          <button v-if="notificationStore.unreadCount > 0" type="button" class="inline-flex h-9 items-center gap-1.5 border border-slate-200 bg-white px-3 text-xs font-bold text-slate-700 transition hover:border-violet-300 hover:text-violet-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200" @click="handleMarkAll">
-            <CheckCheck :size="16" :stroke-width="2" /> Đánh dấu đã đọc
-          </button>
-          <RouterLink to="/notifications/settings" class="inline-flex h-9 items-center gap-1.5 border border-slate-200 bg-white px-3 text-xs font-bold text-slate-700 transition hover:border-violet-300 hover:text-violet-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200">
-            <Settings :size="16" :stroke-width="2" /> Cài đặt
-          </RouterLink>
-        </div>
+      <header class="flex flex-wrap items-center justify-end gap-2">
+        <button v-if="notificationStore.unreadCount > 0" type="button" class="inline-flex h-9 items-center gap-1.5 border border-slate-200 bg-white px-3 text-xs font-bold text-slate-700 transition hover:border-violet-300 hover:text-violet-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200" @click="handleMarkAll">
+          <CheckCheck :size="16" :stroke-width="2" /> Đánh dấu đã đọc
+        </button>
+        <RouterLink to="/notifications/settings" class="inline-flex h-9 items-center gap-1.5 border border-slate-200 bg-white px-3 text-xs font-bold text-slate-700 transition hover:border-violet-300 hover:text-violet-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200">
+          <Settings :size="16" :stroke-width="2" /> Cài đặt
+        </RouterLink>
       </header>
 
       <div class="mt-5 flex items-end justify-between border-b border-slate-200 dark:border-slate-800">

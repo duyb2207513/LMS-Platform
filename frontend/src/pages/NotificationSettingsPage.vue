@@ -72,14 +72,10 @@ onMounted(loadPreferences)
 <template>
   <DefaultLayout>
     <main class="w-full px-2 py-6 sm:px-3 lg:px-2">
-      <header class="flex flex-wrap items-end justify-between gap-3 border-b border-slate-200 pb-4 dark:border-slate-800">
-        <div>
-          <RouterLink to="/notifications" class="inline-flex items-center gap-1 text-xs font-bold text-violet-600 hover:text-violet-800">
-            Trung tâm thông báo
-          </RouterLink>
-          <h1 class="mt-2 text-2xl font-extrabold text-slate-950 dark:text-white">Cài đặt thông báo</h1>
-          <p class="mt-0.5 text-xs text-slate-500 dark:text-slate-400">Chọn kênh và nội dung bạn muốn nhận.</p>
-        </div>
+      <header class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-4 dark:border-slate-800">
+        <RouterLink to="/notifications" class="inline-flex items-center gap-1 text-xs font-bold text-violet-600 hover:text-violet-800">
+          ← Quay lại thông báo
+        </RouterLink>
 
         <button type="button" class="inline-flex h-9 items-center gap-1.5 bg-violet-700 px-4 text-xs font-bold text-white transition hover:bg-violet-800 disabled:cursor-not-allowed disabled:opacity-60" :disabled="saving || loading" @click="save">
           {{ saving ? 'Đang lưu...' : 'Lưu thay đổi' }}

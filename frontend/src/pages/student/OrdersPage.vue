@@ -98,14 +98,9 @@ onMounted(() => Promise.all([loadOrders(), loadRefunds()]))
 <template>
   <DefaultLayout>
     <main class="app-page navbar-page">
-      <header class="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <p class="text-xs font-bold uppercase tracking-wider text-violet-600">Giao dịch</p>
-          <h1 class="app-page-title mt-1">Đơn hàng</h1>
-          <p class="app-page-description">Theo dõi thanh toán và quá trình xử lý hoàn tiền tại một nơi.</p>
-        </div>
+      <div class="flex items-center justify-end">
         <RouterLink to="/courses"><BaseButton class="!rounded-none">Khám phá khóa học</BaseButton></RouterLink>
-      </header>
+      </div>
 
       <nav class="mt-4 flex border-b border-slate-200 dark:border-slate-800" aria-label="Quản lý đơn hàng">
         <button type="button" :class="['border-b-2 px-4 py-2.5 text-xs font-bold transition', activeSection === 'orders' ? 'border-violet-700 text-violet-700' : 'border-transparent text-slate-500 hover:text-slate-900 dark:hover:text-white']" @click="setSection('orders')">Lịch sử đơn hàng <span class="ml-1 text-[10px]">{{ orders.length }}</span></button>

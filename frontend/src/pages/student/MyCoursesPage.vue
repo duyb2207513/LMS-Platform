@@ -61,10 +61,9 @@ onMounted(load)
 <template>
   <DefaultLayout>
     <main class="app-page navbar-page">
-      <header class="flex flex-wrap items-end justify-between gap-5">
-        <div><p class="text-sm font-bold uppercase tracking-[0.14em] text-purple-600 dark:text-purple-400">Không gian học tập</p><h1 class="app-page-title mt-2">Khóa học của tôi</h1><p class="app-page-description">Theo dõi tiến độ và tiếp tục hành trình học từ nơi bạn dừng lại.</p></div>
+      <div class="flex items-center justify-end">
         <RouterLink to="/courses"><BaseButton class="!rounded-none" variant="secondary">Khám phá khóa học</BaseButton></RouterLink>
-      </header>
+      </div>
 
       <section class="mt-5 grid gap-2 sm:grid-cols-3">
         <article class="metric-card"><span class="metric-icon bg-purple-100 text-purple-700 dark:bg-purple-950/40 dark:text-purple-300">▤</span><div><p class="metric-value">{{ items.length }}</p><p class="metric-label">Khóa học đã đăng ký</p></div></article>

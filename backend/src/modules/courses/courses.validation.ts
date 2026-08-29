@@ -83,7 +83,7 @@ export function validatePublicCourseQuery(
   const input = query as Record<string, unknown>;
   const errors: Record<string, string> = {};
   const allowed = new Set([
-    "page", "limit", "search", "categoryId", "level", "minPrice", "maxPrice",
+    "page", "limit", "search", "categoryId", "level", "isFree", "minPrice", "maxPrice",
     "sortBy", "sortOrder"
   ]);
   for (const key of Object.keys(input)) {
@@ -95,6 +95,13 @@ export function validatePublicCourseQuery(
   const search = queryString(input.search);
   const categoryId = queryString(input.categoryId);
   const level = queryString(input.level);
+  const isFreeRaw = input.isFree;
+  let isFree: boolean | undefined;
+  if (isFreeRaw !== undefined) {
+    if (isFreeRaw === true || isFreeRaw === "true" || isFreeRaw === "1" || isFreeRaw === 1) isFree = true;
+    else if (isFreeRaw === false || isFreeRaw === "false" || isFreeRaw === "0" || isFreeRaw === 0) isFree = false;
+    else errors.isFree = "isFree must be a boolean";
+  }
   const minPrice = nonNegativeQueryNumber(input.minPrice, "minPrice", errors);
   const maxPrice = nonNegativeQueryNumber(input.maxPrice, "maxPrice", errors);
   const sortBy = queryString(input.sortBy) ?? "createdAt";
@@ -119,6 +126,7 @@ export function validatePublicCourseQuery(
       ...(search ? { search } : {}),
       ...(categoryId ? { categoryId } : {}),
       ...(level ? { level: level as CourseLevel } : {}),
+      ...(isFree !== undefined ? { isFree } : {}),
       ...(minPrice === undefined ? {} : { minPrice }),
       ...(maxPrice === undefined ? {} : { maxPrice }),
       sortBy: sortBy as PublicCourseQuery["sortBy"],

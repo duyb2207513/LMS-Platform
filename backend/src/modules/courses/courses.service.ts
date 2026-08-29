@@ -83,6 +83,13 @@ export async function listPublicCourses(query: Partial<PublicCourseQuery>) {
   const minPrice = query.minPrice !== undefined && !Number.isNaN(Number(query.minPrice)) ? Number(query.minPrice) : undefined;
   const maxPrice = query.maxPrice !== undefined && !Number.isNaN(Number(query.maxPrice)) ? Number(query.maxPrice) : undefined;
 
+  const isFreeCondition =
+    query.isFree === true
+      ? { OR: [{ isFree: true }, { price: 0 }] }
+      : query.isFree === false
+      ? { isFree: false, price: { gt: 0 } }
+      : {};
+
   const where = {
     status: "PUBLISHED" as const,
     ...(query.search
@@ -90,6 +97,7 @@ export async function listPublicCourses(query: Partial<PublicCourseQuery>) {
       : {}),
     ...(query.categoryId ? { categoryId: query.categoryId } : {}),
     ...(query.level ? { level: query.level } : {}),
+    ...isFreeCondition,
     ...(minPrice !== undefined || maxPrice !== undefined
       ? {
           price: {

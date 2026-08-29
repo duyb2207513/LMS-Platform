@@ -24,22 +24,13 @@ onMounted(load);
 <template>
   <DefaultLayout
     ><main class="app-page navbar-page">
-      <header class="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <p class="text-sm font-bold uppercase tracking-wider text-purple-600">
-            Thành tích
-          </p>
-          <h1 class="app-page-title mt-2">Chứng chỉ của tôi</h1>
-          <p class="app-page-description">
-            Ghi nhận những khóa học bạn đã hoàn thành trên LMS Platform.
-          </p>
-        </div>
+      <div class="flex items-center justify-end">
         <RouterLink to="/certificates/verify"
           ><BaseButton variant="secondary"
             >Xác minh chứng chỉ</BaseButton
           ></RouterLink
         >
-      </header>
+      </div>
       <LoadingSpinner v-if="api.loading.value && !items.length" class="py-20" />
       <p v-if="error" class="mt-5 rounded-2xl bg-red-50 p-4 text-red-700">
         {{ error }}
