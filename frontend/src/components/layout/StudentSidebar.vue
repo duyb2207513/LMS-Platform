@@ -25,12 +25,6 @@ const groups = [
       { label: 'Khóa học của tôi', to: '/my-courses', icon: 'book' },
     ],
   },
-  // {
-  //   label: 'Học tập',
-  //   items: [
-  //     { label: 'Phân tích tiến độ', to: '/dashboard/analytics', icon: 'chart' },
-  //   ],
-  // },
   {
     label: 'Trao đổi',
     items: [
@@ -61,10 +55,10 @@ const activePath = computed(() =>
 )
 
 const linkClass = (path: string) => [
-  'sidebar-link group flex min-h-11 items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition',
+  'sidebar-link group flex min-h-11 items-center gap-3 px-3 py-2.5 text-sm font-semibold transition border-l-2',
   activePath.value === path
-    ? 'bg-violet-100 text-violet-800 dark:bg-violet-950 dark:text-violet-200'
-    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-950 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white',
+    ? 'border-purple-600 bg-white/90 text-purple-900 font-bold shadow-xs dark:border-purple-400 dark:bg-slate-800 dark:text-purple-200'
+    : 'border-transparent text-slate-700 hover:bg-white/60 hover:text-purple-900 dark:text-slate-300 dark:hover:bg-slate-800/80 dark:hover:text-white',
 ]
 </script>
 
@@ -81,44 +75,57 @@ const linkClass = (path: string) => [
 
   <aside
     :class="[
-      'fixed inset-y-0 left-0 z-50 flex w-[17rem] flex-col border-r border-slate-200 bg-white shadow-xl transition-[width,transform] duration-300 dark:border-slate-800 dark:bg-slate-900 lg:bottom-0 lg:top-[4.5rem] lg:z-20 lg:h-auto lg:translate-x-0 lg:shadow-none',
+      'fixed inset-y-0 left-0 z-50 flex w-[17rem] flex-col border-r border-purple-200/90 bg-gradient-to-b from-purple-100/95 via-violet-50/85 to-purple-100/70 shadow-xl transition-[width,transform] duration-300 dark:border-purple-900/40 dark:from-slate-900 dark:via-purple-950/30 dark:to-slate-950 lg:bottom-0 lg:top-[4.5rem] lg:z-20 lg:h-auto lg:translate-x-0 lg:shadow-none',
       collapsed ? 'lg:w-[5.25rem]' : 'lg:w-[17rem]',
       open ? 'translate-x-0' : '-translate-x-full',
     ]"
     aria-label="Điều hướng học viên"
   >
+    <!-- Floating Toggle Collapse Button on Border -->
     <button
       type="button"
-      class="absolute right-0 top-3 z-10 hidden h-12 w-7 place-items-center rounded-l-full border border-r-0 border-slate-200 bg-slate-50 text-slate-600 shadow-sm transition hover:border-violet-300 hover:bg-violet-100 hover:text-violet-700 lg:grid dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300"
+      class="absolute -right-3.5 top-5 z-30 hidden h-7 w-7 place-items-center rounded-full border border-purple-300 bg-white text-purple-700 shadow-md transition-all duration-200 hover:scale-110 hover:border-purple-400 hover:bg-purple-50 hover:text-purple-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 lg:grid dark:border-purple-700 dark:bg-slate-800 dark:text-purple-300 dark:hover:bg-slate-700"
       :aria-label="collapsed ? 'Mở rộng thanh điều hướng' : 'Thu gọn thanh điều hướng'"
       :title="collapsed ? 'Mở rộng menu' : 'Thu gọn menu'"
       @click="emit('toggleCollapse')"
     >
-      <svg class="h-4 w-4 transition-transform duration-300" :class="collapsed ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.25" d="m15 18-6-6 6-6" />
+      <svg class="h-3.5 w-3.5 transition-transform duration-300" :class="collapsed ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="m15 18-6-6 6-6" />
       </svg>
     </button>
 
-    <div class="flex h-[4.5rem] items-center justify-between border-b border-slate-100 px-4 dark:border-slate-800 lg:hidden">
-      <b class="text-sm text-violet-700 dark:text-violet-300">Không gian học tập</b>
-      <button type="button" class="grid h-9 w-9 place-items-center rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800" aria-label="Đóng menu" @click="emit('close')">×</button>
+    <div class="flex h-[4.5rem] items-center justify-between border-b border-purple-200/80 px-4 dark:border-slate-800 lg:hidden">
+      <b class="text-sm font-bold text-purple-800 dark:text-purple-300">Không gian học tập</b>
+      <button type="button" class="grid h-9 w-9 place-items-center hover:bg-purple-200/50 dark:hover:bg-slate-800" aria-label="Đóng menu" @click="emit('close')">×</button>
     </div>
 
-    <div class="border-b border-slate-100 p-4 dark:border-slate-800" :class="collapsed ? 'lg:px-3 lg:py-4' : ''">
-      <RouterLink to="/profile" class="flex items-center gap-3 rounded-2xl bg-slate-50 p-3 transition hover:bg-violet-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 dark:bg-slate-800 dark:hover:bg-violet-950/30" :class="collapsed ? 'lg:justify-center lg:p-2' : ''" aria-label="Mở hồ sơ cá nhân" @click="emit('close')">
-        <img v-if="auth.user?.avatarUrl" :src="assetUrl(auth.user.avatarUrl)" alt="" class="h-11 w-11 rounded-xl object-cover" />
-        <span v-else class="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-violet-700 text-sm font-black text-white">{{ auth.userInitials }}</span>
+    <!-- Student Profile Card (Flat Sharp Styling with Crisp White Contrast) -->
+    <div class="border-b border-purple-200/80 p-3.5 dark:border-slate-800" :class="collapsed ? 'lg:p-2 lg:py-3.5' : ''">
+      <RouterLink
+        to="/profile"
+        :class="[
+          'flex items-center gap-3 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500',
+          collapsed
+            ? 'lg:justify-center lg:p-0'
+            : 'border border-purple-200 bg-white/95 p-3 shadow-xs hover:border-purple-400 hover:bg-white dark:border-purple-800/80 dark:bg-slate-900',
+        ]"
+        aria-label="Mở hồ sơ cá nhân"
+        @click="emit('close')"
+      >
+        <img v-if="auth.user?.avatarUrl" :src="assetUrl(auth.user.avatarUrl)" alt="" class="h-10 w-10 object-cover ring-1 ring-purple-300" />
+        <span v-else class="grid h-10 w-10 shrink-0 place-items-center bg-gradient-to-br from-violet-600 to-purple-600 text-sm font-black text-white shadow-xs">{{ auth.userInitials }}</span>
         <div class="min-w-0" :class="collapsed ? 'lg:hidden' : ''">
           <p class="truncate text-sm font-bold text-slate-950 dark:text-white">{{ auth.user?.fullName }}</p>
-          <p class="mt-0.5 truncate text-xs text-slate-500">{{ auth.user?.email }}</p>
-          <span class="mt-2 inline-flex rounded-full bg-violet-100 px-2 py-0.5 text-[10px] font-black text-violet-700 dark:bg-violet-950 dark:text-violet-300">HỌC VIÊN</span>
+          <p class="mt-0.5 truncate text-xs text-slate-600 dark:text-slate-400">{{ auth.user?.email }}</p>
+          <span class="mt-1.5 inline-block border border-purple-300 bg-purple-100 px-2 py-0.5 text-[10px] font-black text-purple-800 dark:border-purple-700 dark:bg-purple-950 dark:text-purple-300">HỌC VIÊN</span>
         </div>
       </RouterLink>
     </div>
 
+    <!-- Navigation Menu List -->
     <nav class="flex-1 space-y-5 overflow-y-auto overflow-x-hidden p-3">
-      <section v-for="group in groups" :key="group.label" :class="[collapsed ? 'lg:border-b lg:border-slate-100 lg:pb-3 dark:lg:border-slate-800' : '', group.mobileOnly ? 'lg:hidden' : '']">
-        <p class="mb-1.5 px-3 text-[10px] font-black uppercase tracking-[0.16em] text-slate-400" :class="collapsed ? 'lg:hidden' : ''">{{ group.label }}</p>
+      <section v-for="group in groups" :key="group.label" :class="[collapsed ? 'lg:border-b lg:border-purple-200/80 lg:pb-3 dark:lg:border-slate-800' : '', group.mobileOnly ? 'lg:hidden' : '']">
+        <p class="mb-1.5 px-3 text-[10px] font-black uppercase tracking-[0.16em] text-purple-700/85 dark:text-purple-300/80" :class="collapsed ? 'lg:hidden' : ''">{{ group.label }}</p>
         <div class="space-y-1">
           <RouterLink v-for="item in group.items" :key="item.to" :to="item.to" :class="[linkClass(item.to), collapsed ? 'lg:justify-center lg:px-2' : '']" :title="collapsed ? item.label : undefined" @click="emit('close')">
             <svg v-if="item.icon === 'home'" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m3 11 9-8 9 8v9a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1v-9Z" /></svg>

@@ -132,26 +132,35 @@ onMounted(load)
     <div :class="['learning-shell', sidebarCollapsed ? 'sidebar-collapsed' : '']"> 
       <button v-if="sidebarOpen" class="fixed inset-0 z-30 bg-slate-950/45 lg:hidden" aria-label="Đóng mục lục" @click="sidebarOpen = false" />
       <aside :class="['learning-sidebar', sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0', sidebarCollapsed ? 'sidebar-hidden' : '']">
-        <button
-          type="button"
-          class="learning-sidebar-toggle hidden lg:grid"
-          :aria-label="sidebarCollapsed ? 'Mở rộng mục lục' : 'Thu gọn mục lục'"
-          :title="sidebarCollapsed ? 'Mở rộng mục lục' : 'Thu gọn mục lục'"
-          @click="sidebarCollapsed = !sidebarCollapsed"
-        >
-          <PanelLeftOpen v-if="sidebarCollapsed" :size="18" />
-          <PanelLeftClose v-else :size="18" />
-        </button>
-
         <div class="learning-sidebar-content">
           <div class="learning-course-summary">
-            <div class="flex items-start justify-between gap-3">
+            <div class="flex items-center justify-between gap-3">
               <div class="min-w-0">
                 <RouterLink to="/my-courses" class="sidebar-back-btn"><ArrowLeft :size="15" /><span>Khóa học của tôi</span></RouterLink>
-                <h2 class="mt-3 line-clamp-2 text-lg font-black leading-snug">{{ content?.course.title }}</h2>
               </div>
-              <button class="sidebar-mobile-close lg:hidden" aria-label="Đóng mục lục" @click="sidebarOpen = false"><X :size="20" /></button>
+              <div class="flex items-center gap-1.5">
+                <!-- Desktop Sidebar Collapse Button -->
+                <button
+                  type="button"
+                  class="sidebar-collapse-btn hidden lg:grid"
+                  title="Thu gọn mục lục"
+                  aria-label="Thu gọn mục lục"
+                  @click="sidebarCollapsed = true"
+                >
+                  <PanelLeftClose :size="18" />
+                </button>
+                <!-- Mobile Sidebar Close Button -->
+                <button
+                  type="button"
+                  class="sidebar-mobile-close lg:hidden"
+                  aria-label="Đóng mục lục"
+                  @click="sidebarOpen = false"
+                >
+                  <X :size="18" />
+                </button>
+              </div>
             </div>
+            <h2 class="mt-3 line-clamp-2 text-lg font-black leading-snug">{{ content?.course.title }}</h2>
             <div class="mt-5 flex justify-between text-xs font-semibold"><span>{{ progress?.completedLessons || 0 }}/{{ progress?.totalLessons || 0 }} bài</span><span>{{ Math.round(progress?.progressPercent || 0) }}%</span></div>
             <div class="learning-progress-track"><div class="learning-progress-value" :style="{ width: `${progress?.progressPercent || 0}%` }" /></div>
           </div>
@@ -188,6 +197,18 @@ onMounted(load)
       <main class="min-w-0 flex-1">
         <header class="learning-topbar">
           <div class="flex items-center gap-3">
+            <!-- Desktop: Nút mở lại mục lục khi sidebar đang thu gọn -->
+            <button
+              v-if="sidebarCollapsed"
+              type="button"
+              class="hidden lg:inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-700 shadow-xs transition hover:border-purple-300 hover:bg-purple-50 hover:text-purple-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300"
+              title="Mở rộng mục lục"
+              @click="sidebarCollapsed = false"
+            >
+              <PanelLeftOpen :size="17" />
+              <span>Mục lục</span>
+            </button>
+
             <!-- Mobile: Nút quay lại và nút mở mục lục riêng biệt -->
             <RouterLink v-slot="{ navigate }" to="/my-courses" custom>
               <button class="back-btn inline-flex lg:hidden" title="Quay lại khóa học của tôi" @click="navigate">
@@ -250,7 +271,7 @@ onMounted(load)
 
 <style scoped>
 .learning-shell{display:flex;min-height:calc(100vh - 4.5rem)}
-.learning-sidebar{position:fixed;inset:0 auto 0 0;z-index:40;display:flex;width:min(17rem,88vw);flex-direction:column;border-right:1px solid var(--border);background:var(--surface);padding-top:4.5rem;transition:transform .25s ease,width .3s ease}
+.learning-sidebar{position:fixed;inset:0 auto 0 0;z-index:40;display:flex;width:min(18rem,88vw);flex-direction:column;border-right:1px solid var(--border);background:var(--surface);padding-top:4.5rem;transition:transform .25s ease,width .25s ease}
 .learning-sidebar-content{display:flex;min-height:0;flex:1;flex-direction:column;overflow:hidden;transition:opacity .2s ease}
 .learning-course-summary{border-bottom:1px solid var(--border);padding:1.25rem}
 .learning-progress-track{height:.375rem;overflow:hidden;background:var(--surface-muted);margin-top:.5rem}
@@ -261,23 +282,25 @@ onMounted(load)
 .back-btn:hover{background:var(--surface-muted);color:var(--text);border-color:var(--text-muted)}
 .sidebar-back-btn{display:inline-flex;align-items:center;gap:.4rem;font-size:.75rem;font-weight:800;color:var(--brand);transition:color .2s ease;text-decoration:none}
 .sidebar-back-btn:hover{color:#6d28d9}
-.sidebar-mobile-close{display:grid;height:2.25rem;width:2.25rem;flex-shrink:0;place-items:center;border:1px solid var(--border);color:var(--text-muted)}
-.learning-sidebar-toggle{position:absolute;right:0;top:.75rem;z-index:20;height:3rem;width:1.75rem;place-items:center;border:1px solid var(--border);border-right:0;border-radius:999px 0 0 999px;background:var(--surface-muted);color:var(--text-muted);transition:color .2s ease,background .2s ease}
-.learning-sidebar-toggle:hover{background:var(--brand-soft);color:var(--brand)}
+.sidebar-mobile-close{display:grid;height:2rem;width:2rem;flex-shrink:0;place-items:center;border-radius:.5rem;border:1px solid var(--border);background:var(--surface);color:var(--text-muted);transition:all .2s ease}
+.sidebar-mobile-close:hover{background:var(--surface-muted);color:var(--text)}
+.sidebar-collapse-btn{display:none}
 .lesson-link{display:flex;width:100%;align-items:flex-start;gap:.7rem;border-left:3px solid transparent;padding:.7rem .65rem;text-align:left;color:var(--text-muted);transition:.18s}.lesson-link:hover{background:var(--surface-muted);color:var(--text)}.lesson-link--active{border-left-color:var(--brand);background:var(--brand-soft)!important;color:var(--brand)!important}.lesson-state{display:grid;width:1.65rem;height:1.65rem;flex-shrink:0;place-items:center;border:1px solid var(--border);font-size:.65rem;font-weight:800}.lesson-state--done{border-color:#10b981;background:#10b981;color:white}
 .section-quiz-link{display:flex;align-items:center;gap:.7rem;margin-top:.45rem;border:1px solid #fcd34d;background:#fffbeb;padding:.7rem;color:#92400e}.section-quiz-link:hover{background:#fef3c7}.section-quiz-link small{display:block;margin-top:.15rem;font-size:.65rem;opacity:.75}.section-quiz-state{border-color:#f59e0b;background:#f59e0b;color:white}.section-quiz-link--locked{cursor:not-allowed;border-color:var(--border);background:var(--surface-muted);color:var(--text-muted);opacity:.78}
-.lesson-content-stream{overflow:hidden;border:1px solid var(--border);background:var(--surface);padding:1.25rem 1.35rem}
-.lesson-content-stream>.lesson-flow-item+.lesson-flow-item{margin-top:1rem}
-.lesson-video-viewer{display:block;max-height:70vh;width:100%;background:#000;object-fit:contain}
-.lesson-image-viewer{display:flex;align-items:flex-start;justify-content:center}
-.lesson-image-viewer img{display:block;max-height:70vh;max-width:100%;object-fit:contain}
-.lesson-document-viewer{height:min(68vh,44rem);min-height:24rem}
-.lesson-prose{margin:0;max-width:none;color:var(--text)}.lesson-prose :deep(h1){margin:1.6rem 0 .8rem;font-size:2rem;line-height:1.2;font-weight:900}.lesson-prose :deep(h2){margin:1.4rem 0 .7rem;font-size:1.65rem;line-height:1.25;font-weight:850}.lesson-prose :deep(h3){margin:1.2rem 0 .6rem;font-size:1.35rem;line-height:1.3;font-weight:800}.lesson-prose :deep(h4){margin:1rem 0 .5rem;font-size:1.12rem;line-height:1.35;font-weight:800}.lesson-prose :deep(h5){margin:.9rem 0 .45rem;font-size:.95rem;line-height:1.4;font-weight:800;text-transform:uppercase;letter-spacing:.04em}.lesson-prose :deep(p){margin:.55rem 0;font-size:1rem;line-height:1.85}.lesson-prose :deep(ul){margin:.65rem 0;padding-left:1.5rem;list-style:disc}.lesson-prose :deep(li){margin:.3rem 0;line-height:1.75}.lesson-prose :deep(strong){font-weight:850}.lesson-prose :deep(em){font-style:italic}.discussion-panel{width:min(100%,48rem)}.comment-box{width:100%;resize:vertical;border:1px solid var(--border);border-radius:.5rem;background:var(--surface-muted);padding:.75rem;color:var(--text);outline:none}.comment-box:focus{border-color:#a855f7;box-shadow:0 0 0 3px rgba(168,85,247,.1)}
+.lesson-content-stream{overflow:hidden;border:1px solid var(--border);border-radius:1rem;background:var(--surface);padding:2rem 2.25rem;min-height:24rem;display:flex;flex-direction:column;box-shadow:0 1px 3px 0 rgba(0,0,0,0.04)}
+.lesson-content-stream>.lesson-flow-item+.lesson-flow-item{margin-top:1.25rem}
+.lesson-video-viewer{display:block;max-height:70vh;min-height:20rem;width:100%;border-radius:.75rem;background:#000;object-fit:contain}
+.lesson-image-viewer{display:flex;align-items:flex-start;justify-content:center;border-radius:.75rem}
+.lesson-image-viewer img{display:block;max-height:70vh;max-width:100%;border-radius:.75rem;object-fit:contain}
+.lesson-document-viewer{height:min(68vh,44rem);min-height:24rem;border-radius:.75rem}
+.lesson-prose{margin:0;max-width:none;color:var(--text);flex:1;font-size:1.05rem;line-height:1.85}.lesson-prose :deep(h1){margin:1.6rem 0 .8rem;font-size:2rem;line-height:1.2;font-weight:900}.lesson-prose :deep(h2){margin:1.4rem 0 .7rem;font-size:1.65rem;line-height:1.25;font-weight:850}.lesson-prose :deep(h3){margin:1.2rem 0 .6rem;font-size:1.35rem;line-height:1.3;font-weight:800}.lesson-prose :deep(h4){margin:1rem 0 .5rem;font-size:1.12rem;line-height:1.35;font-weight:800}.lesson-prose :deep(h5){margin:.9rem 0 .45rem;font-size:.95rem;line-height:1.4;font-weight:800;text-transform:uppercase;letter-spacing:.04em}.lesson-prose :deep(p){margin:.55rem 0;font-size:1rem;line-height:1.85}.lesson-prose :deep(ul){margin:.65rem 0;padding-left:1.5rem;list-style:disc}.lesson-prose :deep(li){margin:.35rem 0;line-height:1.75}.lesson-prose :deep(strong){font-weight:850}.lesson-prose :deep(em){font-style:italic}.discussion-panel{width:100%;border-radius:1rem}.comment-box{width:100%;resize:vertical;border:1px solid var(--border);border-radius:.5rem;background:var(--surface-muted);padding:.75rem;color:var(--text);outline:none}.comment-box:focus{border-color:#a855f7;box-shadow:0 0 0 3px rgba(168,85,247,.1)}
 @media(min-width:1024px){
-  .learning-sidebar{position:sticky;top:4.5rem;z-index:10;height:calc(100vh - 4.5rem);width:17rem;min-width:17rem;padding-top:0;transition:width .3s ease,min-width .3s ease}
-  .sidebar-collapsed .learning-sidebar.sidebar-hidden{width:5.25rem;min-width:5.25rem;overflow:hidden}
+  .sidebar-mobile-close{display:none !important}
+  .sidebar-collapse-btn{display:grid;height:2rem;width:2rem;flex-shrink:0;place-items:center;border-radius:.5rem;border:1px solid var(--border);background:var(--surface);color:var(--text-muted);transition:all .2s ease}
+  .sidebar-collapse-btn:hover{background:var(--brand-soft);color:var(--brand);border-color:var(--brand)}
+  .learning-sidebar{position:sticky;top:4.5rem;z-index:10;height:calc(100vh - 4.5rem);width:18rem;min-width:18rem;padding-top:0;transition:width .25s ease,min-width .25s ease}
+  .sidebar-collapsed .learning-sidebar{width:0 !important;min-width:0 !important;overflow:hidden;border-right:none;visibility:hidden}
   .sidebar-collapsed .learning-sidebar-content{opacity:0;pointer-events:none}
-  .sidebar-collapsed .learning-sidebar-toggle{right:0;color:var(--brand)}
   .learning-topbar{padding-inline:2rem}
 }
 </style>

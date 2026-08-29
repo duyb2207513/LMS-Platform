@@ -22,9 +22,9 @@ withDefaults(defineProps<{
         iconSize === 'lg' ? 'h-12 w-12 rounded-2xl' : '',
       ]"
     >
-      <img :src="brandIcon" alt="" class="h-full w-full object-contain" />
+      <img :src="brandIcon" alt="LMS Logo" class="h-full w-full object-contain" />
     </span>
-    <span v-if="!compact" class="max-[359px]:hidden truncate whitespace-nowrap bg-gradient-to-r from-violet-700 to-purple-600 bg-clip-text text-lg font-extrabold tracking-[-0.035em] text-transparent sm:text-xl dark:from-violet-400 dark:to-purple-300">
+    <span v-if="!compact" class="max-[359px]:hidden truncate whitespace-nowrap text-lg font-black tracking-tight text-white sm:text-xl">
       LMS Platform
     </span>
   </RouterLink>

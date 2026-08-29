@@ -34,13 +34,13 @@ onUnmounted(() => {
   <div ref="bellRef" class="relative">
     <button
       type="button"
-      class="relative grid h-10 w-10 place-items-center rounded-xl border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:border-purple-200 hover:bg-purple-50 hover:text-purple-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-purple-500/15 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-purple-800 dark:hover:bg-purple-950/30"
+      class="relative grid h-10 w-10 place-items-center rounded-xl border border-white/20 bg-white/10 text-white shadow-sm backdrop-blur-md transition hover:border-white/40 hover:bg-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
       :aria-expanded="isOpen"
       aria-haspopup="true"
       aria-label="Thông báo"
       @click="toggle"
     >
-      <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+      <svg class="h-5 w-5 text-violet-100" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
         <path
           stroke-linecap="round"
           stroke-linejoin="round"

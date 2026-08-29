@@ -74,14 +74,14 @@ watch(
 
 <template>
   <header
-    class="workspace-header sticky top-0 z-40 border-b border-slate-200 bg-white transition-colors duration-300 dark:border-slate-800 dark:bg-slate-950"
+    class="workspace-header sticky top-0 z-40 border-b border-purple-300/30 bg-gradient-to-r from-violet-600 via-purple-500 to-indigo-600 text-white shadow-sm transition-colors duration-300"
   >
     <div class="flex h-[4.5rem] w-full items-center gap-3 px-4 lg:px-5">
       <!-- Left: Mobile menu toggle + Brand & Role Badge -->
       <div class="flex items-center gap-2.5 sm:gap-3">
         <button
           type="button"
-          class="grid h-10 w-10 place-items-center rounded-xl border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:border-purple-200 hover:bg-purple-50 hover:text-purple-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-purple-800 dark:hover:bg-purple-950/30 lg:hidden"
+          class="grid h-10 w-10 place-items-center rounded-none border border-white/20 bg-white/10 text-white shadow-sm backdrop-blur-md transition hover:bg-white/20 lg:hidden"
           aria-label="Mở menu quản lý"
           @click="emit('toggleWorkspace')"
         >
@@ -95,12 +95,7 @@ watch(
           <RouterLink
             v-if="auth.isAdmin"
             :to="dashboardPath"
-            :class="[
-              'hidden rounded-lg px-2.5 py-1 text-[11px] font-extrabold tracking-wider shadow-sm ring-1 ring-inset transition hover:opacity-80 sm:inline-flex',
-              auth.isAdmin
-                ? 'bg-purple-50 text-purple-700 ring-purple-600/20 dark:bg-purple-950/50 dark:text-purple-300 dark:ring-purple-400/30'
-                : 'bg-indigo-50 text-indigo-700 ring-indigo-600/20 dark:bg-indigo-950/50 dark:text-indigo-300 dark:ring-indigo-400/30',
-            ]"
+            class="hidden rounded-none bg-white/15 px-2.5 py-1 text-[11px] font-extrabold tracking-wider text-white shadow-xs ring-1 ring-white/20 backdrop-blur-md transition hover:bg-white/25 sm:inline-flex"
           >
             {{ roleBadgeText }}
           </RouterLink>
@@ -108,7 +103,7 @@ watch(
           <div v-if="auth.isInstructor" class="relative ml-1">
             <button
               type="button"
-              class="workspace-action grid h-10 w-10 place-items-center border border-purple-300 bg-purple-50 text-purple-700 transition hover:border-purple-500 hover:bg-purple-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 dark:border-purple-800 dark:bg-purple-950/40 dark:text-purple-300 dark:hover:bg-purple-900/50"
+              class="workspace-action grid h-10 w-10 place-items-center rounded-none border border-white/20 bg-white/10 text-white backdrop-blur-md transition hover:bg-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
               aria-label="Tạo mới"
               title="Tạo mới"
               @click="quickActionsOpen = !quickActionsOpen; profileOpen = false"
@@ -121,12 +116,11 @@ watch(
             <Transition name="dropdown">
               <div
                 v-if="quickActionsOpen"
-                class="absolute left-0 mt-2 w-56 overflow-hidden border border-slate-200 bg-white p-1.5 shadow-xl dark:border-slate-700 dark:bg-slate-900"
+                class="absolute left-0 mt-2 w-56 overflow-hidden rounded-none border border-slate-200 bg-white p-1.5 shadow-xl text-slate-900 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
               >
                 <RouterLink to="/instructor/courses/create" class="profile-link">
                   Tạo khóa học mới
                 </RouterLink>
-          
               </div>
             </Transition>
           </div>
@@ -137,7 +131,7 @@ watch(
       <div class="hidden min-w-0 max-w-xl flex-1 md:block">
         <form @submit.prevent="handleSearchSubmit" class="relative">
           <span
-            class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400 dark:text-slate-500"
+            class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-purple-200"
           >
             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -148,10 +142,10 @@ watch(
             v-model="searchKeyword"
             type="search"
             :placeholder="auth.isAdmin ? 'Tìm nhanh khóa học, coupon, người dùng...' : 'Tìm khóa học, bài tập...'"
-            class="h-10 w-full rounded-lg border border-slate-200 bg-slate-50 pl-9 pr-14 text-sm font-medium text-slate-900 transition placeholder:text-slate-400 focus:border-purple-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500/10 dark:border-slate-800 dark:bg-slate-900 dark:text-white dark:placeholder:text-slate-500 dark:focus:border-purple-400"
+            class="h-10 w-full rounded-none border border-white/20 bg-white/10 pl-9 pr-14 text-sm font-medium text-white placeholder:text-purple-200 transition focus:border-white/40 focus:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/20 backdrop-blur-md"
           />
           <kbd
-            class="pointer-events-none absolute inset-y-2 right-2.5 hidden items-center rounded-md border border-slate-200 bg-white px-1.5 text-[10px] font-semibold text-slate-400 shadow-sm sm:inline-flex dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400"
+            class="pointer-events-none absolute inset-y-2 right-2.5 hidden items-center rounded-none border border-white/20 bg-white/15 px-1.5 text-[10px] font-semibold text-purple-100 shadow-xs sm:inline-flex"
           >
             Ctrl K
           </kbd>
@@ -164,7 +158,7 @@ watch(
         <div v-if="!auth.isInstructor" class="relative">
           <button
             type="button"
-            class="inline-flex h-10 items-center gap-1.5 rounded-xl bg-gradient-to-r from-violet-600 to-purple-600 px-3 text-xs font-bold text-white shadow-md shadow-purple-500/20 transition hover:from-violet-700 hover:to-purple-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 sm:px-3.5"
+            class="inline-flex h-10 items-center gap-1.5 rounded-none border border-white/30 bg-white px-3 text-xs font-bold text-purple-700 shadow-sm transition hover:bg-purple-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white sm:px-3.5"
             @click="quickActionsOpen = !quickActionsOpen; profileOpen = false"
           >
             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -180,14 +174,14 @@ watch(
           <Transition name="dropdown">
             <div
               v-if="quickActionsOpen"
-              class="absolute right-0 mt-2 w-56 overflow-hidden rounded-2xl border border-slate-200 bg-white p-1.5 shadow-xl shadow-slate-900/10 dark:border-slate-700 dark:bg-slate-900"
+              class="absolute right-0 mt-2 w-56 overflow-hidden rounded-none border border-slate-200 bg-white p-1.5 shadow-xl shadow-slate-900/10 text-slate-900 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
             >
               <template v-if="auth.isInstructor">
                 <RouterLink
                   to="/instructor/courses/create"
                   class="profile-link flex items-center gap-2.5"
                 >
-                  <span class="grid h-7 w-7 place-items-center rounded-lg bg-purple-50 text-purple-600 dark:bg-purple-950/50 dark:text-purple-400">
+                  <span class="grid h-7 w-7 place-items-center rounded-none bg-purple-50 text-purple-600 dark:bg-purple-950/50 dark:text-purple-400">
                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                     </svg>
@@ -197,20 +191,6 @@ watch(
                     <p class="text-[11px] text-slate-400">Soạn thảo giáo trình & bài giảng</p>
                   </div>
                 </RouterLink>
-                <RouterLink
-                  to="/instructor/courses"
-                  class="profile-link flex items-center gap-2.5"
-                >
-                  <span class="grid h-7 w-7 place-items-center rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-400">
-                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                  </span>
-                  <div>
-                    <p class="font-bold text-slate-800 dark:text-slate-200">Tạo bài tập / Quiz</p>
-                    <p class="text-[11px] text-slate-400">Giao bài tập trong khóa học</p>
-                  </div>
-                </RouterLink>
               </template>
 
               <template v-if="auth.isAdmin">
@@ -218,7 +198,7 @@ watch(
                   to="/admin/coupons"
                   class="profile-link flex items-center gap-2.5"
                 >
-                  <span class="grid h-7 w-7 place-items-center rounded-lg bg-purple-50 text-purple-600 dark:bg-purple-950/50 dark:text-purple-400">
+                  <span class="grid h-7 w-7 place-items-center rounded-none bg-purple-50 text-purple-600 dark:bg-purple-950/50 dark:text-purple-400">
                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
                     </svg>
@@ -232,7 +212,7 @@ watch(
                   to="/admin/categories"
                   class="profile-link flex items-center gap-2.5"
                 >
-                  <span class="grid h-7 w-7 place-items-center rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-400">
+                  <span class="grid h-7 w-7 place-items-center rounded-none bg-indigo-50 text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-400">
                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
                     </svg>
@@ -246,7 +226,7 @@ watch(
                   to="/admin/refunds"
                   class="profile-link flex items-center gap-2.5"
                 >
-                  <span class="grid h-7 w-7 place-items-center rounded-lg bg-amber-50 text-amber-600 dark:bg-amber-950/50 dark:text-amber-400">
+                  <span class="grid h-7 w-7 place-items-center rounded-none bg-amber-50 text-amber-600 dark:bg-amber-950/50 dark:text-amber-400">
                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 15v-1a4 4 0 00-4-4H8m0 0l3 3m-3-3l3-3m9 14V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2z" />
                     </svg>
@@ -264,10 +244,10 @@ watch(
         <!-- Button: Xem Website (Switch to Student Preview Mode) -->
         <RouterLink
           to="/courses"
-          class="workspace-action hidden h-10 items-center gap-1.5 border border-slate-200 bg-white px-3 text-xs font-bold text-slate-700 transition hover:border-purple-300 hover:bg-purple-50 hover:text-purple-700 md:inline-flex dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-purple-800 dark:hover:bg-purple-950/30 dark:hover:text-purple-300"
+          class="workspace-action hidden h-10 items-center gap-1.5 rounded-none border border-white/20 bg-white/10 px-3 text-xs font-bold text-white backdrop-blur-md transition hover:bg-white/20 md:inline-flex"
           title="Xem danh mục khóa học với tư cách học viên"
         >
-          <svg class="h-4 w-4 text-slate-500 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="h-4 w-4 text-purple-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
           </svg>
@@ -284,7 +264,7 @@ watch(
         <div v-if="!auth.isInstructor" class="relative">
           <button
             type="button"
-            class="flex min-h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white p-1.5 pr-1.5 text-left shadow-sm transition hover:border-purple-200 hover:bg-purple-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-purple-500/15 dark:border-slate-700 dark:bg-slate-900 dark:hover:border-purple-800 dark:hover:bg-purple-950/30 sm:pr-3"
+            class="flex min-h-10 items-center gap-2 rounded-none border border-white/20 bg-white/10 p-1.5 pr-1.5 text-left text-white shadow-sm backdrop-blur-md transition hover:bg-white/20 sm:pr-3"
             :aria-expanded="profileOpen"
             aria-haspopup="menu"
             @click="profileOpen = !profileOpen; quickActionsOpen = false"
@@ -293,24 +273,24 @@ watch(
               v-if="auth.user?.avatarUrl"
               :src="assetUrl(auth.user.avatarUrl)"
               alt=""
-              class="h-8 w-8 rounded-full object-cover ring-2 ring-purple-100 dark:ring-purple-900"
+              class="h-8 w-8 rounded-none object-cover ring-1 ring-white/30"
             />
             <span
               v-else
-              class="grid h-8 w-8 place-items-center rounded-full bg-gradient-to-br from-violet-600 to-purple-600 text-xs font-bold text-white ring-2 ring-purple-100 dark:ring-purple-900"
+              class="grid h-8 w-8 place-items-center rounded-none bg-white text-xs font-black text-purple-700 shadow-sm"
             >
               {{ auth.userInitials }}
             </span>
             <div class="hidden text-left sm:block">
-              <span class="block text-xs font-bold text-slate-800 dark:text-slate-100 whitespace-nowrap">
+              <span class="block text-xs font-bold text-white whitespace-nowrap">
                 {{ auth.user?.fullName }}
               </span>
-              <span class="block text-[10px] font-semibold text-purple-600 dark:text-purple-400">
+              <span class="block text-[10px] font-semibold text-purple-200">
                 {{ auth.isAdmin ? "Quản trị viên" : "Giảng viên" }}
               </span>
             </div>
             <svg
-              class="hidden h-4 w-4 text-slate-400 sm:block"
+              class="hidden h-4 w-4 text-purple-200 sm:block"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -323,10 +303,10 @@ watch(
           <Transition name="dropdown">
             <div
               v-if="profileOpen"
-              class="absolute right-0 mt-2 w-64 overflow-hidden rounded-2xl border border-slate-200 bg-white p-2 shadow-xl shadow-slate-900/10 dark:border-slate-700 dark:bg-slate-900"
+              class="absolute right-0 mt-2 w-64 overflow-hidden rounded-none border border-slate-200 bg-white p-2 shadow-xl shadow-slate-900/10 text-slate-900 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
               role="menu"
             >
-              <div class="mb-1 rounded-xl bg-slate-50 px-3 py-3 dark:bg-slate-800/70">
+              <div class="mb-1 rounded-none bg-slate-50 px-3 py-3 dark:bg-slate-800/70">
                 <p class="truncate text-sm font-bold text-slate-900 dark:text-white">
                   {{ auth.user?.fullName }}
                 </p>
@@ -334,7 +314,7 @@ watch(
                   {{ auth.user?.email }}
                 </p>
                 <span
-                  class="mt-2 inline-flex rounded-full bg-purple-100 px-2 py-0.5 text-[10px] font-bold tracking-wide text-purple-700 dark:bg-purple-950/50 dark:text-purple-300"
+                  class="mt-2 inline-flex rounded-none bg-purple-100 px-2 py-0.5 text-[10px] font-bold tracking-wide text-purple-700 dark:bg-purple-950/50 dark:text-purple-300"
                 >
                   {{ roleBadgeText }}
                 </span>
@@ -394,7 +374,7 @@ watch(
 
               <button
                 type="button"
-                class="w-full rounded-xl px-3 py-2 text-left text-sm font-semibold text-red-600 transition hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/30"
+                class="w-full rounded-none px-3 py-2 text-left text-sm font-semibold text-red-600 transition hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/30"
                 role="menuitem"
                 @click="logout"
               >
@@ -407,7 +387,7 @@ watch(
         <button
           v-if="auth.isInstructor"
           type="button"
-          class="workspace-action inline-flex h-10 items-center gap-2 border border-red-200 bg-white px-3 text-xs font-bold text-red-600 transition hover:border-red-400 hover:bg-red-50 dark:border-red-900 dark:bg-slate-900 dark:text-red-400 dark:hover:bg-red-950/30 sm:px-4"
+          class="workspace-action inline-flex h-10 items-center gap-2 rounded-none border border-white/30 bg-white/10 px-3 text-xs font-bold text-white backdrop-blur-md transition hover:border-red-500 hover:bg-red-600 sm:px-4"
           @click="logout"
         >
           <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -425,15 +405,11 @@ watch(
   box-shadow: 0 1px 3px rgb(15 23 42 / 0.06);
 }
 
-.workspace-action {
-  border-radius: 0.5rem;
-}
-
 .profile-link {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  border-radius: 0.75rem;
+  border-radius: 0;
   padding: 0.5rem 0.75rem;
   font-size: 0.8125rem;
   font-weight: 600;
