@@ -48,7 +48,7 @@ function toggleSidebarCollapsed() {
       <main
         :class="[
           'min-w-0 w-full transition-[padding] duration-300',
-          sidebarCollapsed ? 'lg:pl-[5.25rem]' : 'lg:pl-[17rem]',
+          sidebarCollapsed ? 'lg:pl-16' : 'lg:pl-56',
         ]"
       >
         <slot />
@@ -62,8 +62,8 @@ function toggleSidebarCollapsed() {
         'transition-[padding] duration-300',
         showStudentSidebar
           ? sidebarCollapsed
-            ? 'lg:pl-[5.25rem]'
-            : 'lg:pl-[17rem]'
+            ? 'lg:pl-16'
+            : 'lg:pl-56'
           : '',
       ]"
     >

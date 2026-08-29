@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { ChevronLeft, ChevronRight } from '@lucide/vue'
+import { ChevronLeft, ChevronRight, Compass, RotateCcw, Search } from '@lucide/vue'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
 import CourseCard from '@/components/course/CourseCard.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
@@ -40,7 +40,7 @@ function loadFiltersFromQuery() {
   search.value = String(route.query.search || '')
   selectedCategory.value = String(route.query.categoryId || '')
   selectedLevel.value = String(route.query.level || '')
-  
+
   const priceQ = String(route.query.price || '')
   const isFreeQ = String(route.query.isFree || '')
   const sortQ = String(route.query.sort || '')
@@ -96,8 +96,11 @@ function clearFilters() {
 }
 
 async function selectCategory(categoryId: string) {
-  if (selectedCategory.value === categoryId) return
-  selectedCategory.value = categoryId
+  if (selectedCategory.value === categoryId) {
+    selectedCategory.value = ''
+  } else {
+    selectedCategory.value = categoryId
+  }
   await fetchWithFilters()
 }
 
@@ -119,49 +122,129 @@ onMounted(async () => {
 
 <template>
   <DefaultLayout>
-    <main class="app-page navbar-page catalog-page">
-      <section class="flex h-11 w-full items-stretch overflow-hidden border border-violet-200 bg-violet-50 dark:border-violet-900 dark:bg-slate-900" aria-label="Danh mục khóa học">
-        <button type="button" class="hidden w-10 shrink-0 place-items-center border-r border-violet-200 text-violet-600 transition hover:bg-violet-100 hover:text-violet-800 sm:grid dark:border-violet-900 dark:hover:bg-violet-950" aria-label="Cuộn danh mục sang trái" @click="scrollCategories(-1)">
-          <ChevronLeft :size="18" :stroke-width="2" />
+    <main class="w-full px-2 py-4 sm:px-4 lg:px-4 space-y-4">
+      <!-- Category Strip -->
+      <section class="flex h-10 w-full items-stretch border border-purple-200 bg-purple-50/60 dark:border-purple-900/60 dark:bg-slate-900" aria-label="Danh mục khóa học">
+        <button
+          type="button"
+          class="hidden w-9 shrink-0 place-items-center border-r border-purple-200 text-purple-700 transition hover:bg-purple-100 sm:grid dark:border-purple-900 dark:hover:bg-purple-950"
+          aria-label="Cuộn sang trái"
+          @click="scrollCategories(-1)"
+        >
+          <ChevronLeft :size="16" />
         </button>
+
         <div ref="categoryScroller" class="category-scroll flex min-w-0 flex-1 items-stretch overflow-x-auto scroll-smooth">
-          <button v-for="category in categoryStore.categories" :key="category.id" type="button" :class="['shrink-0 whitespace-nowrap px-4 text-xs font-bold uppercase tracking-[0.08em] transition', selectedCategory === category.id ? 'bg-violet-700 text-white' : 'text-slate-600 hover:bg-violet-100 hover:text-violet-800 dark:text-slate-300 dark:hover:bg-violet-950 dark:hover:text-violet-200']" @click="selectCategory(category.id)">{{ category.name }}</button>
+          <button
+            type="button"
+            :class="[
+              'shrink-0 whitespace-nowrap px-4 text-xs font-bold uppercase tracking-wider transition',
+              !selectedCategory ? 'bg-violet-700 text-white' : 'text-slate-700 hover:bg-purple-100/70 hover:text-purple-900 dark:text-slate-300 dark:hover:bg-slate-800',
+            ]"
+            @click="selectCategory('')"
+          >
+            Tất cả danh mục
+          </button>
+          <button
+            v-for="category in categoryStore.categories"
+            :key="category.id"
+            type="button"
+            :class="[
+              'shrink-0 whitespace-nowrap px-4 text-xs font-bold uppercase tracking-wider transition',
+              selectedCategory === category.id
+                ? 'bg-violet-700 text-white'
+                : 'text-slate-700 hover:bg-purple-100/70 hover:text-purple-900 dark:text-slate-300 dark:hover:bg-slate-800',
+            ]"
+            @click="selectCategory(category.id)"
+          >
+            {{ category.name }}
+          </button>
         </div>
-        <button type="button" class="hidden w-10 shrink-0 place-items-center border-l border-violet-200 text-violet-600 transition hover:bg-violet-100 hover:text-violet-800 sm:grid dark:border-violet-900 dark:hover:bg-violet-950" aria-label="Cuộn danh mục sang phải" @click="scrollCategories(1)">
-          <ChevronRight :size="18" :stroke-width="2" />
+
+        <button
+          type="button"
+          class="hidden w-9 shrink-0 place-items-center border-l border-purple-200 text-purple-700 transition hover:bg-purple-100 sm:grid dark:border-purple-900 dark:hover:bg-purple-950"
+          aria-label="Cuộn sang phải"
+          @click="scrollCategories(1)"
+        >
+          <ChevronRight :size="16" />
         </button>
       </section>
 
-      <section class="grid gap-0 border-x border-b border-slate-200 bg-white sm:grid-cols-2 lg:grid-cols-[minmax(18rem,2fr)_minmax(9rem,1fr)_minmax(9rem,1fr)_auto] dark:border-slate-700 dark:bg-slate-900">
+      <!-- Search & Filters Bar (Sharp Flat Geometric) -->
+      <section class="grid gap-0 border border-slate-200 bg-white sm:grid-cols-2 lg:grid-cols-[minmax(18rem,2fr)_minmax(10rem,1fr)_minmax(10rem,1fr)_auto] dark:border-slate-800 dark:bg-slate-900">
         <label class="relative block min-w-0">
           <span class="sr-only">Tìm kiếm khóa học</span>
-          <svg class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m21 21-4.35-4.35m1.35-5.65a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z" /></svg>
-          <input v-model="search" class="h-10 w-full border-0 border-r border-slate-200 bg-slate-50 pl-9 pr-3 text-xs text-slate-950 outline-none transition focus:bg-white dark:border-slate-700 dark:bg-slate-800 dark:text-white" placeholder="Tìm tên khóa học hoặc kỹ năng..." />
+          <Search :size="15" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+          <input
+            v-model="search"
+            class="h-10 w-full border-0 border-r border-slate-200 bg-slate-50/50 pl-9 pr-3 text-xs text-slate-950 placeholder:text-slate-400 outline-none transition focus:bg-white dark:border-slate-800 dark:bg-slate-800/60 dark:text-white"
+            placeholder="Tìm theo tên khóa học hoặc kỹ năng..."
+          />
         </label>
-        <select v-model="selectedLevel" class="filter-select" @change="fetchWithFilters()"><option v-for="level in levels" :key="level.value" :value="level.value">{{ level.label }}</option></select>
-        <select v-model="selectedPrice" class="filter-select" @change="fetchWithFilters()"><option v-for="price in priceOptions" :key="price.value" :value="price.value">{{ price.label }}</option></select>
-        <BaseButton v-if="hasFilters" class="!h-10 !rounded-none !border-0 !px-3 !text-xs" variant="ghost" size="sm" @click="clearFilters">Đặt lại</BaseButton>
+        <select v-model="selectedLevel" class="filter-select" @change="fetchWithFilters()">
+          <option v-for="level in levels" :key="level.value" :value="level.value">{{ level.label }}</option>
+        </select>
+        <select v-model="selectedPrice" class="filter-select" @change="fetchWithFilters()">
+          <option v-for="price in priceOptions" :key="price.value" :value="price.value">{{ price.label }}</option>
+        </select>
+        <button
+          v-if="hasFilters"
+          type="button"
+          class="inline-flex h-10 items-center justify-center gap-1.5 px-3 text-xs font-bold text-slate-600 hover:bg-slate-100 hover:text-purple-700 dark:text-slate-400 dark:hover:bg-slate-800 transition"
+          @click="clearFilters"
+        >
+          <RotateCcw :size="13" />
+          <span>Đặt lại</span>
+        </button>
       </section>
 
-      <div class="mb-3 mt-6 flex items-end justify-between gap-4">
+      <!-- Heading & Count -->
+      <div class="flex items-center justify-between gap-4 border-b border-slate-200 pb-3 pt-2 dark:border-slate-800">
         <div>
-          <h2 class="text-lg font-extrabold text-slate-950 dark:text-white">{{ hasFilters ? 'Kết quả tìm kiếm' : 'Tất cả khóa học' }}</h2>
-          <p class="mt-0.5 text-xs text-slate-500">{{ hasFilters ? `Tìm thấy ${courseStore.meta.total} khóa học` : `${courseStore.meta.total} khóa học` }}</p>
+          <h2 class="text-base font-black text-slate-950 dark:text-white leading-tight">
+            {{ hasFilters ? 'Kết quả tìm kiếm' : 'Tất cả khóa học' }}
+          </h2>
+          <p class="mt-0.5 text-xs text-slate-500">
+            {{ hasFilters ? `Tìm thấy ${courseStore.meta.total} khóa học phù hợp` : `Tổng cộng ${courseStore.meta.total} khóa học sẵn có` }}
+          </p>
         </div>
+
+        <span class="border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-bold text-slate-600 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300">
+          Trang {{ courseStore.meta.page }} / {{ courseStore.meta.totalPages || 1 }}
+        </span>
       </div>
 
-      <div v-if="courseStore.loading" class="surface-card grid min-h-72 place-items-center"><LoadingSpinner /></div>
-      <section v-else-if="courseStore.courses.length" class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <!-- Loading / Course Grid -->
+      <div v-if="courseStore.loading" class="border border-slate-200 bg-white grid min-h-72 place-items-center dark:border-slate-800 dark:bg-slate-900">
+        <LoadingSpinner />
+      </div>
+      <section v-else-if="courseStore.courses.length" class="grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         <CourseCard v-for="course in courseStore.courses" :key="course.id" :course="course" />
       </section>
-      <section v-else class="surface-card grid min-h-80 place-items-center p-8 text-center">
-        <div><span class="mx-auto grid h-16 w-16 place-items-center rounded-2xl bg-purple-50 text-2xl dark:bg-purple-950/40">⌕</span><h2 class="mt-5 text-xl font-extrabold">Chưa tìm thấy khóa học</h2><p class="mt-2 text-sm text-slate-500">Thử thay đổi từ khóa hoặc bộ lọc để xem thêm kết quả.</p><BaseButton v-if="hasFilters" class="mt-5" variant="secondary" @click="clearFilters">Xóa bộ lọc</BaseButton></div>
+      <!-- Empty State -->
+      <section v-else class="border border-dashed border-slate-300 bg-white grid min-h-80 place-items-center p-8 text-center dark:border-slate-800 dark:bg-slate-900">
+        <div>
+          <Compass :size="36" class="mx-auto text-slate-400" />
+          <h2 class="mt-3 text-base font-bold text-slate-900 dark:text-white">Không tìm thấy khóa học phù hợp</h2>
+          <p class="mt-1 text-xs text-slate-500">Thử thay đổi từ khóa hoặc bộ lọc để xem thêm kết quả.</p>
+          <button
+            v-if="hasFilters"
+            type="button"
+            class="mt-4 inline-flex items-center gap-1.5 bg-violet-700 px-4 py-2 text-xs font-bold text-white shadow-xs hover:bg-violet-800 transition"
+            @click="clearFilters"
+          >
+            <RotateCcw :size="14" />
+            <span>Xóa bộ lọc</span>
+          </button>
+        </div>
       </section>
 
-      <nav v-if="courseStore.courses.length > 0" class="mt-10 flex items-center justify-center gap-2" aria-label="Phân trang">
+      <!-- Sharp Flat Pagination -->
+      <nav v-if="courseStore.courses.length > 0 && courseStore.meta.totalPages > 1" class="mt-8 flex items-center justify-center gap-1.5" aria-label="Phân trang">
         <button
           :disabled="courseStore.meta.page <= 1"
-          class="flex h-9 items-center justify-center border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-600 transition hover:border-purple-300 hover:text-purple-700 disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"
+          class="flex h-8 items-center justify-center border border-slate-300 bg-white px-3 text-xs font-bold text-slate-700 transition hover:border-purple-400 hover:text-purple-700 disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"
           @click="fetchWithFilters(courseStore.meta.page - 1)"
         >
           ← Trước
@@ -170,10 +253,10 @@ onMounted(async () => {
           v-for="page in (courseStore.meta.totalPages || 1)"
           :key="page"
           :class="[
-            'grid h-9 w-9 place-items-center border text-xs font-bold transition',
+            'grid h-8 w-8 place-items-center border text-xs font-bold transition',
             page === courseStore.meta.page
-              ? 'border-purple-600 bg-purple-600 text-white shadow-lg shadow-purple-500/20'
-              : 'border-slate-200 bg-white text-slate-600 hover:border-purple-300 hover:text-purple-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300',
+              ? 'border-violet-700 bg-violet-700 text-white'
+              : 'border-slate-300 bg-white text-slate-700 hover:border-purple-400 hover:text-purple-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300',
           ]"
           @click="fetchWithFilters(page)"
         >
@@ -181,7 +264,7 @@ onMounted(async () => {
         </button>
         <button
           :disabled="courseStore.meta.page >= courseStore.meta.totalPages"
-          class="flex h-9 items-center justify-center border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-600 transition hover:border-purple-300 hover:text-purple-700 disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"
+          class="flex h-8 items-center justify-center border border-slate-300 bg-white px-3 text-xs font-bold text-slate-700 transition hover:border-purple-400 hover:text-purple-700 disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"
           @click="fetchWithFilters(courseStore.meta.page + 1)"
         >
           Sau →
@@ -192,9 +275,27 @@ onMounted(async () => {
 </template>
 
 <style scoped>
-.catalog-page { padding-top: 0 !important; }
-.filter-select { min-height: 2.5rem; width: 100%; border: 0; border-right: 1px solid var(--border); border-radius: 0; background: var(--surface-muted); padding: .45rem .65rem; color: var(--text); font-size: .75rem; font-weight: 600; outline: none; }
-.filter-select:focus { background: var(--surface); box-shadow: inset 0 -2px 0 #7c3aed; }
-.category-scroll { scrollbar-width: none; }
-.category-scroll::-webkit-scrollbar { display: none; }
+.filter-select {
+  min-height: 2.5rem;
+  width: 100%;
+  border: 0;
+  border-right: 1px solid var(--border);
+  border-radius: 0;
+  background: var(--surface-muted);
+  padding: 0.45rem 0.65rem;
+  color: var(--text);
+  font-size: 0.75rem;
+  font-weight: 600;
+  outline: none;
+}
+.filter-select:focus {
+  background: var(--surface);
+  box-shadow: inset 0 -2px 0 #7c3aed;
+}
+.category-scroll {
+  scrollbar-width: none;
+}
+.category-scroll::-webkit-scrollbar {
+  display: none;
+}
 </style>

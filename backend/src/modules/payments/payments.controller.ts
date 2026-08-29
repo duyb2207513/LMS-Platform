@@ -104,9 +104,6 @@ export async function mockCheckoutController(request: Request, response: Respons
 
       <form method="post" action="${action}">
         <input type="hidden" name="token" value="${token}">
-        <button type="submit" class="btn-momo btn-ok" name="status" value="SUCCEEDED">
-          ✓ Giả lập xác nhận đã thanh toán
-        </button>
         <button type="submit" class="btn-momo btn-cancel" name="status" value="FAILED">
           ✕ Hủy giao dịch
         </button>

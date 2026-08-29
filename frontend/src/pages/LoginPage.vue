@@ -12,27 +12,16 @@ const auth = useAuthStore(), route = useRoute(), router = useRouter()
 const email = ref(''), password = ref(''), loading = ref(false), error = ref(''), emailError = ref('')
 
 interface DemoAccount {
-  role: 'student' | 'instructor' | 'admin'
+  role: 'instructor' | 'admin'
   name: string
   roleLabel: string
   email: string
   password: string
   description: string
-  badgeClass: string
   borderClass: string
 }
 
 const demoAccounts: DemoAccount[] = [
-  {
-    role: 'student',
-    name: 'Học viên',
-    roleLabel: 'Student',
-    email: 'student@lms.test',
-    password: 'Password123',
-    description: 'Trải nghiệm học tập, làm Quiz, nộp bài tập & nhận chứng chỉ',
-    badgeClass: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800',
-    borderClass: 'hover:border-emerald-400 hover:bg-emerald-50/50 dark:hover:border-emerald-600 dark:hover:bg-emerald-950/30'
-  },
   {
     role: 'instructor',
     name: 'Giảng viên',
@@ -40,8 +29,7 @@ const demoAccounts: DemoAccount[] = [
     email: 'instructor@lms.test',
     password: 'Password123',
     description: 'Quản lý khóa học, tạo đề thi, chấm bài tập & xem doanh thu',
-    badgeClass: 'bg-sky-100 text-sky-700 dark:bg-sky-950/60 dark:text-sky-300 border-sky-200 dark:border-sky-800',
-    borderClass: 'hover:border-sky-400 hover:bg-sky-50/50 dark:hover:border-sky-600 dark:hover:bg-sky-950/30'
+    borderClass: 'hover:border-purple-400 hover:bg-purple-50/50 dark:hover:border-purple-600 dark:hover:bg-purple-950/30'
   },
   {
     role: 'admin',
@@ -50,7 +38,6 @@ const demoAccounts: DemoAccount[] = [
     email: 'admin@lms.test',
     password: 'Password123',
     description: 'Toàn quyền quản trị hệ thống, duyệt khóa học, quản lý users & tài chính',
-    badgeClass: 'bg-purple-100 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300 border-purple-200 dark:border-purple-800',
     borderClass: 'hover:border-purple-400 hover:bg-purple-50/50 dark:hover:border-purple-600 dark:hover:bg-purple-950/30'
   }
 ]
@@ -111,12 +98,9 @@ async function loginWithGoogle(idToken: string) {
           <span class="text-xs font-bold uppercase tracking-wider text-purple-700 dark:text-purple-300">
             Tài khoản Demo (Nhà tuyển dụng)
           </span>
-          <span class="text-[11px] text-slate-500 dark:text-slate-400">
-            Pass: <code class="rounded bg-white/90 px-1.5 py-0.5 font-mono font-semibold text-purple-900 shadow-xs dark:bg-slate-800 dark:text-purple-200">Password123</code>
-          </span>
         </div>
 
-        <div class="grid grid-cols-3 gap-2">
+        <div class="grid grid-cols-2 gap-3">
           <button
             v-for="acc in demoAccounts"
             :key="acc.role"
@@ -124,18 +108,15 @@ async function loginWithGoogle(idToken: string) {
             :disabled="loading"
             :title="`Đăng nhập nhanh với vai trò ${acc.name}: ${acc.description}`"
             @click="selectDemoAccount(acc)"
-            class="group relative flex flex-col items-center justify-center rounded-lg border border-slate-200 bg-white px-2 py-3 text-center shadow-xs transition hover:-translate-y-0.5 hover:shadow-md disabled:pointer-events-none disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900"
+            class="group relative flex flex-col items-center justify-center rounded-xl border border-slate-200 bg-white px-3 py-3.5 text-center shadow-xs transition hover:-translate-y-0.5 hover:shadow-md disabled:pointer-events-none disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900"
             :class="acc.borderClass"
           >
-            <span class="text-xs font-bold text-slate-800 dark:text-slate-100">{{ acc.name }}</span>
-            <span class="mt-0.5 text-[10px] font-medium text-slate-500 dark:text-slate-400">{{ acc.roleLabel }}</span>
-            <span class="mt-2 inline-flex items-center rounded-md border px-1.5 py-0.5 text-[9px] font-semibold transition group-hover:scale-105" :class="acc.badgeClass">
-              1-Click ➔
-            </span>
+            <span class="text-sm font-bold text-slate-800 dark:text-slate-100">{{ acc.name }}</span>
+            <span class="mt-0.5 text-xs font-semibold text-purple-600 dark:text-purple-400">{{ acc.roleLabel }}</span>
           </button>
         </div>
-        <p class="mt-2 text-center text-[11px] text-slate-500 dark:text-slate-400">
-          Bấm vào thẻ vai trò để tự động điền & đăng nhập ngay tức thì.
+        <p class="mt-2.5 text-center text-[11px] text-slate-500 dark:text-slate-400">
+          Bấm vào thẻ vai trò để tự động điền &amp; đăng nhập ngay tức thì.
         </p>
       </div>
 

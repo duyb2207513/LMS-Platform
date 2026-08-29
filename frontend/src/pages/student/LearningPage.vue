@@ -43,15 +43,47 @@ const courseId = String(route.params.courseId)
 const enrollmentSucceeded = computed(() => route.query.enrolled === '1')
 const lessons = computed(() => content.value?.sections.flatMap((section) => section.lessons) || [])
 const lessonIndex = computed(() => lessons.value.findIndex((lesson) => lesson.id === selected.value?.id))
-const previousLesson = computed(() => lessonIndex.value > 0 ? lessons.value[lessonIndex.value - 1] : null)
-const nextLesson = computed(() => lessonIndex.value >= 0 ? lessons.value[lessonIndex.value + 1] || null : null)
-const selectedSection = computed(() => content.value?.sections.find((section) => section.lessons.some((lesson) => lesson.id === selected.value?.id)))
-const asset = (url: string | null) => !url ? '' : url.startsWith('http') ? url : `${API_BASE_URL.replace('/api/v1', '')}${url}`
+const previousLesson = computed(() => (lessonIndex.value > 0 ? lessons.value[lessonIndex.value - 1] : null))
+const nextLesson = computed(() => (lessonIndex.value >= 0 ? lessons.value[lessonIndex.value + 1] || null : null))
+const selectedSection = computed(() =>
+  content.value?.sections.find((section) => section.lessons.some((lesson) => lesson.id === selected.value?.id)),
+)
+const asset = (url: string | null) =>
+  !url ? '' : url.startsWith('http') ? url : `${API_BASE_URL.replace('/api/v1', '')}${url}`
 const lessonTypeLabel = (type: Lesson['lessonType']) => ({ TEXT: 'Bài đọc', VIDEO: 'Video', DOCUMENT: 'Tài liệu' }[type])
-const lessonBlocks = computed(() => selected.value?.contents?.length ? selected.value.contents : selected.value ? [{ id: `legacy-${selected.value.id}`, lessonId: selected.value.id, contentType: selected.value.lessonType, textContent: selected.value.content, fileUrl: selected.value.lessonType === 'VIDEO' ? selected.value.videoUrl : selected.value.documentUrl, originalName: null, mimeType: null, sizeBytes: null, position: 1, createdAt: '', updatedAt: '' }] : [])
-const docTypeFor = (url: string | null) => { const value=(url||'').toLowerCase(); if(value.endsWith('.pdf'))return 'pdf';if(value.endsWith('.pptx')||value.endsWith('.ppt'))return 'pptx';if(value.endsWith('.docx')||value.endsWith('.doc'))return 'docx';return '' }
-const isImageBlock = (block: Pick<LessonContent, 'mimeType' | 'fileUrl'>) => Boolean(block.mimeType?.startsWith('image/') || /\.(png|jpe?g|webp)$/i.test(block.fileUrl || ''))
-const sectionQuizUnlocked = (section: CourseContent['sections'][number]) => section.lessons.filter(lesson => lesson.isPublished && lesson.isRequired).every(lesson => lesson.progress?.isCompleted)
+const lessonBlocks = computed(() =>
+  selected.value?.contents?.length
+    ? selected.value.contents
+    : selected.value
+    ? [
+        {
+          id: `legacy-${selected.value.id}`,
+          lessonId: selected.value.id,
+          contentType: selected.value.lessonType,
+          textContent: selected.value.content,
+          fileUrl: selected.value.lessonType === 'VIDEO' ? selected.value.videoUrl : selected.value.documentUrl,
+          originalName: null,
+          mimeType: null,
+          sizeBytes: null,
+          position: 1,
+          createdAt: '',
+          updatedAt: '',
+        },
+      ]
+    : [],
+)
+const docTypeFor = (url: string | null) => {
+  const value = (url || '').toLowerCase()
+  if (value.endsWith('.pdf')) return 'pdf'
+  if (value.endsWith('.pptx') || value.endsWith('.ppt')) return 'pptx'
+  if (value.endsWith('.docx') || value.endsWith('.doc')) return 'docx'
+  return ''
+}
+const isImageBlock = (block: Pick<LessonContent, 'mimeType' | 'fileUrl'>) =>
+  Boolean(block.mimeType?.startsWith('image/') || /\.(png|jpe?g|webp)$/i.test(block.fileUrl || ''))
+const sectionQuizUnlocked = (section: CourseContent['sections'][number]) =>
+  section.lessons.filter((lesson) => lesson.isPublished && lesson.isRequired).every((lesson) => lesson.progress?.isCompleted)
+
 async function load() {
   try {
     const selectedId = selected.value?.id
@@ -61,8 +93,12 @@ async function load() {
     ])
     content.value = courseResponse.data || null
     progress.value = progressResponse.data || null
-    selected.value = selectedId ? lessons.value.find((lesson) => lesson.id === selectedId) || lessons.value[0] || null : lessons.value.find((lesson) => !lesson.progress?.isCompleted) || lessons.value[0] || null
-  } catch (cause) { error.value = cause instanceof Error ? cause.message : 'Không thể tải nội dung khóa học' }
+    selected.value = selectedId
+      ? lessons.value.find((lesson) => lesson.id === selectedId) || lessons.value[0] || null
+      : lessons.value.find((lesson) => !lesson.progress?.isCompleted) || lessons.value[0] || null
+  } catch (cause) {
+    error.value = cause instanceof Error ? cause.message : 'Không thể tải nội dung khóa học'
+  }
 }
 
 async function complete() {
@@ -71,13 +107,24 @@ async function complete() {
   await load()
 }
 
-function chooseLesson(lesson: Lesson) { selected.value = lesson; sidebarOpen.value = false; window.scrollTo({ top: 0, behavior: 'smooth' }) }
-function navigateLesson(lesson: Lesson | null) { if (lesson) chooseLesson(lesson) }
+function chooseLesson(lesson: Lesson) {
+  selected.value = lesson
+  sidebarOpen.value = false
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+}
+
+function navigateLesson(lesson: Lesson | null) {
+  if (lesson) chooseLesson(lesson)
+}
 
 async function loadComments() {
   if (!selected.value) return
-  try { const response = await api.get<ApiResponse<Comment[]>>(`/lessons/${selected.value.id}/comments`); comments.value = response.data || [] }
-  catch { comments.value = [] }
+  try {
+    const response = await api.get<ApiResponse<Comment[]>>(`/lessons/${selected.value.id}/comments`)
+    comments.value = response.data || []
+  } catch {
+    comments.value = []
+  }
 }
 
 async function send() {
@@ -88,35 +135,45 @@ async function send() {
   await loadComments()
 }
 
-async function remove(id: string) { await api.del(`/comments/${id}`); await loadComments() }
+async function remove(id: string) {
+  await api.del(`/comments/${id}`)
+  await loadComments()
+}
+
 const renderText = (content: string | null) => {
   if (!content) return ''
-  // Escape HTML to prevent XSS
-  let textVal = content
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
+  let textVal = content.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 
-  // Replace custom image tag [image:url]
   textVal = textVal.replace(/\[image:(.+?)\]/g, (_, url) => {
-    return `<img src="${asset(url)}" alt="Sơ đồ cây quyết định" class="my-6 max-w-full rounded-2xl border border-slate-200 shadow-sm dark:border-slate-800" />`
+    return `<img src="${asset(url)}" alt="Hình ảnh bài học" class="my-6 max-w-full border border-slate-200 shadow-sm dark:border-slate-800" />`
   })
-  const inline = (value: string) => value
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*([^*]+)\*/g, '<em>$1</em>')
+  const inline = (value: string) => value.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/\*([^*]+)\*/g, '<em>$1</em>')
   const rendered: string[] = []
   let inList = false
-  textVal.split('\n').forEach(line => {
+  textVal.split('\n').forEach((line) => {
     const heading = /^(#{1,5})\s+(.+)$/.exec(line.trim())
     const bullet = /^[-•]\s+(.+)$/.exec(line.trim())
     if (bullet) {
-      if (!inList) { rendered.push('<ul>'); inList = true }
+      if (!inList) {
+        rendered.push('<ul>')
+        inList = true
+      }
       rendered.push(`<li>${inline(bullet[1]!)}</li>`)
       return
     }
-    if (inList) { rendered.push('</ul>'); inList = false }
-    if (heading) { const level = heading[1]!.length; rendered.push(`<h${level}>${inline(heading[2]!)}</h${level}>`); return }
-    if (line.includes('<img ')) { rendered.push(line); return }
+    if (inList) {
+      rendered.push('</ul>')
+      inList = false
+    }
+    if (heading) {
+      const level = heading[1]!.length
+      rendered.push(`<h${level}>${inline(heading[2]!)}</h${level}>`)
+      return
+    }
+    if (line.includes('<img ')) {
+      rendered.push(line)
+      return
+    }
     rendered.push(line.trim() ? `<p>${inline(line)}</p>` : '<br>')
   })
   if (inList) rendered.push('</ul>')
@@ -129,17 +186,28 @@ onMounted(load)
 
 <template>
   <DefaultLayout>
-    <div :class="['learning-shell', sidebarCollapsed ? 'sidebar-collapsed' : '']"> 
-      <button v-if="sidebarOpen" class="fixed inset-0 z-30 bg-slate-950/45 lg:hidden" aria-label="Đóng mục lục" @click="sidebarOpen = false" />
+    <div :class="['learning-shell', sidebarCollapsed ? 'sidebar-collapsed' : '']">
+      <!-- Backdrop for mobile sidebar -->
+      <button
+        v-if="sidebarOpen"
+        class="fixed inset-0 z-30 bg-slate-950/45 lg:hidden"
+        aria-label="Đóng mục lục"
+        @click="sidebarOpen = false"
+      />
+
+      <!-- Learning Sidebar (Sharp Flat Geometric) -->
       <aside :class="['learning-sidebar', sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0', sidebarCollapsed ? 'sidebar-hidden' : '']">
         <div class="learning-sidebar-content">
-          <div class="learning-course-summary">
+          <!-- Course Title & Progress Header -->
+          <div class="learning-course-summary bg-slate-50 dark:bg-slate-900/60 border-b border-slate-200 dark:border-slate-800 p-4">
             <div class="flex items-center justify-between gap-3">
-              <div class="min-w-0">
-                <RouterLink to="/my-courses" class="sidebar-back-btn"><ArrowLeft :size="15" /><span>Khóa học của tôi</span></RouterLink>
-              </div>
-              <div class="flex items-center gap-1.5">
-                <!-- Desktop Sidebar Collapse Button -->
+              <RouterLink to="/my-courses" class="sidebar-back-btn">
+                <ArrowLeft :size="14" />
+                <span>Khóa học của tôi</span>
+              </RouterLink>
+
+              <div class="flex items-center gap-1">
+                <!-- Desktop Sidebar Collapse -->
                 <button
                   type="button"
                   class="sidebar-collapse-btn hidden lg:grid"
@@ -147,122 +215,383 @@ onMounted(load)
                   aria-label="Thu gọn mục lục"
                   @click="sidebarCollapsed = true"
                 >
-                  <PanelLeftClose :size="18" />
+                  <PanelLeftClose :size="16" />
                 </button>
-                <!-- Mobile Sidebar Close Button -->
+                <!-- Mobile Sidebar Close -->
                 <button
                   type="button"
                   class="sidebar-mobile-close lg:hidden"
                   aria-label="Đóng mục lục"
                   @click="sidebarOpen = false"
                 >
-                  <X :size="18" />
+                  <X :size="16" />
                 </button>
               </div>
             </div>
-            <h2 class="mt-3 line-clamp-2 text-lg font-black leading-snug">{{ content?.course.title }}</h2>
-            <div class="mt-5 flex justify-between text-xs font-semibold"><span>{{ progress?.completedLessons || 0 }}/{{ progress?.totalLessons || 0 }} bài</span><span>{{ Math.round(progress?.progressPercent || 0) }}%</span></div>
-            <div class="learning-progress-track"><div class="learning-progress-value" :style="{ width: `${progress?.progressPercent || 0}%` }" /></div>
-          </div>
-          <nav class="flex-1 overflow-y-auto p-3" aria-label="Nội dung khóa học">
-          <section v-for="(section, sectionIndex) in content?.sections" :key="section.id" class="mb-4">
-            <p class="px-2 py-2 text-xs font-extrabold uppercase tracking-wider text-slate-400">Chương {{ sectionIndex + 1 }}</p>
-            <h3 class="px-2 pb-2 text-sm font-bold text-slate-800 dark:text-slate-200">{{ section.title }}</h3>
-            <button v-for="lesson in section.lessons" :key="lesson.id" :class="['lesson-link', selected?.id === lesson.id ? 'lesson-link--active' : '']" @click="chooseLesson(lesson)">
-              <span :class="['lesson-state', lesson.progress?.isCompleted ? 'lesson-state--done' : '']"><Check v-if="lesson.progress?.isCompleted" :size="14" /><template v-else>{{ lesson.position }}</template></span>
-              <span class="min-w-0 flex-1"><span class="line-clamp-2 font-semibold">{{ lesson.title }}</span><span class="mt-1 block text-[11px] opacity-65">{{ lessonTypeLabel(lesson.lessonType) }}<template v-if="lesson.durationSeconds"> · {{ Math.ceil(lesson.durationSeconds / 60) }} phút</template></span></span>
-            </button>
-            <RouterLink v-if="section.quiz && sectionQuizUnlocked(section)" :to="{ path: `/quiz/${section.quiz.id}`, query: { courseId } }" class="section-quiz-link"><span class="lesson-state section-quiz-state"><ListChecks :size="14" /></span><span class="min-w-0 flex-1"><b class="block text-sm">Quiz cuối chương</b><small>{{ section.quiz.title }}</small></span><ChevronRight :size="15" /></RouterLink>
-            <div v-else-if="section.quiz" class="section-quiz-link section-quiz-link--locked"><span class="lesson-state"><LockKeyhole :size="13" /></span><span class="min-w-0 flex-1"><b class="block text-sm">Quiz cuối chương</b><small>Hoàn thành các bài bắt buộc để mở khóa</small></span></div>
-          </section>
 
-          <section class="mt-6 border-t border-slate-200 pt-4 dark:border-slate-800">
-            <p class="px-2 pb-2 text-xs font-extrabold uppercase tracking-wider text-slate-400">Tổng kết &amp; Đánh giá</p>
-            <RouterLink
-              :to="`/courses/${courseId}/assignments`"
-              class="lesson-link flex items-center justify-between !border !border-amber-200/80 !bg-amber-50/70 !text-amber-800 hover:!bg-amber-100 dark:!border-amber-800/60 dark:!bg-amber-950/40 dark:!text-amber-200"
-              title="Xem bài tập và điểm số"
-            >
-              <div class="flex items-center gap-3 min-w-0">
-                <span class="lesson-state !border-amber-300 !bg-amber-100 !text-amber-700 dark:!border-amber-800 dark:!bg-amber-900/60 dark:!text-amber-300"><ClipboardList :size="15" /></span>
-                <span class="font-bold truncate">Bài tập &amp; điểm</span>
+            <h2 class="mt-2.5 line-clamp-2 text-sm font-black text-slate-950 dark:text-white leading-snug">
+              {{ content?.course.title }}
+            </h2>
+
+            <div class="mt-3 flex items-center justify-between text-[11px] font-bold text-slate-500">
+              <span>{{ progress?.completedLessons || 0 }}/{{ progress?.totalLessons || 0 }} bài học</span>
+              <span class="text-purple-700 dark:text-purple-400">{{ Math.round(progress?.progressPercent || 0) }}%</span>
+            </div>
+            <div class="learning-progress-track mt-1.5 h-1.5 w-full bg-slate-200 dark:bg-slate-800">
+              <div class="learning-progress-value h-full" :style="{ width: `${progress?.progressPercent || 0}%` }" />
+            </div>
+          </div>
+
+          <!-- Section & Lesson Navigation -->
+          <nav class="flex-1 overflow-y-auto p-2 space-y-4" aria-label="Nội dung khóa học">
+            <section v-for="(section, sectionIndex) in content?.sections" :key="section.id" class="space-y-1">
+              <div class="px-2 pt-2 pb-1 border-b border-slate-100 dark:border-slate-800/80">
+                <p class="text-[10px] font-black uppercase tracking-wider text-purple-700 dark:text-purple-400">
+                  Chương {{ sectionIndex + 1 }}
+                </p>
+                <h3 class="text-xs font-bold text-slate-900 dark:text-slate-200 mt-0.5 leading-snug">
+                  {{ section.title }}
+                </h3>
               </div>
-              <ChevronRight :size="16" class="shrink-0 text-amber-600 dark:text-amber-400" />
-            </RouterLink>
-          </section>
+
+              <div class="space-y-0.5 pt-1">
+                <button
+                  v-for="lesson in section.lessons"
+                  :key="lesson.id"
+                  :class="['lesson-link', selected?.id === lesson.id ? 'lesson-link--active' : '']"
+                  @click="chooseLesson(lesson)"
+                >
+                  <span :class="['lesson-state', lesson.progress?.isCompleted ? 'lesson-state--done' : '']">
+                    <Check v-if="lesson.progress?.isCompleted" :size="13" :stroke-width="3" />
+                    <template v-else>{{ lesson.position }}</template>
+                  </span>
+                  <span class="min-w-0 flex-1">
+                    <span class="line-clamp-2 text-xs font-bold leading-snug">{{ lesson.title }}</span>
+                    <span class="mt-0.5 block text-[10px] opacity-70">
+                      {{ lessonTypeLabel(lesson.lessonType) }}
+                      <template v-if="lesson.durationSeconds"> · {{ Math.ceil(lesson.durationSeconds / 60) }}p</template>
+                    </span>
+                  </span>
+                </button>
+
+                <!-- Section Quiz Link -->
+                <RouterLink
+                  v-if="section.quiz && sectionQuizUnlocked(section)"
+                  :to="{ path: `/quiz/${section.quiz.id}`, query: { courseId } }"
+                  class="section-quiz-link"
+                >
+                  <span class="lesson-state section-quiz-state"><ListChecks :size="13" /></span>
+                  <span class="min-w-0 flex-1">
+                    <b class="block text-xs">Quiz kiểm tra</b>
+                    <small class="truncate block">{{ section.quiz.title }}</small>
+                  </span>
+                  <ChevronRight :size="14" />
+                </RouterLink>
+
+                <div v-else-if="section.quiz" class="section-quiz-link section-quiz-link--locked">
+                  <span class="lesson-state"><LockKeyhole :size="12" /></span>
+                  <span class="min-w-0 flex-1">
+                    <b class="block text-xs">Quiz kiểm tra</b>
+                    <small class="truncate block">Hoàn thành bài bắt buộc để mở</small>
+                  </span>
+                </div>
+              </div>
+            </section>
+
+            <!-- Assignments Link -->
+            <section class="mt-4 border-t border-slate-200 pt-3 dark:border-slate-800">
+              <RouterLink
+                :to="`/courses/${courseId}/assignments`"
+                class="lesson-link flex items-center justify-between !border !border-amber-300 !bg-amber-50/80 !text-amber-900 hover:!bg-amber-100 dark:!border-amber-800 dark:!bg-amber-950/40 dark:!text-amber-200"
+                title="Xem bài tập và điểm số"
+              >
+                <div class="flex items-center gap-2 min-w-0">
+                  <span class="lesson-state !border-amber-400 !bg-amber-200 !text-amber-800 dark:!border-amber-800 dark:!bg-amber-900/60 dark:!text-amber-300">
+                    <ClipboardList :size="14" />
+                  </span>
+                  <span class="text-xs font-bold truncate">Bài tập &amp; Điểm</span>
+                </div>
+                <ChevronRight :size="15" class="shrink-0 text-amber-700" />
+              </RouterLink>
+            </section>
           </nav>
         </div>
       </aside>
 
-      <main class="min-w-0 flex-1">
-        <header class="learning-topbar">
+      <!-- Main Learning Content Canvas -->
+      <main class="min-w-0 flex-1 bg-slate-50 dark:bg-slate-950 flex flex-col">
+        <!-- Top Toolbar -->
+        <header class="learning-topbar border-b border-slate-200 bg-white px-4 py-2.5 dark:border-slate-800 dark:bg-slate-900">
           <div class="flex items-center gap-3">
-            <!-- Desktop: Nút mở lại mục lục khi sidebar đang thu gọn -->
+            <!-- Reopen sidebar button -->
             <button
               v-if="sidebarCollapsed"
               type="button"
-              class="hidden lg:inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-700 shadow-xs transition hover:border-purple-300 hover:bg-purple-50 hover:text-purple-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300"
+              class="hidden lg:inline-flex items-center gap-1.5 border border-slate-300 bg-white px-3 py-1.5 text-xs font-bold text-slate-800 transition hover:border-purple-400 hover:text-purple-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
               title="Mở rộng mục lục"
               @click="sidebarCollapsed = false"
             >
-              <PanelLeftOpen :size="17" />
+              <PanelLeftOpen :size="15" />
               <span>Mục lục</span>
             </button>
 
-            <!-- Mobile: Nút quay lại và nút mở mục lục riêng biệt -->
-            <RouterLink v-slot="{ navigate }" to="/my-courses" custom>
-              <button class="back-btn inline-flex lg:hidden" title="Quay lại khóa học của tôi" @click="navigate">
-                <ArrowLeft :size="18" />
-              </button>
-            </RouterLink>
-            <button class="inline-flex items-center gap-2 border border-slate-200 px-3 py-2 text-sm font-bold dark:border-slate-700 lg:hidden" @click="sidebarOpen = true; sidebarCollapsed = false">
-              <Menu :size="18" /> Mục lục
+            <!-- Mobile menu trigger -->
+            <button
+              type="button"
+              class="inline-flex items-center gap-1.5 border border-slate-300 px-3 py-1.5 text-xs font-bold lg:hidden dark:border-slate-700"
+              @click="sidebarOpen = true; sidebarCollapsed = false"
+            >
+              <Menu :size="15" />
+              <span>Mục lục</span>
             </button>
+
+            <!-- Course Announcements -->
             <RouterLink
               :to="`/courses/${courseId}/announcements`"
-              class="inline-flex items-center gap-1.5 border border-purple-200 bg-purple-50/70 px-3 py-2 text-xs font-bold text-purple-700 hover:bg-purple-100 sm:text-sm dark:border-purple-800 dark:bg-purple-950/40 dark:text-purple-300"
-              title="Xem thông báo khóa học từ giảng viên"
+              class="inline-flex items-center gap-1.5 border border-purple-300 bg-purple-50 px-3 py-1.5 text-xs font-bold text-purple-800 hover:bg-purple-100 dark:border-purple-800 dark:bg-purple-950/50 dark:text-purple-300"
             >
-              <Megaphone :size="17" /> <span class="hidden sm:inline">Bảng tin thông báo</span><span class="sm:hidden">Thông báo</span>
+              <Megaphone :size="14" />
+              <span class="hidden sm:inline">Bảng tin thông báo</span>
+              <span class="sm:hidden">Thông báo</span>
             </RouterLink>
           </div>
-          <p class="hidden min-w-0 text-sm text-slate-500 sm:block"><span class="font-semibold text-slate-700 dark:text-slate-300">{{ selectedSection?.title }}</span><span v-if="selected"> / {{ selected.title }}</span></p>
-          <span v-if="selected" :class="['rounded-full px-3 py-1 text-xs font-bold', selected.progress?.isCompleted ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300' : 'bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300']">{{ selected.progress?.isCompleted ? 'Đã hoàn thành' : 'Đang học' }}</span>
-        </header>
-        <div class="learning-content">
-          <div v-if="enrollmentSucceeded" class="mb-4 flex items-center gap-3 border border-emerald-300 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-800 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300" role="status">
-            <span class="grid h-7 w-7 shrink-0 place-items-center bg-emerald-600 text-white"><Check :size="16" /></span>
-            Đăng ký khóa học miễn phí thành công. Bạn có thể bắt đầu học ngay.
+
+          <!-- Breadcrumb & Status Tag -->
+          <div class="flex items-center gap-4">
+            <p class="hidden text-xs text-slate-500 sm:block">
+              <span class="font-bold text-slate-700 dark:text-slate-300">{{ selectedSection?.title }}</span>
+              <span v-if="selected" class="text-slate-400"> / </span>
+              <span v-if="selected" class="font-medium text-slate-600 dark:text-slate-400">{{ selected.title }}</span>
+            </p>
+
+            <span
+              v-if="selected"
+              class="inline-block border px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider"
+              :class="[
+                selected.progress?.isCompleted
+                  ? 'border-emerald-300 bg-emerald-50 text-emerald-800 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300'
+                  : 'border-amber-300 bg-amber-50 text-amber-800 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-300',
+              ]"
+            >
+              {{ selected.progress?.isCompleted ? 'Đã hoàn thành' : 'Đang học' }}
+            </span>
           </div>
+        </header>
+
+        <!-- Main Body Stream -->
+        <div class="learning-content max-w-5xl mx-auto w-full p-4 sm:p-6 lg:p-8 space-y-6 flex-1">
+          <!-- Enrollment notification if just registered -->
+          <div
+            v-if="enrollmentSucceeded"
+            class="flex items-center gap-3 border border-emerald-300 bg-emerald-50 p-4 text-xs font-bold text-emerald-800 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300"
+            role="status"
+          >
+            <span class="grid h-6 w-6 shrink-0 place-items-center bg-emerald-600 text-white">
+              <Check :size="14" />
+            </span>
+            <span>Đăng ký khóa học thành công. Chúc bạn có trải nghiệm học tập tuyệt vời!</span>
+          </div>
+
           <LoadingSpinner v-if="api.loading.value && !content" class="py-24" />
-          <p v-else-if="error" class="rounded-2xl bg-red-50 p-4 text-red-700 dark:bg-red-950/30 dark:text-red-300">{{ error }}</p>
+          <p v-else-if="error" class="border border-red-200 bg-red-50 p-4 text-xs font-bold text-red-700">{{ error }}</p>
+
           <template v-else-if="selected">
-            <div class="mb-6"><p class="text-xs font-extrabold uppercase tracking-[0.14em] text-purple-600 dark:text-purple-400">{{ lessonTypeLabel(selected.lessonType) }} · Bài {{ lessonIndex + 1 }}/{{ lessons.length }}</p><h1 class="mt-2 text-3xl font-black tracking-tight sm:text-4xl">{{ selected.title }}</h1></div>
-            <section class="lesson-content-stream">
-              <template v-for="block in lessonBlocks" :key="block.id">
-                <article v-if="block.contentType === 'TEXT'" class="lesson-flow-item lesson-prose whitespace-pre-line" v-html="renderText(block.textContent)" />
-                <video v-else-if="block.contentType === 'VIDEO' && block.fileUrl" :src="asset(block.fileUrl)" controls class="lesson-flow-item lesson-video-viewer" />
-                <div v-else-if="isImageBlock(block) && block.fileUrl" class="lesson-flow-item lesson-image-viewer"><img :src="asset(block.fileUrl)" :alt="block.originalName || 'Hình ảnh bài học'" /></div>
-                <div v-else-if="block.contentType === 'DOCUMENT' && block.fileUrl" class="lesson-flow-item lesson-document-viewer w-full overflow-hidden bg-white">
-                  <VueOfficePdf v-if="docTypeFor(block.fileUrl) === 'pdf'" :src="asset(block.fileUrl)" class="h-full w-full" /><VueOfficePptx v-else-if="docTypeFor(block.fileUrl) === 'pptx'" :src="asset(block.fileUrl)" class="h-full w-full" /><VueOfficeDocx v-else-if="docTypeFor(block.fileUrl) === 'docx'" :src="asset(block.fileUrl)" class="h-full w-full" /><iframe v-else :src="asset(block.fileUrl)" class="h-full w-full" title="Tài liệu bài học" />
+            <!-- Article Canvas Box (Sharp Flat Minimalist) -->
+            <article class="border border-slate-200 bg-white p-6 sm:p-8 shadow-xs dark:border-slate-800 dark:bg-slate-900 space-y-6">
+              <!-- Lesson Header -->
+              <div class="border-b border-slate-100 pb-5 dark:border-slate-800">
+                <p class="text-[11px] font-black uppercase tracking-widest text-purple-700 dark:text-purple-400">
+                  {{ lessonTypeLabel(selected.lessonType) }} · Bài {{ lessonIndex + 1 }}/{{ lessons.length }}
+                </p>
+                <h1 class="mt-2 text-2xl sm:text-3xl lg:text-4xl font-black text-slate-950 dark:text-white tracking-tight leading-tight">
+                  {{ selected.title }}
+                </h1>
+              </div>
+
+              <!-- Lesson Content Stream -->
+              <section class="lesson-content-stream">
+                <template v-for="block in lessonBlocks" :key="block.id">
+                  <div
+                    v-if="block.contentType === 'TEXT'"
+                    class="lesson-flow-item lesson-prose text-slate-800 dark:text-slate-200 text-base sm:text-lg leading-relaxed whitespace-pre-line"
+                    v-html="renderText(block.textContent)"
+                  />
+                  <video
+                    v-else-if="block.contentType === 'VIDEO' && block.fileUrl"
+                    :src="asset(block.fileUrl)"
+                    controls
+                    class="lesson-flow-item lesson-video-viewer"
+                  />
+                  <div
+                    v-else-if="isImageBlock(block) && block.fileUrl"
+                    class="lesson-flow-item lesson-image-viewer"
+                  >
+                    <img :src="asset(block.fileUrl)" :alt="block.originalName || 'Hình ảnh bài học'" class="border border-slate-200 dark:border-slate-800" />
+                  </div>
+                  <div
+                    v-else-if="block.contentType === 'DOCUMENT' && block.fileUrl"
+                    class="lesson-flow-item lesson-document-viewer w-full overflow-hidden bg-white border border-slate-200 dark:border-slate-800"
+                  >
+                    <VueOfficePdf v-if="docTypeFor(block.fileUrl) === 'pdf'" :src="asset(block.fileUrl)" class="h-full w-full" />
+                    <VueOfficePptx v-else-if="docTypeFor(block.fileUrl) === 'pptx'" :src="asset(block.fileUrl)" class="h-full w-full" />
+                    <VueOfficeDocx v-else-if="docTypeFor(block.fileUrl) === 'docx'" :src="asset(block.fileUrl)" class="h-full w-full" />
+                    <iframe v-else :src="asset(block.fileUrl)" class="h-full w-full" title="Tài liệu bài học" />
+                  </div>
+                  <div v-else class="lesson-flow-item grid min-h-48 place-items-center text-center">
+                    <div>
+                      <FileText :size="36" class="mx-auto text-slate-400" />
+                      <p class="mt-2 text-xs font-bold text-slate-500">Nội dung đang được cập nhật</p>
+                    </div>
+                  </div>
+                </template>
+
+                <div v-if="!lessonBlocks.length" class="grid min-h-60 place-items-center text-center">
+                  <div>
+                    <FileText :size="36" class="mx-auto text-slate-400" />
+                    <p class="mt-2 text-xs font-bold text-slate-500">Nội dung đang được cập nhật</p>
+                  </div>
                 </div>
-                <div v-else class="lesson-flow-item grid min-h-48 place-items-center text-center"><div><FileText :size="42" class="mx-auto text-slate-400" /><p class="mt-3 font-bold">Nội dung đang được cập nhật</p></div></div>
-              </template>
-              <div v-if="!lessonBlocks.length" class="grid min-h-72 place-items-center text-center"><div><FileText :size="42" class="mx-auto text-slate-400" /><p class="mt-3 font-bold">Nội dung đang được cập nhật</p></div></div>
-            </section>
+              </section>
 
-            <div class="mt-5 flex flex-wrap items-center justify-between gap-3"><BaseButton variant="secondary" :disabled="!previousLesson" @click="navigateLesson(previousLesson)"><ChevronLeft :size="17" /> Bài trước</BaseButton><div class="flex flex-wrap gap-2"><RouterLink v-slot="{ navigate }" v-if="selected.quiz" :to="{ path: `/quiz/${selected.quiz.id}`, query: { courseId } }" custom><BaseButton variant="outline" @click="navigate">Làm quiz</BaseButton></RouterLink><BaseButton @click="complete"><Check v-if="!selected.progress?.isCompleted" :size="17" />{{ selected.progress?.isCompleted ? 'Đánh dấu chưa xong' : 'Hoàn thành bài học' }}</BaseButton></div><BaseButton variant="secondary" :disabled="!nextLesson" @click="navigateLesson(nextLesson)">Bài tiếp <ChevronRight :size="17" /></BaseButton></div>
+              <!-- Lesson Completion & Navigation Toolbar -->
+              <div class="border-t border-slate-200 dark:border-slate-800 pt-6 flex flex-wrap items-center justify-between gap-3">
+                <button
+                  type="button"
+                  :disabled="!previousLesson"
+                  class="inline-flex items-center gap-1.5 border border-slate-300 bg-white px-4 py-2.5 text-xs font-bold text-slate-800 transition hover:bg-slate-100 disabled:opacity-40 disabled:pointer-events-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
+                  @click="navigateLesson(previousLesson)"
+                >
+                  <ChevronLeft :size="16" />
+                  <span>Bài trước</span>
+                </button>
 
-            <section class="discussion-panel surface-card mt-7 overflow-hidden">
-              <header class="border-b border-slate-100 p-4 dark:border-slate-800"><div class="flex items-center justify-between gap-4"><div><h2 class="text-lg font-black">Thảo luận bài học</h2><p class="mt-0.5 text-xs text-slate-500">Đặt câu hỏi và trao đổi cùng cộng đồng.</p></div><span class="bg-slate-100 px-2.5 py-1 text-[11px] font-bold text-slate-600 dark:bg-slate-800 dark:text-slate-300">{{ comments.length }} chủ đề</span></div></header>
-              <div class="p-4"><div v-if="replyTo" class="mb-3 flex items-center justify-between bg-purple-50 px-3 py-2 text-xs text-purple-700 dark:bg-purple-950/30 dark:text-purple-300"><span>Đang trả lời một bình luận</span><button class="font-bold" @click="replyTo = null">Hủy</button></div><textarea v-model="text" rows="2" class="comment-box" placeholder="Viết câu hỏi hoặc chia sẻ của bạn..." /><div class="mt-2 flex justify-end"><BaseButton size="sm" :disabled="!text.trim()" @click="send">Gửi bình luận</BaseButton></div></div>
-              <div class="divide-y divide-slate-100 border-t border-slate-100 px-5 dark:divide-slate-800 dark:border-slate-800 sm:px-6">
-                <article v-for="item in comments" :key="item.id" class="py-3"><div class="flex gap-2.5"><span class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-gradient-to-br from-violet-500 to-purple-700 text-xs font-bold text-white">{{ item.user.fullName.charAt(0) }}</span><div class="min-w-0 flex-1"><div class="flex flex-wrap items-center gap-2"><b class="text-sm">{{ item.user.fullName }}</b><span class="text-[11px] text-slate-400">{{ new Date(item.createdAt).toLocaleDateString('vi-VN') }}</span></div><p class="mt-1 text-sm leading-6 text-slate-600 dark:text-slate-300">{{ item.isDeleted ? 'Bình luận đã được xóa' : item.content }}</p><div v-if="!item.isDeleted" class="mt-1.5"><button class="text-xs font-bold text-purple-600" @click="replyTo = item.id">Trả lời</button><button v-if="item.user.id === auth.user?.id" class="ml-4 text-xs font-bold text-red-600" @click="remove(item.id)">Xóa</button></div><div v-for="reply in item.replies" :key="reply.id" class="mt-3 flex gap-2 bg-slate-50 p-3 dark:bg-slate-800/70"><span class="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-slate-200 text-[11px] font-bold dark:bg-slate-700">{{ reply.user.fullName.charAt(0) }}</span><div><b class="text-xs">{{ reply.user.fullName }}</b><p class="mt-1 text-xs leading-5 text-slate-600 dark:text-slate-300">{{ reply.isDeleted ? 'Bình luận đã được xóa' : reply.content }}</p></div></div></div></div></article>
-                <p v-if="!comments.length" class="py-10 text-center text-sm text-slate-500">Chưa có thảo luận. Hãy đặt câu hỏi đầu tiên.</p>
+                <div class="flex flex-wrap items-center gap-2">
+                  <RouterLink
+                    v-if="selected.quiz"
+                    :to="{ path: `/quiz/${selected.quiz.id}`, query: { courseId } }"
+                    class="inline-flex items-center gap-1.5 border border-violet-600 bg-white px-4 py-2.5 text-xs font-bold text-violet-700 transition hover:bg-violet-50 dark:bg-slate-800 dark:text-violet-300"
+                  >
+                    <span>Làm bài Quiz</span>
+                  </RouterLink>
+
+                  <button
+                    type="button"
+                    class="inline-flex items-center gap-1.5 px-5 py-2.5 text-xs font-bold text-white shadow-sm transition active:translate-y-px"
+                    :class="[
+                      selected.progress?.isCompleted
+                        ? 'bg-slate-700 hover:bg-slate-800'
+                        : 'bg-gradient-to-r from-violet-700 to-purple-700 hover:from-violet-800 hover:to-purple-800',
+                    ]"
+                    @click="complete"
+                  >
+                    <Check v-if="!selected.progress?.isCompleted" :size="15" />
+                    <span>{{ selected.progress?.isCompleted ? 'Đánh dấu chưa xong' : 'Hoàn thành bài học' }}</span>
+                  </button>
+                </div>
+
+                <button
+                  type="button"
+                  :disabled="!nextLesson"
+                  class="inline-flex items-center gap-1.5 border border-slate-300 bg-white px-4 py-2.5 text-xs font-bold text-slate-800 transition hover:bg-slate-100 disabled:opacity-40 disabled:pointer-events-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
+                  @click="navigateLesson(nextLesson)"
+                >
+                  <span>Bài tiếp theo</span>
+                  <ChevronRight :size="16" />
+                </button>
+              </div>
+            </article>
+
+            <!-- Discussion & Q&A Panel (Sharp Flat Geometric) -->
+            <section class="border border-slate-200 bg-white shadow-xs dark:border-slate-800 dark:bg-slate-900">
+              <header class="border-b border-slate-100 p-4 dark:border-slate-800 flex items-center justify-between">
+                <div>
+                  <h2 class="text-sm font-black text-slate-950 dark:text-white">Thảo luận bài học</h2>
+                  <p class="text-[11px] text-slate-500 mt-0.5">Đặt câu hỏi và trao đổi cùng giảng viên &amp; cộng đồng</p>
+                </div>
+                <span class="border border-slate-200 bg-slate-50 px-2.5 py-0.5 text-[10px] font-bold text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300">
+                  {{ comments.length }} bình luận
+                </span>
+              </header>
+
+              <!-- New Comment Input -->
+              <div class="p-4 bg-slate-50/60 dark:bg-slate-900/60 border-b border-slate-100 dark:border-slate-800">
+                <div v-if="replyTo" class="mb-2 flex items-center justify-between border border-purple-200 bg-purple-50 px-3 py-1.5 text-xs text-purple-800 dark:border-purple-800 dark:bg-purple-950/40 dark:text-purple-300">
+                  <span>Đang trả lời một bình luận</span>
+                  <button class="font-bold hover:underline" @click="replyTo = null">Hủy</button>
+                </div>
+                <textarea
+                  v-model="text"
+                  rows="2"
+                  class="comment-box border border-slate-300 bg-white p-3 text-xs text-slate-900 placeholder:text-slate-400 focus:border-purple-600 focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+                  placeholder="Viết câu hỏi hoặc chia sẻ cảm nhận của bạn về bài học..."
+                />
+                <div class="mt-2.5 flex justify-end">
+                  <button
+                    type="button"
+                    class="bg-violet-700 px-4 py-2 text-xs font-bold text-white shadow-xs hover:bg-violet-800 disabled:opacity-50 transition"
+                    :disabled="!text.trim()"
+                    @click="send"
+                  >
+                    Gửi thảo luận
+                  </button>
+                </div>
+              </div>
+
+              <!-- Comments List -->
+              <div class="divide-y divide-slate-100 dark:divide-slate-800 p-4 space-y-3">
+                <article v-for="item in comments" :key="item.id" class="pt-3 first:pt-0 space-y-2">
+                  <div class="flex items-start gap-3">
+                    <span class="grid h-7 w-7 shrink-0 place-items-center bg-violet-700 text-xs font-black text-white">
+                      {{ item.user.fullName.charAt(0) }}
+                    </span>
+                    <div class="min-w-0 flex-1">
+                      <div class="flex items-center gap-2">
+                        <b class="text-xs font-bold text-slate-900 dark:text-white">{{ item.user.fullName }}</b>
+                        <span class="text-[10px] text-slate-400">{{ new Date(item.createdAt).toLocaleDateString('vi-VN') }}</span>
+                      </div>
+                      <p class="mt-1 text-xs text-slate-700 dark:text-slate-300 leading-relaxed">
+                        {{ item.isDeleted ? 'Bình luận đã được xóa' : item.content }}
+                      </p>
+                      <div v-if="!item.isDeleted" class="mt-1.5 flex items-center gap-3 text-[11px]">
+                        <button class="font-bold text-purple-700 hover:underline dark:text-purple-400" @click="replyTo = item.id">
+                          Trả lời
+                        </button>
+                        <button
+                          v-if="item.user.id === auth.user?.id"
+                          class="font-bold text-red-600 hover:underline"
+                          @click="remove(item.id)"
+                        >
+                          Xóa
+                        </button>
+                      </div>
+
+                      <!-- Replies -->
+                      <div v-if="item.replies?.length" class="mt-3 space-y-2 border-l-2 border-purple-200 pl-3 dark:border-purple-900/60">
+                        <div v-for="reply in item.replies" :key="reply.id" class="bg-slate-50 p-2.5 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+                          <div class="flex items-center gap-2">
+                            <span class="grid h-5 w-5 shrink-0 place-items-center bg-slate-300 text-[10px] font-bold text-slate-800 dark:bg-slate-700 dark:text-slate-200">
+                              {{ reply.user.fullName.charAt(0) }}
+                            </span>
+                            <b class="text-[11px] text-slate-900 dark:text-white">{{ reply.user.fullName }}</b>
+                          </div>
+                          <p class="mt-1 text-xs text-slate-600 dark:text-slate-300">
+                            {{ reply.isDeleted ? 'Bình luận đã được xóa' : reply.content }}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </article>
+                <p v-if="!comments.length" class="py-8 text-center text-xs text-slate-500 font-medium">
+                  Chưa có thảo luận nào. Hãy là người đầu tiên đặt câu hỏi!
+                </p>
               </div>
             </section>
           </template>
-          <section v-else-if="content" class="surface-card grid min-h-72 place-items-center p-8 text-center text-slate-500">Khóa học chưa có bài học được xuất bản.</section>
+
+          <section v-else-if="content" class="border border-slate-200 bg-white p-12 text-center text-xs text-slate-500 dark:border-slate-800 dark:bg-slate-900">
+            Khóa học chưa có bài học được xuất bản.
+          </section>
         </div>
       </main>
     </div>
@@ -270,37 +599,267 @@ onMounted(load)
 </template>
 
 <style scoped>
-.learning-shell{display:flex;min-height:calc(100vh - 4.5rem)}
-.learning-sidebar{position:fixed;inset:0 auto 0 0;z-index:40;display:flex;width:min(18rem,88vw);flex-direction:column;border-right:1px solid var(--border);background:var(--surface);padding-top:4.5rem;transition:transform .25s ease,width .25s ease}
-.learning-sidebar-content{display:flex;min-height:0;flex:1;flex-direction:column;overflow:hidden;transition:opacity .2s ease}
-.learning-course-summary{border-bottom:1px solid var(--border);padding:1.25rem}
-.learning-progress-track{height:.375rem;overflow:hidden;background:var(--surface-muted);margin-top:.5rem}
-.learning-progress-value{height:100%;background:linear-gradient(90deg,#7c3aed,#c026d3);transition:width .3s ease}
-.learning-content{width:100%;padding:1.5rem .5rem}
-.learning-topbar{position:sticky;top:4.5rem;z-index:20;display:flex;min-height:3.75rem;align-items:center;justify-content:space-between;gap:1rem;border-bottom:1px solid var(--border);background:color-mix(in srgb,var(--surface) 90%,transparent);padding:.75rem 1rem;backdrop-filter:blur(12px)}
-.back-btn{align-items:center;gap:.5rem;padding:.5rem .85rem;border-radius:.625rem;font-size:.875rem;font-weight:700;color:var(--text-muted);border:1px solid var(--border);background:var(--surface);transition:all .2s ease;text-decoration:none;line-height:1}
-.back-btn:hover{background:var(--surface-muted);color:var(--text);border-color:var(--text-muted)}
-.sidebar-back-btn{display:inline-flex;align-items:center;gap:.4rem;font-size:.75rem;font-weight:800;color:var(--brand);transition:color .2s ease;text-decoration:none}
-.sidebar-back-btn:hover{color:#6d28d9}
-.sidebar-mobile-close{display:grid;height:2rem;width:2rem;flex-shrink:0;place-items:center;border-radius:.5rem;border:1px solid var(--border);background:var(--surface);color:var(--text-muted);transition:all .2s ease}
-.sidebar-mobile-close:hover{background:var(--surface-muted);color:var(--text)}
-.sidebar-collapse-btn{display:none}
-.lesson-link{display:flex;width:100%;align-items:flex-start;gap:.7rem;border-left:3px solid transparent;padding:.7rem .65rem;text-align:left;color:var(--text-muted);transition:.18s}.lesson-link:hover{background:var(--surface-muted);color:var(--text)}.lesson-link--active{border-left-color:var(--brand);background:var(--brand-soft)!important;color:var(--brand)!important}.lesson-state{display:grid;width:1.65rem;height:1.65rem;flex-shrink:0;place-items:center;border:1px solid var(--border);font-size:.65rem;font-weight:800}.lesson-state--done{border-color:#10b981;background:#10b981;color:white}
-.section-quiz-link{display:flex;align-items:center;gap:.7rem;margin-top:.45rem;border:1px solid #fcd34d;background:#fffbeb;padding:.7rem;color:#92400e}.section-quiz-link:hover{background:#fef3c7}.section-quiz-link small{display:block;margin-top:.15rem;font-size:.65rem;opacity:.75}.section-quiz-state{border-color:#f59e0b;background:#f59e0b;color:white}.section-quiz-link--locked{cursor:not-allowed;border-color:var(--border);background:var(--surface-muted);color:var(--text-muted);opacity:.78}
-.lesson-content-stream{overflow:hidden;border:1px solid var(--border);border-radius:1rem;background:var(--surface);padding:2rem 2.25rem;min-height:24rem;display:flex;flex-direction:column;box-shadow:0 1px 3px 0 rgba(0,0,0,0.04)}
-.lesson-content-stream>.lesson-flow-item+.lesson-flow-item{margin-top:1.25rem}
-.lesson-video-viewer{display:block;max-height:70vh;min-height:20rem;width:100%;border-radius:.75rem;background:#000;object-fit:contain}
-.lesson-image-viewer{display:flex;align-items:flex-start;justify-content:center;border-radius:.75rem}
-.lesson-image-viewer img{display:block;max-height:70vh;max-width:100%;border-radius:.75rem;object-fit:contain}
-.lesson-document-viewer{height:min(68vh,44rem);min-height:24rem;border-radius:.75rem}
-.lesson-prose{margin:0;max-width:none;color:var(--text);flex:1;font-size:1.05rem;line-height:1.85}.lesson-prose :deep(h1){margin:1.6rem 0 .8rem;font-size:2rem;line-height:1.2;font-weight:900}.lesson-prose :deep(h2){margin:1.4rem 0 .7rem;font-size:1.65rem;line-height:1.25;font-weight:850}.lesson-prose :deep(h3){margin:1.2rem 0 .6rem;font-size:1.35rem;line-height:1.3;font-weight:800}.lesson-prose :deep(h4){margin:1rem 0 .5rem;font-size:1.12rem;line-height:1.35;font-weight:800}.lesson-prose :deep(h5){margin:.9rem 0 .45rem;font-size:.95rem;line-height:1.4;font-weight:800;text-transform:uppercase;letter-spacing:.04em}.lesson-prose :deep(p){margin:.55rem 0;font-size:1rem;line-height:1.85}.lesson-prose :deep(ul){margin:.65rem 0;padding-left:1.5rem;list-style:disc}.lesson-prose :deep(li){margin:.35rem 0;line-height:1.75}.lesson-prose :deep(strong){font-weight:850}.lesson-prose :deep(em){font-style:italic}.discussion-panel{width:100%;border-radius:1rem}.comment-box{width:100%;resize:vertical;border:1px solid var(--border);border-radius:.5rem;background:var(--surface-muted);padding:.75rem;color:var(--text);outline:none}.comment-box:focus{border-color:#a855f7;box-shadow:0 0 0 3px rgba(168,85,247,.1)}
-@media(min-width:1024px){
-  .sidebar-mobile-close{display:none !important}
-  .sidebar-collapse-btn{display:grid;height:2rem;width:2rem;flex-shrink:0;place-items:center;border-radius:.5rem;border:1px solid var(--border);background:var(--surface);color:var(--text-muted);transition:all .2s ease}
-  .sidebar-collapse-btn:hover{background:var(--brand-soft);color:var(--brand);border-color:var(--brand)}
-  .learning-sidebar{position:sticky;top:4.5rem;z-index:10;height:calc(100vh - 4.5rem);width:18rem;min-width:18rem;padding-top:0;transition:width .25s ease,min-width .25s ease}
-  .sidebar-collapsed .learning-sidebar{width:0 !important;min-width:0 !important;overflow:hidden;border-right:none;visibility:hidden}
-  .sidebar-collapsed .learning-sidebar-content{opacity:0;pointer-events:none}
-  .learning-topbar{padding-inline:2rem}
+/* Strictly No Rounded Corners - Flat Geometric Layout */
+.learning-shell {
+  display: flex;
+  min-height: calc(100vh - 4.5rem);
+}
+
+.learning-sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: 40;
+  display: flex;
+  width: min(18rem, 88vw);
+  flex-direction: column;
+  border-right: 1px solid var(--border);
+  background: var(--surface);
+  padding-top: 4.5rem;
+  transition: transform 0.25s ease, width 0.25s ease;
+}
+
+.learning-sidebar-content {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.learning-course-summary {
+  border-bottom: 1px solid var(--border);
+}
+
+.learning-progress-track {
+  overflow: hidden;
+  background: var(--surface-muted);
+}
+
+.learning-progress-value {
+  background: linear-gradient(90deg, #7c3aed, #c026d3);
+  transition: width 0.3s ease;
+}
+
+.learning-topbar {
+  position: sticky;
+  top: 4.5rem;
+  z-index: 20;
+  display: flex;
+  min-height: 3.25rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.sidebar-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--brand);
+  text-decoration: none;
+}
+.sidebar-back-btn:hover {
+  color: #6d28d9;
+}
+
+.sidebar-mobile-close {
+  display: grid;
+  height: 1.75rem;
+  width: 1.75rem;
+  flex-shrink: 0;
+  place-items: center;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-muted);
+}
+
+.sidebar-collapse-btn {
+  display: none;
+}
+
+.lesson-link {
+  display: flex;
+  width: 100%;
+  align-items: flex-start;
+  gap: 0.6rem;
+  border-left: 2px solid transparent;
+  padding: 0.55rem 0.5rem;
+  text-align: left;
+  color: var(--text-muted);
+  transition: 0.15s;
+}
+.lesson-link:hover {
+  background: var(--surface-muted);
+  color: var(--text);
+}
+.lesson-link--active {
+  border-left-color: var(--brand);
+  background: var(--brand-soft) !important;
+  color: var(--brand) !important;
+}
+
+.lesson-state {
+  display: grid;
+  width: 1.5rem;
+  height: 1.5rem;
+  flex-shrink: 0;
+  place-items: center;
+  border: 1px solid var(--border);
+  font-size: 0.65rem;
+  font-weight: 800;
+}
+.lesson-state--done {
+  border-color: #10b981;
+  background: #10b981;
+  color: white;
+}
+
+.section-quiz-link {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 0.35rem;
+  border: 1px solid #fcd34d;
+  background: #fffbeb;
+  padding: 0.55rem 0.6rem;
+  color: #92400e;
+}
+.section-quiz-link:hover {
+  background: #fef3c7;
+}
+.section-quiz-link small {
+  display: block;
+  font-size: 0.65rem;
+  opacity: 0.75;
+}
+.section-quiz-state {
+  border-color: #f59e0b;
+  background: #f59e0b;
+  color: white;
+}
+.section-quiz-link--locked {
+  cursor: not-allowed;
+  border-color: var(--border);
+  background: var(--surface-muted);
+  color: var(--text-muted);
+  opacity: 0.78;
+}
+
+.lesson-video-viewer {
+  display: block;
+  max-height: 70vh;
+  min-height: 20rem;
+  width: 100%;
+  background: #000;
+  object-fit: contain;
+}
+
+.lesson-image-viewer {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+.lesson-image-viewer img {
+  display: block;
+  max-height: 70vh;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+.lesson-document-viewer {
+  height: min(68vh, 44rem);
+  min-height: 24rem;
+}
+
+.lesson-prose {
+  margin: 0;
+  max-width: none;
+  color: var(--text);
+  font-size: 1rem;
+  line-height: 1.85;
+}
+.lesson-prose :deep(h1) {
+  margin: 1.4rem 0 0.7rem;
+  font-size: 1.75rem;
+  line-height: 1.25;
+  font-weight: 900;
+}
+.lesson-prose :deep(h2) {
+  margin: 1.25rem 0 0.6rem;
+  font-size: 1.45rem;
+  line-height: 1.3;
+  font-weight: 850;
+}
+.lesson-prose :deep(h3) {
+  margin: 1.1rem 0 0.5rem;
+  font-size: 1.25rem;
+  line-height: 1.35;
+  font-weight: 800;
+}
+.lesson-prose :deep(p) {
+  margin: 0.6rem 0;
+  font-size: 0.95rem;
+  line-height: 1.85;
+}
+.lesson-prose :deep(ul) {
+  margin: 0.6rem 0;
+  padding-left: 1.5rem;
+  list-style: disc;
+}
+.lesson-prose :deep(li) {
+  margin: 0.35rem 0;
+  line-height: 1.75;
+}
+.lesson-prose :deep(strong) {
+  font-weight: 800;
+}
+
+.comment-box {
+  width: 100%;
+  resize: vertical;
+}
+
+@media (min-width: 1024px) {
+  .sidebar-mobile-close {
+    display: none !important;
+  }
+  .sidebar-collapse-btn {
+    display: grid;
+    height: 1.75rem;
+    width: 1.75rem;
+    flex-shrink: 0;
+    place-items: center;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-muted);
+    transition: all 0.2s ease;
+  }
+  .sidebar-collapse-btn:hover {
+    background: var(--brand-soft);
+    color: var(--brand);
+    border-color: var(--brand);
+  }
+  .learning-sidebar {
+    position: sticky;
+    top: 4.5rem;
+    z-index: 10;
+    height: calc(100vh - 4.5rem);
+    width: 18rem;
+    min-width: 18rem;
+    padding-top: 0;
+  }
+  .sidebar-collapsed .learning-sidebar {
+    width: 0 !important;
+    min-width: 0 !important;
+    overflow: hidden;
+    border-right: none;
+    visibility: hidden;
+  }
+  .sidebar-collapsed .learning-sidebar-content {
+    opacity: 0;
+    pointer-events: none;
+  }
 }
 </style>

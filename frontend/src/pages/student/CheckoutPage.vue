@@ -113,12 +113,6 @@ onBeforeUnmount(() => {
 <template>
   <DefaultLayout>
     <main class="checkout-page">
-      <nav class="checkout-progress" aria-label="Tiến trình thanh toán">
-        <div v-for="(label, index) in ['Xác nhận đơn', 'Thanh toán', 'Hoàn tất']" :key="label" :class="['checkout-step', { 'checkout-step--active': checkoutStep >= index + 1 }]">
-          <span>{{ index + 1 }}</span><b>{{ label }}</b>
-        </div>
-      </nav>
-
       <LoadingSpinner v-if="api.loading.value && !order" class="py-24" />
       <p v-else-if="error && !order" class="surface-card p-5 text-red-700">{{ error }}</p>
 
@@ -262,12 +256,6 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .checkout-page { width: 100%; padding: 0 0 3rem; }
-.checkout-progress { display: grid; grid-template-columns: repeat(3,1fr); border-bottom: 1px solid var(--border); background: var(--surface); }
-.checkout-step { display:flex; min-height:4.25rem; align-items:center; justify-content:center; gap:.65rem; border-right:1px solid var(--border); color:var(--text-muted); font-size:.75rem; }
-.checkout-step:last-child { border-right:0; }
-.checkout-step span { display:grid; width:1.6rem; height:1.6rem; place-items:center; border:1px solid var(--border); font-weight:900; }
-.checkout-step--active { color:var(--brand); }
-.checkout-step--active span { border-color:var(--brand); background:var(--brand); color:white; }
 .checkout-layout { display:grid; width:100%; gap:0; }
 .checkout-main { min-width:0; }
 .checkout-heading { border-bottom:1px solid var(--border); padding:2rem clamp(1rem,4vw,3.5rem); }
@@ -285,10 +273,6 @@ onBeforeUnmount(() => {
 @media (min-width:1024px) {
   .checkout-layout { grid-template-columns:minmax(0,1fr) 25rem; }
   .checkout-summary { position:sticky; top:4.5rem; height:fit-content; border-left:1px solid var(--border); }
-}
-@media (max-width:639px) {
-  .checkout-step { min-height:3.5rem; gap:.35rem; font-size:.65rem; }
-  .checkout-step span { width:1.35rem; height:1.35rem; }
 }
 :global(.dark) .checkout-notice { border-color:#0c4a6e; background:#082f49; color:#bae6fd; }
 </style>
